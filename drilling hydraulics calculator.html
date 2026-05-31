@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drilling Hydraulics Calculator - Petrosmart Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --red:#CC0000;
+  --bg:#040408;--surf:#0A0A12;--card:#0E0E18;
+  --border:#181828;--text:#DDDDF0;--muted:#404060;
+  --ok:#00BB55;--warn:#FF8800;--err:#FF3333;--info:#2266EE;
+  --drill:#448844;--drill-dim:rgba(68,136,68,0.12);
+  --mud:#886644;--mud-dim:rgba(136,102,68,0.10);
+  --mono:'JetBrains Mono',monospace;--sans:'Exo 2',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 50% 40% at 25% 25%,rgba(68,136,68,0.04),transparent),
+    radial-gradient(ellipse 40% 50% at 75% 65%,rgba(136,102,68,0.03),transparent);
+  pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:16px;}
+
+.hdr{background:linear-gradient(135deg,#080810,#060C06,#080810);
+  border:1px solid rgba(68,136,68,0.25);border-radius:18px;
+  padding:18px 22px;margin-bottom:18px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 0 60px rgba(68,136,68,0.06);position:relative;overflow:hidden;}
+.hdr::before{content:'⛏️';position:absolute;right:16px;top:50%;
+  transform:translateY(-50%);font-size:80px;opacity:0.05;pointer-events:none;}
+.hdr-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  background:linear-gradient(135deg,var(--drill),#224422);
+  box-shadow:0 4px 20px rgba(68,136,68,0.35);}
+.hdr h1{font-size:19px;font-weight:800;color:#fff;}
+.hdr p{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+.hdr-tags{margin-left:auto;display:flex;gap:7px;flex-shrink:0;}
+.htag{padding:5px 11px;border-radius:8px;border:1px solid;font-size:10px;font-weight:600;font-family:var(--mono);}
+.ht-drill{background:var(--drill-dim);border-color:rgba(68,136,68,0.3);color:#88CC88;}
+.ht-mud{background:var(--mud-dim);border-color:rgba(136,102,68,0.3);color:#BBAA88;}
+.ht-ecd{background:rgba(204,0,0,0.10);border-color:rgba(204,0,0,0.3);color:#FF6666;}
+
+.tabs{display:flex;gap:3px;background:var(--surf);border:1px solid var(--border);
+  border-radius:12px;padding:4px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{flex:1;min-width:70px;padding:9px 4px;background:transparent;border:none;
+  border-radius:9px;color:var(--muted);font-size:10px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);text-transform:uppercase;letter-spacing:0.07em;transition:all 0.2s;}
+.tab:hover{color:#bbb;}
+.tab.on{background:var(--drill);color:#fff;box-shadow:0 0 16px rgba(68,136,68,0.4);}
+.panel{display:none;}.panel.on{display:block;}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+.card.drill-accent{border-color:rgba(68,136,68,0.2);}
+.card.mud-accent{border-color:rgba(136,102,68,0.2);}
+.stitle{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  border-bottom:1px solid #10101C;padding-bottom:7px;margin-bottom:14px;font-family:var(--mono);}
+.stitle.drill{color:var(--drill);}
+.stitle.mud{color:var(--mud);}
+.stitle.red{color:var(--red);}
+.stitle.neu{color:var(--muted);}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+.field{margin-bottom:12px;}
+.lbl{font-size:10px;color:var(--muted);margin-bottom:5px;display:block;
+  text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.ir{display:flex;gap:6px;align-items:center;}
+input[type=number],select{width:100%;background:#07070F;border:1px solid #14142A;
+  border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;
+  font-family:var(--mono);transition:border-color 0.2s;}
+input:focus,select:focus{border-color:var(--drill);}
+select option{background:#0A0A14;}
+.unit{font-size:10px;color:#222;min-width:52px;text-align:right;white-space:nowrap;font-family:var(--mono);}
+
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.rgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.rc{background:#07070E;border:1px solid var(--border);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden;}
+.rc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.rc.hl::after{background:var(--drill);}
+.rc.ok::after{background:var(--ok);}
+.rc.wn::after{background:var(--warn);}
+.rc.er::after{background:var(--err);}
+.rc.mud::after{background:var(--mud);}
+.rc.red::after{background:var(--red);}
+.rc.hl{border-color:rgba(68,136,68,0.3);}
+.rc.ok{border-color:rgba(0,187,85,0.25);}
+.rc.wn{border-color:rgba(255,136,0,0.25);}
+.rc.er{border-color:rgba(255,51,51,0.25);}
+.rc.mud{border-color:rgba(136,102,68,0.25);}
+.rc.red{border-color:rgba(204,0,0,0.25);}
+.rl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;font-family:var(--mono);}
+.rv{font-size:19px;font-weight:700;color:#fff;font-family:var(--mono);}
+.rv span{font-size:10px;color:#222;font-weight:400;}
+.rsub{font-size:10px;color:#222;margin-top:3px;font-family:var(--mono);}
+
+.fbox{background:#05050C;border-left:3px solid var(--drill);border-radius:0 10px 10px 0;
+  padding:12px 16px;margin-top:14px;font-size:11px;color:#444;line-height:2.0;font-family:var(--mono);}
+.fbox strong{color:#999;}
+.fbox .hi{color:var(--drill);font-weight:600;}
+.fbox .him{color:var(--mud);font-weight:600;}
+.fbox .hir{color:var(--red);font-weight:600;}
+.fbox .hiok{color:var(--ok);font-weight:600;}
+
+.analysis{background:#06060E;border:1px solid #0E0E1E;border-radius:12px;padding:16px;margin-top:14px;}
+.atitle{font-size:10px;font-weight:700;color:var(--drill);margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:0.09em;font-family:var(--mono);}
+.atitle.mud{color:var(--mud);}
+.atitle.red{color:var(--red);}
+.arow{display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #0C0C1A;}
+.arow:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.d-ok{background:var(--ok);box-shadow:0 0 8px var(--ok);}
+.d-wn{background:var(--warn);box-shadow:0 0 8px var(--warn);}
+.d-er{background:var(--err);box-shadow:0 0 8px var(--err);}
+.d-drill{background:var(--drill);box-shadow:0 0 8px var(--drill);}
+.d-mud{background:var(--mud);box-shadow:0 0 8px var(--mud);}
+.atxt strong{color:#eee;font-size:12px;display:block;margin-bottom:3px;}
+.atxt p{font-size:11px;color:#444;line-height:1.7;margin:0;}
+.asugg{font-size:11px;color:#FFAA00;margin-top:4px;line-height:1.6;}
+
+.chart-wrap{background:#05050C;border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px;}
+.chart-title{font-size:11px;color:var(--drill);font-weight:600;text-transform:uppercase;
+  letter-spacing:0.05em;margin-bottom:10px;font-family:var(--mono);}
+.chart-title.red{color:var(--red);}
+
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.tbl th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.tbl td{padding:7px 10px;color:#888;border-bottom:1px solid #0C0C18;font-family:var(--mono);}
+.tbl tr:hover td{background:#0A0A14;}
+.tw{color:#fff!important;font-weight:600;}
+.ibox{background:var(--surf);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);line-height:1.7;font-family:var(--mono);}
+.ibox strong{color:#bbb;}
+.sep{height:1px;background:var(--border);margin:14px 0;}
+
+/* MUD WINDOW VISUAL */
+.mw-bar{background:#07070E;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-top:14px;}
+.mw-title{font-size:10px;color:var(--drill);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;}
+.mw-scale{position:relative;height:40px;background:linear-gradient(90deg,#FF3333,#FF8800,#00BB55,#FF8800,#FF3333);
+  border-radius:8px;margin:8px 0;}
+.mw-marker{position:absolute;top:-6px;width:4px;height:52px;border-radius:2px;transform:translateX(-50%);}
+.mw-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);font-family:var(--mono);}
+
+.foot{background:var(--surf);border-top:1px solid var(--border);margin-top:18px;
+  padding:10px 20px;font-size:10px;color:#111;text-align:center;font-family:var(--mono);border-radius:12px;}
+.foot a{color:var(--drill);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+  <div class="hdr-icon">⛏️</div>
+  <div>
+    <h1>Drilling Hydraulics Calculator</h1>
+    <p>Pressure losses - ECD - Bit hydraulics - Pump optimization - API RP 13D</p>
+  </div>
+  <div class="hdr-tags">
+    <div class="htag ht-drill">DRILLSTRING</div>
+    <div class="htag ht-mud">MUD</div>
+    <div class="htag ht-ecd">ECD</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" id="t1" onclick="sw(1)">🔩 Drillstring ΔP</button>
+  <button class="tab" id="t2" onclick="sw(2)">🌀 Annular ΔP</button>
+  <button class="tab" id="t3" onclick="sw(3)">⚡ ECD and Pressure</button>
+  <button class="tab" id="t4" onclick="sw(4)">💥 Bit Hydraulics</button>
+  <button class="tab" id="t5" onclick="sw(5)">⚙️ Pump Optimization</button>
+  <button class="tab" id="t6" onclick="sw(6)">📚 Reference</button>
+</div>
+
+<!-- PANEL 1: DRILLSTRING ΔP -->
+<div class="panel on" id="p1">
+  <div class="card drill-accent">
+    <div class="stitle drill">/// mud properties</div>
+    <div class="row4">
+      <div class="field">
+        <label class="lbl">Mud density ρ</label>
+        <div class="ir"><input type="number" id="rho_mud" value="1.3" step="0.01" oninput="calcDS()"><span class="unit">g/cm3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Plastic viscosity PV</label>
+        <div class="ir"><input type="number" id="PV" value="18" step="1" oninput="calcDS()"><span class="unit">cP</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Yield point YP</label>
+        <div class="ir"><input type="number" id="YP" value="12" step="1" oninput="calcDS()"><span class="unit">lb/100ft2</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pump rate Q</label>
+        <div class="ir"><input type="number" id="Q_pump" value="30" step="0.5" oninput="calcDS()"><span class="unit">bbl/min</span></div>
+      </div>
+    </div>
+
+    <div class="stitle drill">/// drillstring geometry</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Drill pipe OD</label>
+        <div class="ir"><input type="number" id="dp_OD" value="5" step="0.125" oninput="calcDS()"><span class="unit">inch</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Drill pipe ID</label>
+        <div class="ir"><input type="number" id="dp_ID" value="4.276" step="0.01" oninput="calcDS()"><span class="unit">inch</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Drill pipe length</label>
+        <div class="ir"><input type="number" id="dp_L" value="3000" step="50" oninput="calcDS()"><span class="unit">m</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">HWDP OD</label>
+        <div class="ir"><input type="number" id="hw_OD" value="5" step="0.125" oninput="calcDS()"><span class="unit">inch</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">HWDP ID</label>
+        <div class="ir"><input type="number" id="hw_ID" value="3" step="0.1" oninput="calcDS()"><span class="unit">inch</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">HWDP length</label>
+        <div class="ir"><input type="number" id="hw_L" value="180" step="10" oninput="calcDS()"><span class="unit">m</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Drill collar OD</label>
+        <div class="ir"><input type="number" id="dc_OD" value="6.5" step="0.25" oninput="calcDS()"><span class="unit">inch</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Drill collar ID</label>
+        <div class="ir"><input type="number" id="dc_ID" value="2.875" step="0.125" oninput="calcDS()"><span class="unit">inch</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Drill collar length</label>
+        <div class="ir"><input type="number" id="dc_L" value="180" step="10" oninput="calcDS()"><span class="unit">m</span></div>
+      </div>
+    </div>
+
+    <div class="stitle drill">/// surface equipment</div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Surface equipment class</label>
+        <select id="surf_class" onchange="calcDS()">
+          <option value="1">Class 1 (ΔP = 40 psi)</option>
+          <option value="2">Class 2 (ΔP = 100 psi)</option>
+          <option value="3" selected>Class 3 (ΔP = 210 psi)</option>
+          <option value="4">Class 4 (ΔP = 510 psi)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Bit pressure drop (est.)</label>
+        <div class="ir"><input type="number" id="bit_dp" value="1200" step="50" oninput="calcDS()"><span class="unit">psi</span></div>
+      </div>
+    </div>
+
+    <div id="r1"></div>
+  </div>
+</div>
+
+<!-- PANEL 2: ANNULAR ΔP -->
+<div class="panel" id="p2">
+  <div class="card drill-accent">
+    <div class="stitle drill">/// annular pressure drop - Bingham Plastic model</div>
+    <div class="ibox">
+      <strong>Annular flow:</strong> Mud flows up between the drillstring OD and the borehole/casing ID. Pressure losses in the annulus are critical for ECD calculation. Bingham Plastic model (PV + YP) is standard per API RP 13D. Laminar flow is typical in the annulus for good hole cleaning.
+    </div>
+    <div class="row4">
+      <div class="field">
+        <label class="lbl">Mud density ρ</label>
+        <div class="ir"><input type="number" id="a_rho" value="1.3" step="0.01" oninput="calcAnn()"><span class="unit">g/cm3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">PV</label>
+        <div class="ir"><input type="number" id="a_PV" value="18" step="1" oninput="calcAnn()"><span class="unit">cP</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">YP</label>
+        <div class="ir"><input type="number" id="a_YP" value="12" step="1" oninput="calcAnn()"><span class="unit">lb/100ft2</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pump rate Q</label>
+        <div class="ir"><input type="number" id="a_Q" value="30" step="0.5" oninput="calcAnn()"><span class="unit">bbl/min</span></div>
+      </div>
+    </div>
+    <div class="stitle drill">/// annular sections geometry</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Hole/casing ID (section 1)</label>
+        <div class="ir"><input type="number" id="a_Dh1" value="8.5" step="0.25" oninput="calcAnn()"><span class="unit">inch</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pipe OD (section 1)</label>
+        <div class="ir"><input type="number" id="a_Dp1" value="5" step="0.125" oninput="calcAnn()"><span class="unit">inch</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Length (section 1)</label>
+        <div class="ir"><input type="number" id="a_L1" value="3000" step="50" oninput="calcAnn()"><span class="unit">m</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Hole ID (section 2 - DC annulus)</label>
+        <div class="ir"><input type="number" id="a_Dh2" value="8.5" step="0.25" oninput="calcAnn()"><span class="unit">inch</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">DC OD (section 2)</label>
+        <div class="ir"><input type="number" id="a_Dp2" value="6.5" step="0.25" oninput="calcAnn()"><span class="unit">inch</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Length (section 2)</label>
+        <div class="ir"><input type="number" id="a_L2" value="360" step="10" oninput="calcAnn()"><span class="unit">m</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Inclination (avg)</label>
+      <div class="ir"><input type="number" id="a_inc" value="0" step="1" min="0" max="90" oninput="calcAnn()"><span class="unit">° (0=vertical)</span></div>
+    </div>
+    <div id="r2"></div>
+  </div>
+</div>
+
+<!-- PANEL 3: ECD AND PRESSURE -->
+<div class="panel" id="p3">
+  <div class="card drill-accent">
+    <div class="stitle red">/// ECD and wellbore pressure window</div>
+    <div class="ibox">
+      <strong>ECD (Equivalent Circulating Density):</strong> The effective mud density experienced by the formation while circulating. ECD = Static_MW + (Annular_dP / (0.052 × TVD)). Must remain: Pore pressure &lt; BHP_static &lt; ECD × 0.052 × TVD &lt; Fracture pressure.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">True Vertical Depth TVD</label>
+        <div class="ir"><input type="number" id="ecd_TVD" value="3500" step="50" oninput="calcECD()"><span class="unit">m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Mud weight MW</label>
+        <div class="ir"><input type="number" id="ecd_MW" value="1.30" step="0.01" oninput="calcECD()"><span class="unit">g/cm3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Annular pressure loss APL</label>
+        <div class="ir"><input type="number" id="ecd_APL" value="120" step="5" oninput="calcECD()"><span class="unit">psi</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Pore pressure gradient</label>
+        <div class="ir"><input type="number" id="ecd_PP" value="1.05" step="0.01" oninput="calcECD()"><span class="unit">g/cm3 equiv.</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Fracture gradient</label>
+        <div class="ir"><input type="number" id="ecd_FG" value="1.65" step="0.01" oninput="calcECD()"><span class="unit">g/cm3 equiv.</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Safety margins</label>
+        <div class="ir"><input type="number" id="ecd_margin" value="0.05" step="0.01" oninput="calcECD()"><span class="unit">g/cm3</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Swab coefficient Cs</label>
+        <div class="ir"><input type="number" id="ecd_Cs" value="0.03" step="0.005" oninput="calcECD()"><span class="unit">g/cm3 (typ. 0.02-0.05)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Surge coefficient Cg</label>
+        <div class="ir"><input type="number" id="ecd_Cg" value="0.04" step="0.005" oninput="calcECD()"><span class="unit">g/cm3 (typ. 0.03-0.06)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Cuttings loading Cc</label>
+        <div class="ir"><input type="number" id="ecd_Cc" value="0.02" step="0.005" oninput="calcECD()"><span class="unit">g/cm3 equiv.</span></div>
+      </div>
+    </div>
+
+    <div id="r3"></div>
+
+    <div class="mw-bar">
+      <div class="mw-title">MUD WEIGHT WINDOW</div>
+      <div id="mw-window"></div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title red">Wellbore pressure window vs depth</div>
+      <canvas id="ecdChart" height="220"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 4: BIT HYDRAULICS -->
+<div class="panel" id="p4">
+  <div class="card drill-accent">
+    <div class="stitle drill">/// bit hydraulics - nozzle sizing and HSI</div>
+    <div class="ibox">
+      <strong>Bit hydraulics:</strong> Optimized bit hydraulics maximizes rock destruction efficiency. Two criteria: (1) Maximum Bit Hydraulic Power (BHPP) - optimal at 65% of available pressure for bit. (2) Maximum Jet Impact Force (JIF). Nozzle selection balances these objectives with hole cleaning requirements.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Pump rate Q</label>
+        <div class="ir"><input type="number" id="bit_Q" value="30" step="0.5" oninput="calcBit()"><span class="unit">bbl/min</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Total system ΔP (standpipe)</label>
+        <div class="ir"><input type="number" id="bit_SP" value="3000" step="50" oninput="calcBit()"><span class="unit">psi</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Parasitic losses (non-bit)</label>
+        <div class="ir"><input type="number" id="bit_PL" value="1800" step="50" oninput="calcBit()"><span class="unit">psi</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Mud density ρ</label>
+        <div class="ir"><input type="number" id="bit_rho" value="1.3" step="0.01" oninput="calcBit()"><span class="unit">g/cm3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Bit size</label>
+        <div class="ir"><input type="number" id="bit_size" value="8.5" step="0.25" oninput="calcBit()"><span class="unit">inch</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Number of nozzles</label>
+        <div class="ir"><input type="number" id="bit_Nn" value="3" step="1" min="1" max="6" oninput="calcBit()"><span class="unit">-</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Nozzle 1 size</label>
+        <div class="ir"><input type="number" id="nz1" value="12" step="1" oninput="calcBit()"><span class="unit">1/32 inch</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Nozzle 2 size</label>
+        <div class="ir"><input type="number" id="nz2" value="12" step="1" oninput="calcBit()"><span class="unit">1/32 inch</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Nozzle 3 size (0 if 2-nozzle)</label>
+        <div class="ir"><input type="number" id="nz3" value="13" step="1" oninput="calcBit()"><span class="unit">1/32 inch</span></div>
+      </div>
+    </div>
+    <div id="r4"></div>
+    <div class="chart-wrap">
+      <div class="chart-title">Bit hydraulic power vs total flow area (TFA)</div>
+      <canvas id="bitChart" height="190"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 5: PUMP OPTIMIZATION -->
+<div class="panel" id="p5">
+  <div class="card drill-accent">
+    <div class="stitle drill">/// pump selection and optimization</div>
+    <div class="ibox">
+      <strong>Pump optimization:</strong> Determine optimal pump rate for maximum drilling efficiency. Too low: poor hole cleaning, differential sticking risk. Too high: excessive ECD, lost circulation. Optimal is often between minimum for hole cleaning and maximum for bit hydraulics.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Pump max pressure rating</label>
+        <div class="ir"><input type="number" id="pump_Pmax" value="5000" step="100" oninput="calcPump()"><span class="unit">psi</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pump max flow rate</label>
+        <div class="ir"><input type="number" id="pump_Qmax" value="40" step="1" oninput="calcPump()"><span class="unit">bbl/min</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pump power (rated HP)</label>
+        <div class="ir"><input type="number" id="pump_HP" value="1600" step="100" oninput="calcPump()"><span class="unit">HP</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Mud density</label>
+        <div class="ir"><input type="number" id="pump_rho" value="1.3" step="0.01" oninput="calcPump()"><span class="unit">g/cm3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Parasitic losses at Q_ref</label>
+        <div class="ir"><input type="number" id="pump_PL_ref" value="1800" step="50" oninput="calcPump()"><span class="unit">psi at Q_ref</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Q reference for PL</label>
+        <div class="ir"><input type="number" id="pump_Q_ref" value="30" step="1" oninput="calcPump()"><span class="unit">bbl/min</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Min. annular velocity for cuttings</label>
+        <div class="ir"><input type="number" id="pump_AV_min" value="0.5" step="0.05" oninput="calcPump()"><span class="unit">m/s</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Annulus cross-section area</label>
+        <div class="ir"><input type="number" id="pump_Ann" value="0.0183" step="0.001" oninput="calcPump()"><span class="unit">m2</span></div>
+      </div>
+    </div>
+    <div id="r5"></div>
+    <div class="chart-wrap">
+      <div class="chart-title">Pump performance: standpipe pressure vs flow rate</div>
+      <canvas id="pumpChart" height="190"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 6: REFERENCE -->
+<div class="panel" id="p6">
+  <div class="card">
+    <div class="stitle drill">/// key formulas - drilling hydraulics (API RP 13D)</div>
+    <div class="fbox">
+      <strong>Flow velocity in pipe (m/s):</strong> v = Q(bbl/min) × 0.3208 / D_ID(inch)²<br>
+      <strong>Flow velocity in annulus (m/s):</strong> v_ann = Q × 0.3208 / (Dh² - Dp²)<br>
+      <strong>Reynolds number (Bingham Plastic - pipe):</strong><br>
+      Re_BP = 109000 × ρ × v × D / PV [ρ in g/cm3, v in m/s, D in inch, PV in cP]<br>
+      <strong>Laminar/Turbulent threshold (Bingham):</strong> Re_c = 3470 - 1370×(YP/τw)<br>
+      <strong>Fann viscometer - Bingham:</strong> PV = R600 - R300 [cP] | YP = R300 - PV [lb/100ft2]<br>
+      <strong>ΔP laminar (Bingham, pipe) [psi]:</strong><br>
+      ΔP = PV × v × L / (144 × D²) + YP × L / (144 × D)<br>
+      [PV in cP, v in ft/s, L in ft, D in inch, YP in lb/100ft2]<br>
+      <strong>ΔP laminar (Bingham, annulus) [psi]:</strong><br>
+      ΔP_ann = PV × v_ann × L / (144 × (Dh-Dp)²) + YP × L / (144 × (Dh-Dp))<br>
+      <strong>ECD [g/cm3]:</strong> ECD = MW + APL_psi / (0.052 × TVD_ft)<br>
+      ECD [g/cm3] = MW + (APL_bar × 1000) / (0.0981 × TVD_m)<br>
+      <strong>Bit nozzle velocity [ft/s]:</strong> v_n = Q × 3117 / (Cd × TFA_in2)<br>
+      [Cd = 0.95 discharge coefficient, TFA in inch2]<br>
+      <strong>Bit pressure drop [psi]:</strong> ΔP_bit = ρ × v_n² / (1120) [ρ in ppg, v_n in ft/s]<br>
+      <strong>HSI [HP/inch2]:</strong> HSI = Q × ΔP_bit / (1714 × A_bit_in2)<br>
+      <strong>JIF [lbf]:</strong> JIF = 0.01823 × Cd × ρ_ppg × Q² / TFA<br>
+      <strong>Optimal bit ΔP (BHPP criterion):</strong> ΔP_bit_opt = 0.65 × ΔP_standpipe<br>
+      <strong>Equivalent ΔP for cuttings:</strong> APL_min = (annular velocity min) × ρ × D_h<br>
+      <strong>Swab/surge pressure:</strong> ΔP_swab = Cs × 0.052 × TVD | ΔP_surge = Cg × 0.052 × TVD
+    </div>
+    <div class="sep"></div>
+    <div class="stitle drill">/// mud rheology models</div>
+    <table class="tbl">
+      <thead><tr><th>Model</th><th>Parameters</th><th>Application</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Bingham Plastic</td><td>PV + YP</td><td>General oilfield</td><td>API RP 13D standard, simple</td></tr>
+        <tr><td class="tw">Power Law</td><td>n + K</td><td>Low-shear flow</td><td>n = 3.32×log(R600/R300)</td></tr>
+        <tr><td class="tw">Herschel-Bulkley</td><td>τy + K + n</td><td>High-performance WBM</td><td>Most accurate for complex fluids</td></tr>
+        <tr><td class="tw">Robertson-Stiff</td><td>A + B + C</td><td>OBM/synthetic</td><td>Good for oil-based muds</td></tr>
+        <tr><td class="tw">Casson</td><td>τc + μc</td><td>Drilling fluids</td><td>Better for gel-strength fluids</td></tr>
+        <tr><td class="tw">Unified</td><td>Multiple</td><td>Deviated wells</td><td>SINTEF/Statoil unified model</td></tr>
+      </tbody>
+    </table>
+    <div class="sep"></div>
+    <div class="stitle drill">/// typical ECD increments (guidance values)</div>
+    <table class="tbl">
+      <thead><tr><th>Factor</th><th>Typical increment (g/cm3)</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Circulating annular pressure loss</td><td>0.02-0.15</td><td>APL/TVD equivalent, increases with Q and viscosity</td></tr>
+        <tr><td class="tw">Cuttings loading in annulus</td><td>0.01-0.05</td><td>Higher at high ROP and low annular velocity</td></tr>
+        <tr><td class="tw">Temperature effect on MW</td><td>0.01-0.03</td><td>Mud expands with T: MW decreases</td></tr>
+        <tr><td class="tw">Swab while tripping out</td><td>-0.02 to -0.08</td><td>Reduces BHP → kick risk</td></tr>
+        <tr><td class="tw">Surge while tripping in</td><td>+0.02 to +0.10</td><td>Increases BHP → fracture risk</td></tr>
+        <tr><td class="tw">Gel breaking (start of circulation)</td><td>+0.05-0.20</td><td>Transient spike when breaking gels</td></tr>
+        <tr><td class="tw">Connection (static, no ECD)</td><td>-APL equivalent</td><td>BHP drops during connection → kick risk</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">
+  <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
+  · API RP 13D / API RP 13B-1 / SPE Drilling Engineering · Educational tool only
+</div>
+</div>
+
+<script>
+var ecdChart=null,bitChart=null,pumpChart=null;
+
+function sw(n){
+  for(var i=1;i<=6;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    document.getElementById('t'+i).className='tab'+(i===n?' on':'');
+  }
+  if(n===2)setTimeout(calcAnn,80);
+  if(n===3)setTimeout(calcECD,80);
+  if(n===4)setTimeout(calcBit,80);
+  if(n===5)setTimeout(calcPump,80);
+}
+function rc(cls,lbl,val,unit,sub){
+  return '<div class="rc '+(cls||'')+'">'
+    +'<div class="rl">'+lbl+'</div>'
+    +'<div class="rv">'+val+(unit?' <span>'+unit+'</span>':'')+'</div>'
+    +(sub?'<div class="rsub">'+sub+'</div>':'')+'</div>';
+}
+function ar(type,title,body,sugg){
+  var d={ok:'d-ok',wn:'d-wn',er:'d-er',drill:'d-drill',mud:'d-mud'}[type]||'d-drill';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+}
+
+/* Bingham Plastic pipe ΔP [psi] */
+function bpPipe(Q_bblmin,D_in,L_m,PV_cP,YP_lb100ft2,rho_gcm3){
+  var L_ft=L_m*3.2808;
+  var v_fps=Q_bblmin*0.3208/(D_in*D_in); // ft/s
+  var Re=109000*rho_gcm3*v_fps/0.3048*(D_in*0.0254)/(PV_cP); // Re_NRe
+  Re=rho_gcm3*1000*(v_fps*0.3048)*(D_in*0.0254)/(PV_cP/1000);
+  // API simplified Re for Bingham:
+  Re=928*rho_gcm3*v_fps*D_in/PV_cP; // simplified (US units)
+  var Re_c=3470-1370*(YP_lb100ft2/(YP_lb100ft2+PV_cP*v_fps*144/D_in));
+  Re_c=Math.max(2100,Re_c);
+  var dP;
+  if(Re<=Re_c){
+    // Laminar
+    dP=(PV_cP*v_fps*L_ft)/(144*D_in*D_in*1000)+(YP_lb100ft2*L_ft)/(144*D_in*2);
+    // API 13D: ΔP_lam = (PV×v×L)/(96900×d²) + (τy×L)/(144×d)... using psi units:
+    dP=PV_cP*v_fps*L_ft/(96900*D_in*D_in)+YP_lb100ft2*L_ft/(144*D_in);
+  } else {
+    // Turbulent Dodge-Metzner approx
+    var f=0.046/Math.pow(Re,0.2);
+    dP=f*rho_gcm3*v_fps*v_fps*L_ft/(25.81*D_in);
+  }
+  return Math.max(0,dP);
+}
+
+/* Bingham Plastic annular ΔP [psi] */
+function bpAnn(Q_bblmin,Dh_in,Dp_in,L_m,PV_cP,YP_lb100ft2,rho_gcm3){
+  var L_ft=L_m*3.2808;
+  var v_fps=Q_bblmin*0.3208/((Dh_in*Dh_in)-(Dp_in*Dp_in));
+  var De=Dh_in-Dp_in; // equivalent diameter for annulus
+  var Re=928*rho_gcm3*v_fps*De/PV_cP;
+  var dP;
+  if(Re<=2100){
+    dP=PV_cP*v_fps*L_ft/(96900*De*De*0.5)+YP_lb100ft2*L_ft/(144*De*1.5);
+    // API 13D annular laminar:
+    dP=PV_cP*v_fps*L_ft/(144*(Dh_in-Dp_in)*(Dh_in-Dp_in))+YP_lb100ft2*L_ft/(144*(Dh_in-Dp_in)*1.5);
+    // Simplified:
+    dP=PV_cP*v_fps*L_ft/(100000*De*De)+YP_lb100ft2*L_ft/(200*De);
+  } else {
+    var f=0.046/Math.pow(Re,0.2);
+    dP=f*rho_gcm3*v_fps*v_fps*L_ft/(21.1*(Dh_in-Dp_in));
+  }
+  return Math.max(0,dP);
+}
+
+/* ====== PANEL 1: DRILLSTRING ====== */
+function calcDS(){
+  var rho=parseFloat(document.getElementById('rho_mud').value)||1.3;
+  var PV=parseFloat(document.getElementById('PV').value)||18;
+  var YP=parseFloat(document.getElementById('YP').value)||12;
+  var Q=parseFloat(document.getElementById('Q_pump').value)||30;
+  var dp_OD=parseFloat(document.getElementById('dp_OD').value)||5;
+  var dp_ID=parseFloat(document.getElementById('dp_ID').value)||4.276;
+  var dp_L=parseFloat(document.getElementById('dp_L').value)||3000;
+  var hw_OD=parseFloat(document.getElementById('hw_OD').value)||5;
+  var hw_ID=parseFloat(document.getElementById('hw_ID').value)||3;
+  var hw_L=parseFloat(document.getElementById('hw_L').value)||180;
+  var dc_OD=parseFloat(document.getElementById('dc_OD').value)||6.5;
+  var dc_ID=parseFloat(document.getElementById('dc_ID').value)||2.875;
+  var dc_L=parseFloat(document.getElementById('dc_L').value)||180;
+  var surf_dP=[40,100,210,510][parseInt(document.getElementById('surf_class').value)-1];
+  var bit_dp=parseFloat(document.getElementById('bit_dp').value)||1200;
+
+  // DP pressure loss
+  var dP_dp=bpPipe(Q,dp_ID,dp_L,PV,YP,rho);
+  // HWDP
+  var dP_hw=bpPipe(Q,hw_ID,hw_L,PV,YP,rho);
+  // DC
+  var dP_dc=bpPipe(Q,dc_ID,dc_L,PV,YP,rho);
+  var dP_string=dP_dp+dP_hw+dP_dc;
+  var dP_total=dP_string+surf_dP+bit_dp;
+
+  // Velocities
+  var v_dp=Q*0.3208/(dp_ID*dp_ID);
+  var v_hw=Q*0.3208/(hw_ID*hw_ID);
+  var v_dc=Q*0.3208/(dc_ID*dc_ID);
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','DP pressure loss',dP_dp.toFixed(0),'psi','At '+v_dp.toFixed(2)+' ft/s in DP');
+  html+=rc('hl','HWDP pressure loss',dP_hw.toFixed(0),'psi','At '+v_hw.toFixed(2)+' ft/s in HWDP');
+  html+=rc('','DC pressure loss',dP_dc.toFixed(0),'psi','At '+v_dc.toFixed(2)+' ft/s in DC');
+  html+=rc('','Surface equipment ΔP',surf_dP,'psi','Class '+document.getElementById('surf_class').value);
+  html+=rc('','Bit pressure drop',bit_dp,'psi','User estimated');
+  html+=rc('hl','Total string ΔP',dP_string.toFixed(0),'psi','DP + HWDP + DC');
+  html+=rc('mud','Standpipe pressure (est.)',dP_total.toFixed(0),'psi','Total system pressure');
+  html+=rc('','Q pump rate',Q,'bbl/min','= '+(Q*158.987/1440).toFixed(2)+' m3/min');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>DP:</strong> v = '+Q+'×0.3208/'+dp_ID+'² = '+v_dp.toFixed(2)+' ft/s | ΔP = <span class="hi">'+dP_dp.toFixed(0)+' psi</span><br>'
+    +'<strong>HWDP:</strong> v = '+v_hw.toFixed(2)+' ft/s | ΔP = <span class="hi">'+dP_hw.toFixed(0)+' psi</span><br>'
+    +'<strong>DC:</strong> v = '+v_dc.toFixed(2)+' ft/s | ΔP = <span class="hi">'+dP_dc.toFixed(0)+' psi</span><br>'
+    +'<strong>Standpipe P</strong> = '+dP_string.toFixed(0)+' + '+surf_dP+' (surface) + '+bit_dp+' (bit) = <span class="hi">'+dP_total.toFixed(0)+' psi</span>'
+    +'</div>';
+
+  var rows='';
+  if(dP_total>4500){
+    rows+=ar('wn','High standpipe pressure ('+dP_total.toFixed(0)+' psi)','Standpipe pressure approaching maximum pump rating. Verify pump is rated above '+dP_total.toFixed(0)+' psi. High pressure may indicate excessive flow rate or undersized string.','Reduce pump rate or increase pipe ID. Each +0.25" increase in DP ID reduces velocity by '+(((Q*0.3208/(dp_ID*dp_ID))-(Q*0.3208/((dp_ID+0.25)*(dp_ID+0.25)))).toFixed(2))+' ft/s. Consider upgrading to 5.5" DP for this flow rate.');
+  }
+  if(v_dc>20){
+    rows+=ar('wn','High velocity in DC ('+v_dc.toFixed(1)+' ft/s)','DC internal velocity very high at '+v_dc.toFixed(1)+' ft/s. High velocity causes erosion of DC ID, MWD tools, and BHA components. Fatigue risk increases with turbulent flow.','Target DC velocity < 15 ft/s. Consider opening pump choke or selecting DC with larger ID (3.5" ID vs current '+dc_ID+'"). For MWD/LWD tools: verify tool-specific velocity limits (typically < 15 ft/s for turbine tools).');
+  }
+  rows+=ar('drill','Drillstring pressure loss summary','DP: '+dP_dp.toFixed(0)+' psi | HWDP: '+dP_hw.toFixed(0)+' psi | DC: '+dP_dc.toFixed(0)+' psi | Total string: '+dP_string.toFixed(0)+' psi | Estimated standpipe: '+dP_total.toFixed(0)+' psi.','Transfer results to ECD tab: APL (annular pressure loss) is calculated separately in Tab 2. Update bit_dp from Tab 4 for accurate total.');
+
+  html+='<div class="analysis"><div class="atitle">/// DRILLSTRING ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r1').innerHTML=html;
+
+  // Sync mud properties to other tabs
+  document.getElementById('a_rho').value=rho;
+  document.getElementById('a_PV').value=PV;
+  document.getElementById('a_YP').value=YP;
+  document.getElementById('a_Q').value=Q;
+  document.getElementById('bit_rho').value=rho;
+  document.getElementById('pump_rho').value=rho;
+}
+
+/* ====== PANEL 2: ANNULAR ====== */
+function calcAnn(){
+  var rho=parseFloat(document.getElementById('a_rho').value)||1.3;
+  var PV=parseFloat(document.getElementById('a_PV').value)||18;
+  var YP=parseFloat(document.getElementById('a_YP').value)||12;
+  var Q=parseFloat(document.getElementById('a_Q').value)||30;
+  var Dh1=parseFloat(document.getElementById('a_Dh1').value)||8.5;
+  var Dp1=parseFloat(document.getElementById('a_Dp1').value)||5;
+  var L1=parseFloat(document.getElementById('a_L1').value)||3000;
+  var Dh2=parseFloat(document.getElementById('a_Dh2').value)||8.5;
+  var Dp2=parseFloat(document.getElementById('a_Dp2').value)||6.5;
+  var L2=parseFloat(document.getElementById('a_L2').value)||360;
+  var inc=parseFloat(document.getElementById('a_inc').value)||0;
+
+  var dP1=bpAnn(Q,Dh1,Dp1,L1,PV,YP,rho);
+  var dP2=bpAnn(Q,Dh2,Dp2,L2,PV,YP,rho);
+  var APL=dP1+dP2;
+
+  // Velocities
+  var v1=Q*0.3208/((Dh1*Dh1)-(Dp1*Dp1));
+  var v2=Q*0.3208/((Dh2*Dh2)-(Dp2*Dp2));
+
+  // Annular velocity in m/s
+  var v1_ms=v1*0.3048;
+  var v2_ms=v2*0.3048;
+
+  // Min AV for hole cleaning (rule of thumb: > 0.5 m/s in vertical, > 0.8 m/s in deviated)
+  var AV_min=inc<30?0.5:inc<60?0.7:0.9;
+  var hc_ok_1=v1_ms>=AV_min;
+  var hc_ok_2=v2_ms>=AV_min;
+
+  // Reynolds number
+  var De1=Dh1-Dp1;
+  var Re1=928*rho*v1*De1/PV;
+  var Re2=928*rho*v2*(Dh2-Dp2)/PV;
+  var flow1=Re1<2100?'Laminar':'Turbulent';
+  var flow2=Re2<2100?'Laminar':'Turbulent';
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','APL Section 1 (DP/OH)',dP1.toFixed(0),'psi','v = '+v1.toFixed(2)+' ft/s ('+v1_ms.toFixed(2)+' m/s)');
+  html+=rc('hl','APL Section 2 (DC/OH)',dP2.toFixed(0),'psi','v = '+v2.toFixed(2)+' ft/s ('+v2_ms.toFixed(2)+' m/s)');
+  html+=rc('mud','Total APL',APL.toFixed(0),'psi','Annular pressure loss');
+  html+=rc('','APL in bar',(APL/14.504).toFixed(2),'bar','= '+(APL/14.504/0.0981).toFixed(0)+' kPa');
+  html+=rc(hc_ok_1?'ok':'er','Hole cleaning - Section 1',v1_ms.toFixed(2),'m/s',hc_ok_1?'≥ '+AV_min+' m/s ADEQUATE':'< '+AV_min+' m/s RISK');
+  html+=rc(hc_ok_2?'ok':'er','Hole cleaning - Section 2',v2_ms.toFixed(2),'m/s',hc_ok_2?'≥ '+AV_min+' m/s ADEQUATE':'< '+AV_min+' m/s RISK');
+  html+=rc('','Flow regime Sec 1',flow1,'-','Re = '+Re1.toFixed(0));
+  html+=rc('','Flow regime Sec 2',flow2,'-','Re = '+Re2.toFixed(0));
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>v_ann (Sec 1):</strong> Q×0.3208/(Dh²-Dp²) = '+Q+'×0.3208/('+Dh1+'²-'+Dp1+'²) = <span class="hi">'+v1.toFixed(2)+' ft/s = '+v1_ms.toFixed(2)+' m/s</span><br>'
+    +'<strong>ΔP_ann1 ('+flow1+'):</strong> = <span class="hi">'+dP1.toFixed(0)+' psi</span><br>'
+    +'<strong>v_ann (Sec 2):</strong> '+v2.toFixed(2)+' ft/s = '+v2_ms.toFixed(2)+' m/s | ΔP = <span class="hi">'+dP2.toFixed(0)+' psi</span><br>'
+    +'<strong>Total APL</strong> = '+dP1.toFixed(0)+' + '+dP2.toFixed(0)+' = <span class="hi">'+APL.toFixed(0)+' psi = '+(APL/14.504).toFixed(2)+' bar</span>'
+    +'</div>';
+
+  var rows='';
+  if(!hc_ok_1||!hc_ok_2){
+    rows+=ar('er','INADEQUATE HOLE CLEANING VELOCITY','Section '+(hc_ok_1?'2 (DC):'+v2_ms.toFixed(2):'1 (DP):'+v1_ms.toFixed(2))+' m/s is below minimum '+AV_min+' m/s for inclination '+inc+'°. Risk of cuttings accumulation, packoff, differential sticking, and stuck pipe.','Increase pump rate to achieve minimum AV. Required Q for AV = '+AV_min+' m/s in Section 1: Q ≥ '+( AV_min/0.3048*(Dh1*Dh1-Dp1*Dp1)/0.3208).toFixed(1)+' bbl/min. For deviated wells: implement wiper trips and rotary side if AV < 0.7 m/s. Use viscous sweeps (high-YP pills) to lift cuttings beds.');
+  } else {
+    rows+=ar('ok','Hole cleaning adequate in both sections','AV in Section 1: '+v1_ms.toFixed(2)+' m/s | Section 2: '+v2_ms.toFixed(2)+' m/s. Both above minimum '+AV_min+' m/s for '+inc+'° inclination. Cuttings transport should be adequate.','');
+  }
+  if(flow1==='Turbulent'){
+    rows+=ar('mud','Turbulent annular flow in Section 1 (Re = '+Re1.toFixed(0)+')','Turbulent flow in the annulus creates higher pressure losses but also better cuttings transport and hole cleaning. However, turbulent flow can cause borehole erosion in soft/unconsolidated formations.','Monitor caliper log for borehole enlargement. If washouts develop: reduce pump rate or increase mud weight/viscosity to return to laminar flow. For soft formations (shale): target Re < 2100 in annulus to minimize erosion.');
+  }
+
+  html+='<div class="analysis"><div class="atitle">/// ANNULAR FLOW ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r2').innerHTML=html;
+  document.getElementById('ecd_APL').value=APL.toFixed(0);
+}
+
+/* ====== PANEL 3: ECD ====== */
+function calcECD(){
+  var TVD=parseFloat(document.getElementById('ecd_TVD').value)||3500;
+  var MW=parseFloat(document.getElementById('ecd_MW').value)||1.30;
+  var APL=parseFloat(document.getElementById('ecd_APL').value)||120;
+  var PP=parseFloat(document.getElementById('ecd_PP').value)||1.05;
+  var FG=parseFloat(document.getElementById('ecd_FG').value)||1.65;
+  var margin=parseFloat(document.getElementById('ecd_margin').value)||0.05;
+  var Cs=parseFloat(document.getElementById('ecd_Cs').value)||0.03;
+  var Cg=parseFloat(document.getElementById('ecd_Cg').value)||0.04;
+  var Cc=parseFloat(document.getElementById('ecd_Cc').value)||0.02;
+
+  var TVD_ft=TVD*3.2808;
+  // ECD = MW + APL/(0.052 × TVD_ft)
+  var ECD=MW+APL/(0.052*TVD_ft);
+  var ECD_with_cuttings=ECD+Cc;
+
+  // Static BHP
+  var BHP_static=MW*0.052*TVD_ft; // psi
+  var BHP_circ=ECD*0.052*TVD_ft;
+  var P_pore=PP*0.052*TVD_ft;
+  var P_frac=FG*0.052*TVD_ft;
+
+  // Window
+  var MW_min=PP+margin; // minimum MW
+  var MW_max=FG-margin-(APL/(0.052*TVD_ft)); // maximum static MW so ECD < FG-margin
+  var ECD_margin_frac=FG-margin-ECD;
+  var ECD_margin_pore=ECD-PP-margin;
+  var window_ok=MW>=MW_min&&ECD<=FG-margin;
+
+  // Swab/surge
+  var MW_swab=MW-Cs;
+  var MW_surge=MW+Cg;
+  var swab_ok=MW_swab>=PP+0.02;
+  var surge_ok=MW_surge+APL/(0.052*TVD_ft)<=FG-0.02;
+
+  var html='<div class="rgrid">';
+  html+=rc('red','ECD (circulating)',ECD.toFixed(3),'g/cm3','MW + APL/(0.052×TVD_ft)');
+  html+=rc('mud','ECD (with cuttings)',(ECD_with_cuttings).toFixed(3),'g/cm3','ECD + '+Cc+' g/cm3 cuttings loading');
+  html+=rc('hl','Static mud weight',MW,'g/cm3','User input');
+  html+=rc(window_ok?'ok':'er','Mud window',MW_max.toFixed(3),'g/cm3 max static',window_ok?'ECD within window':'ECD EXCEEDS FRACTURE!');
+  html+=rc('','Margin to fracture (ECD)',ECD_margin_frac.toFixed(3),'g/cm3',ECD_margin_frac>0?'ADEQUATE':'LOST CIRC RISK');
+  html+=rc('','Margin above pore P',ECD_margin_pore.toFixed(3),'g/cm3',ECD_margin_pore>0?'OVERBALANCED':'UNDERBALANCED!');
+  html+=rc(swab_ok?'ok':'er','MW after swab',MW_swab.toFixed(3),'g/cm3',swab_ok?'Above pore P + 0.02':'KICK RISK during swab!');
+  html+=rc(surge_ok?'ok':'wn','ECD during surge',(MW_surge+APL/(0.052*TVD_ft)).toFixed(3),'g/cm3',surge_ok?'Below FG':'LOST CIRC during surge!');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>ECD</strong> = MW + APL/(0.052×TVD_ft) = '+MW+' + '+APL+'/(0.052×'+TVD_ft.toFixed(0)+')<br>'
+    +'= '+MW+' + '+( APL/(0.052*TVD_ft)).toFixed(4)+' = <span class="hir">'+ECD.toFixed(4)+' g/cm3</span><br>'
+    +'<strong>BHP static</strong> = '+MW+' × 0.052 × '+TVD_ft.toFixed(0)+' = <span class="hi">'+BHP_static.toFixed(0)+' psi = '+(BHP_static/14.504).toFixed(1)+' bar</span><br>'
+    +'<strong>BHP circulating</strong> = '+ECD.toFixed(4)+' × 0.052 × '+TVD_ft.toFixed(0)+' = <span class="hi">'+BHP_circ.toFixed(0)+' psi</span><br>'
+    +'<strong>Swab MW</strong> = '+MW+' - '+Cs+' = '+MW_swab.toFixed(3)+' | Pore P equiv = '+PP+' → '+(swab_ok?'<span class="hiok">SAFE</span>':'<span class="hir">KICK RISK</span>')+'<br>'
+    +'<strong>Max static MW</strong> = FG - margin - APL/(0.052×TVD) = '+FG+' - '+margin+' - '+(APL/(0.052*TVD_ft)).toFixed(4)+' = <span class="hi">'+MW_max.toFixed(4)+' g/cm3</span>'
+    +'</div>';
+
+  var rows='';
+  if(!window_ok){
+    rows+=ar('er','ECD EXCEEDS FRACTURE GRADIENT - LOST CIRCULATION RISK','ECD = '+ECD.toFixed(3)+' g/cm3 exceeds fracture gradient ('+FG+') minus safety margin ('+(FG-margin)+' g/cm3). Lost circulation events are likely during drilling.','Immediate actions: (1) Reduce pump rate to lower APL. (2) Reduce mud weight if pore pressure allows. (3) Apply Managed Pressure Drilling (MPD) to hold BHP constant. (4) Pre-mix and have LCM (Lost Circulation Material) ready: calcium carbonate 5-25 lbm/bbl, graphite, fibrous materials. (5) Consider casing point if window is consistently insufficient.');
+  }
+  if(!swab_ok){
+    rows+=ar('er','KICK RISK DURING SWAB - MW AFTER SWAB < PORE PRESSURE','After swabbing (MW_eff = '+MW_swab.toFixed(3)+' g/cm3), the effective BHP is below pore pressure ('+PP+' g/cm3). Influx of formation fluid into the wellbore is possible during tripping.','Reduce tripping speed to minimize swab effect: limit pipe velocity to 0.5 m/s in open hole. Calculate maximum allowable trip speed: V_max = (MW - PP - 0.02) × 0.052 × TVD / (dP/dv_constant). Fill annulus with mud after every stand when dry-tripping. Use fill-up line with automatic back-pressure device.');
+  }
+  if(!surge_ok){
+    rows+=ar('wn','LOST CIRCULATION RISK DURING SURGE','ECD during surge = '+(MW_surge+APL/(0.052*TVD_ft)).toFixed(3)+' g/cm3 exceeds FG-margin = '+(FG-0.02).toFixed(3)+'. Lost circulation may occur when running pipe into hole rapidly.','Limit pipe-in speed in open hole: V_max ≈ (FG-0.02-ECD)/(Cg factor) × reference_speed. Use surge calculator (Schlumberger or Halliburton) for precise speed limits. Consider surge-reduction tool (downhole float valve with circulating ports) if swab/surge margins are consistently tight.');
+  }
+  if(window_ok&&swab_ok&&surge_ok){
+    rows+=ar('ok','Wellbore pressure window adequate','MW = '+MW+' g/cm3 | ECD = '+ECD.toFixed(3)+' g/cm3 | Margin to fracture: '+ECD_margin_frac.toFixed(3)+' g/cm3 | Margin above pore P: '+ECD_margin_pore.toFixed(3)+' g/cm3. All pressures within safe window.','');
+  }
+
+  html+='<div class="analysis"><div class="atitle red">/// ECD AND WELLBORE PRESSURE ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r3').innerHTML=html;
+
+  // MW window bar
+  var range=FG*1.1-PP*0.9;
+  var pctOf=function(v){return Math.max(0,Math.min(100,(v-PP*0.9)/range*100));};
+  document.getElementById('mw-window').innerHTML=
+    '<div class="mw-scale">'
+    +'<div class="mw-marker" style="left:'+pctOf(PP).toFixed(0)+'%;background:#2266EE;"></div>'
+    +'<div class="mw-marker" style="left:'+pctOf(MW).toFixed(0)+'%;background:#FFAA00;width:6px;"></div>'
+    +'<div class="mw-marker" style="left:'+pctOf(ECD).toFixed(0)+'%;background:#CC0000;"></div>'
+    +'<div class="mw-marker" style="left:'+pctOf(FG).toFixed(0)+'%;background:#2266EE;"></div>'
+    +'</div>'
+    +'<div class="mw-labels">'
+    +'<span>PP='+PP+'</span>'
+    +'<span>MW='+MW+' (yellow) | ECD='+ECD.toFixed(3)+' (red)</span>'
+    +'<span>FG='+FG+'</span>'
+    +'</div>';
+
+  // ECD profile chart
+  var depths=Array.from({length:20},function(_,i){return i/19*TVD;});
+  var ctx=document.getElementById('ecdChart').getContext('2d');
+  if(ecdChart){ecdChart.destroy();}
+  ecdChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'Pore pressure grad (g/cm3)',data:depths.map(function(d){return{x:PP,y:-d};}),
+          borderColor:'#2266EE',backgroundColor:'transparent',borderWidth:2,pointRadius:0,borderDash:[5,3]},
+        {label:'Fracture gradient (g/cm3)',data:depths.map(function(d){return{x:FG,y:-d};}),
+          borderColor:'#FF3333',backgroundColor:'rgba(255,51,51,0.05)',borderWidth:2,fill:true,pointRadius:0,borderDash:[5,3]},
+        {label:'Static MW',data:depths.map(function(d){return{x:MW,y:-d};}),
+          borderColor:'#FFAA00',backgroundColor:'transparent',borderWidth:2,pointRadius:0},
+        {label:'ECD',data:depths.map(function(d){return{x:ECD,y:-d};}),
+          borderColor:'#CC0000',backgroundColor:'transparent',borderWidth:2.5,pointRadius:0},
+        {label:'Operating point (TVD)',data:[{x:ECD,y:-TVD}],
+          borderColor:'#fff',backgroundColor:'#CC0000',pointRadius:8,showLine:false}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Equivalent density (g/cm3)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:PP*0.9,max:FG*1.05},
+        y:{title:{display:true,text:'Depth (m TVD)',color:'#666'},ticks:{color:'#888',callback:function(v){return Math.abs(v)+' m';}},grid:{color:'#0C0C18'}}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 4: BIT HYDRAULICS ====== */
+function calcBit(){
+  var Q=parseFloat(document.getElementById('bit_Q').value)||30;
+  var SP=parseFloat(document.getElementById('bit_SP').value)||3000;
+  var PL=parseFloat(document.getElementById('bit_PL').value)||1800;
+  var rho=parseFloat(document.getElementById('bit_rho').value)||1.3;
+  var bit_size=parseFloat(document.getElementById('bit_size').value)||8.5;
+  var Nn=parseInt(document.getElementById('bit_Nn').value)||3;
+  var nz=[parseFloat(document.getElementById('nz1').value)||12,
+          parseFloat(document.getElementById('nz2').value)||12,
+          parseFloat(document.getElementById('nz3').value)||13];
+
+  var rho_ppg=rho*8.345;
+  var Q_gpm=Q*42; // gal/min
+  var Cd=0.95;
+
+  // Total flow area TFA [inch2]
+  var TFA=0;
+  for(var i=0;i<Nn;i++) TFA+=Math.PI/4*Math.pow(nz[i]/32,2);
+
+  var dP_bit=SP-PL; // psi
+  // Nozzle velocity from ΔP
+  var v_n=Math.sqrt(2*dP_bit*144/(rho_ppg/62.4*1));
+  v_n=Math.sqrt(dP_bit*144*2/(rho/1000)); // m/s rough
+  v_n=Math.sqrt(2*dP_bit*6894.76/(rho*1000)); // SI: m/s
+  var v_n_fps=v_n*3.2808;
+
+  // Verify with TFA
+  var v_n_TFA=Q*3117/(Cd*TFA*32*32*Math.PI/4); // Approximate ft/s (empirical)
+  v_n_TFA=Q_gpm/(Cd*TFA*60)*(1/0.0254); // m/s approx
+  // Proper: v_n = Q(gpm) / (3.117 × TFA_in2 × Cd)
+  v_n_fps=Q_gpm/(3.117*TFA*Cd);
+  // Bit ΔP from velocity: ΔP = ρ_ppg × v_n_fps² / 1120
+  var dP_bit_calc=rho_ppg*v_n_fps*v_n_fps/1120;
+
+  // Hydraulic horsepower at bit
+  var BHHP=dP_bit_calc*Q/1714; // HP
+  // HSI
+  var A_bit=Math.PI/4*bit_size*bit_size; // inch2
+  var HSI=BHHP/A_bit;
+  // JIF [lbf]
+  var JIF=0.01823*Cd*rho_ppg*Q_gpm*Q_gpm/TFA;
+
+  // Optimal criteria
+  var dP_opt_BHPP=0.65*SP; // psi (BHPP criterion)
+  var TFA_opt=Math.sqrt(rho_ppg*Q_gpm*Q_gpm/(1120*dP_opt_BHPP));
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Bit ΔP (from SP-PL)',dP_bit.toFixed(0),'psi','Standpipe - parasitic losses');
+  html+=rc('hl','Bit ΔP (from nozzles)',dP_bit_calc.toFixed(0),'psi','At v_n = '+v_n_fps.toFixed(0)+' ft/s');
+  html+=rc('drill','TFA (total flow area)',TFA.toFixed(4),'inch2','Sum of '+Nn+' nozzles');
+  html+=rc('drill','Nozzle velocity v_n',v_n_fps.toFixed(0),'ft/s','= '+(v_n_fps*0.3048).toFixed(1)+' m/s');
+  html+=rc('','Bit HHP (BHHP)',BHHP.toFixed(0),'HP','= '+(BHHP*0.7457).toFixed(0)+' kW');
+  html+=rc('','HSI',HSI.toFixed(3),'HP/inch2',HSI>1?'HIGH (>1)':HSI>0.5?'ADEQUATE':'LOW (<0.5)');
+  html+=rc('','JIF (jet impact force)',JIF.toFixed(0),'lbf','= '+(JIF*4.448).toFixed(0)+' N');
+  html+=rc('','Optimal TFA (BHPP)',TFA_opt.toFixed(4),'inch2','For ΔP_bit = 65% of SP');
+  html+=rc('','Optimal ΔP_bit (BHPP)',dP_opt_BHPP.toFixed(0),'psi','65% of '+SP+' psi standpipe');
+  html+=rc('',dP_bit>dP_opt_BHPP?'ΔP_bit > optimal':'ΔP_bit < optimal',((dP_bit/dP_opt_BHPP-1)*100).toFixed(0),'% '+(dP_bit>dP_opt_BHPP?'above':'below')+' BHPP optimum',dP_bit>dP_opt_BHPP?'Consider larger nozzles':'Consider smaller nozzles');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>TFA</strong> = Σ(π/4 × dn²) = '+nz.slice(0,Nn).map(function(n){return 'π/4×('+(n)+'/32)²';}).join(' + ')+' = <span class="hi">'+TFA.toFixed(4)+' inch²</span><br>'
+    +'<strong>v_n</strong> = Q_gpm / (3.117 × TFA × Cd) = '+Q_gpm.toFixed(0)+' / (3.117 × '+TFA.toFixed(4)+' × '+Cd+') = <span class="hi">'+v_n_fps.toFixed(0)+' ft/s</span><br>'
+    +'<strong>ΔP_bit</strong> = ρ_ppg × v_n² / 1120 = '+rho_ppg.toFixed(1)+' × '+v_n_fps.toFixed(0)+'² / 1120 = <span class="hi">'+dP_bit_calc.toFixed(0)+' psi</span><br>'
+    +'<strong>HSI</strong> = BHHP / A_bit = '+BHHP.toFixed(0)+' / '+A_bit.toFixed(2)+' = <span class="hi">'+HSI.toFixed(3)+' HP/in²</span><br>'
+    +'<strong>JIF</strong> = 0.01823 × Cd × ρ_ppg × Q_gpm² / TFA = <span class="hi">'+JIF.toFixed(0)+' lbf</span><br>'
+    +'<strong>Optimal (BHPP):</strong> ΔP_bit = 0.65 × '+SP+' = '+dP_opt_BHPP.toFixed(0)+' psi | TFA_opt = <span class="hi">'+TFA_opt.toFixed(4)+' in²</span>'
+    +'</div>';
+
+  var rows='';
+  if(HSI<0.5){
+    rows+=ar('wn','Low HSI ('+HSI.toFixed(3)+' HP/inch2) - inadequate bottom cleaning','HSI below 0.5 HP/inch2 may result in poor cuttings removal from below the bit (bit balling risk). For PDC bits: minimum 0.5-1.0 HP/inch2 recommended. For roller cone: 0.5-2.0 HP/inch2.','Increase Q or reduce nozzle size to increase ΔP_bit and HSI. To achieve HSI = 1.0: required BHHP = 1.0 × '+A_bit.toFixed(0)+' HP = '+A_bit.toFixed(0)+' HP at bit. Corresponding ΔP_bit = '+A_bit.toFixed(0)+' × 1714 / '+Q+' = '+(A_bit*1714/Q).toFixed(0)+' psi.');
+  }
+  if(v_n_fps>450){
+    rows+=ar('wn','Very high nozzle velocity ('+v_n_fps.toFixed(0)+' ft/s)','Nozzle velocity above 450 ft/s creates very high fluid kinetic energy at bit. For formations prone to erosion, this can cause excessive borehole washout. For hard rock: beneficial. For soft/unconsolidated formation: reduce to 300-400 ft/s.','');
+  }
+  rows+=ar('drill','Bit hydraulics summary','TFA = '+TFA.toFixed(4)+' in² | v_n = '+v_n_fps.toFixed(0)+' ft/s | ΔP_bit = '+dP_bit_calc.toFixed(0)+' psi | BHHP = '+BHHP.toFixed(0)+' HP | HSI = '+HSI.toFixed(2)+' HP/in² | JIF = '+JIF.toFixed(0)+' lbf. BHPP optimal at ΔP_bit = '+dP_opt_BHPP.toFixed(0)+' psi with TFA = '+TFA_opt.toFixed(4)+' in².','');
+
+  html+='<div class="analysis"><div class="atitle">/// BIT HYDRAULICS ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r4').innerHTML=html;
+
+  // Bit hydraulics chart: BHHP vs TFA
+  var TFA_range=Array.from({length:30},function(_,i){return 0.1+i*0.05;});
+  var ctx=document.getElementById('bitChart').getContext('2d');
+  if(bitChart){bitChart.destroy();}
+  bitChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'BHHP (HP)',data:TFA_range.map(function(t){
+          var v2=Q_gpm/(3.117*t*Cd);
+          var dp=rho_ppg*v2*v2/1120;
+          return {x:t,y:dp<SP-PL*0.5?(dp*Q/1714):null};
+        }),borderColor:'#448844',backgroundColor:'rgba(68,136,68,0.08)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.4,yAxisID:'y'},
+        {label:'Bit ΔP (psi)',data:TFA_range.map(function(t){
+          var v2=Q_gpm/(3.117*t*Cd);
+          return {x:t,y:rho_ppg*v2*v2/1120};
+        }),borderColor:'#FF8800',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4,yAxisID:'y2'},
+        {label:'Optimal TFA',data:[{x:TFA_opt,y:dP_opt_BHPP*Q/1714}],
+          borderColor:'#FFAA00',backgroundColor:'#FFAA00',pointRadius:8,showLine:false,yAxisID:'y'},
+        {label:'Current TFA',data:[{x:TFA,y:BHHP}],
+          borderColor:'#fff',backgroundColor:'#448844',pointRadius:8,showLine:false,yAxisID:'y'}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'TFA (inch2)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}},
+        y:{title:{display:true,text:'BHHP (HP)',color:'#448844'},ticks:{color:'#448844'},grid:{color:'#0C0C18'},position:'left'},
+        y2:{title:{display:true,text:'Bit ΔP (psi)',color:'#FF8800'},ticks:{color:'#FF8800'},grid:{display:false},position:'right'}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 5: PUMP ====== */
+function calcPump(){
+  var P_max=parseFloat(document.getElementById('pump_Pmax').value)||5000;
+  var Q_max=parseFloat(document.getElementById('pump_Qmax').value)||40;
+  var HP=parseFloat(document.getElementById('pump_HP').value)||1600;
+  var rho=parseFloat(document.getElementById('pump_rho').value)||1.3;
+  var PL_ref=parseFloat(document.getElementById('pump_PL_ref').value)||1800;
+  var Q_ref=parseFloat(document.getElementById('pump_Q_ref').value)||30;
+  var AV_min=parseFloat(document.getElementById('pump_AV_min').value)||0.5;
+  var Ann=parseFloat(document.getElementById('pump_Ann').value)||0.0183;
+
+  // Parasitic losses scale as Q^1.75 (turbulent) or Q^2 (turbulent approx)
+  var n_PL=1.75;
+  var PL_coeff=PL_ref/Math.pow(Q_ref,n_PL);
+
+  // Min Q for hole cleaning
+  var Q_min_hc=AV_min*Ann*60*1000/158.987; // bbl/min
+  // Max Q from pressure limit
+  var Q_max_P=Q_max; // simplified
+
+  // Power constraint: Q_max_HP
+  var Q_max_HP=HP*1714/P_max;
+
+  // Optimal Q for BHPP: optimal is between Q_min_hc and Q_max
+  var Q_opt=Math.min(Q_max_HP,Q_max_P,Math.max(Q_min_hc,Q_ref));
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Min Q for hole cleaning',Q_min_hc.toFixed(1),'bbl/min','v_ann ≥ '+AV_min+' m/s in '+Ann+' m² annulus');
+  html+=rc('hl','Max Q from HP constraint',Q_max_HP.toFixed(1),'bbl/min','P_max = '+P_max+' psi, HP = '+HP);
+  html+=rc('drill','Max Q from pump rating',Q_max,'bbl/min','Pump mechanical limit');
+  html+=rc('','Recommended Q',Q_opt.toFixed(1),'bbl/min','Balanced for HC and pressure');
+  html+=rc('','PL at Q_ref',PL_ref,'psi','At Q = '+Q_ref+' bbl/min');
+  html+=rc('','PL at optimal Q',(PL_coeff*Math.pow(Q_opt,n_PL)).toFixed(0),'psi','At Q = '+Q_opt.toFixed(1)+' bbl/min');
+  html+=rc('','Pump output power at Q_opt',( Q_opt*(PL_coeff*Math.pow(Q_opt,n_PL))/1714).toFixed(0),'HP','Parasitic losses only');
+  html+=rc('','Available for bit ΔP',P_max-(PL_coeff*Math.pow(Q_opt,n_PL)).toFixed(0),'psi','SP - PL at Q_opt');
+  html+='</div>';
+
+  var rows='';
+  if(Q_min_hc>Q_max_P){
+    rows+=ar('er','Insufficient pump capacity for hole cleaning','Minimum required flow rate for hole cleaning ('+Q_min_hc.toFixed(1)+' bbl/min) exceeds pump maximum ('+Q_max_P+' bbl/min). Cuttings will accumulate in the annulus.','Reduce annular area by using smaller bit or more drill collars. Increase fluid viscosity (raise YP) to improve cuttings transport at lower Q. Use cuttings transport efficiency correlation to quantify risk at current Q_max.');
+  }
+  rows+=ar('drill','Pump operating envelope','Min Q (hole cleaning): '+Q_min_hc.toFixed(1)+' bbl/min | Max Q (HP): '+Q_max_HP.toFixed(1)+' bbl/min | Max Q (pump): '+Q_max+' bbl/min | Recommended: '+Q_opt.toFixed(1)+' bbl/min. Optimize within this envelope using Tab 4 (Bit Hydraulics) to maximize BHHP.','');
+
+  html+='<div class="analysis"><div class="atitle">/// PUMP OPTIMIZATION</div>'+rows+'</div>';
+  document.getElementById('r5').innerHTML=html;
+
+  // Pump chart
+  var Q_range=Array.from({length:30},function(_,i){return 5+i*(Q_max/28);});
+  var ctx=document.getElementById('pumpChart').getContext('2d');
+  if(pumpChart){pumpChart.destroy();}
+  pumpChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'Parasitic losses (psi)',data:Q_range.map(function(q){return{x:q,y:(PL_coeff*Math.pow(q,n_PL)).toFixed(0)};}),
+          borderColor:'#CC7700',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4},
+        {label:'Pump max pressure',data:Q_range.map(function(q){return{x:q,y:P_max};}),
+          borderColor:'#FF3333',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,borderDash:[5,3]},
+        {label:'HP limit P = HP×1714/Q',data:Q_range.map(function(q){return{x:q,y:Math.min(P_max,HP*1714/q)};}),
+          borderColor:'#2266EE',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,borderDash:[3,3]},
+        {label:'Min Q (HC)',data:[{x:Q_min_hc,y:0},{x:Q_min_hc,y:P_max}],
+          borderColor:'#00BB55',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,borderDash:[4,3]},
+        {label:'Operating Q',data:[{x:Q_opt,y:PL_coeff*Math.pow(Q_opt,n_PL)}],
+          borderColor:'#fff',backgroundColor:'#448844',pointRadius:8,showLine:false}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Flow rate Q (bbl/min)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0,max:Q_max*1.1},
+        y:{title:{display:true,text:'Pressure (psi)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0,max:P_max*1.1}
+      }
+    }
+  });
+}
+
+/* INIT */
+calcDS();
+setTimeout(function(){calcAnn();calcECD();calcBit();calcPump();},300);
+</script>
+</body>
+</html>
