@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipeline Pressure Drop Calculator - Petrosmart Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --red:#CC0000;
+  --bg:#040408;--surf:#0A0A12;--card:#0E0E18;
+  --border:#181828;--text:#DDDDF0;--muted:#404060;
+  --ok:#00BB55;--warn:#FF8800;--err:#FF3333;--info:#2266EE;
+  --pipe:#3366AA;--pipe-dim:rgba(51,102,170,0.12);
+  --gas:#2266EE;--liq:#00AAAA;--mix:#7744EE;
+  --mono:'JetBrains Mono',monospace;--sans:'Barlow',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 60% 40% at 20% 30%,rgba(51,102,170,0.04),transparent),
+    radial-gradient(ellipse 40% 50% at 80% 70%,rgba(0,170,170,0.03),transparent);
+  pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:16px;}
+
+.hdr{background:linear-gradient(135deg,#080810,#080418,#080810);
+  border:1px solid rgba(51,102,170,0.25);border-radius:18px;
+  padding:18px 22px;margin-bottom:18px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 0 60px rgba(51,102,170,0.06);position:relative;overflow:hidden;}
+.hdr::before{content:'⟶';position:absolute;right:16px;top:50%;
+  transform:translateY(-50%);font-size:90px;opacity:0.04;pointer-events:none;}
+.hdr-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  background:linear-gradient(135deg,var(--pipe),#224488);
+  box-shadow:0 4px 20px rgba(51,102,170,0.35);}
+.hdr h1{font-size:19px;font-weight:700;color:#fff;}
+.hdr p{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+.hdr-tags{margin-left:auto;display:flex;gap:7px;flex-shrink:0;}
+.htag{padding:5px 11px;border-radius:8px;border:1px solid;font-size:10px;font-weight:600;font-family:var(--mono);}
+.ht-liq{background:rgba(0,170,170,0.10);border-color:rgba(0,170,170,0.3);color:#44DDDD;}
+.ht-gas{background:rgba(34,102,238,0.10);border-color:rgba(34,102,238,0.3);color:#5599FF;}
+.ht-mix{background:rgba(119,68,238,0.10);border-color:rgba(119,68,238,0.3);color:#AA88FF;}
+
+.tabs{display:flex;gap:3px;background:var(--surf);border:1px solid var(--border);
+  border-radius:12px;padding:4px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{flex:1;min-width:80px;padding:9px 5px;background:transparent;border:none;
+  border-radius:9px;color:var(--muted);font-size:10px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);text-transform:uppercase;letter-spacing:0.07em;transition:all 0.2s;}
+.tab:hover{color:#bbb;}
+.tab.on{background:var(--pipe);color:#fff;box-shadow:0 0 16px rgba(51,102,170,0.4);}
+.panel{display:none;}.panel.on{display:block;}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+.card.pipe-accent{border-color:rgba(51,102,170,0.2);}
+.stitle{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  border-bottom:1px solid #10101C;padding-bottom:7px;margin-bottom:14px;font-family:var(--mono);}
+.stitle.pipe{color:var(--pipe);}
+.stitle.gas{color:var(--gas);}
+.stitle.liq{color:var(--liq);}
+.stitle.neu{color:var(--muted);}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.field{margin-bottom:12px;}
+.lbl{font-size:10px;color:var(--muted);margin-bottom:5px;display:block;
+  text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.ir{display:flex;gap:6px;align-items:center;}
+input[type=number],select{width:100%;background:#07070F;border:1px solid #14142A;
+  border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;
+  font-family:var(--mono);transition:border-color 0.2s;}
+input:focus,select:focus{border-color:var(--pipe);}
+select option{background:#0A0A14;}
+.unit{font-size:10px;color:#222;min-width:52px;text-align:right;white-space:nowrap;font-family:var(--mono);}
+
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.rgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.rc{background:#07070E;border:1px solid var(--border);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden;}
+.rc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.rc.hl::after{background:var(--pipe);}
+.rc.ok::after{background:var(--ok);}
+.rc.wn::after{background:var(--warn);}
+.rc.er::after{background:var(--err);}
+.rc.gas::after{background:var(--gas);}
+.rc.liq::after{background:var(--liq);}
+.rc.hl{border-color:rgba(51,102,170,0.3);}
+.rc.ok{border-color:rgba(0,187,85,0.25);}
+.rc.wn{border-color:rgba(255,136,0,0.25);}
+.rc.er{border-color:rgba(255,51,51,0.25);}
+.rc.gas{border-color:rgba(34,102,238,0.25);}
+.rc.liq{border-color:rgba(0,170,170,0.25);}
+.rl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;font-family:var(--mono);}
+.rv{font-size:19px;font-weight:700;color:#fff;font-family:var(--mono);}
+.rv span{font-size:10px;color:#222;font-weight:400;}
+.rsub{font-size:10px;color:#222;margin-top:3px;font-family:var(--mono);}
+
+.fbox{background:#05050C;border-left:3px solid var(--pipe);border-radius:0 10px 10px 0;
+  padding:12px 16px;margin-top:14px;font-size:11px;color:#444;line-height:2.0;font-family:var(--mono);}
+.fbox strong{color:#999;}
+.fbox .hi{color:var(--pipe);font-weight:600;}
+.fbox .hig{color:var(--gas);font-weight:600;}
+.fbox .hil{color:var(--liq);font-weight:600;}
+.fbox .hiok{color:var(--ok);font-weight:600;}
+
+.analysis{background:#06060E;border:1px solid #0E0E1E;border-radius:12px;padding:16px;margin-top:14px;}
+.atitle{font-size:10px;font-weight:700;color:var(--pipe);margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:0.09em;font-family:var(--mono);}
+.arow{display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #0C0C1A;}
+.arow:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.d-ok{background:var(--ok);box-shadow:0 0 8px var(--ok);}
+.d-wn{background:var(--warn);box-shadow:0 0 8px var(--warn);}
+.d-er{background:var(--err);box-shadow:0 0 8px var(--err);}
+.d-pipe{background:var(--pipe);box-shadow:0 0 8px var(--pipe);}
+.d-gas{background:var(--gas);box-shadow:0 0 8px var(--gas);}
+.atxt strong{color:#eee;font-size:12px;display:block;margin-bottom:3px;}
+.atxt p{font-size:11px;color:#444;line-height:1.7;margin:0;}
+.asugg{font-size:11px;color:#FFAA00;margin-top:4px;line-height:1.6;}
+
+.chart-wrap{background:#05050C;border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px;}
+.chart-title{font-size:11px;color:var(--pipe);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;font-family:var(--mono);}
+
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.tbl th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.tbl td{padding:7px 10px;color:#888;border-bottom:1px solid #0C0C18;font-family:var(--mono);}
+.tbl tr:hover td{background:#0A0A14;}
+.tw{color:#fff!important;font-weight:600;}
+.ibox{background:var(--surf);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);line-height:1.7;font-family:var(--mono);}
+.ibox strong{color:#bbb;}
+.sep{height:1px;background:var(--border);margin:14px 0;}
+
+/* PRESSURE PROFILE BAR */
+.pp-bar{background:#07070E;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-top:14px;}
+.pp-title{font-size:10px;color:var(--pipe);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;}
+.pp-track{height:24px;background:#0A0A14;border-radius:12px;overflow:hidden;position:relative;margin:6px 0;}
+.pp-fill{height:100%;border-radius:12px;display:flex;align-items:center;padding:0 10px;
+  font-size:9px;color:#fff;font-family:var(--mono);font-weight:600;transition:width 0.6s;}
+
+.foot{background:var(--surf);border-top:1px solid var(--border);margin-top:18px;
+  padding:10px 20px;font-size:10px;color:#111;text-align:center;font-family:var(--mono);border-radius:12px;}
+.foot a{color:var(--pipe);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+  <div class="hdr-icon">🔴</div>
+  <div>
+    <h1>Pipeline Pressure Drop Calculator</h1>
+    <p>Darcy-Weisbach / Weymouth / Panhandle / Hazen-Williams - Liquid, Gas, Multiphase</p>
+  </div>
+  <div class="hdr-tags">
+    <div class="htag ht-liq">LIQUID</div>
+    <div class="htag ht-gas">GAS</div>
+    <div class="htag ht-mix">MULTIPHASE</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" id="t1" onclick="sw(1)">💧 Liquid Pipeline</button>
+  <button class="tab" id="t2" onclick="sw(2)">⛽ Gas Pipeline</button>
+  <button class="tab" id="t3" onclick="sw(3)">🌀 Multiphase</button>
+  <button class="tab" id="t4" onclick="sw(4)">📊 Pressure Profile</button>
+  <button class="tab" id="t5" onclick="sw(5)">⚡ Erosion and Slug</button>
+  <button class="tab" id="t6" onclick="sw(6)">📚 Reference</button>
+</div>
+
+<!-- PANEL 1: LIQUID -->
+<div class="panel on" id="p1">
+  <div class="card pipe-accent">
+    <div class="stitle liq">/// liquid pipeline - Darcy-Weisbach</div>
+    <div class="ibox">
+      <strong>Darcy-Weisbach:</strong> The fundamental equation for pressure drop in pipes. Valid for all flow regimes (laminar and turbulent). Friction factor f from Moody chart / Colebrook-White equation. Hazen-Williams (water only) and Manning (open channel) available as alternatives.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Pipe inner diameter</label>
+        <div class="ir"><input type="number" id="l_D" value="300" step="1" oninput="calcLiq()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pipe length</label>
+        <div class="ir"><input type="number" id="l_L" value="10" step="0.1" oninput="calcLiq()"><span class="unit">km</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pipe roughness ε</label>
+        <div class="ir"><input type="number" id="l_eps" value="0.046" step="0.001" oninput="calcLiq()"><span class="unit">mm</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Flow rate Q</label>
+        <div class="ir"><input type="number" id="l_Q" value="500" step="10" oninput="calcLiq()"><span class="unit">m3/hr</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Liquid density ρ</label>
+        <div class="ir"><input type="number" id="l_rho" value="870" step="5" oninput="calcLiq()"><span class="unit">kg/m3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Dynamic viscosity μ</label>
+        <div class="ir"><input type="number" id="l_mu" value="5" step="0.1" oninput="calcLiq()"><span class="unit">cP</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Elevation change Δz</label>
+        <div class="ir"><input type="number" id="l_dz" value="0" step="1" oninput="calcLiq()"><span class="unit">m (+ = uphill)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Inlet pressure P1</label>
+        <div class="ir"><input type="number" id="l_P1" value="50" step="1" oninput="calcLiq()"><span class="unit">bar(g)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Number of fittings (90° elbows equiv.)</label>
+        <div class="ir"><input type="number" id="l_fit" value="10" step="1" oninput="calcLiq()"><span class="unit">-</span></div>
+      </div>
+    </div>
+    <div id="r1"></div>
+    <div class="pp-bar" id="pp1">
+      <div class="pp-title">PRESSURE PROFILE</div>
+      <div id="pp1-bars"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 2: GAS -->
+<div class="panel" id="p2">
+  <div class="card pipe-accent">
+    <div class="stitle gas">/// gas pipeline - Weymouth and Panhandle equations</div>
+    <div class="ibox">
+      <strong>Gas pipeline formulas:</strong><br>
+      <strong>Weymouth</strong> (short, high-rate lines): f = C/D^(1/3), good for small-diameter pipelines.<br>
+      <strong>Panhandle A</strong> (intermediate efficiency): E factor 0.92 typical. Good for medium-pressure gas.<br>
+      <strong>Panhandle B</strong> (modified, high-pressure): More accurate at high Reynolds numbers.<br>
+      <strong>General Darcy-Weisbach</strong> with Colebrook-White friction factor is most accurate.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Pipe inner diameter</label>
+        <div class="ir"><input type="number" id="g_D" value="500" step="1" oninput="calcGas()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pipe length</label>
+        <div class="ir"><input type="number" id="g_L" value="100" step="1" oninput="calcGas()"><span class="unit">km</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pipe roughness ε</label>
+        <div class="ir"><input type="number" id="g_eps" value="0.046" step="0.001" oninput="calcGas()"><span class="unit">mm</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Gas flow rate Qg (standard)</label>
+        <div class="ir"><input type="number" id="g_Q" value="5000000" step="100000" oninput="calcGas()"><span class="unit">Sm3/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas specific gravity γg</label>
+        <div class="ir"><input type="number" id="g_gamma" value="0.65" step="0.01" oninput="calcGas()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Inlet pressure P1</label>
+        <div class="ir"><input type="number" id="g_P1" value="70" step="1" oninput="calcGas()"><span class="unit">bar(a)</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Gas temperature T (avg)</label>
+        <div class="ir"><input type="number" id="g_T" value="15" step="1" oninput="calcGas()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Elevation change Δz</label>
+        <div class="ir"><input type="number" id="g_dz" value="0" step="10" oninput="calcGas()"><span class="unit">m (+ = uphill)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pipeline efficiency E</label>
+        <div class="ir"><input type="number" id="g_E" value="0.92" step="0.01" oninput="calcGas()"><span class="unit">0-1 (Panhandle)</span></div>
+      </div>
+    </div>
+    <div id="r2"></div>
+    <div class="chart-wrap">
+      <div class="chart-title">Gas pipeline: pressure drop vs flow rate (3 methods)</div>
+      <canvas id="gasChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 3: MULTIPHASE -->
+<div class="panel" id="p3">
+  <div class="card pipe-accent">
+    <div class="stitle liq">/// multiphase flow - Beggs-Brill correlation</div>
+    <div class="ibox">
+      <strong>Multiphase flow:</strong> Oil-gas-water mixture in pipelines. Beggs-Brill (1973) is the industry standard for flow pattern identification and pressure drop calculation. Flow patterns: Segregated (stratified, wavy), Intermittent (slug, plug), Distributed (bubble, mist).
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Pipe inner diameter</label>
+        <div class="ir"><input type="number" id="m_D" value="200" step="1" oninput="calcMulti()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pipe length</label>
+        <div class="ir"><input type="number" id="m_L" value="20" step="1" oninput="calcMulti()"><span class="unit">km</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pipe inclination</label>
+        <div class="ir"><input type="number" id="m_theta" value="0" step="1" min="-90" max="90" oninput="calcMulti()"><span class="unit">° (+= uphill)</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Oil flow rate Qo</label>
+        <div class="ir"><input type="number" id="m_Qo" value="2000" step="100" oninput="calcMulti()"><span class="unit">bbl/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas flow rate Qg</label>
+        <div class="ir"><input type="number" id="m_Qg" value="1000000" step="50000" oninput="calcMulti()"><span class="unit">Sm3/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Water flow rate Qw</label>
+        <div class="ir"><input type="number" id="m_Qw" value="500" step="100" oninput="calcMulti()"><span class="unit">bbl/d</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Oil density</label>
+        <div class="ir"><input type="number" id="m_rho_o" value="850" step="5" oninput="calcMulti()"><span class="unit">kg/m3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas density (op. cond.)</label>
+        <div class="ir"><input type="number" id="m_rho_g" value="50" step="1" oninput="calcMulti()"><span class="unit">kg/m3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Operating pressure P</label>
+        <div class="ir"><input type="number" id="m_P" value="50" step="1" oninput="calcMulti()"><span class="unit">bar(a)</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Oil viscosity</label>
+        <div class="ir"><input type="number" id="m_muo" value="5" step="0.1" oninput="calcMulti()"><span class="unit">cP</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas viscosity</label>
+        <div class="ir"><input type="number" id="m_mug" value="0.015" step="0.001" oninput="calcMulti()"><span class="unit">cP</span></div>
+      </div>
+    </div>
+    <div id="r3"></div>
+  </div>
+</div>
+
+<!-- PANEL 4: PRESSURE PROFILE -->
+<div class="panel" id="p4">
+  <div class="card pipe-accent">
+    <div class="stitle pipe">/// pipeline pressure profile along length</div>
+    <div class="ibox">
+      Calculates and plots the pressure profile along the pipeline length, accounting for friction losses, elevation changes, and compressibility (gas). Useful for identifying intermediate booster station requirements.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Fluid type</label>
+        <select id="pp_fluid" onchange="calcProfile()">
+          <option value="liquid">Liquid (crude oil)</option>
+          <option value="gas">Gas (natural gas)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Pipe inner diameter</label>
+        <div class="ir"><input type="number" id="pp_D" value="300" step="1" oninput="calcProfile()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Total pipe length</label>
+        <div class="ir"><input type="number" id="pp_L" value="50" step="1" oninput="calcProfile()"><span class="unit">km</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Inlet pressure P_in</label>
+        <div class="ir"><input type="number" id="pp_P1" value="60" step="1" oninput="calcProfile()"><span class="unit">bar(a or g)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Min. delivery pressure P_min</label>
+        <div class="ir"><input type="number" id="pp_Pmin" value="10" step="1" oninput="calcProfile()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Flow rate</label>
+        <div class="ir"><input type="number" id="pp_Q" value="500" step="10" oninput="calcProfile()"><span class="unit">m3/hr or Sm3/d (/1000)</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Density / Sp. gravity γg</label>
+        <div class="ir"><input type="number" id="pp_rho" value="870" step="5" oninput="calcProfile()"><span class="unit">kg/m3 or -</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Viscosity</label>
+        <div class="ir"><input type="number" id="pp_mu" value="5" step="0.1" oninput="calcProfile()"><span class="unit">cP</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Elevation change (total)</label>
+        <div class="ir"><input type="number" id="pp_dz" value="50" step="10" oninput="calcProfile()"><span class="unit">m (+= uphill)</span></div>
+      </div>
+    </div>
+    <div id="r4"></div>
+    <div class="chart-wrap">
+      <div class="chart-title">Pressure profile along pipeline</div>
+      <canvas id="profileChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 5: EROSION AND SLUG -->
+<div class="panel" id="p5">
+  <div class="card pipe-accent">
+    <div class="stitle pipe">/// erosion velocity and slug flow analysis</div>
+    <div class="ibox">
+      <strong>Erosion:</strong> API RP 14E: V_e = C/√ρ_mix [m/s], C=100 uninhibited, C=150 with inhibitor. <strong>Slug flow:</strong> Characterized by Lockhart-Martinelli parameter X_LM. Slug detection and frequency estimation important for pipeline design and slug catcher sizing.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Pipe inner diameter</label>
+        <div class="ir"><input type="number" id="e_D" value="200" step="1" oninput="calcErosion()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Liquid superficial velocity</label>
+        <div class="ir"><input type="number" id="e_vsl" value="0.5" step="0.01" oninput="calcErosion()"><span class="unit">m/s</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas superficial velocity</label>
+        <div class="ir"><input type="number" id="e_vsg" value="3" step="0.1" oninput="calcErosion()"><span class="unit">m/s</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Liquid density ρL</label>
+        <div class="ir"><input type="number" id="e_rhoL" value="870" step="5" oninput="calcErosion()"><span class="unit">kg/m3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas density ρG</label>
+        <div class="ir"><input type="number" id="e_rhoG" value="50" step="1" oninput="calcErosion()"><span class="unit">kg/m3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Inhibitor used?</label>
+        <select id="e_inh" onchange="calcErosion()">
+          <option value="100">No (C=100)</option>
+          <option value="150">Yes (C=150)</option>
+          <option value="200">Resistant alloy (C=200)</option>
+        </select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Liquid viscosity μL</label>
+        <div class="ir"><input type="number" id="e_muL" value="5" step="0.1" oninput="calcErosion()"><span class="unit">cP</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas viscosity μG</label>
+        <div class="ir"><input type="number" id="e_muG" value="0.015" step="0.001" oninput="calcErosion()"><span class="unit">cP</span></div>
+      </div>
+    </div>
+    <div id="r5"></div>
+    <div class="chart-wrap">
+      <div class="chart-title">Beggs-Brill flow pattern map (horizontal)</div>
+      <canvas id="flowMapChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 6: REFERENCE -->
+<div class="panel" id="p6">
+  <div class="card">
+    <div class="stitle pipe">/// key formulas - pipeline pressure drop</div>
+    <div class="fbox">
+      <strong>Darcy-Weisbach:</strong> ΔP = f × (L/D) × (ρ × v²/2) [Pa]<br>
+      <strong>Total pressure drop:</strong> ΔP_total = ΔP_friction + ΔP_elevation + ΔP_acceleration<br>
+      <strong>ΔP_elevation:</strong> ρ × g × Δz [Pa] (+ for uphill)<br>
+      <strong>Reynolds number:</strong> Re = ρ × v × D / μ [dimensionless]<br>
+      <strong>Friction factor (Colebrook-White):</strong> 1/√f = -2 × log10(ε/(3.7D) + 2.51/(Re×√f))<br>
+      <strong>Swamee-Jain (explicit):</strong> f = 0.25 / [log10(ε/(3.7D) + 5.74/Re^0.9)]²<br>
+      <strong>Weymouth (gas):</strong> Q = 3.7435×10⁻³ × D^(8/3) × √((P1²-P2²)/(γg×T×Z×L)) [Sm3/d]<br>
+      <strong>Panhandle A:</strong> Q = 435.87 × E × (T_sc/P_sc)^1.0788 × (P1²-P2²)^0.5394 / (γg^0.4606×T^0.5394×L^0.5394×D^1.0788)<br>
+      <strong>Hazen-Williams (water):</strong> Q = 0.2785 × C_HW × D^2.63 × S^0.54 [m3/s, S = slope = ΔP/(ρgL)]<br>
+      <strong>Beggs-Brill Froude:</strong> Fr = vm/√(g×D) | NFr = vm²/(g×D)<br>
+      <strong>Lockhart-Martinelli X:</strong> X_LM = (ΔP/L)_liquid/(ΔP/L)_gas)^0.5<br>
+      <strong>Erosion velocity (API RP 14E):</strong> Ve = C/√ρ_mix [ft/s], C=100-200<br>
+      <strong>Slug frequency:</strong> fs ≈ 0.025 × (vsL + vsg)² / D [Hz] (approximate Taitel-Dukler)
+    </div>
+    <div class="sep"></div>
+    <div class="stitle pipe">/// pipe roughness values</div>
+    <table class="tbl">
+      <thead><tr><th>Pipe material</th><th>ε (mm)</th><th>ε (inches)</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">New carbon steel</td><td>0.046</td><td>0.0018</td><td>Standard oil/gas pipelines</td></tr>
+        <tr><td class="tw">Internally coated steel</td><td>0.006</td><td>0.00024</td><td>FBE or liquid epoxy coating</td></tr>
+        <tr><td class="tw">Stainless steel (new)</td><td>0.015</td><td>0.0006</td><td>CRA process piping</td></tr>
+        <tr><td class="tw">Galvanized steel</td><td>0.15</td><td>0.006</td><td>Water service</td></tr>
+        <tr><td class="tw">Cast iron</td><td>0.26</td><td>0.010</td><td>Old water mains</td></tr>
+        <tr><td class="tw">Concrete</td><td>0.3-3.0</td><td>0.012-0.12</td><td>Varies with surface quality</td></tr>
+        <tr><td class="tw">PVC / GRE</td><td>0.0015</td><td>0.00006</td><td>Smooth plastic</td></tr>
+        <tr><td class="tw">Corroded carbon steel</td><td>0.5-5.0</td><td>0.02-0.2</td><td>Increase over time with corrosion</td></tr>
+      </tbody>
+    </table>
+    <div class="sep"></div>
+    <div class="stitle pipe">/// fitting loss coefficients (K-factors)</div>
+    <table class="tbl">
+      <thead><tr><th>Fitting type</th><th>K (velocity heads)</th><th>Le/D (equiv. length)</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Gate valve (fully open)</td><td>0.1-0.3</td><td>7</td><td>Minimal loss when open</td></tr>
+        <tr><td class="tw">Globe valve (fully open)</td><td>4-10</td><td>350</td><td>High resistance design</td></tr>
+        <tr><td class="tw">Ball valve (fully open)</td><td>0.05-0.1</td><td>3</td><td>Very low loss</td></tr>
+        <tr><td class="tw">Butterfly valve (fully open)</td><td>0.3-1.5</td><td>45</td><td>Depends on disc angle</td></tr>
+        <tr><td class="tw">90° standard elbow</td><td>0.3-0.9</td><td>30</td><td>Most common fitting</td></tr>
+        <tr><td class="tw">90° long-radius elbow</td><td>0.15-0.4</td><td>16</td><td>R/D = 1.5</td></tr>
+        <tr><td class="tw">45° elbow</td><td>0.15-0.4</td><td>16</td><td>Half of 90° approx</td></tr>
+        <tr><td class="tw">Tee (flow through)</td><td>0.1-0.3</td><td>10</td><td>Straight through</td></tr>
+        <tr><td class="tw">Tee (branching flow)</td><td>0.7-1.5</td><td>60</td><td>Side branch exit</td></tr>
+        <tr><td class="tw">Check valve (swing)</td><td>0.6-2.0</td><td>100</td><td>Depends on flow rate</td></tr>
+        <tr><td class="tw">Pipe entry (sharp)</td><td>0.5</td><td>-</td><td>Tank to pipe entry</td></tr>
+        <tr><td class="tw">Pipe exit</td><td>1.0</td><td>-</td><td>Pipe to tank</td></tr>
+        <tr><td class="tw">Reducer (gradual)</td><td>0.04-0.1</td><td>-</td><td>Half angle < 15°</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">
+  <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
+  · Darcy-Weisbach / Weymouth / Panhandle A&B / Beggs-Brill / API RP 14E · Educational tool only
+</div>
+</div>
+
+<script>
+var gasChart=null, profileChart=null, flowMapChart=null;
+
+function sw(n){
+  for(var i=1;i<=6;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    document.getElementById('t'+i).className='tab'+(i===n?' on':'');
+  }
+  if(n===2)setTimeout(calcGas,80);
+  if(n===3)setTimeout(calcMulti,80);
+  if(n===4)setTimeout(calcProfile,80);
+  if(n===5)setTimeout(calcErosion,80);
+}
+function rc(cls,lbl,val,unit,sub){
+  return '<div class="rc '+(cls||'')+'">'
+    +'<div class="rl">'+lbl+'</div>'
+    +'<div class="rv">'+val+(unit?' <span>'+unit+'</span>':'')+'</div>'
+    +(sub?'<div class="rsub">'+sub+'</div>':'')+'</div>';
+}
+function ar(type,title,body,sugg){
+  var d={ok:'d-ok',wn:'d-wn',er:'d-er',pipe:'d-pipe',gas:'d-gas'}[type]||'d-pipe';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+}
+
+/* Colebrook-White friction factor (iterative) */
+function frictionFactor(Re, eps_D){
+  if(Re<2300) return 64/Re; // laminar
+  var f=0.02; // initial guess
+  for(var i=0;i<50;i++){
+    var f_new=1/Math.pow(-2*Math.log10(eps_D/3.7+2.51/(Re*Math.sqrt(f))),2);
+    if(Math.abs(f_new-f)<1e-7) break;
+    f=f_new;
+  }
+  return f;
+}
+// Swamee-Jain explicit
+function frictionSJ(Re,eps_D){
+  if(Re<2300) return 64/Re;
+  return 0.25/Math.pow(Math.log10(eps_D/3.7+5.74/Math.pow(Re,0.9)),2);
+}
+
+/* ====== PANEL 1: LIQUID ====== */
+function calcLiq(){
+  var D_mm=parseFloat(document.getElementById('l_D').value)||300;
+  var L_km=parseFloat(document.getElementById('l_L').value)||10;
+  var eps=parseFloat(document.getElementById('l_eps').value)||0.046; // mm
+  var Q_m3h=parseFloat(document.getElementById('l_Q').value)||500;
+  var rho=parseFloat(document.getElementById('l_rho').value)||870;
+  var mu_cP=parseFloat(document.getElementById('l_mu').value)||5;
+  var dz=parseFloat(document.getElementById('l_dz').value)||0;
+  var P1=parseFloat(document.getElementById('l_P1').value)||50;
+  var n_fit=parseFloat(document.getElementById('l_fit').value)||10;
+
+  var D=D_mm/1000; // m
+  var L=L_km*1000; // m
+  var eps_D=eps/D_mm;
+  var A=Math.PI/4*D*D;
+  var Q_m3s=Q_m3h/3600;
+  var v=Q_m3s/A; // m/s
+  var mu_Pa=mu_cP/1000; // Pa.s
+  var Re=rho*v*D/mu_Pa;
+  var f=frictionFactor(Re,eps_D);
+  var regime=Re<2300?'Laminar':Re<4000?'Transitional':'Turbulent';
+
+  // Darcy-Weisbach friction pressure drop
+  var dP_fric=f*(L/D)*(rho*v*v/2); // Pa
+  // Fittings (K factor approx 0.5 per 90° elbow)
+  var K_fit=n_fit*0.5;
+  var dP_fit=K_fit*(rho*v*v/2);
+  // Elevation
+  var dP_elev=rho*9.81*dz; // Pa
+  // Total
+  var dP_total=dP_fric+dP_fit+dP_elev;
+  var dP_total_bar=dP_total/1e5;
+  var P2=P1-dP_total_bar;
+  var dP_grad=dP_fric/(L*1e5)*1000; // bar/km
+
+  // Velocity check
+  var V_erosion=100/Math.sqrt(rho);
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Total pressure drop',dP_total_bar.toFixed(3),'bar','= '+(dP_total_bar*1e5/1000).toFixed(0)+' kPa');
+  html+=rc('hl','Outlet pressure P2',P2.toFixed(2),'bar(g)',P2>0?'Adequate':'BELOW ZERO - Pump required');
+  html+=rc('liq','Flow velocity',v.toFixed(3),'m/s','A = '+(A*1e4).toFixed(2)+' cm2');
+  html+=rc('','Reynolds number',Re.toFixed(0),'-',regime);
+  html+=rc('','Friction factor f',f.toFixed(5),'-','Colebrook-White');
+  html+=rc('','Friction ΔP',(dP_fric/1e5).toFixed(3),'bar',(dP_fric/1e5/dP_total_bar*100).toFixed(0)+'% of total');
+  html+=rc('','Elevation ΔP',(dP_elev/1e5).toFixed(3),'bar',dz>=0?'Uphill penalty':'Downhill gain');
+  html+=rc('','Fittings ΔP',(dP_fit/1e5).toFixed(3),'bar','K='+K_fit.toFixed(1)+' for '+n_fit+' x 90° elbows');
+  html+=rc('','Pressure gradient',dP_grad.toFixed(4),'bar/km','Friction only');
+  html+=rc(v>V_erosion?'er':v>V_erosion*0.8?'wn':'ok','Erosion velocity limit',V_erosion.toFixed(2),'m/s','API RP 14E C=100 | actual: '+v.toFixed(2)+' m/s');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Re</strong> = ρ×v×D/μ = '+rho+'×'+v.toFixed(3)+'×'+D+'/'+mu_Pa.toFixed(4)+' = <span class="hi">'+Re.toFixed(0)+' ('+regime+')</span><br>'
+    +'<strong>f (Colebrook-White)</strong> = <span class="hi">'+f.toFixed(5)+'</span> | ε/D = '+eps_D.toFixed(5)+'<br>'
+    +'<strong>ΔP_fric</strong> = f×(L/D)×(ρv²/2) = '+f.toFixed(5)+'×('+(L/D).toFixed(0)+')×('+rho+'×'+v.toFixed(3)+'²/2) = <span class="hi">'+(dP_fric/1e5).toFixed(3)+' bar</span><br>'
+    +'<strong>ΔP_elev</strong> = ρ×g×Δz = '+rho+'×9.81×'+dz+' = <span class="hi">'+(dP_elev/1e5).toFixed(3)+' bar</span><br>'
+    +'<strong>ΔP_total</strong> = '+(dP_fric/1e5).toFixed(3)+' + '+(dP_fit/1e5).toFixed(3)+' + '+(dP_elev/1e5).toFixed(3)+' = <span class="hi">'+dP_total_bar.toFixed(3)+' bar</span>'
+    +'</div>';
+
+  var rows='';
+  if(P2<5){
+    rows+=ar('er','Outlet pressure too low (P2 = '+P2.toFixed(1)+' bar)','Pressure at delivery is '+(P2<0?'negative':'critically low')+'. '+(P2<0?'Pipeline cannot operate without boosting.':'Minimum operating pressure for valves and instrumentation is typically 5-10 bar.'),'Install booster pump station. Required pump head = '+( Math.abs(P2-5)*1e5/(rho*9.81)).toFixed(0)+' m ('+(Math.abs(P2-5)).toFixed(1)+' bar). Alternatively reduce flow rate to '+(Q_m3h*Math.sqrt((P1-5)/dP_total_bar)).toFixed(0)+' m3/hr (proportional estimate).');
+  }
+  if(v<0.5&&Re<50000){
+    rows+=ar('wn','Low velocity ('+v.toFixed(2)+' m/s) - potential settling and slugging','At '+v.toFixed(2)+' m/s, heavy particles and water may settle in low spots. For crude oil: minimum velocity 0.5 m/s to keep solids in suspension. Wax deposition risk increases below cloud point temperature at low velocities.','Increase flow velocity or implement regular pigging programme. For waxy crude: (1) Continuous chemical wax inhibitor injection. (2) Hot oil circulation through offload line. (3) Install pig launcher/receiver and plan monthly pigging minimum.');
+  }
+  if(v>5){
+    rows+=ar('wn','High velocity ('+v.toFixed(2)+' m/s) - erosion and noise risk','Velocity above 5 m/s may cause erosion at bends, reducers and tees, especially if solids are present. Noise and vibration levels may exceed design limits (85 dB at pipe wall).','Consider increasing pipe diameter: next standard size is '+(Math.ceil(D_mm/100+1)*100)+' mm ID. Velocity reduces to approx '+(v*D*D/Math.pow((Math.ceil(D_mm/100+1)*100)/1000,2)).toFixed(2)+' m/s. Install hard-facing on high-velocity bends (Stellite overlay, Inconel weld overlay).');
+  }
+  if(!rows) rows=ar('ok','Liquid pipeline design acceptable','v = '+v.toFixed(2)+' m/s, Re = '+Re.toFixed(0)+' ('+regime+'), ΔP = '+dP_total_bar.toFixed(2)+' bar, P2 = '+P2.toFixed(1)+' bar. All parameters within normal operating range.','');
+
+  html+='<div class="analysis"><div class="atitle">/// LIQUID PIPELINE ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r1').innerHTML=html;
+
+  // Pressure profile bars
+  var bars='';
+  var dPfrPct=Math.min(100,(dP_fric/1e5)/Math.max(0.001,P1)*100);
+  var dPelPct=Math.min(100,(Math.abs(dP_elev)/1e5)/Math.max(0.001,P1)*100);
+  var dPfitPct=Math.min(100,(dP_fit/1e5)/Math.max(0.001,P1)*100);
+  var P2pct=Math.min(100,Math.max(0,P2/P1*100));
+  bars+='<div style="font-size:9px;color:var(--muted);font-family:var(--mono);margin-bottom:6px;">P1 = '+P1+' bar | P2 = '+P2.toFixed(1)+' bar | ΔP = '+dP_total_bar.toFixed(2)+' bar</div>';
+  bars+='<div class="pp-track"><div class="pp-fill" style="width:'+dPfrPct.toFixed(0)+'%;background:#3366AA;">Friction: '+(dP_fric/1e5).toFixed(2)+'b</div></div>';
+  bars+='<div class="pp-track"><div class="pp-fill" style="width:'+dPelPct.toFixed(0)+'%;background:'+(dz>=0?'#CC4422':'#00AA44')+';">Elevation: '+(dP_elev/1e5).toFixed(2)+'b</div></div>';
+  bars+='<div class="pp-track"><div class="pp-fill" style="width:'+dPfitPct.toFixed(0)+'%;background:#6633AA;">Fittings: '+(dP_fit/1e5).toFixed(2)+'b</div></div>';
+  bars+='<div class="pp-track"><div class="pp-fill" style="width:'+P2pct.toFixed(0)+'%;background:'+(P2>10?'#00BB55':'#FF3333')+';">P2 = '+P2.toFixed(1)+' bar</div></div>';
+  document.getElementById('pp1-bars').innerHTML=bars;
+}
+
+/* ====== PANEL 2: GAS ====== */
+function calcGas(){
+  var D_mm=parseFloat(document.getElementById('g_D').value)||500;
+  var L_km=parseFloat(document.getElementById('g_L').value)||100;
+  var eps=parseFloat(document.getElementById('g_eps').value)||0.046;
+  var Q_std=parseFloat(document.getElementById('g_Q').value)||5000000; // Sm3/d
+  var gamma=parseFloat(document.getElementById('g_gamma').value)||0.65;
+  var P1=parseFloat(document.getElementById('g_P1').value)||70; // bar(a)
+  var T_C=parseFloat(document.getElementById('g_T').value)||15;
+  var dz=parseFloat(document.getElementById('g_dz').value)||0;
+  var E=parseFloat(document.getElementById('g_E').value)||0.92;
+
+  var D=D_mm/1000;
+  var L=L_km*1000;
+  var T_K=T_C+273.15;
+  var Tsc=288.15, Psc=1.01325; // standard conditions
+
+  // Z factor approximation
+  var Pc=667+15*gamma-37.5*gamma*gamma; // psia
+  var Tc=168+325*gamma-12.5*gamma*gamma; // R
+  var P1_psia=P1*14.504;
+  var Ppr=P1_psia/Pc;
+  var Tpr=T_K*1.8/Tc;
+  var Z=1-3.52*Ppr/(10.73*Tpr)+0.274*Ppr*Ppr/(10.73*Tpr*Tpr);
+  Z=Math.max(0.6,Math.min(1.0,Z));
+
+  // Average gas density at line conditions
+  var MW_g=gamma*28.97;
+  var rho_avg=P1*1e5*MW_g/(Z*8314*T_K); // kg/m3
+
+  // Gas viscosity (Lee-Kesler approx)
+  var mu_g=0.0001*(( 9.4+0.02*MW_g)*Math.pow(T_K,1.5))/(209+19*MW_g+T_K);
+  mu_g=Math.max(0.008,Math.min(mu_g,0.025)); // clamp
+
+  // Actual volumetric flow at line conditions
+  var Q_act=Q_std/86400*(Z*T_K/Tsc)*(Psc/P1); // m3/s
+  var A=Math.PI/4*D*D;
+  var v=Q_act/A; // m/s
+
+  var Re=rho_avg*v*D/(mu_g/1000);
+  var f=frictionFactor(Re,eps/D_mm);
+
+  // Darcy-Weisbach ΔP² method (for gas)
+  // ΔP² = f × (L/D) × (ρ_avg × v²/2) × 2 × P1 (simplified pressure-squared)
+  var dP_DW=f*(L/D)*(rho_avg*v*v/2); // Pa average
+  var dP_DW_bar=dP_DW/1e5;
+  var P2_DW=P1-dP_DW_bar;
+
+  // Weymouth formula: Q = 3.7435e-3 × D^(8/3) × sqrt((P1²-P2²)/(γ×T×Z×L))
+  // Solve for P2: P2² = P1² - (Q/3.7435e-3/D^(8/3))² × γ×T×Z×L
+  var Q_Mscfd=Q_std/28317; // Mscf/d
+  var Wy_coeff=3.7435e-3*Math.pow(D_mm/1000*39.37,8/3); // ft units approx
+  // Using SI-friendly Weymouth: Q [Sm3/d] = 3.7435e-3 × D[m]^(8/3) × sqrt((P1²-P2²)/( γ×T×Z×L)) × 86400×Psc/(R_univ×Tsc)
+  // Simplified: P2_wy² = P1² - (Q_std × sqrt(γ×T×Z×L) / K_wy)²
+  var K_wy=3.7435e-3*Math.pow(D,8/3)*Math.sqrt(1/(gamma*T_K*Z*L))*86400;
+  // P2_wy: iterative
+  var P2_wy=P1*0.8;
+  for(var i=0;i<20;i++){
+    var Z_avg=Z; // simplified constant Z
+    var K=3.7435e-3*Math.pow(D,8/3)*Math.sqrt((P1*P1-P2_wy*P2_wy)/(gamma*T_K*Z_avg*L))*86400;
+    var err=K-Q_std/1e6; // in MSm3/d
+    if(Math.abs(err)<1e-4) break;
+    P2_wy-=err*(P1-P2_wy)*0.1;
+    P2_wy=Math.max(0.1,P2_wy);
+  }
+  // Panhandle A: Q = 435.87 × E × (Tsc/Psc)^1.0788 × (P1²-P2²)^0.5394 / (γg^0.4606 × T^0.5394 × L^0.5394 × D_in^1.0788)
+  // Using D in inches, P in psia, Q in Mscf/d, L in miles, T in R
+  var D_in=D*39.37;
+  var L_mi=L_km*0.6214;
+  var T_R=T_K*1.8;
+  var P1_pa=P1*14.504; // psia
+  var P2_pa=P1_pa*0.85; // initial
+  for(var j=0;j<20;j++){
+    var Q_calc_PA=435.87*E*Math.pow(Tsc*1.8/14.696,1.0788)*Math.pow(P1_pa*P1_pa-P2_pa*P2_pa,0.5394)/(Math.pow(gamma,0.4606)*Math.pow(T_R,0.5394)*Math.pow(L_mi,0.5394)*Math.pow(D_in,1.0788));
+    var err2=Q_calc_PA-Q_Mscfd;
+    if(Math.abs(err2)<0.01) break;
+    P2_pa-=err2*0.5;
+    P2_pa=Math.max(1,P2_pa);
+  }
+  var P2_PA=P2_pa/14.504;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','ΔP (Darcy-Weisbach)',dP_DW_bar.toFixed(2),'bar','P2 = '+P2_DW.toFixed(1)+' bar(a)');
+  html+=rc('gas','P2 (Weymouth)',P2_wy.toFixed(2),'bar(a)','ΔP = '+(P1-P2_wy).toFixed(2)+' bar');
+  html+=rc('gas','P2 (Panhandle A)',P2_PA.toFixed(2),'bar(a)','E = '+E+', ΔP = '+(P1-P2_PA).toFixed(2)+' bar');
+  html+=rc('','Gas velocity (actual)',v.toFixed(2),'m/s','At P = '+P1+' bar, T = '+T_C+'°C');
+  html+=rc('','Reynolds number',Re.toFixed(0),'-',Re>1e6?'Fully turbulent':'Transitional/turbulent');
+  html+=rc('','Friction factor f',f.toFixed(5),'-','Colebrook-White');
+  html+=rc('','Z factor (estimated)',Z.toFixed(3),'-','Hall-Yarborough approx');
+  html+=rc('','Gas density (actual)',rho_avg.toFixed(2),'kg/m3','At P1, T conditions');
+  html+=rc('','Actual volumetric flow',(Q_act*3600).toFixed(0),'m3/hr actual','= '+(v).toFixed(2)+' m/s at '+(A*1e4).toFixed(0)+' cm2');
+  html+=rc('','Velocity / speed of sound',(v/(Math.sqrt(1.3*8314/MW_g*T_K))*100).toFixed(1),'% Mach','Mach < 50% recommended');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Darcy-Weisbach:</strong> ΔP = f×(L/D)×(ρ×v²/2) = '+f.toFixed(5)+'×'+(L/D).toFixed(0)+'×('+(rho_avg).toFixed(2)+'×'+v.toFixed(2)+'²/2) / 1e5 = <span class="hi">'+dP_DW_bar.toFixed(2)+' bar</span><br>'
+    +'<strong>Weymouth:</strong> P2 = sqrt(P1² - (Q/K_Wy)² × γ×T×Z×L) = <span class="hig">'+P2_wy.toFixed(2)+' bar(a)</span><br>'
+    +'<strong>Panhandle A:</strong> (iterative, E='+E+') = <span class="hig">'+P2_PA.toFixed(2)+' bar(a)</span><br>'
+    +'<strong>Z factor:</strong> '+Z.toFixed(3)+' | Re = '+Re.toFixed(0)+' | f = '+f.toFixed(5)+' | ρ_avg = '+rho_avg.toFixed(2)+' kg/m3'
+    +'</div>';
+
+  var rows='';
+  var v_sonic=Math.sqrt(1.3*8314/MW_g*T_K);
+  if(v>v_sonic*0.5){
+    rows+=ar('er','Gas velocity exceeds 50% of sonic speed (Mach '+(v/v_sonic).toFixed(2)+')','High gas velocities create noise, erosion and potential flow instability. At Mach > 0.3-0.5, compressibility effects become significant and pressure drop increases non-linearly.','Increase pipe diameter to reduce velocity. Mach number target < 0.3 for process piping, < 0.5 for export pipelines. Next larger diameter: '+(Math.ceil(D_mm/100+1)*100)+' mm reduces velocity to '+(v*D*D/Math.pow((Math.ceil(D_mm/100+1)*100)/1000,2)).toFixed(2)+' m/s (Mach '+(v*D*D/Math.pow((Math.ceil(D_mm/100+1)*100)/1000,2)/v_sonic).toFixed(2)+').');
+  }
+  if((P1-P2_wy)/P1>0.3){
+    rows+=ar('wn','High pressure ratio ('+(( P1-P2_wy)/P1*100).toFixed(0)+'% pressure loss)','Losing more than 30% of inlet pressure over the pipeline length. Gas density varies significantly along the line, making pressure-average calculations less accurate. Full isothermal compressible flow simulation recommended.','Consider: (1) Installing intermediate compressor station at approximately km '+(L_km/2).toFixed(0)+'. (2) Increasing pipe diameter. (3) Operating at higher inlet pressure to reduce pressure ratio. For ΔP/P1 > 40%, use AGA Equation 1 (full compressible flow) for accurate sizing.');
+  }
+  rows+=ar('pipe','Gas pipeline comparison','Darcy-Weisbach: P2 = '+P2_DW.toFixed(1)+' bar | Weymouth: P2 = '+P2_wy.toFixed(1)+' bar | Panhandle A: P2 = '+P2_PA.toFixed(1)+' bar. Differences reflect equation applicability: Weymouth is conservative (higher ΔP) for large diameter, Panhandle A more accurate for Re > 10M.','Use Darcy-Weisbach with Colebrook friction factor for most accurate results. Weymouth is conservative and good for design. Panhandle A/B: recommended for long-distance gas transmission at high Re (> 10 million).');
+
+  html+='<div class="analysis"><div class="atitle gas">/// GAS PIPELINE ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r2').innerHTML=html;
+
+  // Gas chart: P2 vs Q for 3 methods
+  var Q_range=Array.from({length:20},function(_,i){return Q_std*(0.3+i*0.07);});
+  var ctx=document.getElementById('gasChart').getContext('2d');
+  if(gasChart){gasChart.destroy();}
+  gasChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'Darcy-Weisbach',data:Q_range.map(function(q){
+          var qa=q/86400*(Z*T_K/Tsc)*(Psc/P1);
+          var v2=qa/A;
+          var Re2=rho_avg*v2*D/(mu_g/1000);
+          var f2=frictionFactor(Re2,eps/D_mm);
+          var dp=f2*(L/D)*(rho_avg*v2*v2/2)/1e5;
+          return {x:q/1e6,y:Math.max(0,P1-dp)};
+        }),borderColor:'#3366AA',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4},
+        {label:'Weymouth',data:Q_range.map(function(q){
+          var P2w=P1*0.8;
+          for(var ii=0;ii<15;ii++){
+            var K=3.7435e-3*Math.pow(D,8/3)*Math.sqrt(Math.max(0,P1*P1-P2w*P2w)/(gamma*T_K*Z*L))*86400;
+            P2w-=(K-q/1e6)*0.3; P2w=Math.max(0.1,P2w);
+          }
+          return {x:q/1e6,y:Math.max(0,P2w)};
+        }),borderColor:'#2266EE',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4,borderDash:[5,3]},
+        {label:'Panhandle A',data:Q_range.map(function(q){
+          var QM=q/28317;
+          var P2p=P1_pa*0.85;
+          for(var ii=0;ii<15;ii++){
+            var QC=435.87*E*Math.pow(Tsc*1.8/14.696,1.0788)*Math.pow(Math.max(0,P1_pa*P1_pa-P2p*P2p),0.5394)/(Math.pow(gamma,0.4606)*Math.pow(T_R,0.5394)*Math.pow(L_mi,0.5394)*Math.pow(D_in,1.0788));
+            P2p-=(QC-QM)*0.5; P2p=Math.max(1,P2p);
+          }
+          return {x:q/1e6,y:Math.max(0,P2p/14.504)};
+        }),borderColor:'#00AAAA',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4,borderDash:[3,3]},
+        {label:'Operating point',data:[{x:Q_std/1e6,y:P2_DW}],
+          borderColor:'#fff',backgroundColor:'#FF8800',pointRadius:8,showLine:false}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Gas flow rate (MSm3/d)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}},
+        y:{title:{display:true,text:'Outlet pressure P2 (bar)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 3: MULTIPHASE ====== */
+function calcMulti(){
+  var D_mm=parseFloat(document.getElementById('m_D').value)||200;
+  var L_km=parseFloat(document.getElementById('m_L').value)||20;
+  var theta=parseFloat(document.getElementById('m_theta').value)||0;
+  var Qo_bbl=parseFloat(document.getElementById('m_Qo').value)||2000;
+  var Qg_std=parseFloat(document.getElementById('m_Qg').value)||1000000;
+  var Qw_bbl=parseFloat(document.getElementById('m_Qw').value)||500;
+  var rho_o=parseFloat(document.getElementById('m_rho_o').value)||850;
+  var rho_g=parseFloat(document.getElementById('m_rho_g').value)||50;
+  var P=parseFloat(document.getElementById('m_P').value)||50;
+  var mu_o=parseFloat(document.getElementById('m_muo').value)||5;
+  var mu_g=parseFloat(document.getElementById('m_mug').value)||0.015;
+
+  var D=D_mm/1000;
+  var L=L_km*1000;
+  var A=Math.PI/4*D*D;
+  var rho_w=1050;
+
+  // Convert to m3/s
+  var Qo=Qo_bbl*0.158987/86400;
+  var Qw=Qw_bbl*0.158987/86400;
+  var Ql=Qo+Qw;
+  var Qg=Qg_std/86400*(P/50)*(288.15/(273.15+15))*(1/1); // actual m3/s (approx)
+  Qg=Qg_std/86400*1.01325/P*(288.15/288.15); // actual at P bar (Z≈1)
+
+  // Superficial velocities
+  var vsl=Ql/A;
+  var vsg=Qg/A;
+  var vm=vsl+vsg;
+
+  // Input liquid fraction (no-slip)
+  var lamL=Ql/(Ql+Qg);
+  var lamG=1-lamL;
+
+  // Beggs-Brill flow regime
+  // Froude number
+  var NFr=vm*vm/(9.81*D);
+  var NLV=vsl*Math.pow(rho_o/(9.81*0.073),0.25); // liquid velocity number
+  var NGV=vsg*Math.pow(rho_o/(9.81*0.073),0.25); // gas velocity number
+
+  // Pattern boundaries (simplified)
+  var L1=316*Math.pow(lamL,0.302);
+  var L2=0.0009252*Math.pow(lamL,-2.4684);
+  var L3=0.1*Math.pow(lamL,-1.4516);
+  var L4=0.5*Math.pow(lamL,-6.738);
+  var pattern;
+  if(lamL<0.01&&NFr<L1 || lamL>=0.01&&NFr<L2){
+    pattern='SEGREGATED';
+  } else if(lamL>=0.01&&NFr>=L2&&NFr<=L3){
+    pattern='TRANSITION';
+  } else if(lamL<0.4&&NFr>=L3&&NFr<=L1 || lamL>=0.4&&NFr>L3&&NFr<=L4){
+    pattern='INTERMITTENT (Slug)';
+  } else {
+    pattern='DISTRIBUTED (Mist/Bubble)';
+  }
+
+  // Liquid holdup (Beggs-Brill simplified)
+  var a,b,c;
+  if(pattern==='SEGREGATED'){a=0.98;b=0.4846;c=0.0868;}
+  else if(pattern.includes('INTERMITTENT')){a=0.845;b=0.5351;c=0.0173;}
+  else if(pattern==='TRANSITION'){a=0.845;b=0.5351;c=0.0173;}
+  else{a=1.065;b=0.5824;c=0.0609;}
+  var HL0=a*Math.pow(lamL,b)/Math.pow(NFr,c);
+  HL0=Math.min(1,Math.max(lamL,HL0));
+
+  // Inclination correction (simplified)
+  var theta_rad=theta*Math.PI/180;
+  var C=Math.max(0,(1-HL0)*Math.log(2.96*Math.pow(lamL,0.305)*Math.pow(NFr,0.0978)));
+  var psi=1+C*(Math.sin(1.8*theta_rad)-Math.sin(1.8*theta_rad)*Math.sin(1.8*theta_rad)*Math.sin(1.8*theta_rad)/3);
+  var HL=HL0*psi;
+  HL=Math.min(1,Math.max(0,HL));
+
+  // Mixture density and viscosity
+  var rho_m=rho_o*HL+(1-HL)*rho_g;
+  var mu_m_cP=Math.pow(mu_o,HL)*Math.pow(mu_g,1-HL);
+  var mu_m=mu_m_cP/1000;
+
+  // Mixture friction factor
+  var Re_m=rho_m*vm*D/mu_m;
+  var f_m=frictionFactor(Re_m,0.046/D_mm);
+  var dP_fric=f_m*(L/D)*(rho_m*vm*vm/2)/1e5; // bar
+  var dP_elev=rho_m*9.81*Math.sin(theta_rad)*L/1e5; // bar
+  var dP_total=dP_fric+dP_elev;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Flow pattern',pattern,'-','Beggs-Brill (1973)');
+  html+=rc('hl','Liquid holdup HL',HL.toFixed(3),'-','Actual liquid fraction in pipe');
+  html+=rc('liq','vsl (superficial liquid)',vsl.toFixed(3),'m/s','Liquid only');
+  html+=rc('gas','vsg (superficial gas)',vsg.toFixed(3),'m/s','Gas only');
+  html+=rc('','Mixture velocity vm',vm.toFixed(3),'m/s','vsl + vsg');
+  html+=rc('','No-slip liquid fraction λL',lamL.toFixed(3),'-','Ql/(Ql+Qg)');
+  html+=rc('','Mixture density ρm',rho_m.toFixed(1),'kg/m3','ρo×HL + ρg×(1-HL)');
+  html+=rc('','Froude number NFr',NFr.toFixed(3),'-','vm²/(g×D)');
+  html+=rc('hl','ΔP friction',dP_fric.toFixed(2),'bar','Over '+L_km+' km');
+  html+=rc('','ΔP elevation',dP_elev.toFixed(2),'bar','At θ='+theta+'°');
+  html+=rc('hl','Total ΔP',(dP_fric+dP_elev).toFixed(2),'bar','Beggs-Brill');
+  html+=rc('','Slug detection',pattern.includes('Slug')?'SLUG EXPECTED':'Not slug','-',pattern);
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>vsl</strong> = Ql/A = '+(Ql*1000).toFixed(3)+' L/s / '+A.toFixed(5)+' m2 = <span class="hil">'+vsl.toFixed(3)+' m/s</span><br>'
+    +'<strong>vsg</strong> = Qg/A = '+(Qg*1000).toFixed(3)+' L/s / '+A.toFixed(5)+' m2 = <span class="hig">'+vsg.toFixed(3)+' m/s</span><br>'
+    +'<strong>NFr</strong> = vm²/(g×D) = '+vm.toFixed(3)+'² / (9.81×'+D+') = <span class="hi">'+NFr.toFixed(3)+'</span><br>'
+    +'<strong>λL</strong> = '+lamL.toFixed(3)+' | <strong>HL</strong> = '+HL0.toFixed(3)+' (horiz) × ψ '+psi.toFixed(3)+' = <span class="hi">'+HL.toFixed(3)+'</span><br>'
+    +'<strong>ρm</strong> = '+rho_o+'×'+HL.toFixed(3)+' + '+rho_g+'×'+(1-HL).toFixed(3)+' = <span class="hi">'+rho_m.toFixed(1)+' kg/m3</span><br>'
+    +'<strong>ΔP_total</strong> = '+dP_fric.toFixed(2)+' (fric) + '+dP_elev.toFixed(2)+' (elev) = <span class="hi">'+dP_total.toFixed(2)+' bar</span>'
+    +'</div>';
+
+  var rows='';
+  if(pattern.includes('Slug')){
+    rows+=ar('wn','SLUG FLOW DETECTED - slug catcher required','Beggs-Brill predicts Intermittent/Slug flow pattern at NFr = '+NFr.toFixed(2)+' and λL = '+lamL.toFixed(3)+'. Slug flow causes severe pressure fluctuations, liquid surges, and operational upsets at the receiving facility.','Design slug catcher at pipeline outlet: volume = slug_velocity × A × slug_length. Estimated slug length ≈ 12-60 pipe diameters = '+(D*30).toFixed(1)+' m. Consider anti-slug control (choke control, gas injection). Install slug monitoring (pressure transmitters at 5km intervals).');
+  }
+  if(pattern==='DISTRIBUTED (Mist/Bubble)'){
+    rows+=ar('ok','Distributed (mist/bubble) flow - stable operating regime','Gas and liquid are well-mixed. Lowest pressure drop fluctuation. Mist flow at very high GOR gives near-single-phase gas behaviour.','');
+  }
+  if(pattern==='SEGREGATED'){
+    rows+=ar('pipe','Segregated flow - stratified or wavy','Liquid runs along bottom of pipe with gas above. Common in near-horizontal pipelines at moderate velocities. Risk of water accumulation at low points causing accelerated corrosion.','Ensure pipeline minimum velocity > 0.5 m/s to prevent water settling. Schedule pigging to remove accumulated liquids. Check pipeline low points for corrosion vulnerability (install UT monitoring spools at low points).');
+  }
+  if(!rows) rows=ar('pipe','Multiphase analysis complete','Pattern: '+pattern+'. HL = '+HL.toFixed(3)+'. ΔP = '+dP_total.toFixed(2)+' bar over '+L_km+' km.','');
+
+  html+='<div class="analysis"><div class="atitle">/// MULTIPHASE FLOW ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r3').innerHTML=html;
+}
+
+/* ====== PANEL 4: PRESSURE PROFILE ====== */
+function calcProfile(){
+  var fluid=document.getElementById('pp_fluid').value;
+  var D_mm=parseFloat(document.getElementById('pp_D').value)||300;
+  var L_km=parseFloat(document.getElementById('pp_L').value)||50;
+  var P_in=parseFloat(document.getElementById('pp_P1').value)||60;
+  var P_min=parseFloat(document.getElementById('pp_Pmin').value)||10;
+  var Q=parseFloat(document.getElementById('pp_Q').value)||500;
+  var rho=parseFloat(document.getElementById('pp_rho').value)||870;
+  var mu=parseFloat(document.getElementById('pp_mu').value)||5;
+  var dz=parseFloat(document.getElementById('pp_dz').value)||50;
+
+  var D=D_mm/1000;
+  var nSeg=20;
+  var dL_km=L_km/nSeg;
+  var dL=dL_km*1000;
+  var A=Math.PI/4*D*D;
+  var eps_D=0.046/D_mm;
+
+  var distances=[0], pressures=[P_in];
+  var P=P_in;
+  var booster_needed=false;
+  var booster_km=-1;
+
+  for(var i=0;i<nSeg;i++){
+    var dP_seg;
+    if(fluid==='liquid'){
+      var Q_m3s=Q/3600;
+      var v=Q_m3s/A;
+      var Re=rho*v*D/(mu/1000);
+      var f=frictionFactor(Re,eps_D);
+      var dP_f=f*(dL/D)*(rho*v*v/2)/1e5;
+      var dP_e=rho*9.81*(dz/nSeg)/1e5;
+      dP_seg=dP_f+dP_e;
+    } else {
+      var Z=0.88;
+      var gamma=rho; // treated as specific gravity for gas
+      var T_K=288.15;
+      var Q_std=Q*1e6/86400; // MSm3/d → Sm3/s
+      var rho_g=P*1e5*(gamma*28.97)/(Z*8314*T_K);
+      var Q_act=Q_std/86400*(Z*T_K/288.15)*(1.01325/P);
+      var v_g=Q_act/A;
+      var mu_g=0.000015;
+      var Re_g=rho_g*v_g*D/mu_g;
+      var f_g=frictionFactor(Re_g,eps_D);
+      dP_seg=f_g*(dL/D)*(rho_g*v_g*v_g/2)/1e5;
+      var dP_eg=rho_g*9.81*(dz/nSeg)/1e5;
+      dP_seg+=dP_eg;
+    }
+    P=P-dP_seg;
+    if(P<P_min&&!booster_needed){
+      booster_needed=true;
+      booster_km=dL_km*i;
+    }
+    distances.push(dL_km*(i+1));
+    pressures.push(Math.max(0,P));
+  }
+
+  var P_out=pressures[pressures.length-1];
+  var dP_total=P_in-P_out;
+  var adequate=P_out>=P_min;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Inlet pressure',P_in,'bar','User specified');
+  html+=rc(adequate?'ok':'er','Outlet pressure',P_out.toFixed(1),'bar',adequate?'Above P_min = '+P_min+' bar':'BELOW minimum - booster required');
+  html+=rc('','Total ΔP',dP_total.toFixed(2),'bar','Over '+L_km+' km');
+  html+=rc('','Avg. gradient',(dP_total/L_km).toFixed(4),'bar/km','');
+  if(booster_needed) html+=rc('wn','Booster station required at',booster_km.toFixed(0),'km','Pressure falls below P_min');
+  html+='</div>';
+
+  document.getElementById('r4').innerHTML=html;
+
+  // Chart
+  var ctx=document.getElementById('profileChart').getContext('2d');
+  if(profileChart){profileChart.destroy();}
+  profileChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'Pressure profile (bar)',data:distances.map(function(d,i){return{x:d,y:pressures[i].toFixed(2)};}),
+          borderColor:'#3366AA',backgroundColor:'rgba(51,102,170,0.08)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.4},
+        {label:'Min. delivery P ('+P_min+' bar)',data:distances.map(function(d){return{x:d,y:P_min};}),
+          borderColor:'#FF3333',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,borderDash:[5,3]},
+        {label:'Booster station',data:booster_needed?[{x:booster_km,y:P_min}]:[],
+          borderColor:'#FF8800',backgroundColor:'#FF8800',pointRadius:10,showLine:false}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Distance (km)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0,max:L_km},
+        y:{title:{display:true,text:'Pressure (bar)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 5: EROSION ====== */
+function calcErosion(){
+  var D_mm=parseFloat(document.getElementById('e_D').value)||200;
+  var vsl=parseFloat(document.getElementById('e_vsl').value)||0.5;
+  var vsg=parseFloat(document.getElementById('e_vsg').value)||3;
+  var rhoL=parseFloat(document.getElementById('e_rhoL').value)||870;
+  var rhoG=parseFloat(document.getElementById('e_rhoG').value)||50;
+  var C=parseFloat(document.getElementById('e_inh').value)||100;
+  var muL=parseFloat(document.getElementById('e_muL').value)||5;
+  var muG=parseFloat(document.getElementById('e_muG').value)||0.015;
+
+  var D=D_mm/1000;
+  var A=Math.PI/4*D*D;
+  var vm=vsl+vsg;
+  var lamL=vsl/vm;
+  var rho_m=rhoL*lamL+rhoG*(1-lamL);
+
+  // API RP 14E erosion velocity
+  var V_e_ms=C/Math.sqrt(rho_m)/3.2808; // convert from ft/s
+  var V_e_fps=C/Math.sqrt(rho_m);
+  var erosion_ok=vm<=V_e_ms;
+  var erosion_ratio=vm/V_e_ms*100;
+
+  // Lockhart-Martinelli parameter
+  var dP_L=0.02*(1/D)*(rhoL*vsl*vsl/2);
+  var dP_G=0.02*(1/D)*(rhoG*vsg*vsg/2);
+  var X_LM=dP_L>0&&dP_G>0?Math.sqrt(dP_L/dP_G):999;
+
+  // Flow pattern
+  var NFr=vm*vm/(9.81*D);
+  var L1=316*Math.pow(lamL,0.302);
+  var L2=0.0009252*Math.pow(lamL,-2.4684);
+  var L3=0.1*Math.pow(lamL,-1.4516);
+  var L4=0.5*Math.pow(lamL,-6.738);
+  var pattern='';
+  if(lamL<0.01&&NFr<L1 || lamL>=0.01&&NFr<L2) pattern='Segregated';
+  else if(lamL>=0.01&&NFr>=L2&&NFr<=L3) pattern='Transition';
+  else if(lamL<0.4&&NFr>=L3&&NFr<=L1 || lamL>=0.4&&NFr>L3&&NFr<=L4) pattern='Intermittent/Slug';
+  else pattern='Distributed';
+
+  // Slug frequency approx
+  var fs=0.025*vm*vm/D;
+
+  var html='<div class="rgrid">';
+  html+=rc(erosion_ok?'ok':'er','Erosion velocity limit',V_e_ms.toFixed(2),'m/s (API RP 14E)','C='+C+', ρmix='+rho_m.toFixed(0)+' kg/m3');
+  html+=rc(erosion_ok?'ok':'er','Mixture velocity',vm.toFixed(2),'m/s',erosion_ok?'✅ Below Ve ('+erosion_ratio.toFixed(0)+'%)':'❌ EXCEEDS Ve ('+erosion_ratio.toFixed(0)+'%)');
+  html+=rc('liq','Liquid superficial v',vsl.toFixed(3),'m/s','vsl / vm = '+(lamL*100).toFixed(0)+'%');
+  html+=rc('gas','Gas superficial v',vsg.toFixed(3),'m/s','vsg / vm = '+((1-lamL)*100).toFixed(0)+'%');
+  html+=rc('','Mixture density ρm',rho_m.toFixed(1),'kg/m3','No-slip homogeneous');
+  html+=rc('','Lockhart-Martinelli X',X_LM.toFixed(3),'-',X_LM<0.1?'Gas dominated':X_LM<10?'Mixed':'Liquid dominated');
+  html+=rc('','Flow pattern',pattern,'-','Beggs-Brill classification');
+  if(pattern.includes('Slug')) html+=rc('wn','Est. slug frequency',fs.toFixed(3),'Hz','≈ '+(fs*60).toFixed(1)+' slugs/min');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Ve (API RP 14E):</strong> Ve = C/√ρmix = '+C+'/√'+rho_m.toFixed(0)+' = '+V_e_fps.toFixed(2)+' ft/s = <span class="hi">'+V_e_ms.toFixed(2)+' m/s</span><br>'
+    +'<strong>vm</strong> = vsl + vsg = '+vsl+' + '+vsg+' = <span class="hi">'+vm.toFixed(2)+' m/s</span><br>'
+    +'Erosion ratio: '+vm.toFixed(2)+'/'+V_e_ms.toFixed(2)+' = <span class="hi">'+(erosion_ratio).toFixed(0)+'%</span> - '+(erosion_ok?'SAFE':'EXCEEDED')+'\n'
+    +'<strong>X_LM</strong> = √(ΔPl/ΔPg) = √('+dP_L.toFixed(2)+'/'+dP_G.toFixed(2)+') = <span class="hi">'+X_LM.toFixed(3)+'</span>'
+    +'</div>';
+
+  var rows='';
+  if(!erosion_ok){
+    rows+=ar('er','EROSION VELOCITY EXCEEDED ('+erosion_ratio.toFixed(0)+'% of API RP 14E limit)','Mixture velocity '+vm.toFixed(2)+' m/s exceeds API RP 14E erosion limit '+V_e_ms.toFixed(2)+' m/s (C='+C+'). At bends, tees and reducers, metal loss can be rapid. For sand-laden flow, corrosion-erosion combination is especially severe.','Increase pipe diameter: '+(Math.ceil(D_mm/100+1)*100)+' mm ID reduces velocity to '+(vm*D*D/Math.pow((Math.ceil(D_mm/100+1)*100)/1000,2)).toFixed(2)+' m/s. Install hard-facing (Stellite, Inconel 625 overlay) at high-wear points. Use erosion-resistant bends (long-radius R/D > 3, poket tees). Implement sand monitoring (erosion probe ER type) at high-risk locations.');
+  }
+  if(pattern.includes('Slug')){
+    rows+=ar('wn','Slug flow: dynamic loads on piping and equipment','Slug flow creates cyclic pressure forces on bends. Force = ρm × A × vm². At pipe bends: F = '+( rho_m*A*vm*vm/1000).toFixed(1)+' kN (estimate). Frequency: ~'+fs.toFixed(2)+' Hz. Resonance with structural modes must be avoided (natural frequency of span).','Perform dynamic stress analysis on slug-impacted bends (Caesar II or similar). Install pipe supports with damping elements at change-of-direction bends. Install slug detector (pressure differential measurement across known restriction) with automatic control response. Design slug catcher at receiving facility.');
+  }
+  rows+=ar('pipe','Erosion and slug summary','Erosion: '+(erosion_ok?'OK ('+erosion_ratio.toFixed(0)+'% of limit)':'EXCEEDED ('+erosion_ratio.toFixed(0)+'%)')+'. Flow pattern: '+pattern+'. X_LM = '+X_LM.toFixed(2)+'. Mixture velocity = '+vm.toFixed(2)+' m/s.','');
+
+  html+='<div class="analysis"><div class="atitle">/// EROSION AND SLUG ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r5').innerHTML=html;
+
+  // Flow map chart (Beggs-Brill)
+  var ctx=document.getElementById('flowMapChart').getContext('2d');
+  if(flowMapChart){flowMapChart.destroy();}
+  // Draw simplified flow map
+  var vsg_range=Array.from({length:30},function(_,i){return Math.pow(10,-1+i*0.15);});
+  var vsl_range=[0.01,0.1,1,5];
+  var colors2=['#3366AA','#00AAAA','#CC7700','#CC0000'];
+  flowMapChart=new Chart(ctx,{
+    type:'scatter',
+    data:{
+      datasets:[
+        {label:'Segregated/Stratified',data:[{x:10,y:0.01},{x:30,y:0.1},{x:100,y:0.5}],
+          borderColor:'#2266EE',backgroundColor:'rgba(34,102,238,0.2)',pointRadius:0,showLine:true,fill:false,borderWidth:1,borderDash:[4,3]},
+        {label:'Slug boundary',data:[{x:0.5,y:0.01},{x:2,y:0.1},{x:8,y:1},{x:20,y:5}],
+          borderColor:'#FF8800',backgroundColor:'transparent',pointRadius:0,showLine:true,fill:false,borderWidth:1,borderDash:[3,3]},
+        {label:'Operating point',data:[{x:vsg,y:vsl}],
+          borderColor:'#fff',backgroundColor:pattern.includes('Slug')?'#FF3333':'#00BB55',pointRadius:12,showLine:false}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'logarithmic',title:{display:true,text:'vsg (m/s)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}},
+        y:{type:'logarithmic',title:{display:true,text:'vsl (m/s)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}}
+      }
+    }
+  });
+}
+
+/* INIT */
+calcLiq();
+setTimeout(function(){calcGas();calcMulti();calcProfile();calcErosion();},300);
+</script>
+</body>
+</html>
