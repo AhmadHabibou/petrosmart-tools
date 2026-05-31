@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Well Productivity Index Calculator - Petrosmart Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --red:#CC0000;
+  --bg:#040408;--surf:#0A0A12;--card:#0E0E18;
+  --border:#181828;--text:#DDDDF0;--muted:#404060;
+  --ok:#00BB55;--warn:#FF8800;--err:#FF3333;--info:#2266EE;
+  --oil:#CC7700;--oil-dim:rgba(204,119,0,0.12);
+  --gas:#2266EE;--gas-dim:rgba(34,102,238,0.10);
+  --well:#00AAAA;--well-dim:rgba(0,170,170,0.10);
+  --mono:'Fira Code',monospace;--sans:'Nunito',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 50% 40% at 20% 30%,rgba(204,119,0,0.04),transparent),
+    radial-gradient(ellipse 40% 50% at 80% 70%,rgba(0,170,170,0.03),transparent);
+  pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:16px;}
+
+/* HEADER */
+.hdr{
+  background:linear-gradient(135deg,#080810,#100A04,#080810);
+  border:1px solid rgba(204,119,0,0.25);border-radius:18px;
+  padding:18px 22px;margin-bottom:18px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 0 60px rgba(204,119,0,0.06);
+  position:relative;overflow:hidden;}
+.hdr::before{content:'🛢️';position:absolute;right:16px;top:50%;
+  transform:translateY(-50%);font-size:80px;opacity:0.05;pointer-events:none;}
+.hdr-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  background:linear-gradient(135deg,var(--oil),#884400);
+  box-shadow:0 4px 20px rgba(204,119,0,0.35);}
+.hdr h1{font-size:19px;font-weight:800;color:#fff;}
+.hdr p{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+.hdr-tags{margin-left:auto;display:flex;gap:7px;flex-shrink:0;}
+.htag{padding:5px 11px;border-radius:8px;border:1px solid;
+  font-size:10px;font-weight:600;font-family:var(--mono);}
+.ht-ipr{background:var(--oil-dim);border-color:rgba(204,119,0,0.3);color:#FFAA33;}
+.ht-vlp{background:var(--well-dim);border-color:rgba(0,170,170,0.3);color:#44DDDD;}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--surf);border:1px solid var(--border);
+  border-radius:12px;padding:4px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{flex:1;min-width:80px;padding:9px 5px;background:transparent;border:none;
+  border-radius:9px;color:var(--muted);font-size:10px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);text-transform:uppercase;letter-spacing:0.07em;transition:all 0.2s;}
+.tab:hover{color:#bbb;}
+.tab.on{background:var(--oil);color:#fff;box-shadow:0 0 16px rgba(204,119,0,0.4);}
+.panel{display:none;}.panel.on{display:block;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+.card.oil-accent{border-color:rgba(204,119,0,0.2);}
+.card.well-accent{border-color:rgba(0,170,170,0.2);}
+.stitle{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  border-bottom:1px solid #10101C;padding-bottom:7px;margin-bottom:14px;font-family:var(--mono);}
+.stitle.oil{color:var(--oil);}
+.stitle.well{color:var(--well);}
+.stitle.gas{color:var(--gas);}
+.stitle.neu{color:var(--muted);}
+
+/* FORM */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.field{margin-bottom:12px;}
+.lbl{font-size:10px;color:var(--muted);margin-bottom:5px;display:block;
+  text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.ir{display:flex;gap:6px;align-items:center;}
+input[type=number],select{width:100%;background:#07070F;border:1px solid #14142A;
+  border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;
+  font-family:var(--mono);transition:border-color 0.2s;}
+input:focus,select:focus{border-color:var(--oil);}
+select option{background:#0A0A14;}
+.unit{font-size:10px;color:#222;min-width:52px;text-align:right;
+  white-space:nowrap;font-family:var(--mono);}
+
+/* METHOD BTNS */
+.method-btns{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.mbtn{padding:7px 14px;background:var(--card);border:1px solid var(--border);
+  border-radius:9px;color:var(--muted);font-size:11px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);transition:all 0.2s;}
+.mbtn:hover{color:#ccc;border-color:#444;}
+.mbtn.on{background:var(--oil-dim);border-color:var(--oil);color:#FFAA33;}
+
+/* RESULTS */
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.rgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.rc{background:#07070E;border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px;position:relative;overflow:hidden;}
+.rc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.rc.hl::after{background:var(--oil);}
+.rc.ok::after{background:var(--ok);}
+.rc.wn::after{background:var(--warn);}
+.rc.er::after{background:var(--err);}
+.rc.well::after{background:var(--well);}
+.rc.gas::after{background:var(--gas);}
+.rc.hl{border-color:rgba(204,119,0,0.3);}
+.rc.ok{border-color:rgba(0,187,85,0.25);}
+.rc.wn{border-color:rgba(255,136,0,0.25);}
+.rc.er{border-color:rgba(255,51,51,0.25);}
+.rc.well{border-color:rgba(0,170,170,0.25);}
+.rc.gas{border-color:rgba(34,102,238,0.25);}
+.rl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;font-family:var(--mono);}
+.rv{font-size:19px;font-weight:700;color:#fff;font-family:var(--mono);}
+.rv span{font-size:10px;color:#222;font-weight:400;}
+.rsub{font-size:10px;color:#222;margin-top:3px;font-family:var(--mono);}
+
+/* FORMULA */
+.fbox{background:#05050C;border-left:3px solid var(--oil);border-radius:0 10px 10px 0;
+  padding:12px 16px;margin-top:14px;font-size:11px;color:#444;line-height:2.0;font-family:var(--mono);}
+.fbox strong{color:#999;}
+.fbox .hi{color:var(--oil);font-weight:600;}
+.fbox .hiw{color:var(--well);font-weight:600;}
+.fbox .hig{color:var(--gas);font-weight:600;}
+.fbox .hiok{color:var(--ok);font-weight:600;}
+
+/* ANALYSIS */
+.analysis{background:#06060E;border:1px solid #0E0E1E;border-radius:12px;padding:16px;margin-top:14px;}
+.atitle{font-size:10px;font-weight:700;color:var(--oil);margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:0.09em;font-family:var(--mono);}
+.atitle.well{color:var(--well);}
+.arow{display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #0C0C1A;}
+.arow:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.d-ok{background:var(--ok);box-shadow:0 0 8px var(--ok);}
+.d-wn{background:var(--warn);box-shadow:0 0 8px var(--warn);}
+.d-er{background:var(--err);box-shadow:0 0 8px var(--err);}
+.d-oil{background:var(--oil);box-shadow:0 0 8px var(--oil);}
+.d-well{background:var(--well);box-shadow:0 0 8px var(--well);}
+.atxt strong{color:#eee;font-size:12px;display:block;margin-bottom:3px;}
+.atxt p{font-size:11px;color:#444;line-height:1.7;margin:0;}
+.asugg{font-size:11px;color:#FFAA00;margin-top:4px;line-height:1.6;}
+
+/* CHART */
+.chart-wrap{background:#05050C;border:1px solid var(--border);border-radius:12px;
+  padding:14px;margin-top:14px;}
+.chart-title{font-size:11px;color:var(--oil);font-weight:600;text-transform:uppercase;
+  letter-spacing:0.05em;margin-bottom:10px;font-family:var(--mono);}
+.chart-title.well{color:var(--well);}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.tbl th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;
+  letter-spacing:0.07em;font-family:var(--mono);}
+.tbl td{padding:7px 10px;color:#888;border-bottom:1px solid #0C0C18;font-family:var(--mono);}
+.tbl tr:hover td{background:#0A0A14;}
+.tw{color:#fff!important;font-weight:600;}
+.ibox{background:var(--surf);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);
+  line-height:1.7;font-family:var(--mono);}
+.ibox strong{color:#bbb;}
+.sep{height:1px;background:var(--border);margin:14px 0;}
+
+/* OP POINT BADGE */
+.op-badge{background:rgba(0,170,170,0.1);border:1px solid rgba(0,170,170,0.3);
+  border-radius:12px;padding:14px 16px;margin-top:14px;display:flex;align-items:center;gap:12px;}
+.op-icon{font-size:28px;}
+.op-title{font-size:10px;color:var(--well);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.07em;}
+.op-val{font-size:24px;font-weight:800;color:#fff;font-family:var(--mono);}
+.op-unit{font-size:12px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+
+.foot{background:var(--surf);border-top:1px solid var(--border);margin-top:18px;
+  padding:10px 20px;font-size:10px;color:#111;text-align:center;
+  font-family:var(--mono);border-radius:12px;}
+.foot a{color:var(--oil);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-icon">🛢️</div>
+  <div>
+    <h1>Well Productivity Index Calculator</h1>
+    <p>IPR Darcy / Vogel / Fetkovich / Klinkenberg - VLP - Operating point - AOF</p>
+  </div>
+  <div class="hdr-tags">
+    <div class="htag ht-ipr">IPR CURVE</div>
+    <div class="htag ht-vlp">VLP CURVE</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" id="t1" onclick="sw(1)">📊 PI & IPR</button>
+  <button class="tab" id="t2" onclick="sw(2)">🌊 Vogel / Fetkovich</button>
+  <button class="tab" id="t3" onclick="sw(3)">⛽ Gas Well IPR</button>
+  <button class="tab" id="t4" onclick="sw(4)">🔄 IPR + VLP (Nodal)</button>
+  <button class="tab" id="t5" onclick="sw(5)">💉 Skin and Damage</button>
+  <button class="tab" id="t6" onclick="sw(6)">📚 Reference</button>
+</div>
+
+<!-- ===== PANEL 1: PI & IPR (LINEAR) ===== -->
+<div class="panel on" id="p1">
+  <div class="card oil-accent">
+    <div class="stitle oil">/// productivity index and linear IPR</div>
+    <div class="ibox">
+      <strong>Productivity Index (PI or J):</strong> Ratio of flow rate to drawdown pressure. Valid for oil above bubble point (Darcy linear flow). PI = Q / (Pr - Pwf) [bbl/d/psi or m3/d/bar]. Below bubble point, use Vogel or Fetkovich (Tab 2).
+    </div>
+
+    <div class="stitle oil">/// reservoir and well data</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Static reservoir pressure Pr</label>
+        <div class="ir"><input type="number" id="Pr" value="250" step="1" oninput="calcPI()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Bubble point pressure Pb</label>
+        <div class="ir"><input type="number" id="Pb" value="150" step="1" oninput="calcPI()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Test flowing pressure Pwf_test</label>
+        <div class="ir"><input type="number" id="Pwf_t" value="220" step="1" oninput="calcPI()"><span class="unit">bar</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Test flow rate Q_test</label>
+        <div class="ir"><input type="number" id="Q_test" value="800" step="10" oninput="calcPI()"><span class="unit">bbl/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Water cut WC</label>
+        <div class="ir"><input type="number" id="WC" value="20" step="1" oninput="calcPI()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">GOR (solution)</label>
+        <div class="ir"><input type="number" id="GOR" value="200" step="10" oninput="calcPI()"><span class="unit">scf/bbl</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Reservoir permeability k</label>
+        <div class="ir"><input type="number" id="k_res" value="50" step="1" oninput="calcPI()"><span class="unit">mD</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Net pay thickness h</label>
+        <div class="ir"><input type="number" id="h_res" value="20" step="1" oninput="calcPI()"><span class="unit">m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Oil viscosity at reservoir T</label>
+        <div class="ir"><input type="number" id="mu_o" value="2.5" step="0.1" oninput="calcPI()"><span class="unit">cP</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Formation volume factor Bo</label>
+        <div class="ir"><input type="number" id="Bo" value="1.25" step="0.01" oninput="calcPI()"><span class="unit">RB/STB</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Drainage radius re</label>
+        <div class="ir"><input type="number" id="re" value="500" step="10" oninput="calcPI()"><span class="unit">m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Wellbore radius rw</label>
+        <div class="ir"><input type="number" id="rw" value="0.108" step="0.001" oninput="calcPI()"><span class="unit">m</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Skin factor S</label>
+        <div class="ir"><input type="number" id="S_skin" value="5" step="0.5" oninput="calcPI()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Desired Pwf for production</label>
+        <div class="ir"><input type="number" id="Pwf_des" value="180" step="1" oninput="calcPI()"><span class="unit">bar</span></div>
+      </div>
+    </div>
+
+    <div id="r1"></div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">IPR curve (linear above Pb + Vogel below Pb)</div>
+      <canvas id="iprChart" height="220"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 2: VOGEL / FETKOVICH ===== -->
+<div class="panel" id="p2">
+  <div class="card oil-accent">
+    <div class="stitle oil">/// Vogel and Fetkovich IPR - below bubble point</div>
+    <div class="ibox">
+      <strong>Vogel (1968):</strong> For solution-gas drive reservoirs below Pb. Qo/Qo_max = 1 - 0.2(Pwf/Pr) - 0.8(Pwf/Pr)². More accurate than linear PI below Pb. <strong>Fetkovich:</strong> Extends Vogel for high-rate wells where turbulence (non-Darcy flow) is significant: Q = C × (Pr² - Pwf²)^n, where n = 0.5–1.0.
+    </div>
+
+    <div class="method-btns">
+      <button class="mbtn on" id="mth-vogel" onclick="setMethod('vogel')">Vogel (1968)</button>
+      <button class="mbtn" id="mth-fetk" onclick="setMethod('fetkovich')">Fetkovich</button>
+      <button class="mbtn" id="mth-jones" onclick="setMethod('jones')">Jones-Blount-Glaze</button>
+    </div>
+
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Static reservoir pressure Pr</label>
+        <div class="ir"><input type="number" id="v_Pr" value="150" step="1" oninput="calcVogel()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">AOF (Qo_max) from test</label>
+        <div class="ir"><input type="number" id="v_Qmax" value="2000" step="50" oninput="calcVogel()"><span class="unit">bbl/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Desired Pwf</label>
+        <div class="ir"><input type="number" id="v_Pwf" value="80" step="1" oninput="calcVogel()"><span class="unit">bar</span></div>
+      </div>
+    </div>
+    <div class="row3" id="fetk-params" style="display:none;">
+      <div class="field">
+        <label class="lbl">Flow coefficient C (Fetkovich)</label>
+        <div class="ir"><input type="number" id="f_C" value="0.001" step="0.0001" oninput="calcVogel()"><span class="unit">bbl/d/bar2n</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Exponent n (0.5-1.0)</label>
+        <div class="ir"><input type="number" id="f_n" value="0.8" step="0.05" min="0.5" max="1.0" oninput="calcVogel()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Turbulence coefficient D</label>
+        <div class="ir"><input type="number" id="f_D" value="0.0001" step="0.0001" oninput="calcVogel()"><span class="unit">d/Mscf</span></div>
+      </div>
+    </div>
+    <div class="row3" id="jones-params" style="display:none;">
+      <div class="field">
+        <label class="lbl">Laminar coeff. a (bar2/Mscf/d)</label>
+        <div class="ir"><input type="number" id="j_a" value="0.5" step="0.01" oninput="calcVogel()"><span class="unit">bar2/rate</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Turbulent coeff. b</label>
+        <div class="ir"><input type="number" id="j_b" value="0.001" step="0.0001" oninput="calcVogel()"><span class="unit">bar2/rate2</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Test rate Q_test</label>
+        <div class="ir"><input type="number" id="j_Qtest" value="1000" step="50" oninput="calcVogel()"><span class="unit">bbl/d</span></div>
+      </div>
+    </div>
+    <div id="r2"></div>
+    <div class="chart-wrap">
+      <div class="chart-title">Vogel IPR curve - inflow performance</div>
+      <canvas id="vogelChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 3: GAS WELL IPR ===== -->
+<div class="panel" id="p3">
+  <div class="card oil-accent">
+    <div class="stitle gas">/// gas well deliverability - Darcy and non-Darcy flow</div>
+    <div class="ibox">
+      <strong>Gas IPR:</strong> Uses pseudo-pressure m(p) or simplified pressure-squared approach. Darcy flow dominates at low rates; turbulence (non-Darcy / high-velocity) becomes significant at high rates. AOF = Absolute Open Flow potential (Pwf = 0 or atmospheric).
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Reservoir pressure Pr</label>
+        <div class="ir"><input type="number" id="g_Pr" value="300" step="1" oninput="calcGas()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas specific gravity γg</label>
+        <div class="ir"><input type="number" id="g_gamma" value="0.65" step="0.01" oninput="calcGas()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Reservoir temperature T</label>
+        <div class="ir"><input type="number" id="g_T" value="120" step="1" oninput="calcGas()"><span class="unit">°C</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Permeability k</label>
+        <div class="ir"><input type="number" id="g_k" value="20" step="1" oninput="calcGas()"><span class="unit">mD</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Net pay h</label>
+        <div class="ir"><input type="number" id="g_h" value="25" step="1" oninput="calcGas()"><span class="unit">m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Drainage radius re</label>
+        <div class="ir"><input type="number" id="g_re" value="600" step="10" oninput="calcGas()"><span class="unit">m</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Wellbore radius rw</label>
+        <div class="ir"><input type="number" id="g_rw" value="0.108" step="0.001" oninput="calcGas()"><span class="unit">m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Skin factor S</label>
+        <div class="ir"><input type="number" id="g_S" value="3" step="0.5" oninput="calcGas()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Desired Pwf</label>
+        <div class="ir"><input type="number" id="g_Pwf" value="100" step="1" oninput="calcGas()"><span class="unit">bar</span></div>
+      </div>
+    </div>
+    <div id="r3"></div>
+    <div class="chart-wrap">
+      <div class="chart-title gas">Gas well IPR - pressure squared method</div>
+      <canvas id="gasChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 4: IPR + VLP (NODAL) ===== -->
+<div class="panel" id="p4">
+  <div class="card well-accent">
+    <div class="stitle well">/// nodal analysis - IPR vs VLP (tubing performance)</div>
+    <div class="ibox">
+      <strong>Nodal Analysis:</strong> The operating point (natural flow rate) is found at the intersection of the Inflow Performance Relationship (IPR) and the Vertical Lift Performance (VLP / TPC). The VLP curve represents the minimum bottomhole pressure needed to lift a given flow rate to surface.
+    </div>
+
+    <div class="stitle oil">/// IPR parameters (Vogel model)</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Reservoir pressure Pr</label>
+        <div class="ir"><input type="number" id="n_Pr" value="200" step="1" oninput="calcNodal()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">AOF (Qmax at Pwf=0)</label>
+        <div class="ir"><input type="number" id="n_Qmax" value="3000" step="50" oninput="calcNodal()"><span class="unit">bbl/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Bubble point Pb</label>
+        <div class="ir"><input type="number" id="n_Pb" value="150" step="1" oninput="calcNodal()"><span class="unit">bar</span></div>
+      </div>
+    </div>
+
+    <div class="stitle well">/// VLP / tubing performance parameters</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Tubing head pressure (THP)</label>
+        <div class="ir"><input type="number" id="n_THP" value="20" step="1" oninput="calcNodal()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Tubing depth (TVD)</label>
+        <div class="ir"><input type="number" id="n_depth" value="2000" step="50" oninput="calcNodal()"><span class="unit">m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Tubing inner diameter</label>
+        <div class="ir"><input type="number" id="n_ID" value="76" step="1" oninput="calcNodal()"><span class="unit">mm</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Oil gradient (produced fluid)</label>
+        <div class="ir"><input type="number" id="n_grad" value="0.085" step="0.001" oninput="calcNodal()"><span class="unit">bar/m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">GOR (producing)</label>
+        <div class="ir"><input type="number" id="n_GOR" value="300" step="10" oninput="calcNodal()"><span class="unit">scf/bbl</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Water cut</label>
+        <div class="ir"><input type="number" id="n_WC" value="20" step="1" oninput="calcNodal()"><span class="unit">%</span></div>
+      </div>
+    </div>
+
+    <div id="op-point"></div>
+
+    <div class="chart-wrap">
+      <div class="chart-title well">Nodal analysis: IPR (Vogel) vs VLP curves</div>
+      <canvas id="nodalChart" height="260"></canvas>
+    </div>
+    <div id="r4"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 5: SKIN ===== -->
+<div class="panel" id="p5">
+  <div class="card oil-accent">
+    <div class="stitle oil">/// skin factor and formation damage analysis</div>
+    <div class="ibox">
+      <strong>Skin factor S:</strong> Dimensionless measure of additional pressure drop near wellbore. S &gt; 0: damage (drilling fluid, scale, clay); S &lt; 0: stimulation (fracture, acid). Relates to extra pressure drop: ΔP_skin = 0.87 × S × m (m = slope of Horner plot in psi/cycle).
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Skin factor S (measured/estimated)</label>
+        <div class="ir"><input type="number" id="sk_S" value="8" step="0.5" oninput="calcSkin()"><span class="unit">dimensionless</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Reservoir pressure Pr</label>
+        <div class="ir"><input type="number" id="sk_Pr" value="250" step="1" oninput="calcSkin()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Undamaged PI (J*)</label>
+        <div class="ir"><input type="number" id="sk_Jo" value="30" step="0.5" oninput="calcSkin()"><span class="unit">bbl/d/bar</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Reservoir permeability k</label>
+        <div class="ir"><input type="number" id="sk_k" value="50" step="1" oninput="calcSkin()"><span class="unit">mD</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Net pay h</label>
+        <div class="ir"><input type="number" id="sk_h" value="20" step="1" oninput="calcSkin()"><span class="unit">m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Wellbore radius rw</label>
+        <div class="ir"><input type="number" id="sk_rw" value="0.108" step="0.001" oninput="calcSkin()"><span class="unit">m</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Damage zone permeability kd</label>
+        <div class="ir"><input type="number" id="sk_kd" value="15" step="1" oninput="calcSkin()"><span class="unit">mD</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Damage radius rd</label>
+        <div class="ir"><input type="number" id="sk_rd" value="0.5" step="0.05" oninput="calcSkin()"><span class="unit">m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Current flowing Pwf</label>
+        <div class="ir"><input type="number" id="sk_Pwf" value="200" step="1" oninput="calcSkin()"><span class="unit">bar</span></div>
+      </div>
+    </div>
+    <div id="r5"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 6: REFERENCE ===== -->
+<div class="panel" id="p6">
+  <div class="card">
+    <div class="stitle oil">/// key formulas - well deliverability</div>
+    <div class="fbox">
+      <strong>Productivity Index (PI):</strong> J = Q / (Pr - Pwf) [bbl/d/psi or m3/d/bar]<br>
+      <strong>Darcy IPR:</strong> Q = J × (Pr - Pwf) [linear, valid above Pb]<br>
+      <strong>AOF (linear):</strong> Qmax = J × Pr [at Pwf = 0]<br>
+      <strong>Darcy steady-state (radial flow):</strong><br>
+      J_Darcy = 0.00708 × k × h / (μ_o × Bo × (ln(re/rw) - 0.75 + S)) [bbl/d/psi with k in mD]<br>
+      <strong>Vogel IPR (1968):</strong> Q/Qmax = 1 - 0.2×(Pwf/Pr) - 0.8×(Pwf/Pr)²<br>
+      Qmax (Vogel AOF at Pwf=0) = Q_test / [1 - 0.2×(Pwf_t/Pr) - 0.8×(Pwf_t/Pr)²]<br>
+      <strong>Composite IPR (Pr &gt; Pb):</strong><br>
+      - Above Pb: linear Q = J × (Pr - Pwf)<br>
+      - Below Pb: Q = Qb + (Jb×Pb/1.8) × [1 - 0.2×(Pwf/Pb) - 0.8×(Pwf/Pb)²]<br>
+      where Qb = J × (Pr - Pb), Jb = J<br>
+      <strong>Fetkovich:</strong> Q = C × (Pr² - Pwf²)^n, n = 0.5-1.0<br>
+      <strong>Gas Darcy IPR (simplified):</strong><br>
+      Q_g = kh × (Pr² - Pwf²) / (1422 × T_R × μ_g × Z × (ln(re/rw) - 0.75 + S)) [Mscf/d]<br>
+      <strong>Skin from Hawkins formula:</strong> S = (k/kd - 1) × ln(rd/rw)<br>
+      <strong>Damage ratio DR:</strong> DR = J_damaged / J_undamaged = (ln(re/rw) - 0.75) / (ln(re/rw) - 0.75 + S)<br>
+      <strong>Flow efficiency FE:</strong> FE = (Pr - Pwf - ΔPskin) / (Pr - Pwf) = 1 - ΔPskin/(Pr-Pwf)<br>
+      <strong>VLP / Gradient:</strong> Pwf_min = THP + gradient × depth + friction_loss<br>
+      <strong>Operating point:</strong> Intersection of Q_IPR(Pwf) = Q_VLP(Pwf)
+    </div>
+    <div class="sep"></div>
+    <div class="stitle oil">/// skin factor classification</div>
+    <table class="tbl">
+      <thead><tr><th>Skin value S</th><th>Classification</th><th>Typical cause</th><th>Recommended action</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">&lt; -5</td><td>Highly stimulated</td><td>Hydraulic fracture (long HF)</td><td>Monitor fracture closure</td></tr>
+        <tr><td class="tw">-5 to -2</td><td>Stimulated</td><td>Acid frac, short HF</td><td>Optimize artificial lift</td></tr>
+        <tr><td class="tw">-2 to 0</td><td>Slightly stimulated</td><td>Acid wash, good completion</td><td>Monitor production</td></tr>
+        <tr><td class="tw">0 to 3</td><td>Near ideal</td><td>Minor completion damage</td><td>No action needed</td></tr>
+        <tr><td class="tw">3 to 10</td><td>Moderate damage</td><td>Drill-in fluid, partial plug</td><td>Evaluate acid treatment</td></tr>
+        <tr><td class="tw">10 to 20</td><td>Significant damage</td><td>Clay swelling, scale, severe filtrate</td><td>Acid job / workover likely</td></tr>
+        <tr><td class="tw">&gt; 20</td><td>Severe damage / near-wellbore plug</td><td>Formation fines, cement, bridging</td><td>Perforation optimization + acid</td></tr>
+      </tbody>
+    </table>
+    <div class="sep"></div>
+    <div class="stitle oil">/// IPR model selection guide</div>
+    <table class="tbl">
+      <thead><tr><th>Condition</th><th>Recommended IPR model</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Pr &gt; Pb (above bubble point)</td><td>Linear Darcy (PI method)</td><td>Most accurate, simple</td></tr>
+        <tr><td class="tw">Pr ≤ Pb (solution gas drive)</td><td>Vogel (1968)</td><td>Standard for solution-gas drive</td></tr>
+        <tr><td class="tw">Pr partially above Pb</td><td>Composite: Linear + Vogel</td><td>Most common real case</td></tr>
+        <tr><td class="tw">High-rate oil (turbulence)</td><td>Jones-Blount-Glaze</td><td>For gravel-packed wells</td></tr>
+        <tr><td class="tw">Gas wells (any)</td><td>Fetkovich / LIT / pseudo-pressure</td><td>Pressure-squared for P &lt; 170 bar</td></tr>
+        <tr><td class="tw">Tight gas / unconventional</td><td>Modified Fetkovich + Klinkenberg</td><td>Slippage correction for low perm</td></tr>
+        <tr><td class="tw">Horizontal well</td><td>Joshi / Renard-Dupuy formula</td><td>Anisotropy correction needed</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">
+  <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
+  · Vogel 1968 / Fetkovich 1973 / Darcy Radial Flow / NACE Nodal Analysis · Educational tool only
+</div>
+</div>
+
+<script>
+var iprChart=null, vogelChart=null, gasChart=null, nodalChart=null;
+var vogelMethod='vogel';
+
+/* ====== UTILS ====== */
+function sw(n){
+  for(var i=1;i<=6;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    document.getElementById('t'+i).className='tab'+(i===n?' on':'');
+  }
+  if(n===2)setTimeout(calcVogel,80);
+  if(n===3)setTimeout(calcGas,80);
+  if(n===4)setTimeout(calcNodal,80);
+}
+function rc(cls,lbl,val,unit,sub){
+  return '<div class="rc '+(cls||'')+'">'
+    +'<div class="rl">'+lbl+'</div>'
+    +'<div class="rv">'+val+(unit?' <span>'+unit+'</span>':'')+'</div>'
+    +(sub?'<div class="rsub">'+sub+'</div>':'')+'</div>';
+}
+function ar(type,title,body,sugg){
+  var d={ok:'d-ok',wn:'d-wn',er:'d-er',oil:'d-oil',well:'d-well'}[type]||'d-oil';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+}
+
+function setMethod(m){
+  vogelMethod=m;
+  ['vogel','fetkovich','jones'].forEach(function(x){
+    document.getElementById('mth-'+x).classList.toggle('on',x===m);
+  });
+  document.getElementById('fetk-params').style.display=m==='fetkovich'?'grid':'none';
+  document.getElementById('jones-params').style.display=m==='jones'?'grid':'none';
+  calcVogel();
+}
+
+/* ====== PANEL 1: PI & IPR ====== */
+function calcPI(){
+  var Pr=parseFloat(document.getElementById('Pr').value)||250;
+  var Pb=parseFloat(document.getElementById('Pb').value)||150;
+  var Pwf_t=parseFloat(document.getElementById('Pwf_t').value)||220;
+  var Q_test=parseFloat(document.getElementById('Q_test').value)||800;
+  var WC=parseFloat(document.getElementById('WC').value)||20;
+  var GOR=parseFloat(document.getElementById('GOR').value)||200;
+  var k=parseFloat(document.getElementById('k_res').value)||50;
+  var h=parseFloat(document.getElementById('h_res').value)||20;
+  var mu_o=parseFloat(document.getElementById('mu_o').value)||2.5;
+  var Bo=parseFloat(document.getElementById('Bo').value)||1.25;
+  var re=parseFloat(document.getElementById('re').value)||500;
+  var rw=parseFloat(document.getElementById('rw').value)||0.108;
+  var S=parseFloat(document.getElementById('S_skin').value)||5;
+  var Pwf_des=parseFloat(document.getElementById('Pwf_des').value)||180;
+
+  // Test-derived PI (measured)
+  var J_test=Q_test/(Pr-Pwf_t); // bbl/d/bar
+  var Q_des=J_test*(Pr-Pwf_des);
+  var AOF_linear=J_test*Pr;
+  var drawdown_des=Pr-Pwf_des;
+
+  // Darcy-theoretical PI (no skin)
+  // SI version: J = (0.00708 × k × h) / (μ × Bo × (ln(re/rw) - 0.75 + S))
+  // In bbl/d/psi: J = 0.00708*k*h / (mu*Bo*(ln(re/rw)-0.75+S))
+  // Convert bar to psi: 1 bar = 14.504 psi → J_bbl_psi = J_bbl_bar / 14.504
+  var ln_term=Math.log(re/rw);
+  var J_darcy_noDmg=0.00708*k*h/(mu_o*Bo*(ln_term-0.75)); // bbl/d/psi
+  var J_darcy=0.00708*k*h/(mu_o*Bo*(ln_term-0.75+S)); // bbl/d/psi
+  var J_darcy_bar=J_darcy*14.504; // bbl/d/bar
+  var J_darcy_noDmg_bar=J_darcy_noDmg*14.504;
+
+  // Damage ratio
+  var DR=J_darcy_bar/J_darcy_noDmg_bar;
+
+  // Composite IPR (linear above Pb, Vogel below Pb)
+  var Qb=J_test*(Pr-Pb); // flow at Pb
+  var J_below=Qb; // Jb*Pb/1.8 factor
+  var Qmax_composite=Qb+J_test*Pb/1.8; // AOF with Vogel below Pb
+
+  // Production at desired Pwf
+  var Q_des_composite;
+  if(Pwf_des>=Pb){
+    Q_des_composite=J_test*(Pr-Pwf_des);
+  } else {
+    Q_des_composite=Qb+(J_test*Pb/1.8)*(1-0.2*(Pwf_des/Pb)-0.8*Math.pow(Pwf_des/Pb,2));
+  }
+
+  // Liquid rate and oil rate
+  var Q_oil_des=Q_des_composite*(1-WC/100);
+  var Q_water_des=Q_des_composite*(WC/100);
+  var Q_gas_des=Q_oil_des*GOR/1000; // Mscf/d
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','PI from test (J)',J_test.toFixed(3),'bbl/d/bar','= '+(J_test/14.504).toFixed(4)+' bbl/d/psi');
+  html+=rc('hl','PI Darcy theory',J_darcy_bar.toFixed(3),'bbl/d/bar','With S='+S);
+  html+=rc('','PI undamaged (S=0)',J_darcy_noDmg_bar.toFixed(3),'bbl/d/bar','Darcy, no damage');
+  html+=rc(DR>0.7?'ok':'wn','Damage ratio',( DR*100).toFixed(1),'%','J_damaged / J_undamaged');
+  html+=rc('hl','Q at desired Pwf='+Pwf_des+' bar',Q_des_composite.toFixed(0),'bbl/d (total liquid)','Composite IPR');
+  html+=rc('oil','Oil rate',Q_oil_des.toFixed(0),'bbl/d oil','At '+WC+'% water cut');
+  html+=rc('','Water rate',Q_water_des.toFixed(0),'bbl/d water','');
+  html+=rc('','Gas rate',Q_gas_des.toFixed(2),'Mscf/d','GOR = '+GOR+' scf/bbl');
+  html+=rc('','AOF (composite IPR)',Qmax_composite.toFixed(0),'bbl/d','At Pwf = 0');
+  html+=rc('','Drawdown at desired Pwf',drawdown_des,'bar','Pr - Pwf_desired');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>PI (test)</strong> = Q_test / (Pr - Pwf_t) = '+Q_test+' / ('+Pr+' - '+Pwf_t+') = <span class="hi">'+J_test.toFixed(3)+' bbl/d/bar</span><br>'
+    +'<strong>Darcy J</strong> = 0.00708 × k × h / (μ × Bo × (ln(re/rw) - 0.75 + S))<br>'
+    +'= 0.00708 × '+k+' × '+h+' / ('+mu_o+' × '+Bo+' × ('+ln_term.toFixed(3)+' - 0.75 + '+S+')) = <span class="hi">'+J_darcy.toFixed(4)+' bbl/d/psi = '+J_darcy_bar.toFixed(3)+' bbl/d/bar</span><br>'
+    +'<strong>AOF (composite)</strong> = Qb + J×Pb/1.8 = '+Qb.toFixed(0)+' + '+(J_test*Pb/1.8).toFixed(0)+' = <span class="hi">'+Qmax_composite.toFixed(0)+' bbl/d</span><br>'
+    +'<strong>DR</strong> = '+J_darcy_bar.toFixed(3)+' / '+J_darcy_noDmg_bar.toFixed(3)+' = <span class="hi">'+(DR*100).toFixed(1)+'%</span>'
+    +'</div>';
+
+  var rows='';
+  if(DR<0.5){
+    rows+=ar('er','Severe formation damage (DR = '+(DR*100).toFixed(0)+'%)','Productivity is only '+(DR*100).toFixed(0)+'% of ideal. The well is producing at less than half of its potential. Skin S = '+S+' causes extra pressure drop of approx '+(0.87*S*(Pr-Pwf_des)*2/( ln_term-0.75+S)).toFixed(0)+' bar additional drawdown.','Acid stimulation: matrix acidizing or acid fracturing could remove near-wellbore damage. Target post-treatment S < 2. For S > 20, evaluate hydraulic fracturing to bypass damage. Workover cost justification: ΔQ = (J*undamaged - J*damaged) × drawdown = '+(J_darcy_noDmg_bar-J_darcy_bar).toFixed(2)+' × '+drawdown_des+' = '+(( J_darcy_noDmg_bar-J_darcy_bar)*drawdown_des).toFixed(0)+' bbl/d additional oil.');
+  } else if(DR<0.8){
+    rows+=ar('wn','Moderate formation damage (DR = '+(DR*100).toFixed(0)+'%)','Well producing at '+(DR*100).toFixed(0)+'% of ideal undamaged productivity. Potential gain from stimulation: ~'+(( J_darcy_noDmg_bar-J_darcy_bar)*drawdown_des).toFixed(0)+' bbl/d additional.','Evaluate economic threshold for acid treatment. Rule of thumb: stimulation justified if incremental oil value > 5× treatment cost. Matrix acid job cost ~$50-200k vs potential uplift of '+(( J_darcy_noDmg_bar-J_darcy_bar)*drawdown_des*365*50/1e6).toFixed(1)+'M USD/yr at $50/bbl.');
+  } else {
+    rows+=ar('ok','Good well productivity (DR = '+(DR*100).toFixed(0)+'%)','Well is producing at '+(DR*100).toFixed(0)+'% of theoretical undamaged PI. Minor skin may be irreducible (geometrical skin, partial penetration). No major stimulation required.','');
+  }
+  if(Pwf_des<Pb){
+    rows+=ar('oil','Operating below bubble point - composite IPR used','Pwf = '+Pwf_des+' bar < Pb = '+Pb+' bar. Gas liberation below Pb reduces oil relative permeability. Vogel model applied below Pb gives Q = '+Q_des_composite.toFixed(0)+' bbl/d vs linear prediction of '+(J_test*(Pr-Pwf_des)).toFixed(0)+' bbl/d ('+((Q_des_composite/(J_test*(Pr-Pwf_des))-1)*100).toFixed(0)+'% difference).','Monitor GOR increase below bubble point as indicator of reservoir depletion. High producing GOR reduces reservoir energy and pump/lift efficiency. Consider artificial lift (ESP, gas lift) when Pwf approaches Pb.');
+  }
+
+  html+='<div class="analysis"><div class="atitle">/// IPR ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r1').innerHTML=html;
+
+  // Draw composite IPR chart
+  drawIPR(Pr,Pb,J_test,Qmax_composite,Pwf_des,Q_des_composite);
+  // Pass data to nodal tab
+  document.getElementById('n_Pr').value=Pr;
+  document.getElementById('n_Qmax').value=Qmax_composite.toFixed(0);
+  document.getElementById('n_Pb').value=Pb;
+}
+
+function drawIPR(Pr,Pb,J,Qmax,Pwf_des,Q_des){
+  var ctx=document.getElementById('iprChart').getContext('2d');
+  if(iprChart){iprChart.destroy();}
+  var nPts=60;
+  var Pwf_pts=Array.from({length:nPts+1},function(_,i){return i/nPts*Pr;});
+  var Q_pts=Pwf_pts.map(function(p){
+    if(p>=Pb) return J*(Pr-p);
+    var Qb=J*(Pr-Pb);
+    return Qb+(J*Pb/1.8)*(1-0.2*(p/Pb)-0.8*Math.pow(p/Pb,2));
+  });
+  iprChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'Composite IPR (Linear+Vogel)',data:Q_pts.map(function(q,i){return{x:q,y:Pwf_pts[i]};}),
+          borderColor:'#CC7700',backgroundColor:'rgba(204,119,0,0.07)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.3},
+        {label:'Bubble point Pb='+Pb+' bar',data:[{x:0,y:Pb},{x:J*(Pr-Pb)*1.5,y:Pb}],
+          borderColor:'#FF8800',backgroundColor:'transparent',borderWidth:1,pointRadius:0,borderDash:[5,3]},
+        {label:'Operating point',data:[{x:Q_des,y:Pwf_des}],
+          borderColor:'#fff',backgroundColor:'#00AAAA',pointRadius:10,showLine:false},
+        {label:'Bubble point Pb',data:[{x:J*(Pr-Pb),y:Pb}],
+          borderColor:'#FF8800',backgroundColor:'#FF8800',pointRadius:6,showLine:false},
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{title:{display:true,text:'Flow rate Q (bbl/d)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0},
+        y:{title:{display:true,text:'Flowing BHP Pwf (bar)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0,max:Pr*1.05,reverse:false}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 2: VOGEL ====== */
+function calcVogel(){
+  var Pr=parseFloat(document.getElementById('v_Pr').value)||150;
+  var Qmax=parseFloat(document.getElementById('v_Qmax').value)||2000;
+  var Pwf=parseFloat(document.getElementById('v_Pwf').value)||80;
+
+  var Pwf_r=Pwf/Pr;
+  var Q_vogel=Qmax*(1-0.2*Pwf_r-0.8*Pwf_r*Pwf_r);
+  var Q_vogel_pct=Q_vogel/Qmax*100;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Vogel flow rate',Q_vogel.toFixed(0),'bbl/d','At Pwf='+Pwf+' bar');
+  html+=rc('hl','AOF (Qmax)',Qmax,'bbl/d','At Pwf = 0');
+  html+=rc('','Pwf/Pr ratio',Pwf_r.toFixed(3),'-','Dimensionless pressure');
+  html+=rc('','% of AOF produced',Q_vogel_pct.toFixed(1),'%','Q / Qmax');
+  html+=rc('','Remaining deliverability',(Qmax-Q_vogel).toFixed(0),'bbl/d','Qmax - Q');
+  html+=rc('','IPR at 50% Pwf/Pr',(Qmax*(1-0.2*0.5-0.8*0.25)).toFixed(0),'bbl/d','Reference point');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Vogel (1968):</strong> Q/Qmax = 1 - 0.2×(Pwf/Pr) - 0.8×(Pwf/Pr)²<br>'
+    +'= 1 - 0.2×'+Pwf_r.toFixed(3)+' - 0.8×'+Pwf_r.toFixed(3)+'² = 1 - '+(0.2*Pwf_r).toFixed(4)+' - '+(0.8*Pwf_r*Pwf_r).toFixed(4)+' = <span class="hi">'+(Q_vogel/Qmax).toFixed(4)+'</span><br>'
+    +'Q = Qmax × '+(Q_vogel/Qmax).toFixed(4)+' = '+Qmax+' × '+(Q_vogel/Qmax).toFixed(4)+' = <span class="hi">'+Q_vogel.toFixed(0)+' bbl/d</span>'
+    +'</div>';
+
+  var rows='';
+  if(Pwf_r<0.1){
+    rows+=ar('oil','Operating near maximum drawdown','Pwf/Pr = '+Pwf_r.toFixed(3)+'. Operating at very low Pwf captures '+Q_vogel_pct.toFixed(0)+'% of AOF. Approaching the limit of natural flow. Check that Pwf is achievable with current tubing size and artificial lift if applicable.','At Pwf/Pr < 0.1, Vogel equation gives: Q ≈ 0.98 × Qmax. Little additional gain from further drawdown. Focus on increasing AOF (Qmax) through stimulation or infill drilling rather than increasing drawdown.');
+  } else if(Pwf_r>0.8){
+    rows+=ar('wn','Minimal drawdown - significant upside potential','Operating at Pwf/Pr = '+Pwf_r.toFixed(3)+', only '+Q_vogel_pct.toFixed(0)+'% of AOF is being produced. Reducing Pwf to 50% of Pr would yield '+(Qmax*(1-0.2*0.5-0.8*0.25)-Q_vogel).toFixed(0)+' bbl/d additional. Consider artificial lift (ESP, gas lift) to reduce Pwf and capture additional deliverability.','Install ESP or gas lift to reduce Pwf from '+Pwf+' to target '+(Pr*0.4).toFixed(0)+' bar. Estimated additional production: '+(Qmax*(1-0.2*0.4-0.8*0.16)-Q_vogel).toFixed(0)+' bbl/d = '+(( Qmax*(1-0.2*0.4-0.8*0.16)-Q_vogel)*365*50/1e6).toFixed(1)+'M USD/yr at $50/bbl.');
+  } else {
+    rows+=ar('ok','Good operating point on Vogel curve','Operating at '+(Q_vogel_pct).toFixed(0)+'% of AOF at Pwf/Pr = '+Pwf_r.toFixed(2)+'. This is a reasonable operating point on the Vogel IPR curve.','');
+  }
+
+  html+='<div class="analysis"><div class="atitle">/// VOGEL IPR ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r2').innerHTML=html;
+
+  // Vogel chart
+  var Pwf_pts=Array.from({length:51},function(_,i){return i/50*Pr;});
+  var Q_pts=Pwf_pts.map(function(p){
+    var r=p/Pr;
+    return Qmax*(1-0.2*r-0.8*r*r);
+  });
+  var ctx=document.getElementById('vogelChart').getContext('2d');
+  if(vogelChart){vogelChart.destroy();}
+  vogelChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'Vogel IPR',data:Q_pts.map(function(q,i){return{x:q,y:Pwf_pts[i]};}),
+          borderColor:'#CC7700',backgroundColor:'rgba(204,119,0,0.07)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.3},
+        {label:'Linear IPR (for ref)',data:Pwf_pts.map(function(p){return{x:Qmax*(1-p/Pr),y:p};}),
+          borderColor:'#666',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,borderDash:[4,3],tension:0},
+        {label:'Operating point',data:[{x:Q_vogel,y:Pwf}],
+          borderColor:'#fff',backgroundColor:'#00AAAA',pointRadius:10,showLine:false}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{title:{display:true,text:'Q (bbl/d)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0},
+        y:{title:{display:true,text:'Pwf (bar)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 3: GAS IPR ====== */
+function calcGas(){
+  var Pr=parseFloat(document.getElementById('g_Pr').value)||300;
+  var gamma_g=parseFloat(document.getElementById('g_gamma').value)||0.65;
+  var T_C=parseFloat(document.getElementById('g_T').value)||120;
+  var k=parseFloat(document.getElementById('g_k').value)||20;
+  var h=parseFloat(document.getElementById('g_h').value)||25;
+  var re=parseFloat(document.getElementById('g_re').value)||600;
+  var rw=parseFloat(document.getElementById('g_rw').value)||0.108;
+  var S=parseFloat(document.getElementById('g_S').value)||3;
+  var Pwf=parseFloat(document.getElementById('g_Pwf').value)||100;
+
+  var T_R=T_C+273.15; // K → convert to Rankine for US formulas
+  var T_Rank=T_R*1.8; // Rankine
+
+  // Gas viscosity approximation (Lee-Kesler)
+  var MW_g=gamma_g*28.97;
+  var mu_g=0.0001*(( 9.4+0.02*MW_g)*Math.pow(T_R,1.5))/(209+19*MW_g+T_R)*Math.exp((3.5+0.986/T_R+(0.01*MW_g))); // cP rough
+  mu_g=Math.max(0.01,Math.min(mu_g,0.1));
+
+  // Z factor approximation (Hall-Yarborough simplified)
+  var Ppc=677+15*gamma_g-37.5*gamma_g*gamma_g; // psia
+  var Tpc=168+325*gamma_g-12.5*gamma_g*gamma_g; // R
+  var Ppr=(Pr*14.504)/Ppc;
+  var Tpr=T_Rank/Tpc;
+  var Z=1-3.52*Ppr/(10.73*Tpr)+0.274*Ppr*Ppr/(10.73*Tpr*Tpr); // very rough
+  Z=Math.max(0.5,Math.min(1.0,Z));
+
+  // Pressure-squared method (valid for P < 170 bar ≈ 2500 psia)
+  // Q_g [Mscf/d] = k*h*(Pr²-Pwf²) / (1422*T_R[R]*mu_g*Z*(ln(re/rw)-0.75+S))
+  var ln_term=Math.log(re/rw);
+  var denom=1422*T_Rank*mu_g*Z*(ln_term-0.75+S);
+  var Q_g=k*h*(Pr*Pr-Pwf*Pwf)*14.504*14.504/denom; // Mscf/d (pressures in psia)
+  var Q_g_Sm3d=Q_g*28.317; // Sm3/d
+
+  // AOF at Pwf=atm ≈ 0
+  var Q_AOF=k*h*Pr*Pr*14.504*14.504/denom;
+  var Q_AOF_Sm3d=Q_AOF*28.317;
+
+  // Deliverability index
+  var DI=Q_g/(Pr*Pr-Pwf*Pwf)*14.504*14.504; // Mscf/d/psia²
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Gas flow rate',Q_g.toFixed(1),'Mscf/d','= '+(Q_g_Sm3d/1000).toFixed(1)+' MSm3/d');
+  html+=rc('hl','AOF (at Pwf ≈ 0)',Q_AOF.toFixed(0),'Mscf/d','= '+(Q_AOF_Sm3d/1e6).toFixed(2)+' BCF/d');
+  html+=rc('gas','Deliverability index',DI.toFixed(4),'Mscf/d/psia2','Laminar Darcy only');
+  html+=rc('','Z factor (estimated)',Z.toFixed(3),'-','Hall-Yarborough approx');
+  html+=rc('','Gas viscosity μg',mu_g.toFixed(4),'cP','Lee-Kesler correlation');
+  html+=rc('','ln(re/rw)',ln_term.toFixed(3),'-','re='+re+'m, rw='+rw+'m');
+  html+=rc('','Skin factor S',S,'-',S>0?'Damaged well':'Stimulated / ideal');
+  html+=rc('','% of AOF produced',(Q_g/Q_AOF*100).toFixed(1),'%','At Pwf='+Pwf+' bar');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Q_g (pressure-squared):</strong> = k×h×(Pr²-Pwf²) / (1422×T_R×μg×Z×(ln(re/rw)-0.75+S))<br>'
+    +'= '+k+'×'+h+'×('+(Pr*14.504).toFixed(0)+'²-'+(Pwf*14.504).toFixed(0)+'²) / (1422×'+T_Rank.toFixed(0)+'×'+mu_g.toFixed(4)+'×'+Z.toFixed(3)+'×('+ln_term.toFixed(3)+'-0.75+'+S+'))<br>'
+    +'= <span class="hig">'+Q_g.toFixed(2)+' Mscf/d = '+(Q_g_Sm3d/1000).toFixed(2)+' MSm3/d</span><br>'
+    +'<strong>AOF</strong> = '+Q_AOF.toFixed(0)+' Mscf/d = <span class="hig">'+(Q_AOF_Sm3d/1e6).toFixed(4)+' BCF/d</span>'
+    +'</div>';
+
+  var rows='';
+  if(Pr>170){
+    rows+=ar('wn','High reservoir pressure ('+Pr+' bar) - pseudo-pressure method recommended','Pressure-squared method is valid for P < ~170 bar (2500 psia). At '+Pr+' bar, gas deviation factor Z and viscosity vary significantly with pressure. Full pseudo-pressure m(p) integration per Al-Hussainy (1966) gives more accurate results.','Use reservoir simulation or specialized software (Kappa Saphir, Fekete FAST) for pseudo-pressure calculation. Alternatively, apply pressure-squared method at average pressure: P_avg = sqrt((Pr²+Pwf²)/2) for intermediate accuracy correction.');
+  }
+  if(S>5){
+    rows+=ar('wn','Significant skin in gas well (S = '+S+')','Gas wells are more sensitive to skin than oil wells because turbulent (non-Darcy) flow adds rate-dependent skin: S_total = S_Darcy + D×Q. At S = '+S+'+D×'+Q_g.toFixed(0)+' Mscf/d, actual effective skin may be higher than specified.','Evaluate well stimulation: acid treatment or hydraulic fracturing. For S > 10, HF is typically justified. Post-frac S typically -3 to -5 for radial HF, -5 to -7 for long planar HF. Potential gain: Δ_AOF = '+(Q_AOF*( (ln_term-0.75+S)/(ln_term-0.75+2)-1)).toFixed(0)+' Mscf/d at S=2 (estimate).');
+  }
+  rows+=ar('well','Gas well deliverability summary','AOF = '+Q_AOF.toFixed(0)+' Mscf/d ('+(Q_AOF_Sm3d/1e6).toFixed(4)+' BCF/d). At Pwf = '+Pwf+' bar: Q = '+Q_g.toFixed(1)+' Mscf/d ('+(Q_g/Q_AOF*100).toFixed(0)+'% of AOF). Deliverability index = '+DI.toFixed(4)+' Mscf/d/psia².','Gas wells may show backpressure effect (non-Darcy): effective S = S_Darcy + D × Q. Isochronal test or modified isochronal test (MITest) required to separate Darcy (S) and non-Darcy (D) components for accurate deliverability prediction.');
+
+  html+='<div class="analysis"><div class="atitle gas">/// GAS WELL IPR ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r3').innerHTML=html;
+
+  // Gas IPR chart
+  var Pwf_pts=Array.from({length:51},function(_,i){return i/50*Pr;});
+  var Q_pts=Pwf_pts.map(function(p){
+    var q=k*h*(Pr*Pr-p*p)*14.504*14.504/denom;
+    return Math.max(0,q);
+  });
+  var ctx=document.getElementById('gasChart').getContext('2d');
+  if(gasChart){gasChart.destroy();}
+  gasChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'Gas IPR (Mscf/d)',data:Q_pts.map(function(q,i){return{x:q,y:Pwf_pts[i]};}),
+          borderColor:'#2266EE',backgroundColor:'rgba(34,102,238,0.07)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.3},
+        {label:'Operating point',data:[{x:Q_g,y:Pwf}],
+          borderColor:'#fff',backgroundColor:'#00AAAA',pointRadius:10,showLine:false}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{title:{display:true,text:'Gas rate (Mscf/d)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0},
+        y:{title:{display:true,text:'Pwf (bar)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 4: NODAL ====== */
+function calcNodal(){
+  var Pr=parseFloat(document.getElementById('n_Pr').value)||200;
+  var Qmax=parseFloat(document.getElementById('n_Qmax').value)||3000;
+  var Pb=parseFloat(document.getElementById('n_Pb').value)||150;
+  var THP=parseFloat(document.getElementById('n_THP').value)||20;
+  var depth=parseFloat(document.getElementById('n_depth').value)||2000;
+  var ID_mm=parseFloat(document.getElementById('n_ID').value)||76;
+  var grad=parseFloat(document.getElementById('n_grad').value)||0.085;
+  var GOR=parseFloat(document.getElementById('n_GOR').value)||300;
+  var WC=parseFloat(document.getElementById('n_WC').value)||20;
+
+  var ID_m=ID_mm/1000;
+  var A_tub=Math.PI/4*ID_m*ID_m;
+  var nPts=60;
+  var Q_pts=Array.from({length:nPts+1},function(_,i){return i/nPts*Qmax*1.1;});
+
+  // VLP: Pwf = THP + hydrostatic gradient × depth + friction
+  // Friction increases with velocity (Q²)
+  // Hydrostatic gradient depends on GOR (gas reduces gradient)
+  var grad_adj=grad*(1-Math.min(0.5,GOR/2000)); // rough GOR correction
+  var VLP_Q=Q_pts.map(function(q){
+    var q_m3s=q*0.158987/86400; // m3/s
+    var v=q_m3s/A_tub; // m/s
+    var fric=0.0015*v*v*depth; // rough friction bar
+    return THP+grad_adj*depth+fric;
+  });
+
+  // IPR (Vogel, composite): simplified
+  var J_approx=Qmax/Pr/1.8*(1+0.2+0.8); // from Vogel: Qmax = J*Pb/1.8 + J*(Pr-Pb)
+  var IPR_Q=Q_pts.map(function(q){
+    // Invert Vogel: given Q find Pwf
+    // Q = Qmax*(1-0.2*(Pwf/Pr)-0.8*(Pwf/Pr)^2)
+    // 0.8x^2 + 0.2x + (Q/Qmax - 1) = 0, x = Pwf/Pr
+    var a=0.8,b=0.2,c=q/Qmax-1;
+    var disc=b*b-4*a*c;
+    if(disc<0) return 0;
+    var x=(-b+Math.sqrt(disc))/(2*a);
+    return Math.max(0,x*Pr);
+  });
+
+  // Find intersection
+  var op_Q=-1,op_Pwf=-1;
+  for(var i=0;i<Q_pts.length-1;i++){
+    var diff1=IPR_Q[i]-VLP_Q[i];
+    var diff2=IPR_Q[i+1]-VLP_Q[i+1];
+    if(diff1*diff2<0){
+      var t=-diff1/(diff2-diff1);
+      op_Q=Q_pts[i]+t*(Q_pts[i+1]-Q_pts[i]);
+      op_Pwf=VLP_Q[i]+t*(VLP_Q[i+1]-VLP_Q[i]);
+      break;
+    }
+  }
+
+  var op_Q_oil=op_Q*(1-WC/100);
+  var op_Q_water=op_Q*(WC/100);
+
+  // Check if well will flow naturally
+  var flows=op_Q>0&&op_Pwf>THP;
+
+  document.getElementById('op-point').innerHTML='<div class="op-badge">'
+    +'<div class="op-icon">'+(flows?'⚡':'❌')+'</div>'
+    +'<div>'
+    +'<div class="op-title">Natural flow operating point</div>'
+    +'<div class="op-val">'+(flows?op_Q.toFixed(0):'No flow')+'</div>'
+    +'<div class="op-unit">'+(flows?'bbl/d total liquid | Pwf = '+op_Pwf.toFixed(0)+' bar | Oil = '+op_Q_oil.toFixed(0)+' bbl/d':'Well cannot produce against THP = '+THP+' bar')+'</div>'
+    +'</div></div>';
+
+  // Chart
+  var ctx=document.getElementById('nodalChart').getContext('2d');
+  if(nodalChart){nodalChart.destroy();}
+  nodalChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'IPR (Vogel)',data:Q_pts.map(function(q,i){return{x:q,y:IPR_Q[i]};}),
+          borderColor:'#CC7700',backgroundColor:'rgba(204,119,0,0.06)',fill:false,borderWidth:2.5,pointRadius:0,tension:0.3},
+        {label:'VLP (Tubing curve)',data:Q_pts.map(function(q,i){return{x:q,y:VLP_Q[i]};}),
+          borderColor:'#00AAAA',backgroundColor:'rgba(0,170,170,0.06)',fill:false,borderWidth:2.5,pointRadius:0,tension:0.4},
+        {label:'Operating point',data:flows?[{x:op_Q,y:op_Pwf}]:[],
+          borderColor:'#fff',backgroundColor:'#FFAA00',pointRadius:12,showLine:false},
+        {label:'AOF',data:[{x:Qmax,y:0}],
+          borderColor:'#CC7700',backgroundColor:'#CC7700',pointRadius:6,showLine:false}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{title:{display:true,text:'Flow rate Q (bbl/d)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0,max:Qmax*1.1},
+        y:{title:{display:true,text:'Bottomhole pressure Pwf (bar)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0,max:Pr*1.1}
+      }
+    }
+  });
+
+  var rows='';
+  if(!flows){
+    rows=ar('er','WELL WILL NOT FLOW NATURALLY AT THIS THP','The VLP curve lies entirely above the IPR curve at THP = '+THP+' bar. The wellbore is unable to lift fluids against backpressure. Artificial lift or reduced wellhead pressure required.','Options: (1) Reduce THP by lowering separator pressure. (2) Reduce tubing size to improve gas-liquid ratio (gas lift effect). (3) Install ESP or gas lift system. (4) Reduce GOR through zonal isolation if gas is suppressing liquid column. Target THP < '+(IPR_Q[0]-5).toFixed(0)+' bar for natural flow to initiate.');
+  } else {
+    rows=ar('ok','Well flows naturally at '+op_Q.toFixed(0)+' bbl/d','Natural operating point: Q = '+op_Q.toFixed(0)+' bbl/d at Pwf = '+op_Pwf.toFixed(0)+' bar. Oil rate = '+op_Q_oil.toFixed(0)+' bbl/d at '+WC+'% WC. '+(op_Q/Qmax*100).toFixed(0)+'% of AOF captured by natural flow.','To increase production: (1) Reduce THP (lower wellhead back pressure). (2) Install ESP to extend IPR × VLP intersection to higher flow. (3) Reduce skin via stimulation to shift IPR curve right. (4) Optimize tubing size.');
+  }
+  document.getElementById('r4').innerHTML='<div class="analysis"><div class="atitle well">/// NODAL ANALYSIS</div>'+rows+'</div>';
+}
+
+/* ====== PANEL 5: SKIN ====== */
+function calcSkin(){
+  var S=parseFloat(document.getElementById('sk_S').value)||8;
+  var Pr=parseFloat(document.getElementById('sk_Pr').value)||250;
+  var Jo=parseFloat(document.getElementById('sk_Jo').value)||30;
+  var k=parseFloat(document.getElementById('sk_k').value)||50;
+  var h=parseFloat(document.getElementById('sk_h').value)||20;
+  var rw=parseFloat(document.getElementById('sk_rw').value)||0.108;
+  var kd=parseFloat(document.getElementById('sk_kd').value)||15;
+  var rd=parseFloat(document.getElementById('sk_rd').value)||0.5;
+  var Pwf=parseFloat(document.getElementById('sk_Pwf').value)||200;
+
+  var re=500; // assumed
+  var ln_term=Math.log(re/rw);
+  var J_undamaged=Jo; // bbl/d/bar
+  var DR=( ln_term-0.75)/(ln_term-0.75+S);
+  var J_damaged=J_undamaged*DR;
+  var Q_undamaged=J_undamaged*(Pr-Pwf);
+  var Q_damaged=J_damaged*(Pr-Pwf);
+  var Q_loss=Q_undamaged-Q_damaged;
+  var dP_skin=S*Q_damaged/(J_undamaged*ln_term); // bar approx (simplified)
+
+  // Hawkins formula for mechanical skin from zone damage
+  var S_hawkins=(k/kd-1)*Math.log(rd/rw);
+
+  // Flow efficiency
+  var FE=(Pr-Pwf-dP_skin)/(Pr-Pwf);
+
+  // Economic impact ($/yr)
+  var oil_price=65; // USD/bbl
+  var revenue_loss=Q_loss*365*oil_price/1e6; // MUSD/yr
+  var acid_cost=0.15; // MUSD typical
+  var payback=acid_cost/( revenue_loss);
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Skin from Hawkins formula',S_hawkins.toFixed(2),'-','Based on kd='+kd+'mD, rd='+rd+'m');
+  html+=rc('hl','Damage ratio',( DR*100).toFixed(1),'%','J_damaged / J_undamaged');
+  html+=rc('','PI undamaged J*',J_undamaged,'bbl/d/bar','Design target');
+  html+=rc('wn','PI damaged J',J_damaged.toFixed(2),'bbl/d/bar','With S = '+S);
+  html+=rc('wn','Production lost',Q_loss.toFixed(0),'bbl/d','vs undamaged well');
+  html+=rc('','Extra ΔP due to skin',dP_skin.toFixed(1),'bar','Additional drawdown');
+  html+=rc('','Flow efficiency FE',(FE*100).toFixed(1),'%','(Pr-Pwf-dP_skin)/(Pr-Pwf)');
+  html+=rc('er','Revenue loss est.','$'+revenue_loss.toFixed(2),'M/yr','At $'+oil_price+'/bbl, '+Q_loss.toFixed(0)+' bbl/d loss');
+  html+=rc('','Acid job payback',( payback*12).toFixed(1),'months','At $'+( acid_cost*1000).toFixed(0)+'k treatment cost');
+  html+=rc('','Stimulation target','S < 2','-','Goal post-acid treatment');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Hawkins:</strong> S = (k/kd - 1) × ln(rd/rw) = ('+k+'/'+kd+' - 1) × ln('+rd+'/'+rw+')<br>'
+    +'= '+(k/kd-1).toFixed(3)+' × '+Math.log(rd/rw).toFixed(3)+' = <span class="hi">'+S_hawkins.toFixed(2)+'</span><br>'
+    +'<strong>DR</strong> = (ln(re/rw)-0.75) / (ln(re/rw)-0.75+S) = '+(ln_term-0.75).toFixed(3)+' / '+(ln_term-0.75+S).toFixed(3)+' = <span class="hi">'+(DR*100).toFixed(1)+'%</span><br>'
+    +'<strong>ΔP_skin</strong> ≈ S × Q / (J* × ln(re/rw)) = '+S+' × '+Q_damaged.toFixed(0)+' / ('+J_undamaged+' × '+ln_term.toFixed(3)+') ≈ <span class="hi">'+dP_skin.toFixed(1)+' bar</span><br>'
+    +'<strong>Revenue loss:</strong> '+Q_loss.toFixed(0)+' bbl/d × 365 d × $'+oil_price+' = <span class="hi">$'+revenue_loss.toFixed(2)+'M/yr</span>'
+    +'</div>';
+
+  var rows='';
+  if(S>20){
+    rows+=ar('er','EXTREME DAMAGE (S = '+S+') - Workover likely required','Skin of '+S+' represents very severe near-wellbore damage. This level of damage typically cannot be removed by matrix acidizing alone. Hydraulic fracturing or mechanical intervention (perforation cleanup, coiled tubing) is likely required.','Priority actions: (1) Run production log to confirm near-wellbore damage vs reservoir damage. (2) Evaluate hydraulic fracturing: HF bypasses damage, typically achieving S_eff = -3 to -6. Economic return: Δ_revenue = '+( (J_undamaged-J_damaged)*(Pr-Pwf)*365*oil_price/1e6).toFixed(1)+'M/yr gain at full recovery. (3) Pressure transient analysis (PTA) to confirm skin origin.');
+  } else if(S>10){
+    rows+=ar('wn','Significant damage (S = '+S+') - Acid stimulation recommended','Skin of '+S+' costs '+Q_loss.toFixed(0)+' bbl/d or $'+revenue_loss.toFixed(2)+'M/yr. Matrix acid job payback period: '+(payback*12).toFixed(0)+' months. Strong economic case for stimulation.','Matrix acid treatment: HCl for carbonate damage, HCl/HF (mud acid) for clay/sandstone damage. Design acid volume = 100 gal/ft pay. Confirm acid compatibility with formation (clay swelling risk with HF). Pre-flush with NH4Cl brine to remove clay sensitivity.');
+  } else if(S>3){
+    rows+=ar('oil','Moderate damage (S = '+S+') - evaluate stimulation economics','Skin causes '+Q_loss.toFixed(0)+' bbl/d loss = $'+revenue_loss.toFixed(2)+'M/yr. Acid treatment payback '+(payback*12).toFixed(0)+' months. May be economically justified depending on acid job cost.','');
+  } else if(S<0){
+    rows+=ar('ok','Well is stimulated (S = '+S+') - negative skin from fracture or acid','Negative skin indicates the well is more productive than ideal radial flow due to stimulation. S = '+S+' corresponds to an effective wellbore radius of r_w_eff = rw × exp(-S) = '+( rw*Math.exp(-S)).toFixed(2)+' m.','');
+  } else {
+    rows+=ar('ok','Minimal skin (S = '+S+') - near-ideal well performance','Skin is within acceptable range (0-3). Minimal damage expected. Well performance close to theoretical Darcy radial flow.','');
+  }
+
+  html+='<div class="analysis"><div class="atitle">/// SKIN AND DAMAGE ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r5').innerHTML=html;
+}
+
+/* ====== INIT ====== */
+calcPI();
+calcSkin();
+setTimeout(function(){calcVogel();calcGas();calcNodal();},300);
+</script>
+</body>
+</html>
