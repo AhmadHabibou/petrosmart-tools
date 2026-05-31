@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hydrostatic Pressure Calculator - Petrosmart Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#CC0000;
+  --red2:#FF2222;
+  --black:#080808;
+  --card:#111111;
+  --border:#222222;
+  --text:#E8E8E8;
+  --muted:#666;
+  --ok:#00CC66;
+  --warn:#FF8800;
+  --err:#FF3333;
+  --info:#4488FF;
+  --mono:'Share Tech Mono',monospace;
+  --sans:'Barlow',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--black);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+
+/* GRID BACKGROUND */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(204,0,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(204,0,0,0.04) 1px,transparent 1px);
+  background-size:40px 40px;pointer-events:none;z-index:0;
+}
+
+.wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:20px 16px;}
+
+/* HEADER */
+.hdr{
+  background:linear-gradient(135deg,#CC0000 0%,#880000 100%);
+  border-radius:16px;padding:20px 24px;
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:20px;
+  box-shadow:0 8px 32px rgba(204,0,0,0.35);
+  position:relative;overflow:hidden;
+}
+.hdr::after{
+  content:'';position:absolute;right:-20px;top:-20px;
+  width:120px;height:120px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.06);
+}
+.hdr-icon{
+  width:48px;height:48px;
+  background:rgba(255,255,255,0.15);
+  border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:24px;flex-shrink:0;
+}
+.hdr h1{font-size:18px;font-weight:700;color:#fff;letter-spacing:0.02em;}
+.hdr p{font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px;font-family:var(--mono);}
+
+/* TABS */
+.tabs{
+  display:flex;gap:3px;background:#0D0D0D;
+  border:1px solid var(--border);border-radius:12px;
+  padding:4px;margin-bottom:20px;flex-wrap:wrap;
+}
+.tab{
+  flex:1;min-width:100px;padding:9px 8px;
+  background:transparent;border:none;border-radius:9px;
+  color:var(--muted);font-size:11px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);
+  text-transform:uppercase;letter-spacing:0.06em;
+  transition:all 0.2s;
+}
+.tab:hover{color:#ccc;background:rgba(255,255,255,0.04);}
+.tab.on{background:var(--red);color:#fff;box-shadow:0 2px 12px rgba(204,0,0,0.4);}
+
+.panel{display:none;}
+.panel.on{display:block;}
+
+/* SECTION TITLE */
+.stitle{
+  font-size:10px;font-weight:700;color:var(--red);
+  text-transform:uppercase;letter-spacing:0.1em;
+  border-bottom:1px solid #1A1A1A;padding-bottom:8px;
+  margin-bottom:14px;display:flex;align-items:center;gap:6px;
+}
+
+/* CARDS */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:18px;margin-bottom:16px;
+}
+
+/* FORM */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.field{margin-bottom:12px;}
+.lbl{
+  font-size:10px;color:var(--muted);margin-bottom:5px;
+  display:block;text-transform:uppercase;letter-spacing:0.07em;
+  font-family:var(--mono);
+}
+.ir{display:flex;gap:6px;align-items:center;}
+input[type=number],select{
+  width:100%;background:#1A1A1A;border:1px solid #2A2A2A;
+  border-radius:8px;color:#fff;font-size:14px;
+  padding:9px 12px;outline:none;
+  font-family:var(--mono);
+  transition:border-color 0.2s;
+}
+input:focus,select:focus{border-color:var(--red);}
+select option{background:#1A1A1A;}
+.unit{
+  font-size:10px;color:#555;min-width:54px;
+  text-align:right;white-space:nowrap;
+  font-family:var(--mono);
+}
+
+/* RESULTS GRID */
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px;}
+.rc{
+  background:#0D0D0D;border:1px solid var(--border);
+  border-radius:12px;padding:14px 16px;
+  position:relative;overflow:hidden;
+}
+.rc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.rc.hl::before{background:var(--red);}
+.rc.ok::before{background:var(--ok);}
+.rc.wn::before{background:var(--warn);}
+.rc.er::before{background:var(--err);}
+.rc.inf::before{background:var(--info);}
+.rc.hl{border-color:rgba(204,0,0,0.3);}
+.rc.ok{border-color:rgba(0,204,102,0.3);}
+.rc.wn{border-color:rgba(255,136,0,0.3);}
+.rc.er{border-color:rgba(255,51,51,0.3);}
+.rc.inf{border-color:rgba(68,136,255,0.3);}
+.rl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;font-family:var(--mono);}
+.rv{font-size:22px;font-weight:700;color:#fff;font-family:var(--mono);}
+.rv span{font-size:11px;color:#666;font-weight:400;}
+.rsub{font-size:10px;color:#666;margin-top:3px;font-family:var(--mono);}
+
+/* FORMULA BOX */
+.fbox{
+  background:#0D0D0D;border-left:3px solid var(--red);
+  border-radius:0 10px 10px 0;padding:12px 16px;
+  margin-top:14px;font-size:11px;color:#888;
+  line-height:2.0;font-family:var(--mono);
+}
+.fbox strong{color:#ddd;}
+
+/* ANALYSIS */
+.analysis{
+  background:#080808;border:1px solid #1A1A1A;
+  border-radius:12px;padding:16px;margin-top:14px;
+}
+.atitle{
+  font-size:10px;font-weight:700;color:var(--red);
+  margin-bottom:12px;text-transform:uppercase;
+  letter-spacing:0.08em;font-family:var(--mono);
+}
+.arow{display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #121212;}
+.arow:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.d-ok{background:var(--ok);box-shadow:0 0 6px var(--ok);}
+.d-wn{background:var(--warn);box-shadow:0 0 6px var(--warn);}
+.d-er{background:var(--err);box-shadow:0 0 6px var(--err);}
+.d-info{background:var(--info);box-shadow:0 0 6px var(--info);}
+.atxt strong{color:#fff;font-size:12px;display:block;margin-bottom:3px;}
+.atxt p{font-size:11px;color:#888;line-height:1.7;margin:0;}
+.asugg{font-size:11px;color:#FFAA00;margin-top:4px;line-height:1.6;}
+
+/* ALERTS */
+.alert{border-radius:10px;padding:10px 14px;margin-top:10px;font-size:11px;line-height:1.7;}
+.a-ok{background:rgba(0,204,102,0.08);border:1px solid rgba(0,204,102,0.25);color:#00CC66;}
+.a-er{background:rgba(255,51,51,0.08);border:1px solid rgba(255,51,51,0.25);color:#FF5555;}
+.a-wn{background:rgba(255,136,0,0.08);border:1px solid rgba(255,136,0,0.25);color:#FFA500;}
+.a-info{background:rgba(68,136,255,0.08);border:1px solid rgba(68,136,255,0.25);color:#88AAFF;}
+
+/* VISUAL COLUMN */
+.col-vis{
+  background:#0D0D0D;border:1px solid #1A1A1A;
+  border-radius:12px;padding:16px;margin-top:14px;
+}
+.col-title{font-size:10px;color:var(--red);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;font-family:var(--mono);}
+
+/* PRESSURE GAUGE VISUAL */
+.gauge-wrap{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
+.column-vis{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;}
+.col-label{font-size:9px;color:var(--muted);text-transform:uppercase;font-family:var(--mono);}
+.fluid-col{
+  width:60px;border:2px solid #333;border-radius:4px;
+  background:#0A0A0A;position:relative;overflow:hidden;
+}
+.fluid-fill{
+  position:absolute;bottom:0;left:0;right:0;
+  transition:height 0.6s ease;
+}
+.col-val{font-size:11px;color:#fff;font-family:var(--mono);font-weight:600;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.tbl th{text-align:left;padding:7px 10px;color:var(--muted);font-weight:600;border-bottom:1px solid #1A1A1A;font-size:9px;text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.tbl td{padding:7px 10px;color:#ccc;border-bottom:1px solid #111;}
+.tbl tr:hover td{background:#141414;}
+.tw{color:#fff;font-weight:600;}
+
+/* SEPARATOR */
+.sep{height:1px;background:#1A1A1A;margin:16px 0;}
+
+/* FLUID PRESETS */
+.fluid-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.fbtn{
+  padding:5px 12px;background:#151515;border:1px solid #2A2A2A;
+  border-radius:6px;color:#aaa;font-size:11px;cursor:pointer;
+  font-family:var(--mono);transition:all 0.15s;
+}
+.fbtn:hover,.fbtn.on{background:var(--red);border-color:var(--red);color:#fff;}
+
+/* UNIT CONVERTER */
+.conv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.conv-card{background:#0D0D0D;border:1px solid #1A1A1A;border-radius:8px;padding:10px 12px;text-align:center;}
+.conv-lbl{font-size:9px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;margin-bottom:4px;}
+.conv-val{font-size:16px;font-weight:700;color:#fff;font-family:var(--mono);}
+
+.foot{
+  background:#0A0A0A;border-top:1px solid #1A1A1A;
+  margin-top:20px;padding:12px 20px;
+  font-size:10px;color:#444;text-align:center;
+  font-family:var(--mono);border-radius:12px;
+}
+.foot a{color:var(--red);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-icon">🔬</div>
+  <div>
+    <h1>Hydrostatic Pressure Calculator</h1>
+    <p>Petrosmart Academy - Petroleum and Industrial Fluid Column Pressure Tool</p>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" id="t1" onclick="sw(1)">Single Column</button>
+  <button class="tab" id="t2" onclick="sw(2)">Multi-Layer</button>
+  <button class="tab" id="t3" onclick="sw(3)">Wellbore</button>
+  <button class="tab" id="t4" onclick="sw(4)">Unit Converter</button>
+  <button class="tab" id="t5" onclick="sw(5)">Fluid Reference</button>
+</div>
+
+<!-- ===== PANEL 1: SINGLE COLUMN ===== -->
+<div class="panel on" id="p1">
+  <div class="card">
+    <div class="stitle">🧪 Fluid selection</div>
+    <div class="fluid-btns">
+      <button class="fbtn on" onclick="setFluid('water',1000,'Water (fresh)')">Water</button>
+      <button class="fbtn" onclick="setFluid('seawater',1025,'Seawater')">Seawater</button>
+      <button class="fbtn" onclick="setFluid('crude',870,'Crude oil 33°API')">Crude oil</button>
+      <button class="fbtn" onclick="setFluid('diesel',830,'Diesel fuel')">Diesel</button>
+      <button class="fbtn" onclick="setFluid('mud',1200,'Drilling mud 1.2 SG')">Drill mud 1.2</button>
+      <button class="fbtn" onclick="setFluid('mud15',1500,'Heavy drilling mud 1.5 SG')">Drill mud 1.5</button>
+      <button class="fbtn" onclick="setFluid('brine',1080,'Brine water')">Brine</button>
+      <button class="fbtn" onclick="setFluid('custom',0,'Custom')">Custom</button>
+    </div>
+
+    <div class="stitle">⚙️ Parameters</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Fluid density</label>
+        <div class="ir"><input type="number" id="rho1" value="1000" step="1" oninput="calc1()"><span class="unit">kg/m3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Column height / depth</label>
+        <div class="ir"><input type="number" id="h1" value="100" step="1" oninput="calc1()"><span class="unit">m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Surface pressure (P0)</label>
+        <div class="ir"><input type="number" id="p01" value="0" step="0.1" oninput="calc1()"><span class="unit">bar</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Gravitational acceleration</label>
+        <div class="ir"><input type="number" id="g1" value="9.81" step="0.01" oninput="calc1()"><span class="unit">m/s2</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pipe / casing inner diameter</label>
+        <div class="ir"><input type="number" id="dia1" value="0.20" step="0.01" oninput="calc1()"><span class="unit">m</span></div>
+      </div>
+    </div>
+
+    <div id="r1"></div>
+
+    <!-- Visual -->
+    <div class="col-vis" id="col-vis1">
+      <div class="col-title">Pressure profile visualization</div>
+      <div class="gauge-wrap" id="gauge1"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 2: MULTI-LAYER ===== -->
+<div class="panel" id="p2">
+  <div class="card">
+    <div class="stitle">📐 Multi-layer fluid column (up to 5 layers)</div>
+    <div style="font-size:11px;color:#888;margin-bottom:14px;">Enter each fluid layer from top to bottom. Common in wellbore annuli, storage tanks and pipelines with stratified fluids.</div>
+
+    <div id="layers-form"></div>
+
+    <button class="fbtn" onclick="addLayer()" style="margin-top:8px;padding:7px 16px;">+ Add layer</button>
+    <button class="fbtn" onclick="removeLayer()" style="margin-top:8px;padding:7px 16px;margin-left:6px;">- Remove last</button>
+
+    <div class="field" style="margin-top:14px;">
+      <label class="lbl">Surface pressure (P0)</label>
+      <div class="ir"><input type="number" id="p0multi" value="0" step="0.1" oninput="calcMulti()"><span class="unit">bar</span></div>
+    </div>
+
+    <div id="r2"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 3: WELLBORE ===== -->
+<div class="panel" id="p3">
+  <div class="card">
+    <div class="stitle">🛢️ Wellbore pressure analysis - Petroleum engineering</div>
+    <div style="font-size:11px;color:#888;margin-bottom:14px;">Calculates bottom-hole pressure (BHP), formation pressure gradient, overbalance/underbalance, equivalent circulating density (ECD) and kill mud weight. Standard petroleum engineering calculations per API RP 13D.</div>
+
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Well total depth (TVD)</label>
+        <div class="ir"><input type="number" id="tvd" value="3000" oninput="calcWell()"><span class="unit">m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Drilling mud density</label>
+        <div class="ir"><input type="number" id="mud_rho" value="1300" step="10" oninput="calcWell()"><span class="unit">kg/m3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Surface casing pressure</label>
+        <div class="ir"><input type="number" id="scp" value="0" step="0.5" oninput="calcWell()"><span class="unit">bar</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Formation pressure (known/estimated)</label>
+        <div class="ir"><input type="number" id="Pf" value="380" step="1" oninput="calcWell()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Annular pressure loss (APL)</label>
+        <div class="ir"><input type="number" id="apl" value="25" step="1" oninput="calcWell()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Fracture gradient</label>
+        <div class="ir"><input type="number" id="frac" value="0.18" step="0.01" oninput="calcWell()"><span class="unit">bar/m</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Pore pressure gradient (known)</label>
+        <div class="ir"><input type="number" id="ppg" value="0.105" step="0.001" oninput="calcWell()"><span class="unit">bar/m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Casing shoe depth (TVD)</label>
+        <div class="ir"><input type="number" id="shoe" value="1500" oninput="calcWell()"><span class="unit">m</span></div>
+      </div>
+    </div>
+
+    <div id="r3"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 4: UNIT CONVERTER ===== -->
+<div class="panel" id="p4">
+  <div class="card">
+    <div class="stitle">🔄 Pressure unit converter</div>
+    <div class="field">
+      <label class="lbl">Input pressure value</label>
+      <div class="ir"><input type="number" id="pconv" value="100" step="0.01" oninput="calcConv()"><span class="unit">-</span></div>
+    </div>
+    <div class="field">
+      <label class="lbl">Input unit</label>
+      <select id="unit-in" onchange="calcConv()">
+        <option value="bar">bar</option>
+        <option value="psi">psi</option>
+        <option value="kPa">kPa</option>
+        <option value="MPa">MPa</option>
+        <option value="atm">atm</option>
+        <option value="Pa">Pa</option>
+        <option value="kg_cm2">kgf/cm2</option>
+        <option value="mH2O">m H2O (water column)</option>
+        <option value="mmHg">mmHg</option>
+        <option value="inHg">inHg</option>
+        <option value="ppg">ppg (mud weight)</option>
+      </select>
+    </div>
+    <div id="conv-out"></div>
+
+    <div class="sep"></div>
+    <div class="stitle">🔄 Density / pressure gradient converter</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Mud density</label>
+        <div class="ir"><input type="number" id="mud-dens" value="1300" oninput="calcDensConv()"><span class="unit">kg/m3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Depth</label>
+        <div class="ir"><input type="number" id="mud-depth" value="1000" oninput="calcDensConv()"><span class="unit">m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Fluid type</label>
+        <select id="mud-type" onchange="calcDensConv()">
+          <option value="water">Water</option>
+          <option value="mud" selected>Drilling mud</option>
+          <option value="oil">Oil</option>
+          <option value="cement">Cement slurry</option>
+        </select>
+      </div>
+    </div>
+    <div id="dens-conv-out"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 5: FLUID REFERENCE ===== -->
+<div class="panel" id="p5">
+  <div class="card">
+    <div class="stitle">📚 Petroleum and industrial fluid reference - Click to load</div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Fluid</th><th>Density (kg/m3)</th><th>SG</th><th>Gradient (bar/m)</th><th>Gradient (psi/ft)</th><th>At 1000m (bar)</th>
+        </tr>
+      </thead>
+      <tbody id="fluid-tb"></tbody>
+    </table>
+    <div class="sep"></div>
+    <div class="stitle">📖 Key formulas reference</div>
+    <div class="fbox">
+      <strong>Hydrostatic pressure:</strong> P = P0 + rho x g x h (Pa)<br>
+      <strong>In bar:</strong> P (bar) = P0 + rho (kg/m3) x 9.81 x h (m) / 100000<br>
+      <strong>In psi:</strong> P (psi) = P0 + 0.4335 x SG x h (ft)<br>
+      <strong>Pressure gradient:</strong> G (bar/m) = rho x 9.81 / 100000<br>
+      <strong>Pressure gradient:</strong> G (psi/ft) = SG x 0.4335<br>
+      <strong>ECD:</strong> ECD (kg/m3) = mud_density + APL x 100000 / (9.81 x TVD)<br>
+      <strong>Kill mud weight:</strong> KMW = mud_rho + (SIDPP x 100000) / (9.81 x TVD)<br>
+      <strong>Overbalance:</strong> OB = BHP - Pformation<br>
+      <strong>Underbalance:</strong> UB = Pformation - BHP (kick conditions)<br>
+      <strong>Fracture pressure:</strong> Pfrac = fracture_gradient (bar/m) x TVD<br>
+      <strong>EMW:</strong> EMW (kg/m3) = P (bar) x 100000 / (9.81 x TVD)
+    </div>
+    <div class="sep"></div>
+    <div class="stitle">🎓 Pressure conversion table</div>
+    <table class="tbl">
+      <thead><tr><th>From</th><th>To bar</th><th>To psi</th><th>To kPa</th><th>To atm</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">1 bar</td><td>1.000</td><td>14.504</td><td>100.0</td><td>0.9869</td></tr>
+        <tr><td class="tw">1 psi</td><td>0.06895</td><td>1.000</td><td>6.895</td><td>0.06805</td></tr>
+        <tr><td class="tw">1 kPa</td><td>0.01000</td><td>0.1450</td><td>1.000</td><td>0.009869</td></tr>
+        <tr><td class="tw">1 MPa</td><td>10.000</td><td>145.04</td><td>1000.0</td><td>9.8692</td></tr>
+        <tr><td class="tw">1 atm</td><td>1.01325</td><td>14.696</td><td>101.325</td><td>1.000</td></tr>
+        <tr><td class="tw">1 kgf/cm2</td><td>0.98067</td><td>14.223</td><td>98.067</td><td>0.96784</td></tr>
+        <tr><td class="tw">1 m H2O</td><td>0.09807</td><td>1.4223</td><td>9.807</td><td>0.09678</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">
+  <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
+  · Hydrostatic pressure calculations per API RP 13D / ISO 10416 · Educational tool only
+</div>
+</div><!-- end wrap -->
+
+<script>
+/* ===================== DATA ===================== */
+var fluids=[
+  {name:'Fresh water',rho:1000,notes:'Standard reference'},
+  {name:'Seawater',rho:1025,notes:'Offshore standard'},
+  {name:'Brine (saturated NaCl)',rho:1200,notes:'Completion fluid'},
+  {name:'Crude oil - Extra light (>45 API)',rho:800,notes:'Condensate range'},
+  {name:'Crude oil - Light (35-45 API)',rho:840,notes:'WTI, Brent range'},
+  {name:'Crude oil - Medium (25-35 API)',rho:875,notes:'Arabian Light range'},
+  {name:'Crude oil - Heavy (10-25 API)',rho:930,notes:'Venezuelan, Canadian'},
+  {name:'Crude oil - Extra heavy (<10 API)',rho:1000,notes:'Bitumen range'},
+  {name:'Diesel fuel',rho:830,notes:'EN 590 specification'},
+  {name:'Drilling mud 1.1 SG',rho:1100,notes:'Low density mud'},
+  {name:'Drilling mud 1.2 SG',rho:1200,notes:'Standard water-based mud'},
+  {name:'Drilling mud 1.5 SG',rho:1500,notes:'High pressure zone mud'},
+  {name:'Drilling mud 1.8 SG',rho:1800,notes:'HPHT application'},
+  {name:'Drilling mud 2.0 SG',rho:2000,notes:'Extreme HPHT'},
+  {name:'Cement slurry (standard)',rho:1830,notes:'API Class G standard'},
+  {name:'Cement slurry (heavy)',rho:2100,notes:'Weighted slurry'},
+  {name:'Natural gas (at surface)',rho:0.83,notes:'STP conditions'},
+  {name:'Methane (at reservoir)',rho:120,notes:'At 200 bar, 80°C approx'},
+  {name:'Completion brine KCl',rho:1050,notes:'3% KCl solution'},
+  {name:'Formate brine (cesium)',rho:2100,notes:'Ultra-high density brine'},
+];
+
+/* ===================== UTILS ===================== */
+function barToPsi(b){return b*14.5038;}
+function barToKpa(b){return b*100;}
+function barToMpa(b){return b/10;}
+function rhoToGrad(rho){return rho*9.81/100000;}// bar/m
+function rhoToGradPsi(rho){return rho/1000*0.4335;}// psi/ft
+
+function sw(n){
+  for(var i=1;i<=5;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    document.getElementById('t'+i).className='tab'+(i===n?' on':'');
+  }
+}
+
+function rc(cls,lbl,val,unit,sub){
+  return '<div class="rc '+(cls||'')+'">'
+    +'<div class="rl">'+lbl+'</div>'
+    +'<div class="rv">'+val+(unit?' <span>'+unit+'</span>':'')+'</div>'
+    +(sub?'<div class="rsub">'+sub+'</div>':'')+' </div>';
+}
+function ar(type,title,body,sugg){
+  var d={ok:'d-ok',wn:'d-wn',er:'d-er',info:'d-info'}[type]||'d-info';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">💡 '+sugg+'</div>':'')+' </div></div>';
+}
+
+/* ===================== FLUID PRESET ===================== */
+var activeFluid='water';
+function setFluid(id,rho,name){
+  activeFluid=id;
+  document.querySelectorAll('.fbtn').forEach(function(b){b.classList.remove('on');});
+  event.target.classList.add('on');
+  if(rho>0) document.getElementById('rho1').value=rho;
+  calc1();
+}
+
+/* ===================== PANEL 1 ===================== */
+function calc1(){
+  var rho=+document.getElementById('rho1').value||1000;
+  var h=+document.getElementById('h1').value||100;
+  var p0=+document.getElementById('p01').value||0;
+  var g=+document.getElementById('g1').value||9.81;
+  var dia=+document.getElementById('dia1').value||0.20;
+
+  var P_Pa=rho*g*h;
+  var P_bar=P_Pa/100000+p0;
+  var P_psi=barToPsi(P_bar);
+  var P_kPa=barToKpa(P_bar);
+  var P_MPa=barToMpa(P_bar);
+  var SG=rho/1000;
+  var grad_bar=rhoToGrad(rho);
+  var grad_psi=rhoToGradPsi(rho);
+  var area=Math.PI*(dia/2)*(dia/2);
+  var force=P_bar*1e5*area/1000; // kN
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Hydrostatic pressure',P_bar.toFixed(3),'bar','P0 + rho.g.h/100000');
+  html+=rc('hl','In psi',P_psi.toFixed(2),'psi','= '+P_kPa.toFixed(1)+' kPa');
+  html+=rc('','Specific gravity',SG.toFixed(3),'SG','rho / 1000');
+  html+=rc('','Pressure gradient',grad_bar.toFixed(5),'bar/m',grad_psi.toFixed(4)+' psi/ft');
+  html+=rc('','Force on pipe cross-section',force.toFixed(1),'kN','On '+dia*1000+' mm ID pipe');
+  html+=rc('','At depth '+h+'m - MPa',P_MPa.toFixed(3),'MPa','= '+(P_bar*14.504).toFixed(1)+' psi');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>P_hydrostatic</strong> = P0 + rho x g x h<br>'
+    +'= '+p0+' bar + '+rho+' kg/m3 x '+g+' m/s2 x '+h+' m<br>'
+    +'= '+p0+' + '+P_Pa.toFixed(0)+' Pa = '+p0+' + '+(P_Pa/100000).toFixed(5)+' bar<br>'
+    +'= <strong>'+P_bar.toFixed(4)+' bar = '+P_psi.toFixed(2)+' psi = '+P_kPa.toFixed(1)+' kPa</strong><br>'
+    +'<strong>Pressure gradient</strong> = rho x g / 100000 = <strong>'+grad_bar.toFixed(5)+' bar/m = '+grad_psi.toFixed(4)+' psi/ft</strong>'
+    +'</div>';
+
+  // Analysis
+  var rows='';
+
+  // Classify pressure level
+  if(P_bar<10){
+    rows+=ar('ok','Low pressure regime (<10 bar)','At '+P_bar.toFixed(2)+' bar, this is a low-pressure application. Standard carbon steel piping (ASME B31.3 Class 150/300) is adequate. No special pressure containment design required.','Use Schedule 40 carbon steel pipe or standard PVC for ambient-temperature water service. Minimum design pressure should be 1.5x operating pressure per ASME B31.3.');
+  } else if(P_bar<70){
+    rows+=ar('ok','Medium pressure regime (10-70 bar)','At '+P_bar.toFixed(2)+' bar, this is a medium-pressure application. Class 300-600 flanges, ASME B31.3 Schedule 80-160 piping required. Typical for production manifolds and surface pipelines.','Verify pipe wall thickness: t_min = P.D / (2.S.E) where S = allowable stress. For API 5L Grade B (S=241 MPa), minimum wall = '+((P_bar*100000*dia)/(2*241e6*1000)).toFixed(1)+' mm for '+dia*1000+'mm ID.');
+  } else if(P_bar<350){
+    rows+=ar('wn','High pressure regime (70-350 bar)','At '+P_bar.toFixed(2)+' bar, this is a high-pressure application. ASME Class 1500-2500 flanges, special material selection (NACE MR0175 for sour service), rigorous pressure testing required.','Pressure test at 1.5x MAWP minimum. For subsea applications at this pressure, use DNV-ST-F101 standard for pipeline design. Specify corrosion allowance of 3-6mm for petroleum service.');
+  } else {
+    rows+=ar('er','Very high / HPHT regime (>350 bar)','At '+P_bar.toFixed(2)+' bar, this is an HPHT (High Pressure, High Temperature) application. Special HPHT wellhead, BOP stack design required. API 17TR8 / API 16A Class 15000 equipment minimum.','HPHT wells require specialized well integrity management. All barriers must be dual-verified per API RP 65-2. BOP pressure rating must exceed '+P_bar.toFixed(0)+' bar with 25% safety margin.');
+  }
+
+  // Density analysis
+  if(rho>1800){
+    rows+=ar('wn','Very high fluid density ('+rho+' kg/m3)','This density corresponds to '+SG.toFixed(2)+' SG, typical of heavy cement slurry or maximum-weight drilling mud. At this density, formation fracture risk exists if applied in a shallow-cased section.','Check fracture gradient before applying this mud weight. Typical fracture gradient in Cameroon/Central Africa basins: 0.155-0.165 bar/m. Equivalent mud weight at '+h+'m: '+rho.toFixed(0)+' kg/m3. Calculate LOT (Leak-Off Test) pressure before increasing mud weight above 1.6 SG.');
+  } else if(rho<900&&rho>700){
+    rows+=ar('info','Light oil or solvent density ('+rho+' kg/m3)','This density corresponds to '+SG.toFixed(2)+' SG, typical of light crude oil ('+((141.5/SG)-131.5).toFixed(0)+'°API), diesel, or condensate. Hydrostatic pressure is '+((1000-rho)/1000*100).toFixed(0)+'% lower than water at the same depth.','For oil columns in reservoirs, remember the oil-water contact: hydrostatic pressure from oil column is LESS than water leg. This creates the buoyancy force that drives oil to surface. Oil-water contact depth calculation: h_owc = (P_aquifer - P_res) / ((rho_w - rho_o) x g)');
+  }
+
+  // Force analysis
+  rows+=ar('info','Hydraulic force on pipe cross-section ('+dia*1000+' mm ID)','At '+P_bar.toFixed(2)+' bar, the net axial force on the pipe cross-section (area = '+area.toFixed(4)+' m2) is '+force.toFixed(1)+' kN. This is the end-cap effect force that every pressure vessel must resist.','This '+force.toFixed(0)+' kN axial force governs flange bolt sizing. Using ASME PCC-1 / ASME VIII: Number of M24 bolts required at '+P_bar.toFixed(0)+' bar: approximately '+Math.ceil(force*1000/(145*354)).toLocaleString()+' bolts (Grade 8.8, 50% proof load). Always verify with full ASME bolted flange calculation.');
+
+  html+='<div class="analysis"><div class="atitle">/// ANALYSIS AND ENGINEERING IMPLICATIONS</div>'+rows+'</div>';
+  document.getElementById('r1').innerHTML=html;
+
+  // Visual column
+  var maxH=Math.max(h,10);
+  var pctFill=Math.min(h/maxH*100,100);
+  var colors={'water':'#4488FF','seawater':'#2255BB','crude':'#884400','diesel':'#AA6600','mud':'#664400','mud15':'#442200','brine':'#6688AA','custom':'#CC0000'};
+  var fc=colors[activeFluid]||'#CC0000';
+  var gradRed=P_bar>350?'rgba(255,51,51,0.8)':P_bar>70?'rgba(255,136,0,0.7)':P_bar>10?'rgba(255,200,0,0.5)':'rgba(68,136,255,0.5)';
+
+  document.getElementById('gauge1').innerHTML=
+    '<div class="column-vis">'
+      +'<div class="col-label">Fluid column</div>'
+      +'<div class="fluid-col" style="height:160px;">'
+        +'<div class="fluid-fill" style="height:'+pctFill+'%;background:linear-gradient(0deg,'+fc+','+fc+'88);"></div>'
+      +'</div>'
+      +'<div class="col-val">'+h+' m</div>'
+      +'<div class="col-label">'+rho+' kg/m3</div>'
+    +'</div>'
+    +'<div class="column-vis">'
+      +'<div class="col-label">Pressure level</div>'
+      +'<div class="fluid-col" style="height:160px;">'
+        +'<div class="fluid-fill" style="height:'+Math.min(P_bar/500*100,100)+'%;background:linear-gradient(0deg,'+gradRed+',transparent);"></div>'
+      +'</div>'
+      +'<div class="col-val">'+P_bar.toFixed(2)+' bar</div>'
+      +'<div class="col-label">'+P_psi.toFixed(0)+' psi</div>'
+    +'</div>'
+    +'<div style="flex:1;padding-left:10px;">'
+      +'<div style="font-size:10px;color:#555;margin-bottom:8px;font-family:var(--mono);">PRESSURE PROFILE</div>'
+      +[0,25,50,75,100].map(function(pct){
+        var depth=h*pct/100;
+        var pb=(rho*9.81*depth/100000+p0).toFixed(2);
+        return '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #111;">'
+          +'<span style="font-size:10px;color:#666;font-family:var(--mono);">'+depth.toFixed(0)+' m</span>'
+          +'<span style="font-size:10px;color:#aaa;font-family:var(--mono);">'+pb+' bar</span>'
+          +'<span style="font-size:10px;color:#666;font-family:var(--mono);">'+(barToPsi(+pb)).toFixed(1)+' psi</span>'
+          +'</div>';
+      }).join('')
+    +'</div>';
+}
+
+/* ===================== PANEL 2: MULTI-LAYER ===================== */
+var layers=[
+  {name:'Water',rho:1025,h:50},
+  {name:'Crude oil',rho:860,h:80},
+  {name:'Drilling mud',rho:1200,h:70},
+];
+
+function renderLayers(){
+  var f=document.getElementById('layers-form');
+  f.innerHTML=layers.map(function(l,i){
+    return '<div style="background:#0D0D0D;border:1px solid #1A1A1A;border-radius:10px;padding:12px 14px;margin-bottom:8px;">'
+      +'<div style="font-size:10px;color:var(--red);font-family:var(--mono);margin-bottom:10px;">LAYER '+(i+1)+'</div>'
+      +'<div class="row3">'
+        +'<div class="field"><label class="lbl">Fluid name</label><input type="text" id="ln'+i+'" value="'+l.name+'" oninput="updateLayer('+i+')" style="background:#1A1A1A;border:1px solid #222;border-radius:8px;color:#fff;font-size:13px;padding:8px 10px;font-family:var(--mono);width:100%;"></div>'
+        +'<div class="field"><label class="lbl">Density (kg/m3)</label><div class="ir"><input type="number" id="lr'+i+'" value="'+l.rho+'" oninput="updateLayer('+i+')" style="background:#1A1A1A;border:1px solid #222;border-radius:8px;color:#fff;font-size:13px;padding:8px 10px;font-family:var(--mono);width:100%;"><span class="unit">kg/m3</span></div></div>'
+        +'<div class="field"><label class="lbl">Thickness (m)</label><div class="ir"><input type="number" id="lh'+i+'" value="'+l.h+'" oninput="updateLayer('+i+')" style="background:#1A1A1A;border:1px solid #222;border-radius:8px;color:#fff;font-size:13px;padding:8px 10px;font-family:var(--mono);width:100%;"><span class="unit">m</span></div></div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  calcMulti();
+}
+
+function updateLayer(i){
+  layers[i].name=document.getElementById('ln'+i).value||layers[i].name;
+  layers[i].rho=+document.getElementById('lr'+i).value||layers[i].rho;
+  layers[i].h=+document.getElementById('lh'+i).value||layers[i].h;
+  calcMulti();
+}
+
+function addLayer(){
+  layers.push({name:'Layer '+(layers.length+1),rho:1000,h:50});
+  if(layers.length<=5) renderLayers();
+}
+
+function removeLayer(){
+  if(layers.length>1){layers.pop(); renderLayers();}
+}
+
+function calcMulti(){
+  var p0=+document.getElementById('p0multi').value||0;
+  var P=p0;
+  var totalH=0;
+  var rows='<div style="margin-top:14px;">';
+  rows+='<table class="tbl"><thead><tr><th>Layer</th><th>Fluid</th><th>Density</th><th>Thickness</th><th>P at top</th><th>P at base</th><th>Gradient</th></tr></thead><tbody>';
+
+  layers.forEach(function(l,i){
+    var Ptop=P;
+    var dP=l.rho*9.81*l.h/100000;
+    var Pbase=P+dP;
+    var grad=rhoToGrad(l.rho);
+    rows+='<tr>'
+      +'<td class="tw">'+(i+1)+'</td>'
+      +'<td>'+l.name+'</td>'
+      +'<td style="font-family:var(--mono);">'+l.rho+' kg/m3</td>'
+      +'<td style="font-family:var(--mono);">'+l.h+' m</td>'
+      +'<td style="font-family:var(--mono);">'+Ptop.toFixed(3)+' bar</td>'
+      +'<td class="tw" style="font-family:var(--mono);">'+Pbase.toFixed(3)+' bar</td>'
+      +'<td style="font-family:var(--mono);">'+grad.toFixed(5)+' bar/m</td>'
+      +'</tr>';
+    P=Pbase;
+    totalH+=l.h;
+  });
+  rows+='</tbody></table>';
+
+  // Average density
+  var totalWeight=layers.reduce(function(s,l){return s+l.rho*l.h;},0);
+  var avgRho=totalWeight/totalH;
+  var avgGrad=rhoToGrad(avgRho);
+
+  rows+='</div><div class="rgrid">';
+  rows+=rc('hl','Total bottom pressure',P.toFixed(3),'bar','At '+totalH+' m total depth');
+  rows+=rc('hl','In psi',barToPsi(P).toFixed(2),'psi','= '+barToKpa(P).toFixed(1)+' kPa');
+  rows+=rc('','Total column height',totalH,'m',layers.length+' layers');
+  rows+=rc('','Average fluid density',avgRho.toFixed(1),'kg/m3','Average SG: '+(avgRho/1000).toFixed(3));
+  rows+=rc('','Average gradient',avgGrad.toFixed(5),'bar/m',rhoToGradPsi(avgRho).toFixed(4)+' psi/ft');
+  rows+=rc('','Equivalent single layer','EMW: '+avgRho.toFixed(0),'kg/m3','Same bottom pressure');
+  rows+='</div>';
+
+  rows+='<div class="fbox"><strong>Multi-layer calculation:</strong> P_base = P0 + SUM(rho_i x g x h_i)<br>';
+  layers.forEach(function(l,i){
+    rows+='Layer '+(i+1)+' ('+l.name+'): +'+l.rho+' x 9.81 x '+l.h+' / 100000 = +'+(l.rho*9.81*l.h/100000).toFixed(3)+' bar<br>';
+  });
+  rows+='<strong>Total: '+P.toFixed(4)+' bar = '+barToPsi(P).toFixed(2)+' psi</strong></div>';
+
+  // Stratification analysis
+  var anaRows='';
+  var hasOilWater=layers.some(function(l){return l.rho<900;})&&layers.some(function(l){return l.rho>980;});
+  if(hasOilWater){
+    anaRows+=ar('info','Oil-water stratification detected','The column contains both light fluid (oil/condensate <900 kg/m3) and heavy fluid (water/mud >980 kg/m3). This creates natural stratification with the lighter fluid floating on top. Check layer ordering - lightest fluid must be at top for stable column.','In wellbore: oil column above gas-oil contact (GOC), water below oil-water contact (OWC). Pressure communication at each contact: P_oil(at OWC) = P_water(at OWC) confirms correct pressure model.');
+  }
+  if(layers.some(function(l){return l.rho>1600;})){
+    anaRows+=ar('wn','Heavy fluid in column (>1.6 SG)','Dense fluid (>1600 kg/m3) detected - likely cement slurry or weighted drilling mud. At this density, excessive equivalent mud weight (EMW) may exceed formation fracture gradient in shallow uncased sections.','For cement operations: ensure shoe track volume and pump rate are designed to prevent lost circulation. Maximum allowable mud weight window = fracture gradient - safety margin (typically 0.025 bar/m).');
+  }
+  if(!anaRows) anaRows=ar('ok','Column configuration nominal','Multi-layer fluid column is within normal operating parameters. Average EMW of '+avgRho.toFixed(0)+' kg/m3 is a reasonable density for most applications.','');
+  rows+='<div class="analysis"><div class="atitle">/// MULTI-LAYER ANALYSIS</div>'+anaRows+'</div>';
+  document.getElementById('r2').innerHTML=rows;
+}
+
+/* ===================== PANEL 3: WELLBORE ===================== */
+function calcWell(){
+  var TVD=+document.getElementById('tvd').value||3000;
+  var mud=+document.getElementById('mud_rho').value||1300;
+  var scp=+document.getElementById('scp').value||0;
+  var Pf=+document.getElementById('Pf').value||380;
+  var apl=+document.getElementById('apl').value||25;
+  var frac=+document.getElementById('frac').value||0.18;
+  var ppg=+document.getElementById('ppg').value||0.105;
+  var shoe=+document.getElementById('shoe').value||1500;
+
+  // BHP (static)
+  var BHP_static=mud*9.81*TVD/100000+scp;
+  // ECD
+  var ECD_rho=mud+apl*100000/(9.81*TVD);
+  var BHP_ecd=ECD_rho*9.81*TVD/100000;
+  // Formation pressure
+  var Pform=ppg*TVD;
+  // Overbalance
+  var OB=BHP_static-Pform;
+  var OB_pct=OB/Pform*100;
+  // Fracture pressure at shoe and TD
+  var Pfrac_shoe=frac*shoe;
+  var Pfrac_td=frac*TVD;
+  // Kill mud weight (based on SIDPP = scp)
+  var KMW=mud+scp*100000/(9.81*TVD);
+  // Mud window
+  var window_bar=Pfrac_td-Pform;
+  var window_rho=(ECD_rho-mud);
+  // Mud gradient
+  var mud_grad=rhoToGrad(mud);
+  var EMW_current=BHP_static*100000/(9.81*TVD);
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','BHP static',BHP_static.toFixed(1),'bar','= '+barToPsi(BHP_static).toFixed(0)+' psi');
+  html+=rc('hl','BHP circulating (ECD)',BHP_ecd.toFixed(1),'bar','ECD = '+ECD_rho.toFixed(0)+' kg/m3');
+  html+=rc(OB>0?'ok':'er','Formation pressure',Pform.toFixed(1),'bar','Gradient: '+ppg+' bar/m');
+  html+=rc(OB>0&&OB<50?'ok':OB>50?'wn':'er','Overbalance',OB.toFixed(1),'bar',(OB_pct).toFixed(1)+'% over formation P');
+  html+=rc(BHP_ecd<Pfrac_td?'ok':'er','Fracture P at TD',Pfrac_td.toFixed(1),'bar','ECD '+(BHP_ecd<Pfrac_td?'below':'ABOVE')+' frac gradient');
+  html+=rc('','Fracture P at shoe',Pfrac_shoe.toFixed(1),'bar','Shoe at '+shoe+' m TVD');
+  html+=rc(KMW<=1.3*mud?'ok':'wn','Kill mud weight',KMW.toFixed(0),'kg/m3',KMW>mud?'Increase mud by '+(KMW-mud).toFixed(0)+' kg/m3':'On balance - check');
+  html+=rc('','Mud window',window_bar.toFixed(1),'bar','Frac - Pore = '+(window_rho).toFixed(0)+' kg/m3 window');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>BHP_static</strong> = rho_mud x g x TVD / 100000 + SCP<br>'
+    +'= '+mud+' x 9.81 x '+TVD+' / 100000 + '+scp+' = <strong>'+BHP_static.toFixed(2)+' bar</strong><br>'
+    +'<strong>ECD</strong> = '+mud+' + '+apl+' x 100000 / (9.81 x '+TVD+') = <strong>'+ECD_rho.toFixed(0)+' kg/m3</strong><br>'
+    +'<strong>BHP_ECD</strong> = '+ECD_rho.toFixed(0)+' x 9.81 x '+TVD+' / 100000 = <strong>'+BHP_ecd.toFixed(2)+' bar</strong><br>'
+    +'<strong>Overbalance</strong> = BHP - Pformation = '+BHP_static.toFixed(2)+' - '+Pform.toFixed(2)+' = <strong>'+OB.toFixed(2)+' bar ('+OB_pct.toFixed(1)+'%)</strong><br>'
+    +'<strong>Kill mud weight</strong> = '+mud+' + ('+scp+' x 100000) / (9.81 x '+TVD+') = <strong>'+KMW.toFixed(0)+' kg/m3</strong>'
+    +'</div>';
+
+  var rows='';
+  // Overbalance check
+  if(OB<0){
+    rows+=ar('er','UNDERBALANCE CONDITION - KICK RISK','BHP ('+BHP_static.toFixed(1)+' bar) is BELOW formation pressure ('+Pform.toFixed(1)+' bar). Formation fluids will flow into the wellbore (kick). If uncontrolled, this leads to a blowout.','Immediate actions: (1) Check drill string is full - fill if needed. (2) Increase mud weight to '+KMW.toFixed(0)+' kg/m3 minimum. (3) If kick already taken: shut in BOP, record SIDPP='+scp.toFixed(1)+' bar, bullhead or circulate kill mud per well kill procedure. Alert company man and OIM.');
+  } else if(OB_pct>20){
+    rows+=ar('wn','High overbalance ('+OB_pct.toFixed(0)+'% above formation P)','Excessive overbalance increases differential pipe sticking risk and causes formation damage (mud filtrate invasion). In depleted zones, fracturing risk is elevated with ECD.','Target overbalance: 3-7% above formation pressure (industry best practice). Consider reducing mud weight to '+Math.round(Pform*100000/(9.81*TVD)*(1.05)).toFixed(0)+' kg/m3 (5% OB). Monitor drag/torque for stuck pipe indicators.');
+  } else {
+    rows+=ar('ok','Overbalance within acceptable range ('+OB.toFixed(1)+' bar, '+OB_pct.toFixed(1)+'%)','BHP provides positive overbalance against formation. Wellbore is stable. Formation fluids are contained. Continue monitoring mud properties, pit volume and flow rates for any kick indicators.','');
+  }
+
+  // Fracture check
+  if(BHP_ecd>=Pfrac_td){
+    rows+=ar('er','ECD EXCEEDS FRACTURE GRADIENT AT TD','Circulating BHP ('+BHP_ecd.toFixed(1)+' bar) exceeds fracture pressure at TD ('+Pfrac_td.toFixed(1)+' bar). Lost circulation is likely during drilling or cementing. Mud loss to formation will reduce annular level and BHP, potentially causing a secondary kick.','Reduce ECD by: (1) Reducing pump rate (lower APL). (2) Reducing mud weight if mud window allows. (3) Using managed pressure drilling (MPD). (4) Adding LCM (Lost Circulation Material) to mud system. Current ECD exceeds frac by '+(BHP_ecd-Pfrac_td).toFixed(1)+' bar.');
+  } else if(window_bar<30){
+    rows+=ar('wn','Narrow mud window ('+window_bar.toFixed(1)+' bar = '+window_rho.toFixed(0)+' kg/m3)','Difference between fracture pressure and pore pressure is only '+window_bar.toFixed(1)+' bar. This is a narrow mud window requiring precise mud weight management. ECD ('+ECD_rho.toFixed(0)+' kg/m3) must stay below '+(Pfrac_td*100000/(9.81*TVD)).toFixed(0)+' kg/m3 fracture limit.','Consider MPD (Managed Pressure Drilling). Minimize EWM by optimizing pump rates and rheology. Use real-time PWD (Pressure While Drilling) tools. Pre-position LCM pill. Design backup well control procedures for narrow-window operations.');
+  } else {
+    rows+=ar('ok','Adequate mud window ('+window_bar.toFixed(1)+' bar = '+window_rho.toFixed(0)+' kg/m3)','ECD ('+ECD_rho.toFixed(0)+' kg/m3) is comfortably below fracture gradient. Current mud weight of '+mud+' kg/m3 provides safe operation with '+((Pfrac_td-BHP_ecd)).toFixed(1)+' bar margin to fracture.','');
+  }
+
+  // Casing shoe check
+  if(BHP_static>Pfrac_shoe){
+    rows+=ar('er','BHP EXCEEDS FRACTURE PRESSURE AT CASING SHOE','Mud hydrostatic ('+BHP_static.toFixed(1)+' bar) exceeds fracture pressure at shoe ('+Pfrac_shoe.toFixed(1)+' bar at '+shoe+'m). This will cause losses behind the casing shoe during any kill operation.','The casing shoe must support the load of killing the well. If shoe takes losses during kill, consider: (1) Volumetric well control method instead of circulate-kill. (2) Bullheading kill fluid if shoe can sustain. (3) Perforate and wash above shoe if shallower LOT is stronger.');
+  }
+
+  // Kill mud
+  if(KMW>mud*1.15){
+    rows+=ar('wn','Significant kill mud weight increase required','Kill mud weight ('+KMW.toFixed(0)+' kg/m3) is '+(KMW-mud).toFixed(0)+' kg/m3 above current mud weight ('+mud+' kg/m3). This is a '+((KMW-mud)/mud*100).toFixed(0)+'% increase. Time and volume required to weight up must be planned.','Weight-up rate: mixing +0.1 SG typically requires 5-10 bbl barite/bbl mud increase. Volume to kill: strokes to bit x pump output. Ensure barite supply on hand: approx '+(Math.round((KMW-mud)*0.5)).toLocaleString()+' kg barite per m3 of mud to add '+(KMW-mud).toFixed(0)+' kg/m3.');
+  }
+
+  html+='<div class="analysis"><div class="atitle">/// WELLBORE PRESSURE ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r3').innerHTML=html;
+}
+
+/* ===================== PANEL 4: UNIT CONVERTER ===================== */
+var toBar={bar:1,psi:0.0689476,kPa:0.01,MPa:10,atm:1.01325,Pa:1e-5,kg_cm2:0.980665,mH2O:0.0980665,mmHg:0.00133322,inHg:0.033864,ppg:0.163};
+
+function calcConv(){
+  var val=+document.getElementById('pconv').value||100;
+  var unit=document.getElementById('unit-in').value;
+  var inBar=val*(toBar[unit]||1);
+
+  var convs=[
+    {u:'bar',v:inBar},
+    {u:'psi',v:inBar*14.5038},
+    {u:'kPa',v:inBar*100},
+    {u:'MPa',v:inBar*0.1},
+    {u:'atm',v:inBar*0.986923},
+    {u:'Pa',v:inBar*100000},
+    {u:'kgf/cm2',v:inBar*1.01972},
+    {u:'m H2O',v:inBar/0.0980665},
+    {u:'ft H2O',v:inBar/0.0980665*3.28084},
+    {u:'mmHg',v:inBar*750.062},
+    {u:'inHg',v:inBar*29.53},
+    {u:'ppg(mud)',v:inBar/0.163},
+  ];
+
+  document.getElementById('conv-out').innerHTML='<div class="conv-grid">'
+    +convs.map(function(c){
+      return '<div class="conv-card"><div class="conv-lbl">'+c.u+'</div><div class="conv-val">'+c.v.toPrecision(5)+'</div></div>';
+    }).join('')+'</div>';
+}
+
+function calcDensConv(){
+  var rho=+document.getElementById('mud-dens').value||1300;
+  var h=+document.getElementById('mud-depth').value||1000;
+  var P_bar=rho*9.81*h/100000;
+  var SG=rho/1000;
+  var grad_bar=rhoToGrad(rho);
+  var grad_psi=rhoToGradPsi(rho);
+
+  document.getElementById('dens-conv-out').innerHTML='<div class="rgrid">'
+    +rc('hl','Pressure at '+h+'m',P_bar.toFixed(3),'bar','= '+barToPsi(P_bar).toFixed(1)+' psi')
+    +rc('','Specific gravity',SG.toFixed(3),'SG','= '+rho+' / 1000')
+    +rc('','Gradient',grad_bar.toFixed(5),'bar/m','= '+grad_psi.toFixed(4)+' psi/ft')
+    +rc('','In ppg (oilfield)',((rho/1000)*8.345).toFixed(2),'ppg','US oilfield unit')
+    +'</div>'
+    +'<div class="fbox"><strong>'+rho+' kg/m3</strong> = SG '+SG.toFixed(3)+' = '+((rho/1000)*8.345).toFixed(2)+' ppg = '+grad_bar.toFixed(5)+' bar/m = '+grad_psi.toFixed(4)+' psi/ft</div>';
+}
+
+/* ===================== PANEL 5: FLUID TABLE ===================== */
+function buildFluidTable(){
+  var tb=document.getElementById('fluid-tb');
+  tb.innerHTML=fluids.map(function(f){
+    var sg=(f.rho/1000).toFixed(3);
+    var g=rhoToGrad(f.rho).toFixed(5);
+    var gp=rhoToGradPsi(f.rho).toFixed(4);
+    var p1k=(f.rho*9.81*1000/100000).toFixed(2);
+    return '<tr onclick="loadFluid('+f.rho+')">'
+      +'<td class="tw">'+f.name+'</td>'
+      +'<td style="font-family:var(--mono);">'+f.rho+'</td>'
+      +'<td style="font-family:var(--mono);">'+sg+'</td>'
+      +'<td style="font-family:var(--mono);">'+g+'</td>'
+      +'<td style="font-family:var(--mono);">'+gp+'</td>'
+      +'<td style="font-family:var(--mono);">'+p1k+'</td>'
+    +'</tr>';
+  }).join('');
+}
+
+function loadFluid(rho){
+  sw(1);
+  document.getElementById('rho1').value=rho;
+  document.querySelectorAll('.fbtn').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.fbtn').forEach(function(b){if(b.textContent==='Custom')b.classList.add('on');});
+  calc1();
+}
+
+/* ===================== INIT ===================== */
+renderLayers();
+buildFluidTable();
+calc1();
+calcWell();
+calcConv();
+calcDensConv();
+</script>
+</body>
+</html>
