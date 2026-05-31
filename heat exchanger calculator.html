@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heat Exchanger Calculator - Petrosmart Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --red:#CC0000;--red-dim:rgba(204,0,0,0.12);
+  --bg:#050507;--surf:#0B0B0F;--card:#0F0F15;
+  --border:#181820;--text:#DDDDE8;--muted:#44445A;
+  --ok:#00BB55;--warn:#FF8800;--err:#FF3333;--info:#2266DD;
+  --hot:#EE4422;--cold:#2266EE;--hot-dim:rgba(238,68,34,0.12);--cold-dim:rgba(34,102,238,0.12);
+  --mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 60% 40% at 30% 30%,rgba(238,68,34,0.03),transparent),
+    radial-gradient(ellipse 50% 50% at 70% 70%,rgba(34,102,238,0.03),transparent);
+  pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:840px;margin:0 auto;padding:16px;}
+
+/* HEADER */
+.hdr{background:linear-gradient(120deg,#0A0A10,#14080A,#08080E);
+  border:1px solid rgba(238,68,34,0.2);border-radius:18px;
+  padding:18px 22px;margin-bottom:18px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 0 50px rgba(238,68,34,0.05),0 0 30px rgba(34,102,238,0.03);
+  position:relative;overflow:hidden;}
+.hdr::before{content:'';position:absolute;right:0;top:0;bottom:0;width:40%;
+  background:linear-gradient(90deg,transparent,rgba(34,102,238,0.03));}
+.hdr-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  background:linear-gradient(135deg,var(--hot),#AA2200);
+  box-shadow:0 4px 20px rgba(238,68,34,0.3);}
+.hdr h1{font-size:19px;font-weight:700;color:#fff;}
+.hdr p{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+.hdr-temps{margin-left:auto;display:flex;gap:8px;flex-shrink:0;}
+.temp-tag{display:flex;align-items:center;gap:6px;padding:6px 12px;
+  border-radius:8px;border:1px solid;font-size:11px;font-weight:600;font-family:var(--mono);}
+.tt-hot{background:var(--hot-dim);border-color:rgba(238,68,34,0.3);color:#FF7755;}
+.tt-cold{background:var(--cold-dim);border-color:rgba(34,102,238,0.3);color:#5599FF;}
+.tt-dot{width:8px;height:8px;border-radius:50%;}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--surf);border:1px solid var(--border);
+  border-radius:12px;padding:4px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{flex:1;min-width:80px;padding:9px 5px;background:transparent;border:none;
+  border-radius:9px;color:var(--muted);font-size:10px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);text-transform:uppercase;letter-spacing:0.07em;transition:all 0.2s;}
+.tab:hover{color:#bbb;}
+.tab.on{background:var(--hot);color:#fff;box-shadow:0 0 14px rgba(238,68,34,0.35);}
+.panel{display:none;}.panel.on{display:block;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+.card.hot-accent{border-color:rgba(238,68,34,0.2);}
+.card.cold-accent{border-color:rgba(34,102,238,0.2);}
+.stitle{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  border-bottom:1px solid #101018;padding-bottom:7px;margin-bottom:14px;font-family:var(--mono);}
+.stitle.hot{color:var(--hot);}
+.stitle.cold{color:var(--cold);}
+.stitle.neu{color:var(--muted);}
+
+/* FORM */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.field{margin-bottom:12px;}
+.lbl{font-size:10px;color:var(--muted);margin-bottom:5px;display:block;
+  text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.ir{display:flex;gap:6px;align-items:center;}
+input[type=number],select{width:100%;background:#08080E;border:1px solid #141420;
+  border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;
+  font-family:var(--mono);transition:border-color 0.2s;}
+input:focus,select:focus{border-color:var(--hot);}
+select option{background:#0A0A12;}
+.unit{font-size:10px;color:#222;min-width:52px;text-align:right;white-space:nowrap;font-family:var(--mono);}
+
+/* RESULTS */
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.rgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.rc{background:#07070D;border:1px solid var(--border);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden;}
+.rc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.rc.hl::after{background:var(--hot);}
+.rc.hl-c::after{background:var(--cold);}
+.rc.ok::after{background:var(--ok);}
+.rc.wn::after{background:var(--warn);}
+.rc.er::after{background:var(--err);}
+.rc.hl{border-color:rgba(238,68,34,0.25);}
+.rc.hl-c{border-color:rgba(34,102,238,0.25);}
+.rc.ok{border-color:rgba(0,187,85,0.25);}
+.rc.wn{border-color:rgba(255,136,0,0.25);}
+.rc.er{border-color:rgba(255,51,51,0.25);}
+.rl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;font-family:var(--mono);}
+.rv{font-size:19px;font-weight:700;color:#fff;font-family:var(--mono);}
+.rv span{font-size:10px;color:#222;font-weight:400;}
+.rsub{font-size:10px;color:#222;margin-top:3px;font-family:var(--mono);}
+
+/* FORMULA */
+.fbox{background:#05050B;border-left:3px solid var(--hot);border-radius:0 10px 10px 0;
+  padding:12px 16px;margin-top:14px;font-size:11px;color:#444;line-height:2.0;font-family:var(--mono);}
+.fbox strong{color:#999;}
+.fbox .hi{color:var(--hot);font-weight:600;}
+.fbox .hic{color:var(--cold);font-weight:600;}
+.fbox .hig{color:var(--ok);font-weight:600;}
+
+/* ANALYSIS */
+.analysis{background:#060610;border:1px solid #10101A;border-radius:12px;padding:16px;margin-top:14px;}
+.atitle{font-size:10px;font-weight:700;color:var(--hot);margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:0.09em;font-family:var(--mono);}
+.atitle.cold{color:var(--cold);}
+.arow{display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #0C0C14;}
+.arow:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.d-ok{background:var(--ok);box-shadow:0 0 6px var(--ok);}
+.d-wn{background:var(--warn);box-shadow:0 0 6px var(--warn);}
+.d-er{background:var(--err);box-shadow:0 0 6px var(--err);}
+.d-hot{background:var(--hot);box-shadow:0 0 6px var(--hot);}
+.d-cold{background:var(--cold);box-shadow:0 0 6px var(--cold);}
+.atxt strong{color:#eee;font-size:12px;display:block;margin-bottom:3px;}
+.atxt p{font-size:11px;color:#444;line-height:1.7;margin:0;}
+.asugg{font-size:11px;color:#FFAA00;margin-top:4px;line-height:1.6;}
+
+/* ALERTS */
+.alert{border-radius:10px;padding:10px 14px;margin-top:10px;font-size:11px;line-height:1.7;font-weight:500;}
+.a-ok{background:rgba(0,187,85,0.07);border:1px solid rgba(0,187,85,0.2);color:#00CC66;}
+.a-er{background:rgba(255,51,51,0.07);border:1px solid rgba(255,51,51,0.2);color:#FF5555;}
+.a-wn{background:rgba(255,136,0,0.07);border:1px solid rgba(255,136,0,0.2);color:#FFA500;}
+.a-hot{background:rgba(238,68,34,0.07);border:1px solid rgba(238,68,34,0.2);color:#FF8866;}
+
+/* CHART */
+.chart-wrap{background:#05050B;border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px;}
+.chart-title{font-size:11px;color:var(--hot);font-weight:600;text-transform:uppercase;
+  letter-spacing:0.05em;margin-bottom:10px;font-family:var(--mono);}
+
+/* HX VISUAL */
+.hx-vis{background:#05050B;border:1px solid var(--border);border-radius:12px;
+  padding:16px;margin-top:14px;}
+.hx-title{font-size:10px;color:var(--hot);font-weight:600;font-family:var(--mono);
+  text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.tbl th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;
+  letter-spacing:0.07em;font-family:var(--mono);}
+.tbl td{padding:7px 10px;color:#888;border-bottom:1px solid #0C0C14;font-family:var(--mono);}
+.tbl tr:hover td{background:#0A0A10;}
+.tw{color:#fff!important;font-weight:600;}
+.ibox{background:var(--surf);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);
+  line-height:1.7;font-family:var(--mono);}
+.ibox strong{color:#bbb;}
+.sep{height:1px;background:var(--border);margin:14px 0;}
+
+/* HX TYPE SELECTOR */
+.hx-types{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px;}
+.hxbtn{background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:10px 8px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.hxbtn:hover{border-color:#444;}
+.hxbtn.on{border-color:var(--hot);background:var(--hot-dim);}
+.hxbtn-icon{font-size:20px;margin-bottom:4px;}
+.hxbtn-name{font-size:11px;font-weight:600;color:#ddd;}
+.hxbtn-desc{font-size:9px;color:var(--muted);font-family:var(--mono);margin-top:2px;}
+
+.foot{background:var(--surf);border-top:1px solid var(--border);margin-top:18px;
+  padding:10px 20px;font-size:10px;color:#1A1A22;text-align:center;
+  font-family:var(--mono);border-radius:12px;}
+.foot a{color:var(--hot);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-icon">🔥</div>
+  <div>
+    <h1>Heat Exchanger Calculator</h1>
+    <p>LMTD method - NTU-effectiveness - Fouling - Shell and tube / Plate</p>
+  </div>
+  <div class="hdr-temps">
+    <div class="temp-tag tt-hot"><div class="tt-dot" style="background:#EE4422;"></div>HOT SIDE</div>
+    <div class="temp-tag tt-cold"><div class="tt-dot" style="background:#2266EE;"></div>COLD SIDE</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" id="t1" onclick="sw(1)">🌡️ LMTD Method</button>
+  <button class="tab" id="t2" onclick="sw(2)">📊 NTU-Effectiveness</button>
+  <button class="tab" id="t3" onclick="sw(3)">⚗️ Fouling Analysis</button>
+  <button class="tab" id="t4" onclick="sw(4)">🔧 Shell and Tube</button>
+  <button class="tab" id="t5" onclick="sw(5)">📋 Plate HX</button>
+  <button class="tab" id="t6" onclick="sw(6)">📚 Reference</button>
+</div>
+
+<!-- ===== PANEL 1: LMTD METHOD ===== -->
+<div class="panel on" id="p1">
+  <div class="card hot-accent">
+    <div class="stitle hot">/// heat exchanger type</div>
+    <div class="hx-types">
+      <div class="hxbtn on" id="hx-counter" onclick="setHX('counter')">
+        <div class="hxbtn-icon">↔️</div>
+        <div class="hxbtn-name">Counter-flow</div>
+        <div class="hxbtn-desc">Most efficient</div>
+      </div>
+      <div class="hxbtn" id="hx-parallel" onclick="setHX('parallel')">
+        <div class="hxbtn-icon">→→</div>
+        <div class="hxbtn-name">Parallel flow</div>
+        <div class="hxbtn-desc">Co-current</div>
+      </div>
+      <div class="hxbtn" id="hx-shell" onclick="setHX('shell')">
+        <div class="hxbtn-icon">🏭</div>
+        <div class="hxbtn-name">Shell & Tube</div>
+        <div class="hxbtn-desc">1-2 pass</div>
+      </div>
+      <div class="hxbtn" id="hx-cross" onclick="setHX('cross')">
+        <div class="hxbtn-icon">✚</div>
+        <div class="hxbtn-name">Cross flow</div>
+        <div class="hxbtn-desc">Unmixed</div>
+      </div>
+    </div>
+
+    <div class="stitle hot">/// hot side (shell side)</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Hot fluid inlet temperature T1</label>
+        <div class="ir"><input type="number" id="T1" value="180" step="0.5" oninput="calcLMTD()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Hot fluid outlet temperature T2</label>
+        <div class="ir"><input type="number" id="T2" value="100" step="0.5" oninput="calcLMTD()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Hot fluid mass flow rate</label>
+        <div class="ir"><input type="number" id="mh" value="10" step="0.1" oninput="calcLMTD()"><span class="unit">kg/s</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Hot fluid Cp</label>
+        <div class="ir"><input type="number" id="Cph" value="2200" step="50" oninput="calcLMTD()"><span class="unit">J/kg.K</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Hot side fouling factor Rh</label>
+        <div class="ir"><input type="number" id="Rh" value="0.0002" step="0.00005" oninput="calcLMTD()"><span class="unit">m2.K/W</span></div>
+      </div>
+    </div>
+
+    <div class="stitle cold">/// cold side (tube side)</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Cold fluid inlet temperature t1</label>
+        <div class="ir"><input type="number" id="t1" value="30" step="0.5" oninput="calcLMTD()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Cold fluid outlet temperature t2</label>
+        <div class="ir"><input type="number" id="t2" value="90" step="0.5" oninput="calcLMTD()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Cold fluid mass flow rate</label>
+        <div class="ir"><input type="number" id="mc" value="12" step="0.1" oninput="calcLMTD()"><span class="unit">kg/s</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Cold fluid Cp</label>
+        <div class="ir"><input type="number" id="Cpc" value="4182" step="50" oninput="calcLMTD()"><span class="unit">J/kg.K</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Cold side fouling factor Rc</label>
+        <div class="ir"><input type="number" id="Rc" value="0.0002" step="0.00005" oninput="calcLMTD()"><span class="unit">m2.K/W</span></div>
+      </div>
+    </div>
+
+    <div class="stitle neu">/// heat transfer coefficient</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Overall U (clean)</label>
+        <div class="ir"><input type="number" id="U_clean" value="800" step="10" oninput="calcLMTD()"><span class="unit">W/m2.K</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Number of shell passes</label>
+        <select id="n_pass" onchange="calcLMTD()">
+          <option value="1">1 shell pass</option>
+          <option value="2">2 shell passes</option>
+          <option value="4">4 shell passes</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Tube passes per shell</label>
+        <select id="n_tube" onchange="calcLMTD()">
+          <option value="2" selected>2 tube passes</option>
+          <option value="4">4 tube passes</option>
+          <option value="6">6 tube passes</option>
+          <option value="1">1 tube pass</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="r1"></div>
+
+    <!-- HX Temperature Profile Visual -->
+    <div class="hx-vis">
+      <div class="hx-title">Temperature profile along exchanger</div>
+      <canvas id="lmtdChart" height="180"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 2: NTU-EFFECTIVENESS ===== -->
+<div class="panel" id="p2">
+  <div class="card hot-accent">
+    <div class="stitle hot">/// NTU-effectiveness method</div>
+    <div class="ibox">
+      <strong>NTU method:</strong> Used when outlet temperatures are unknown. Given U, A, flow rates and inlet temperatures - calculates actual heat transfer and outlet temperatures. More direct than LMTD iteration for design without specified outlet T.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Hot inlet temperature Th,in</label>
+        <div class="ir"><input type="number" id="ntu_T1" value="180" step="0.5" oninput="calcNTU()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Cold inlet temperature Tc,in</label>
+        <div class="ir"><input type="number" id="ntu_t1" value="30" step="0.5" oninput="calcNTU()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Heat transfer area A</label>
+        <div class="ir"><input type="number" id="ntu_A" value="50" step="1" oninput="calcNTU()"><span class="unit">m2</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Hot Cp</label>
+        <div class="ir"><input type="number" id="ntu_Cph" value="2200" step="50" oninput="calcNTU()"><span class="unit">J/kg.K</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Cold Cp</label>
+        <div class="ir"><input type="number" id="ntu_Cpc" value="4182" step="50" oninput="calcNTU()"><span class="unit">J/kg.K</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Overall U (dirty)</label>
+        <div class="ir"><input type="number" id="ntu_U" value="650" step="10" oninput="calcNTU()"><span class="unit">W/m2.K</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Hot mass flow rate</label>
+        <div class="ir"><input type="number" id="ntu_mh" value="10" step="0.1" oninput="calcNTU()"><span class="unit">kg/s</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Cold mass flow rate</label>
+        <div class="ir"><input type="number" id="ntu_mc" value="12" step="0.1" oninput="calcNTU()"><span class="unit">kg/s</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Flow arrangement</label>
+        <select id="ntu_flow" onchange="calcNTU()">
+          <option value="counter">Counter-flow</option>
+          <option value="parallel">Parallel flow</option>
+          <option value="cross">Cross flow (unmixed)</option>
+        </select>
+      </div>
+    </div>
+    <div id="r2"></div>
+    <div class="chart-wrap">
+      <div class="chart-title">Effectiveness vs NTU curves (all configurations)</div>
+      <canvas id="ntuChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 3: FOULING ANALYSIS ===== -->
+<div class="panel" id="p3">
+  <div class="card">
+    <div class="stitle hot">/// fouling impact and cleaning interval analysis</div>
+    <div class="ibox">
+      <strong>Fouling:</strong> Deposits on heat transfer surfaces (scale, corrosion products, biological growth, process deposits) increase thermal resistance and reduce heat transfer by 20-60% in service. Fouling resistance Rf is added to overall thermal resistance: 1/U_dirty = 1/U_clean + Rf_hot + Rf_cold + wall resistance.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">U clean (design)</label>
+        <div class="ir"><input type="number" id="f_Uc" value="800" step="10" oninput="calcFoul()"><span class="unit">W/m2.K</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Hot side fouling Rh</label>
+        <div class="ir"><input type="number" id="f_Rh" value="0.0002" step="0.00005" oninput="calcFoul()"><span class="unit">m2.K/W</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Cold side fouling Rc</label>
+        <div class="ir"><input type="number" id="f_Rc" value="0.0002" step="0.00005" oninput="calcFoul()"><span class="unit">m2.K/W</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Wall material</label>
+        <select id="f_wall_mat" onchange="calcFoul()">
+          <option value="0.0">Ignore wall resistance</option>
+          <option value="0.00003" selected>Carbon steel (50W/m.K)</option>
+          <option value="0.00006">Stainless 316 (25W/m.K)</option>
+          <option value="0.00050">Titanium (20W/m.K)</option>
+          <option value="0.00012">Duplex 2205 (20W/m.K)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Wall thickness</label>
+        <div class="ir"><input type="number" id="f_tw" value="3" step="0.5" oninput="calcFoul()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Design area A</label>
+        <div class="ir"><input type="number" id="f_A" value="50" step="1" oninput="calcFoul()"><span class="unit">m2</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Fouling rate (growth/year)</label>
+        <div class="ir"><input type="number" id="f_rate" value="0.00005" step="0.00001" oninput="calcFoul()"><span class="unit">m2.K/W per yr</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Max acceptable U reduction</label>
+        <div class="ir"><input type="number" id="f_maxloss" value="25" step="1" oninput="calcFoul()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div id="r3"></div>
+    <div class="chart-wrap">
+      <div class="chart-title">U value vs time (fouling degradation)</div>
+      <canvas id="foulChart" height="180"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 4: SHELL AND TUBE ===== -->
+<div class="panel" id="p4">
+  <div class="card hot-accent">
+    <div class="stitle hot">/// shell and tube HX design (TEMA standards)</div>
+    <div class="ibox">
+      <strong>Shell and tube:</strong> Most common type in petroleum refining and petrochemicals. Design per TEMA (Tubular Exchanger Manufacturers Association) and ASME Sec VIII. Key parameters: tube OD, pitch, layout (triangular/square), baffle spacing, shell ID.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Required heat duty Q</label>
+        <div class="ir"><input type="number" id="st_Q" value="1760" step="10" oninput="calcST()"><span class="unit">kW</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">LMTD corrected (from Tab 1)</label>
+        <div class="ir"><input type="number" id="st_LMTD" value="52" step="1" oninput="calcST()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Overall U (dirty)</label>
+        <div class="ir"><input type="number" id="st_U" value="650" step="10" oninput="calcST()"><span class="unit">W/m2.K</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Tube outer diameter</label>
+        <div class="ir"><input type="number" id="st_do" value="25" step="0.5" oninput="calcST()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Tube wall thickness</label>
+        <div class="ir"><input type="number" id="st_tw" value="2" step="0.25" oninput="calcST()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Tube length (effective)</label>
+        <div class="ir"><input type="number" id="st_L" value="4.88" step="0.25" oninput="calcST()"><span class="unit">m</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Tube pitch (triangular typical)</label>
+        <div class="ir"><input type="number" id="st_pt" value="32" step="1" oninput="calcST()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Tube layout angle</label>
+        <select id="st_layout" onchange="calcST()">
+          <option value="tri">30° Triangular (most tubes)</option>
+          <option value="sq">90° Square (cleanable)</option>
+          <option value="rot">45° Rotated square</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Baffle spacing (% of shell ID)</label>
+        <div class="ir"><input type="number" id="st_Bsp" value="40" step="5" oninput="calcST()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div id="r4"></div>
+    <div class="hx-vis">
+      <div class="hx-title">Shell and tube cross-section (tube bundle)</div>
+      <svg width="100%" height="160" viewBox="0 0 500 160" id="st-svg">
+        <text x="250" y="80" text-anchor="middle" fill="#333" font-family="JetBrains Mono" font-size="12">Calculate to render</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 5: PLATE HX ===== -->
+<div class="panel" id="p5">
+  <div class="card cold-accent">
+    <div class="stitle cold">/// plate heat exchanger design</div>
+    <div class="ibox">
+      <strong>Plate HX:</strong> Higher U values (3000-8000 W/m2.K) than shell and tube due to turbulent flow at low Re (corrugated plates). Compact, easy to clean, flexible (add/remove plates). Limited by pressure (<25 bar) and temperature (<180°C) for gasketed types.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Required heat duty Q</label>
+        <div class="ir"><input type="number" id="ph_Q" value="1760" step="10" oninput="calcPlate()"><span class="unit">kW</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">LMTD corrected</label>
+        <div class="ir"><input type="number" id="ph_LMTD" value="52" step="1" oninput="calcPlate()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Overall U (plate HX)</label>
+        <div class="ir"><input type="number" id="ph_U" value="4000" step="100" oninput="calcPlate()"><span class="unit">W/m2.K</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Single plate area</label>
+        <div class="ir"><input type="number" id="ph_ap" value="0.5" step="0.05" oninput="calcPlate()"><span class="unit">m2/plate</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Plate channel gap</label>
+        <div class="ir"><input type="number" id="ph_gap" value="3" step="0.5" oninput="calcPlate()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Plate material</label>
+        <select id="ph_mat" onchange="calcPlate()">
+          <option value="316ss">316L Stainless steel</option>
+          <option value="ti">Titanium</option>
+          <option value="hast">Hastelloy C276</option>
+          <option value="cs">Carbon steel</option>
+        </select>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Hot flow rate</label>
+        <div class="ir"><input type="number" id="ph_mh" value="10" step="0.1" oninput="calcPlate()"><span class="unit">kg/s</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Cold flow rate</label>
+        <div class="ir"><input type="number" id="ph_mc" value="12" step="0.1" oninput="calcPlate()"><span class="unit">kg/s</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Operating pressure (max)</label>
+        <div class="ir"><input type="number" id="ph_P" value="10" step="1" oninput="calcPlate()"><span class="unit">bar(g)</span></div>
+      </div>
+    </div>
+    <div id="r5"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 6: REFERENCE ===== -->
+<div class="panel" id="p6">
+  <div class="card">
+    <div class="stitle hot">/// typical overall U values (W/m2.K) - TEMA / Perry's</div>
+    <table class="tbl">
+      <thead><tr><th>Hot side fluid</th><th>Cold side fluid</th><th>U clean</th><th>U dirty</th><th>HX type</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Steam (condensing)</td><td>Water</td><td>2000-5000</td><td>1500-4000</td><td>Shell and tube</td></tr>
+        <tr><td class="tw">Steam (condensing)</td><td>Light oil</td><td>300-700</td><td>200-500</td><td>Shell and tube</td></tr>
+        <tr><td class="tw">Light oil</td><td>Water</td><td>300-900</td><td>200-700</td><td>Shell and tube</td></tr>
+        <tr><td class="tw">Crude oil (hot)</td><td>Crude oil (cold)</td><td>200-500</td><td>150-350</td><td>Shell and tube</td></tr>
+        <tr><td class="tw">Gas (high pressure)</td><td>Water</td><td>200-500</td><td>150-400</td><td>Shell and tube</td></tr>
+        <tr><td class="tw">Gas (low pressure)</td><td>Water</td><td>50-200</td><td>40-150</td><td>Shell and tube</td></tr>
+        <tr><td class="tw">Water</td><td>Water</td><td>800-1800</td><td>600-1500</td><td>Shell and tube</td></tr>
+        <tr><td class="tw">Water</td><td>Water</td><td>3000-6000</td><td>2000-5000</td><td>Plate HX (PHE)</td></tr>
+        <tr><td class="tw">Condensing refrigerant</td><td>Water</td><td>1000-4000</td><td>800-3000</td><td>Plate HX</td></tr>
+        <tr><td class="tw">Hot oil (mineral)</td><td>Cold oil</td><td>100-400</td><td>80-300</td><td>Shell and tube</td></tr>
+        <tr><td class="tw">Flue gas</td><td>Water</td><td>20-60</td><td>15-50</td><td>Fin tube (air cooler)</td></tr>
+      </tbody>
+    </table>
+    <div class="sep"></div>
+    <div class="stitle hot">/// TEMA fouling resistances (m2.K/W)</div>
+    <table class="tbl">
+      <thead><tr><th>Service / Fluid</th><th>Rf (m2.K/W)</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Seawater (T < 50°C)</td><td>0.000088</td><td>TEMA R/C category</td></tr>
+        <tr><td class="tw">Seawater (T > 50°C)</td><td>0.000176</td><td>TEMA R/C category</td></tr>
+        <tr><td class="tw">River water (treated)</td><td>0.000176</td><td>-</td></tr>
+        <tr><td class="tw">Cooling water (tower)</td><td>0.000176</td><td>Treated makeup water</td></tr>
+        <tr><td class="tw">City water / municipal</td><td>0.000088</td><td>-</td></tr>
+        <tr><td class="tw">Boiler feedwater (treated)</td><td>0.000088</td><td>-</td></tr>
+        <tr><td class="tw">Steam (non-oil-bearing)</td><td>0.000088</td><td>-</td></tr>
+        <tr><td class="tw">Crude oil (below 120°C)</td><td>0.000528</td><td>Refinery crude preheat</td></tr>
+        <tr><td class="tw">Crude oil (120-175°C)</td><td>0.000705</td><td>Refinery crude preheat</td></tr>
+        <tr><td class="tw">Crude oil (175-230°C)</td><td>0.001056</td><td>Refinery crude preheat</td></tr>
+        <tr><td class="tw">Light petroleum distillates</td><td>0.000176</td><td>Naphtha, kerosene</td></tr>
+        <tr><td class="tw">Heavy fuel oil</td><td>0.001056</td><td>Viscous, high T</td></tr>
+        <tr><td class="tw">Natural gas (dry)</td><td>0.000176</td><td>Clean gas</td></tr>
+        <tr><td class="tw">Reboiler (kettle)</td><td>0.000176-0.000528</td><td>Depends on service</td></tr>
+      </tbody>
+    </table>
+    <div class="sep"></div>
+    <div class="stitle hot">/// all key formulas</div>
+    <div class="fbox">
+      <strong>LMTD (counter-flow):</strong> ΔT1=Th,in-Tc,out | ΔT2=Th,out-Tc,in | LMTD = (ΔT1-ΔT2)/ln(ΔT1/ΔT2)<br>
+      <strong>LMTD (parallel-flow):</strong> ΔT1=Th,in-Tc,in | ΔT2=Th,out-Tc,out<br>
+      <strong>F-factor correction:</strong> LMTD_eff = F x LMTD_counter | F from P and R parameters<br>
+      <strong>P = (t2-t1)/(T1-t1)</strong> (cold side temperature effectiveness)<br>
+      <strong>R = (T1-T2)/(t2-t1)</strong> (ratio of capacity rates)<br>
+      <strong>Heat duty:</strong> Q = m_h x Cp_h x (T1-T2) = m_c x Cp_c x (t2-t1) = U x A x LMTD_eff<br>
+      <strong>Required area:</strong> A = Q / (U_dirty x LMTD_eff)<br>
+      <strong>Overall U (dirty):</strong> 1/U_d = 1/U_c + Rh + Rc + t_wall/k_wall<br>
+      <strong>NTU:</strong> NTU = U x A / C_min | C_min = min(m_h x Cp_h, m_c x Cp_c)<br>
+      <strong>Capacity ratio:</strong> C* = C_min/C_max<br>
+      <strong>Effectiveness (counter):</strong> eps = (1-exp(-NTU(1-C*)))/(1-C*exp(-NTU(1-C*)))<br>
+      <strong>Effectiveness (parallel):</strong> eps = (1-exp(-NTU(1+C*)))/(1+C*)<br>
+      <strong>Actual Q:</strong> Q = eps x C_min x (Th,in - Tc,in)<br>
+      <strong>Number of tubes:</strong> Nt = A / (pi x do x L_eff)<br>
+      <strong>Shell ID (triangular):</strong> D_s ≈ do x (0.637 x Nt / CTP)^0.5 x (pt/do)<br>
+      <strong>Pressure drop (tube side):</strong> dP = f x (L/di) x (rho x v^2 / 2) x N_passes<br>
+      <strong>Pressure drop (shell side):</strong> dP = f x N_baffles x D_s x (rho x v_shell^2 / 2) / D_e
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
+  · TEMA standards / Perry's Chemical Engineers Handbook / Incropera Fundamentals of Heat and Mass Transfer · Educational tool
+</div>
+</div>
+
+<script>
+var lmtdChart=null, ntuChart=null, foulChart=null;
+var hxType='counter';
+
+/* ====== UTILS ====== */
+function sw(n){
+  for(var i=1;i<=6;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    document.getElementById('t'+i).className='tab'+(i===n?' on':'');
+  }
+  if(n===2)setTimeout(calcNTU,80);
+  if(n===3)setTimeout(calcFoul,80);
+  if(n===5)setTimeout(calcPlate,80);
+}
+function rc(cls,lbl,val,unit,sub){
+  return '<div class="rc '+(cls||'')+'">'
+    +'<div class="rl">'+lbl+'</div>'
+    +'<div class="rv">'+val+(unit?' <span>'+unit+'</span>':'')+'</div>'
+    +(sub?'<div class="rsub">'+sub+'</div>':'')+'</div>';
+}
+function ar(type,title,body,sugg){
+  var d={ok:'d-ok',wn:'d-wn',er:'d-er',hot:'d-hot',cold:'d-cold'}[type]||'d-hot';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+}
+
+function setHX(type){
+  hxType=type;
+  ['counter','parallel','shell','cross'].forEach(function(t){
+    document.getElementById('hx-'+t).classList.toggle('on',t===type);
+  });
+  calcLMTD();
+}
+
+/* ====== PANEL 1: LMTD ====== */
+function calcLMTD(){
+  var T1=parseFloat(document.getElementById('T1').value)||180;
+  var T2=parseFloat(document.getElementById('T2').value)||100;
+  var mh=parseFloat(document.getElementById('mh').value)||10;
+  var Cph=parseFloat(document.getElementById('Cph').value)||2200;
+  var Rh=parseFloat(document.getElementById('Rh').value)||0.0002;
+  var t1=parseFloat(document.getElementById('t1').value)||30;
+  var t2=parseFloat(document.getElementById('t2').value)||90;
+  var mc=parseFloat(document.getElementById('mc').value)||12;
+  var Cpc=parseFloat(document.getElementById('Cpc').value)||4182;
+  var Rc=parseFloat(document.getElementById('Rc').value)||0.0002;
+  var U_c=parseFloat(document.getElementById('U_clean').value)||800;
+  var n_pass=parseInt(document.getElementById('n_pass').value)||1;
+  var n_tube=parseInt(document.getElementById('n_tube').value)||2;
+
+  // Heat duties
+  var Q_hot=mh*Cph*(T1-T2); // W
+  var Q_cold=mc*Cpc*(t2-t1); // W
+  var Q_avg=(Q_hot+Q_cold)/2;
+
+  // LMTD calculation based on flow type
+  var dT1, dT2;
+  if(hxType==='counter'||hxType==='shell'){
+    dT1=T1-t2; dT2=T2-t1; // counter-flow
+  } else if(hxType==='parallel'){
+    dT1=T1-t1; dT2=T2-t2; // parallel
+  } else {
+    dT1=T1-t2; dT2=T2-t1; // cross default to counter
+  }
+
+  var LMTD_cf;
+  if(Math.abs(dT1-dT2)<0.001) LMTD_cf=dT1;
+  else LMTD_cf=(dT1-dT2)/Math.log(dT1/dT2);
+
+  // F-factor correction for multi-pass shell and tube
+  var P=(t2-t1)/(T1-t1);
+  var R=(T1-T2)/(t2-t1);
+  var F=1.0;
+  if(hxType==='shell'&&n_pass>1){
+    var W=Math.pow((1-P*R)/(1-P),(1/n_pass));
+    var S=Math.sqrt(R*R+1);
+    F=S*Math.log(W)/(n_pass*(1-W)*(1-W*R)/(1-W)/(1-W*R)*Math.log((2/P-1-R+S*(1-P*R/P)/(1-R))/(2/P-1-R-S*(1-P*R/P)/(1-R))));
+    if(isNaN(F)||F<=0||F>1.1) F=0.95; // fallback
+  }
+  var LMTD_eff=LMTD_cf*F;
+
+  // U dirty
+  var wall_R=0.00003; // typical CS wall
+  var U_d=1/(1/U_c+Rh+Rc+wall_R);
+
+  // Required area
+  var A_req=Q_avg/(U_d*LMTD_eff);
+  var A_clean=Q_avg/(U_c*LMTD_eff);
+
+  // Oversurface / excess area
+  var oversurface=(A_req/A_clean-1)*100;
+
+  // Energy balance check
+  var balance=Math.abs(Q_hot-Q_cold)/Q_avg*100;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Heat duty Q',( Q_avg/1000).toFixed(2),'kW','= '+(Q_avg/1e6).toFixed(3)+' MW');
+  html+=rc('hl','LMTD (corrected)',LMTD_eff.toFixed(2),'°C','Counter LMTD='+LMTD_cf.toFixed(2)+'°C | F='+F.toFixed(3));
+  html+=rc('','Overall U (dirty)',U_d.toFixed(0),'W/m2.K','1/U_d = 1/U_c + Rh + Rc + Rwall');
+  html+=rc('','Required area A',A_req.toFixed(2),'m2','At U_dirty x LMTD_eff');
+  html+=rc('','Clean area (U_c)',A_clean.toFixed(2),'m2','Design oversurface: +'+oversurface.toFixed(0)+'%');
+  html+=rc(balance<5?'ok':'wn','Energy balance',balance.toFixed(1),'% deviation',balance<5?'GOOD':'Check: Q_hot≠Q_cold');
+  html+=rc('','Hot side Qh',(Q_hot/1000).toFixed(2),'kW',T1+'→'+T2+'°C at '+mh+' kg/s');
+  html+=rc('','Cold side Qc',(Q_cold/1000).toFixed(2),'kW',t1+'→'+t2+'°C at '+mc+' kg/s');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Counter LMTD:</strong> ΔT1='+T1+'-'+t2+'='+dT1.toFixed(1)+'°C | ΔT2='+T2+'-'+t1+'='+dT2.toFixed(1)+'°C<br>'
+    +'LMTD = ('+dT1.toFixed(1)+' - '+dT2.toFixed(1)+') / ln('+dT1.toFixed(1)+'/'+dT2.toFixed(1)+') = <span class="hi">'+LMTD_cf.toFixed(2)+'°C</span><br>'
+    +'<strong>LMTD_eff</strong> = F x LMTD = '+F.toFixed(3)+' x '+LMTD_cf.toFixed(2)+' = <span class="hi">'+LMTD_eff.toFixed(2)+'°C</span><br>'
+    +'<strong>1/U_dirty</strong> = 1/'+U_c+' + '+Rh+' + '+Rc+' + 0.00003 = <span class="hi">1/'+U_d.toFixed(0)+'</span><br>'
+    +'<strong>A_required</strong> = '+( Q_avg/1000).toFixed(2)+' kW x 1000 / ('+U_d.toFixed(0)+' x '+LMTD_eff.toFixed(2)+') = <span class="hi">'+A_req.toFixed(2)+' m2</span>'
+    +'</div>';
+
+  var rows='';
+  if(dT1<=0||dT2<=0){
+    rows+=ar('er','TEMPERATURE CROSS - Thermodynamically impossible','The temperature profiles violate the Second Law of Thermodynamics. Hot outlet ('+T2+'°C) cannot be lower than cold outlet ('+t2+'°C) in a counter-flow exchanger, or hot outlet cannot be below cold inlet in parallel flow.','Revise temperature targets: T2 must remain above t1 (counter-flow) with minimum approach ΔT ≥ 5-10°C. Typical minimum approach temperature: 10-20°C for process HX. Reduce cold outlet temperature or increase hot outlet temperature.');
+  } else if(Math.min(dT1,dT2)<5){
+    rows+=ar('wn','Very small temperature approach (min ΔT = '+Math.min(dT1,dT2).toFixed(1)+'°C)','Minimum temperature difference (pinch) below 5°C requires very large heat transfer area (LMTD in denominator approaches zero). Heat exchanger becomes uneconomically large. Even small fouling or flow deviation will cause underperformance.','Increase minimum approach ΔT to 10-15°C for liquid-liquid service. Each 1°C of additional approach temperature reduces required area by approximately '+(1/LMTD_eff*100).toFixed(1)+'% at current conditions. Evaluate economic optimum approach: capital cost vs energy recovery value.');
+  }
+  if(oversurface>40){
+    rows+=ar('wn','High oversurface ('+oversurface.toFixed(0)+'%)','Fouling factors add '+oversurface.toFixed(0)+'% to clean area. This is high. At next turnaround with cleaned tubes, the exchanger will be over-surfaced by this margin, potentially causing operational issues (excess duty, temperature control difficulty).','Consider using inhibited cooling water or chemical treatment to reduce fouling rates. If fouling cannot be reduced, the oversurface is correctly sized. Document fouling assumptions in HX datasheet and review against actual cleaning history after first operation cycle.');
+  }
+  if(F<0.8&&hxType==='shell'){
+    rows+=ar('wn','Low F-factor correction (F = '+F.toFixed(3)+')','F-factor below 0.8 for a multi-pass shell-and-tube exchanger indicates poor thermal efficiency relative to pure counter-flow. The P and R parameters are pushing toward the correction factor discontinuity region.','Consider: (1) Increase number of shell passes (series arrangement). (2) Use pure counter-flow (single pass shell with U-tubes). (3) TEMA F or G shell instead of E shell. P = '+P.toFixed(3)+' and R = '+R.toFixed(3)+' should ideally give F > 0.85.');
+  }
+  if(!rows) rows=ar('ok','Heat exchanger design acceptable','Q = '+(Q_avg/1000).toFixed(2)+' kW | LMTD = '+LMTD_eff.toFixed(2)+'°C | U_dirty = '+U_d.toFixed(0)+' W/m2.K | Required area = '+A_req.toFixed(2)+' m2. All parameters within normal operating range.','');
+
+  html+='<div class="analysis"><div class="atitle">/// LMTD DESIGN ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r1').innerHTML=html;
+  document.getElementById('st_Q').value=(Q_avg/1000).toFixed(1);
+  document.getElementById('st_LMTD').value=LMTD_eff.toFixed(1);
+  document.getElementById('ph_Q').value=(Q_avg/1000).toFixed(1);
+  document.getElementById('ph_LMTD').value=LMTD_eff.toFixed(1);
+
+  // Draw temperature profile chart
+  drawTempProfile(T1,T2,t1,t2,hxType);
+}
+
+function drawTempProfile(T1,T2,t1,t2,type){
+  var ctx=document.getElementById('lmtdChart').getContext('2d');
+  if(lmtdChart){lmtdChart.destroy();}
+  var nPts=20;
+  var xPts=Array.from({length:nPts},function(_,i){return i/(nPts-1);});
+  var hotPts,coldPts;
+  if(type==='parallel'){
+    hotPts=xPts.map(function(x){return T1-x*(T1-T2);});
+    coldPts=xPts.map(function(x){return t1+x*(t2-t1);});
+  } else {
+    hotPts=xPts.map(function(x){return T1-x*(T1-T2);});
+    coldPts=xPts.map(function(x){return t2-x*(t2-t1);});
+  }
+  lmtdChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:xPts.map(function(x){return (x*100).toFixed(0)+'%';}),
+      datasets:[
+        {label:'Hot side (°C)',data:hotPts,borderColor:'#EE4422',backgroundColor:'rgba(238,68,34,0.08)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.1},
+        {label:'Cold side (°C)',data:coldPts,borderColor:'#2266EE',backgroundColor:'rgba(34,102,238,0.08)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.1},
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}},tooltip:{backgroundColor:'#111',titleColor:'#fff',bodyColor:'#aaa'}},
+      scales:{
+        x:{title:{display:true,text:'Position along exchanger',color:'#555'},ticks:{color:'#555',font:{size:9}},grid:{color:'#0C0C14'}},
+        y:{title:{display:true,text:'Temperature (°C)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C14'}}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 2: NTU ====== */
+function calcNTU(){
+  var T1=parseFloat(document.getElementById('ntu_T1').value)||180;
+  var t1=parseFloat(document.getElementById('ntu_t1').value)||30;
+  var A=parseFloat(document.getElementById('ntu_A').value)||50;
+  var Cph=parseFloat(document.getElementById('ntu_Cph').value)||2200;
+  var Cpc=parseFloat(document.getElementById('ntu_Cpc').value)||4182;
+  var U=parseFloat(document.getElementById('ntu_U').value)||650;
+  var mh=parseFloat(document.getElementById('ntu_mh').value)||10;
+  var mc=parseFloat(document.getElementById('ntu_mc').value)||12;
+  var flow=document.getElementById('ntu_flow').value;
+
+  var Ch=mh*Cph;
+  var Cc=mc*Cpc;
+  var Cmin=Math.min(Ch,Cc);
+  var Cmax=Math.max(Ch,Cc);
+  var Cstar=Cmin/Cmax;
+  var NTU=U*A/Cmin;
+
+  var eps;
+  if(flow==='counter'){
+    if(Math.abs(1-Cstar)<0.001) eps=NTU/(1+NTU);
+    else eps=(1-Math.exp(-NTU*(1-Cstar)))/(1-Cstar*Math.exp(-NTU*(1-Cstar)));
+  } else if(flow==='parallel'){
+    eps=(1-Math.exp(-NTU*(1+Cstar)))/(1+Cstar);
+  } else {
+    // Cross flow unmixed
+    eps=1-Math.exp((Math.pow(NTU,0.22)/Cstar)*(Math.exp(-Cstar*Math.pow(NTU,0.78))-1));
+  }
+  eps=Math.min(eps,1.0);
+
+  var Q_actual=eps*Cmin*(T1-t1);
+  var T2_out=T1-Q_actual/Ch;
+  var t2_out=t1+Q_actual/Cc;
+  var Q_max=Cmin*(T1-t1);
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','NTU',NTU.toFixed(3),'-','= U x A / C_min = '+U+' x '+A+' / '+Cmin.toFixed(0));
+  html+=rc('hl','Effectiveness ε',( eps*100).toFixed(1),'%','Actual/max possible heat transfer');
+  html+=rc('','Capacity ratio C*',Cstar.toFixed(4),'-','C_min/C_max');
+  html+=rc('','Actual heat duty',(Q_actual/1000).toFixed(2),'kW','ε x C_min x (Th,in - Tc,in)');
+  html+=rc('hot','Hot outlet T',T2_out.toFixed(1),'°C','Th,in - Q/Ch');
+  html+=rc('hl-c','Cold outlet T',t2_out.toFixed(1),'°C','Tc,in + Q/Cc');
+  html+=rc('','Maximum possible Q',(Q_max/1000).toFixed(2),'kW','If ε = 100%');
+  html+=rc('','C_min side',Ch<Cc?'HOT':'COLD','-','C_min = '+Cmin.toFixed(0)+' W/K');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Ch</strong> = '+mh+' x '+Cph+' = '+Ch.toFixed(0)+' W/K | <strong>Cc</strong> = '+mc+' x '+Cpc+' = '+Cc.toFixed(0)+' W/K<br>'
+    +'<strong>C_min</strong> = '+Cmin.toFixed(0)+' | <strong>C*</strong> = '+Cmin.toFixed(0)+'/'+Cmax.toFixed(0)+' = <span class="hi">'+Cstar.toFixed(4)+'</span><br>'
+    +'<strong>NTU</strong> = '+U+' x '+A+' / '+Cmin.toFixed(0)+' = <span class="hi">'+NTU.toFixed(3)+'</span><br>'
+    +'<strong>ε ('+flow+')</strong> = f(NTU, C*) = <span class="hi">'+(eps*100).toFixed(2)+'%</span><br>'
+    +'<strong>Q</strong> = '+( eps*100).toFixed(2)+'% x '+Cmin.toFixed(0)+' x ('+T1+'-'+t1+') = <span class="hi">'+(Q_actual/1000).toFixed(2)+' kW</span>'
+    +'</div>';
+
+  var rows='';
+  if(eps<0.5){
+    rows+=ar('wn','Low effectiveness (ε = '+(eps*100).toFixed(1)+'%)','Less than 50% of maximum possible heat transfer is achieved. The exchanger is undersized for this duty, or the NTU is insufficient. NTU = '+NTU.toFixed(2)+' is below the 1.5-3 range typical for efficient heat exchangers.','To increase ε: increase area A or U. Each doubling of NTU approximately increases ε from '+(eps*100).toFixed(0)+'% to '+(Math.min((1-Math.exp(-2*NTU*(1-Cstar)))/(1-Cstar*Math.exp(-2*NTU*(1-Cstar)))*100,100)).toFixed(0)+'% (counter-flow). Consider multi-pass arrangement to increase effective NTU.');
+  } else if(eps>0.85){
+    rows+=ar('ok','High effectiveness (ε = '+(eps*100).toFixed(1)+'%)','Excellent heat recovery. Above 85% effectiveness requires NTU > 3, which means either very large area or very high U. This is thermally efficient but may have high pressure drop.','Verify that pressure drop is acceptable at this high NTU design. For NTU > 4, pressure drop can be significant. Plate heat exchangers achieve ε > 90% with lower pressure drop than shell-and-tube at equivalent NTU.');
+  } else {
+    rows+=ar('ok','Good effectiveness (ε = '+(eps*100).toFixed(1)+'%)','Effectiveness is in the optimal range (50-85%) for balanced capital cost vs energy recovery. NTU = '+NTU.toFixed(2)+' provides good heat transfer with manageable pressure drop.','');
+  }
+  html+='<div class="analysis"><div class="atitle cold">/// NTU-EFFECTIVENESS ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r2').innerHTML=html;
+
+  // NTU curves chart
+  var NTU_range=Array.from({length:40},function(_,i){return i*0.2;});
+  var Cstar_vals=[0,0.25,0.5,0.75,1.0];
+  var colors=['#EE4422','#FF8800','#FFAA00','#00BB55','#2266EE'];
+  var datasets=Cstar_vals.map(function(cs,j){
+    return {
+      label:'C*='+cs,
+      data:NTU_range.map(function(ntu){
+        var e;
+        if(cs===0) e=1-Math.exp(-ntu);
+        else if(Math.abs(1-cs)<0.001) e=ntu/(1+ntu);
+        else e=(1-Math.exp(-ntu*(1-cs)))/(1-cs*Math.exp(-ntu*(1-cs)));
+        return {x:ntu,y:Math.min(e,1)*100};
+      }),
+      borderColor:colors[j],backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:0.3
+    };
+  });
+  // Add operating point
+  datasets.push({
+    label:'Operating point',data:[{x:NTU,y:eps*100}],
+    borderColor:'#fff',backgroundColor:'#fff',pointRadius:8,showLine:false
+  });
+
+  var ctx=document.getElementById('ntuChart').getContext('2d');
+  if(ntuChart){ntuChart.destroy();}
+  ntuChart=new Chart(ctx,{
+    type:'line',data:{datasets:datasets},
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'NTU',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C14'},min:0,max:6},
+        y:{title:{display:true,text:'Effectiveness ε (%)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C14'},min:0,max:100}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 3: FOULING ====== */
+function calcFoul(){
+  var Uc=parseFloat(document.getElementById('f_Uc').value)||800;
+  var Rh=parseFloat(document.getElementById('f_Rh').value)||0.0002;
+  var Rc=parseFloat(document.getElementById('f_Rc').value)||0.0002;
+  var wall_k=parseFloat(document.getElementById('f_wall_mat').value)||0.00003;
+  var tw=parseFloat(document.getElementById('f_tw').value)||3;
+  var A=parseFloat(document.getElementById('f_A').value)||50;
+  var rate=parseFloat(document.getElementById('f_rate').value)||0.00005;
+  var maxloss=parseFloat(document.getElementById('f_maxloss').value)||25;
+
+  var Rwall=wall_k*tw/1000; // if wall_k is k/thickness, else direct
+  // Actually: Rwall = tw/k. k from selection = 0.00003 means tw=1mm/50W/m.K = 0.00002 m2K/W
+  // Let's use wall_k directly as Rwall per mm, scaled:
+  var Rwall_total=parseFloat(document.getElementById('f_wall_mat').value)*tw;
+
+  var Ud_total=1/(1/Uc+Rh+Rc+Rwall_total);
+  var Ud_nofoul=1/(1/Uc+Rwall_total);
+  var U_reduction=(1-Ud_total/Ud_nofoul)*100;
+  var cleaning_interval=(Rh+Rc)/(rate*2); // years until max fouling
+
+  // Time to reach max acceptable U loss
+  var Ud_limit=Uc*(1-maxloss/100);
+  var Rf_limit=1/Ud_limit-1/Uc;
+  var time_to_limit=Rf_limit/rate;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','U clean',Uc,'W/m2.K','Design U without fouling');
+  html+=rc('hl','U dirty',Ud_total.toFixed(0),'W/m2.K','With fouling factors applied');
+  html+=rc(U_reduction<20?'ok':'wn','U reduction',U_reduction.toFixed(1),'%','Due to fouling + wall resistance');
+  html+=rc('','Total fouling resistance',(Rh+Rc).toFixed(5),'m2.K/W','Rh + Rc');
+  html+=rc('','Wall resistance',Rwall_total.toFixed(6),'m2.K/W','At wall thickness '+tw+' mm');
+  html+=rc('','Cleaning interval est.',time_to_limit.toFixed(1),'years','Until U reduces by '+maxloss+'%');
+  html+=rc('','Area at U dirty',( parseFloat(document.getElementById('f_A').value)*Uc/Ud_total).toFixed(1),'m2','Equivalent clean area x '+(Uc/Ud_total).toFixed(2));
+  html+=rc('','Fouling penalty on area',((Uc/Ud_total-1)*100).toFixed(0),'%','Extra area needed for fouling');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>1/U_dirty</strong> = 1/'+Uc+' + '+Rh+' + '+Rc+' + '+Rwall_total.toFixed(6)+'<br>'
+    +'= '+(1/Uc).toFixed(6)+' + '+(Rh+Rc).toFixed(5)+' + '+Rwall_total.toFixed(6)+' = <span class="hi">'+(1/Ud_total).toFixed(6)+' → U_dirty = '+Ud_total.toFixed(0)+' W/m2.K</span><br>'
+    +'<strong>U reduction:</strong> ('+Uc+' - '+Ud_total.toFixed(0)+') / '+Uc+' = <span class="hi">'+U_reduction.toFixed(1)+'%</span><br>'
+    +'<strong>Cleaning interval:</strong> Rf_limit / rate = '+Rf_limit.toFixed(5)+' / '+rate+' = <span class="hi">'+time_to_limit.toFixed(1)+' years</span>'
+    +'</div>';
+
+  var rows='';
+  if(U_reduction>30){
+    rows+=ar('wn','High fouling penalty ('+U_reduction.toFixed(0)+'% U reduction)','Total fouling factors (Rh+Rc = '+(Rh+Rc).toFixed(5)+' m2.K/W) cause '+U_reduction.toFixed(0)+'% reduction in U value. This requires '+((Uc/Ud_total-1)*100).toFixed(0)+'% additional heat transfer area compared to clean conditions.','Evaluate: (1) Water treatment to reduce CaCO3 and biological fouling on cooling water side. (2) Online cleaning systems (sponge ball for condensers). (3) Twisted tube inserts (helical) to increase turbulence and reduce fouling. (4) Anti-fouling coatings (Xylan, PTFE) for cooling water side.');
+  }
+  rows+=ar('hot','Recommended cleaning schedule','At fouling growth rate of '+rate+' m2.K/W per year, U will reduce by '+maxloss+'% in approximately '+time_to_limit.toFixed(1)+' years. Plan mechanical cleaning at '+Math.max(1,Math.floor(time_to_limit))+'-year intervals.','Implement online monitoring: trending U_actual = Q_measured / (A x LMTD_actual). When U drops below '+Ud_limit.toFixed(0)+' W/m2.K ('+maxloss+'% loss), schedule cleaning. Hydroblasting (200-500 bar) for shell and tube; CIP chemical cleaning for plate heat exchangers.');
+
+  html+='<div class="analysis"><div class="atitle">/// FOULING ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r3').innerHTML=html;
+
+  // Fouling degradation chart
+  var years=Array.from({length:Math.ceil(time_to_limit*2)+1},function(_,i){return i*time_to_limit*2/20;});
+  var Uvals=years.map(function(yr){
+    var Rf=rate*yr;
+    return 1/(1/Uc+Rf+Rwall_total);
+  });
+  var ctx=document.getElementById('foulChart').getContext('2d');
+  if(foulChart){foulChart.destroy();}
+  foulChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'U actual (W/m2.K)',data:years.map(function(yr,i){return{x:yr,y:Uvals[i].toFixed(0)};}),
+          borderColor:'#EE4422',backgroundColor:'rgba(238,68,34,0.08)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.4},
+        {label:'Cleaning threshold ('+Ud_limit.toFixed(0)+')',data:years.map(function(yr){return{x:yr,y:Ud_limit};}),
+          borderColor:'#FF8800',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,borderDash:[6,3],tension:0},
+        {label:'U clean ('+Uc+')',data:years.map(function(yr){return{x:yr,y:Uc};}),
+          borderColor:'#00BB55',backgroundColor:'transparent',borderWidth:1,pointRadius:0,borderDash:[3,3],tension:0}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Service time (years)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C14'}},
+        y:{title:{display:true,text:'U value (W/m2.K)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C14'}}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 4: SHELL AND TUBE ====== */
+function calcST(){
+  var Q=parseFloat(document.getElementById('st_Q').value)||1760; // kW
+  var LMTD=parseFloat(document.getElementById('st_LMTD').value)||52;
+  var U=parseFloat(document.getElementById('st_U').value)||650;
+  var do_mm=parseFloat(document.getElementById('st_do').value)||25;
+  var tw=parseFloat(document.getElementById('st_tw').value)||2;
+  var L=parseFloat(document.getElementById('st_L').value)||4.88;
+  var pt_mm=parseFloat(document.getElementById('st_pt').value)||32;
+  var layout=document.getElementById('st_layout').value;
+  var Bsp=parseFloat(document.getElementById('st_Bsp').value)||40;
+
+  var A_req=Q*1000/(U*LMTD); // m2
+  var di_mm=do_mm-2*tw;
+  var A_per_tube=Math.PI*(do_mm/1000)*L; // m2 per tube (outer surface)
+  var N_tubes=Math.ceil(A_req/A_per_tube);
+
+  // Shell ID estimate
+  var CTP=0.93; // tube count constant for 1 pass
+  var pitch_ratio=pt_mm/do_mm;
+  var Ds_m=do_mm/1000*pitch_ratio*Math.sqrt(N_tubes/CTP*4/Math.PI);
+  var Ds_mm=Ds_m*1000;
+  // Round to standard shell
+  var Ds_std=[203,254,305,387,438,489,540,591,635,686,737,787,838,889,940,991,1067,1143,1219,1372,1524].find(function(s){return s>=Ds_mm;})||Ds_mm;
+
+  // Baffle spacing
+  var B_m=Ds_std/1000*Bsp/100;
+  var N_baffles=Math.floor(L/B_m);
+
+  // Flow areas
+  var A_tube=Math.PI/4*(di_mm/1000)*(di_mm/1000)*N_tubes; // total tube cross section
+
+  // Bundle area fraction
+  var Cb=layout==='tri'?0.866:1.0;
+  var A_shell_pass=Ds_std/1000*B_m*(1-(do_mm/pt_mm)); // simplified shell-side flow area
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Required heat transfer area',A_req.toFixed(2),'m2','Q/(U x LMTD)');
+  html+=rc('hl','Number of tubes',N_tubes,'tubes','At '+do_mm+' OD x '+L.toFixed(2)+'m');
+  html+=rc('','Shell ID (calculated)',(Ds_mm).toFixed(0),'mm','Before rounding');
+  html+=rc('','Shell ID (standard)',Ds_std,'mm','TEMA standard shell');
+  html+=rc('','Tube inner diameter',di_mm.toFixed(1),'mm',do_mm+' OD - 2x'+tw+'mm wall');
+  html+=rc('','Number of baffles',N_baffles,'-','At '+Bsp+'% shell ID spacing');
+  html+=rc('','Area per tube',A_per_tube.toFixed(4),'m2',do_mm+' mm OD x '+L.toFixed(2)+'m');
+  html+=rc('','L/D_s ratio',(L/(Ds_std/1000)).toFixed(1),'-','Typical 6-10 for process HX');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>A_required</strong> = Q/(U x LMTD) = '+Q+' kW x 1000 / ('+U+' x '+LMTD+') = <span class="hi">'+A_req.toFixed(2)+' m2</span><br>'
+    +'<strong>N_tubes</strong> = '+A_req.toFixed(2)+' / (pi x '+(do_mm/1000).toFixed(3)+' x '+L.toFixed(2)+') = ceil('+( A_req/A_per_tube).toFixed(1)+') = <span class="hi">'+N_tubes+'</span><br>'
+    +'<strong>Shell ID</strong> = '+do_mm+'/1000 x '+(pt_mm/do_mm).toFixed(2)+' x sqrt('+N_tubes+'/0.93 x 4/pi) = <span class="hi">'+Ds_mm.toFixed(0)+' mm → '+Ds_std+' mm standard</span><br>'
+    +'<strong>Baffle spacing:</strong> '+Bsp+'% x '+Ds_std+' mm = '+B_m.toFixed(3)+' m → '+N_baffles+' baffles'
+    +'</div>';
+
+  var rows='';
+  var LD=L/(Ds_std/1000);
+  if(LD<6){
+    rows+=ar('wn','Short shell (L/D = '+LD.toFixed(1)+')','L/D ratio of '+LD.toFixed(1)+' is below the typical minimum of 6 for shell-and-tube exchangers. Short shells have non-ideal flow distribution at the tube sheet and lower TEMA standards compliance.','Increase tube length to 6.0-9.0 m to achieve L/D = 6-10. Alternatively, reduce tube OD from '+do_mm+'mm to 19mm which increases N_tubes and reduces required L. TEMA preferred tube lengths: 8ft (2.44m), 12ft (3.66m), 16ft (4.88m), 20ft (6.10m).');
+  }
+  if(N_baffles<3){
+    rows+=ar('wn','Very few baffles ('+N_baffles+')','With only '+N_baffles+' baffles, shell-side flow distribution is poor. Bypass streams and maldistribution significantly reduce effective heat transfer. TEMA recommends minimum 3 baffles.','Reduce baffle spacing to '+Math.floor(Bsp*0.6)+'% of shell ID to achieve minimum 3 baffles. Alternatively increase tube length. For short exchangers, use rod baffles (NTIW) which provide better distribution at low baffle counts.');
+  }
+  rows+=ar('hot','TEMA sizing summary',Ds_std+' mm ID shell | '+N_tubes+' tubes x '+do_mm+' OD x '+L.toFixed(2)+' m L | '+pt_mm+' mm pitch ('+( layout==='tri'?'30° triangular':'90° square')+') | '+N_baffles+' segmental baffles at '+Bsp+'% spacing. L/D = '+LD.toFixed(1)+'.','Specify TEMA type (AES, BEU, AEW etc.) on HX datasheet. Verify mechanical design per ASME Sec VIII for pressure rating. Include nozzle schedule, tie rod details and tube sheet thickness calculation for complete mechanical design.');
+
+  html+='<div class="analysis"><div class="atitle">/// SHELL AND TUBE DESIGN</div>'+rows+'</div>';
+  document.getElementById('r4').innerHTML=html;
+
+  // Draw tube bundle SVG
+  drawTubeBundleSVG(Ds_std,do_mm,pt_mm,N_tubes,layout);
+}
+
+function drawTubeBundleSVG(Ds,do_mm,pt,Nt,layout){
+  var svg=document.getElementById('st-svg');
+  var cx=250,cy=80,scale=0.5;
+  var R=Math.min(Ds*scale/2,70);
+  var r=do_mm*scale/2;
+  var pt_s=pt*scale;
+  var out='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="#336688" stroke-width="2"/>';
+
+  // Draw tubes in pattern
+  var tubeCount=0,maxShow=Math.min(Nt,80);
+  var row=0;
+  for(var y=-R;y<=R;y+=pt_s*(layout==='tri'?0.866:1)){
+    var xOffset=(layout==='tri'&&row%2===1)?pt_s/2:0;
+    for(var x=-R;x<=R;x+=pt_s){
+      var tx=cx+x+xOffset,ty=cy+y;
+      if(Math.sqrt((tx-cx)*(tx-cx)+(ty-cy)*(ty-cy))+r<R){
+        out+='<circle cx="'+tx.toFixed(1)+'" cy="'+ty.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="rgba(200,180,120,0.3)" stroke="#C8A060" stroke-width="0.5"/>';
+        tubeCount++;
+        if(tubeCount>=maxShow) break;
+      }
+    }
+    row++;
+    if(tubeCount>=maxShow) break;
+  }
+  out+='<text x="'+cx+'" y="145" text-anchor="middle" fill="#555" font-size="10" font-family="JetBrains Mono">'+Ds+'mm ID | '+Nt+' tubes x '+do_mm+'mm OD | '+(layout==='tri'?'30°':'90°')+' '+pt+'mm pitch</text>';
+  svg.innerHTML=out;
+}
+
+/* ====== PANEL 5: PLATE HX ====== */
+function calcPlate(){
+  var Q=parseFloat(document.getElementById('ph_Q').value)||1760; // kW
+  var LMTD=parseFloat(document.getElementById('ph_LMTD').value)||52;
+  var U=parseFloat(document.getElementById('ph_U').value)||4000;
+  var ap=parseFloat(document.getElementById('ph_ap').value)||0.5;
+  var gap=parseFloat(document.getElementById('ph_gap').value)||3; // mm
+  var mat=document.getElementById('ph_mat').value;
+  var P=parseFloat(document.getElementById('ph_P').value)||10;
+  var mh=parseFloat(document.getElementById('ph_mh').value)||10;
+  var mc=parseFloat(document.getElementById('ph_mc').value)||12;
+
+  var A_req=Q*1000/(U*LMTD);
+  var N_plates=Math.ceil(A_req/ap)+2; // +2 for end plates
+  var N_channels=N_plates-1;
+  var N_hot_ch=Math.floor(N_channels/2);
+  var N_cold_ch=Math.ceil(N_channels/2);
+
+  // Velocity in channels
+  var ch_width=0.3; // typical plate width m
+  var A_ch=ch_width*(gap/1000);
+  var v_hot=mh/1000/A_ch/N_hot_ch; // m/s (approx density water)
+  var v_cold=mc/1000/A_ch/N_cold_ch;
+
+  // Pressure limits
+  var P_ok=P<=25;
+  var mat_names={s316:'316L SS',ti:'Titanium',hast:'Hastelloy C276',cs:'Carbon steel'};
+  var mat_limits={s316:'25 bar / 180°C',ti:'20 bar / 150°C',hast:'25 bar / 200°C',cs:'10 bar / 150°C'};
+
+  var html='<div class="rgrid">';
+  html+=rc('hl-c','Required area',A_req.toFixed(2),'m2','Q/(U x LMTD)');
+  html+=rc('hl-c','Number of plates',N_plates,'plates',N_channels+' channels ('+N_hot_ch+' hot + '+N_cold_ch+' cold)');
+  html+=rc('','Area per plate',ap,'m2/plate','User defined plate size');
+  html+=rc('','Total actual area',(N_plates*ap).toFixed(1),'m2','With '+Math.round((N_plates*ap/A_req-1)*100)+'% margin');
+  html+=rc(P_ok?'ok':'er','Pressure rating',P+' bar(g)',P_ok?'Within gasketed PHE limit':'EXCEEDS gasketed PHE limit (25 bar)');
+  html+=rc('','Plate material',mat_names[mat]||mat,'-',mat_limits[mat]||'-');
+  html+=rc('','Hot channel velocity',v_hot.toFixed(2),'m/s','Approx at '+N_hot_ch+' channels');
+  html+=rc('','Cold channel velocity',v_cold.toFixed(2),'m/s','Approx at '+N_cold_ch+' channels');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>A_req</strong> = '+Q+' kW x 1000 / ('+U+' x '+LMTD+') = <span class="hic">'+A_req.toFixed(2)+' m2</span><br>'
+    +'<strong>N_plates</strong> = ceil('+A_req.toFixed(2)+' / '+ap+') + 2 end plates = <span class="hic">'+N_plates+'</span><br>'
+    +'<strong>N_channels</strong> = '+N_plates+' - 1 = '+N_channels+' ('+N_hot_ch+' hot + '+N_cold_ch+' cold alternating)<br>'
+    +'<strong>Channel velocity (hot):</strong> '+mh+' kg/s / (1000 kg/m3 x 0.3m x '+(gap/1000)+'m x '+N_hot_ch+') ≈ <span class="hi">'+v_hot.toFixed(2)+' m/s</span>'
+    +'</div>';
+
+  var rows='';
+  if(!P_ok){
+    rows+=ar('er','Pressure exceeds gasketed plate HX limit (> 25 bar)','Operating pressure '+P+' bar exceeds the maximum recommended for gasketed PHEs (25 bar typical). At higher pressures, gasket failure risk increases significantly.','For P > 25 bar: (1) Use brazed plate HX (BPHX) - no gaskets, rated to 30-45 bar. (2) Use welded plate HX - rated to 40 bar. (3) Shell and tube exchanger. Alfanova (Alfa Laval) brazed PHX rated to 30 bar. PACKINOX (plate-shell HX) for very high pressure and temperature.');
+  }
+  if(v_hot<0.1||v_cold<0.1){
+    rows+=ar('wn','Low channel velocity (< 0.1 m/s) - fouling risk','Channel velocities below 0.1 m/s increase fouling risk in plate heat exchangers. Turbulent flow at v > 0.2 m/s is essential for the self-cleaning effect of corrugated plates.','Reduce number of parallel channels by increasing passes. Or select smaller plate with more channels. Target velocity: 0.2-0.8 m/s for water service. Consider plate type with higher chevron angle (β = 60-65°) to enhance turbulence at lower velocities.');
+  }
+  var A_vs_ST=A_req*5/100; // PHE is ~5-8x smaller area for same duty (higher U)
+  rows+=ar('cold','PHE vs Shell and Tube comparison','Plate HX: '+N_plates+' plates, '+A_req.toFixed(1)+' m2 at U = '+U+' W/m2.K. Equivalent S&T at U = 650 W/m2.K would require: '+(Q*1000/650/LMTD).toFixed(1)+' m2 - '+(Q*1000/650/LMTD/A_req).toFixed(1)+'x more area. PHE advantages: compact, easy cleaning, low pressure drop, flexible capacity.','PHE disadvantages: gasket limitation (P < 25 bar, T < 180°C), susceptible to fouling on small channels if solids present. Specify 2-3mm channel gap minimum for cooling water and 4-5mm for process streams with suspended particles.');
+
+  html+='<div class="analysis"><div class="atitle cold">/// PLATE HX ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r5').innerHTML=html;
+}
+
+/* ====== INIT ====== */
+calcLMTD();
+setTimeout(function(){calcNTU();calcFoul();calcST();calcPlate();},300);
+</script>
+</body>
+</html>
