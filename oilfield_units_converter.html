@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oilfield Units Converter - Petrosmart Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#CC0000;--red-glow:rgba(204,0,0,0.25);
+  --bg:#060608;--surface:#0E0E12;--card:#13131A;
+  --border:#1C1C24;--text:#E4E4EE;--muted:#52525E;
+  --ok:#00BB55;--warn:#FF8800;--err:#FF3333;--info:#2277EE;
+  --mono:'Fira Code',monospace;--sans:'Space Grotesk',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+
+/* ANIMATED BACKGROUND */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 60% 40% at 20% 20%,rgba(204,0,0,0.04),transparent),
+    radial-gradient(ellipse 40% 60% at 80% 80%,rgba(204,0,0,0.03),transparent);
+  pointer-events:none;z-index:0;
+}
+
+.wrap{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:16px;}
+
+/* HEADER */
+.hdr{
+  background:linear-gradient(135deg,#0E0E12 0%,#1A0505 50%,#0E0E12 100%);
+  border:1px solid rgba(204,0,0,0.3);border-radius:18px;
+  padding:20px 24px;margin-bottom:18px;
+  display:flex;align-items:center;gap:16px;
+  box-shadow:0 0 40px rgba(204,0,0,0.1),inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.hdr-icon{
+  width:52px;height:52px;background:var(--red);border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  flex-shrink:0;box-shadow:0 4px 20px var(--red-glow);
+}
+.hdr-txt h1{font-size:19px;font-weight:700;color:#fff;letter-spacing:-0.01em;}
+.hdr-txt p{font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--mono);}
+.hdr-stats{margin-left:auto;display:flex;gap:12px;flex-shrink:0;}
+.hdr-stat{text-align:center;background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);border-radius:10px;padding:8px 14px;}
+.hdr-stat-val{font-size:18px;font-weight:700;color:var(--red);font-family:var(--mono);}
+.hdr-stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;}
+
+/* SEARCH BAR */
+.search-wrap{position:relative;margin-bottom:16px;}
+.search-input{
+  width:100%;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;color:#fff;font-size:14px;padding:12px 16px 12px 44px;
+  outline:none;font-family:var(--sans);transition:border-color 0.2s;
+}
+.search-input:focus{border-color:var(--red);box-shadow:0 0 0 3px var(--red-glow);}
+.search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);
+  color:var(--muted);font-size:16px;}
+.search-clear{position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  color:var(--muted);cursor:pointer;font-size:12px;font-family:var(--mono);}
+
+/* CATEGORY PILLS */
+.cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.cat{padding:6px 14px;background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;color:var(--muted);font-size:11px;font-weight:600;
+  cursor:pointer;transition:all 0.15s;letter-spacing:0.04em;}
+.cat:hover{color:#ccc;border-color:#333;}
+.cat.on{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 2px 12px var(--red-glow);}
+
+/* LAYOUT MODES */
+.mode-btns{display:flex;gap:6px;margin-bottom:14px;align-items:center;}
+.mode-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-right:4px;font-family:var(--mono);}
+.mbtn{padding:5px 12px;background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;color:var(--muted);font-size:11px;cursor:pointer;font-family:var(--mono);}
+.mbtn.on{background:var(--red);border-color:var(--red);color:#fff;}
+
+/* CONVERTER CARDS */
+.conv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px;}
+.conv-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;transition:border-color 0.2s;
+}
+.conv-card:hover{border-color:rgba(204,0,0,0.3);}
+.conv-card.hidden{display:none;}
+.card-hdr{
+  background:linear-gradient(90deg,rgba(204,0,0,0.12),transparent);
+  padding:12px 16px;display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid var(--border);
+}
+.card-icon{font-size:18px;}
+.card-title{font-size:13px;font-weight:600;color:#fff;flex:1;}
+.card-cat{font-size:9px;color:var(--muted);font-family:var(--mono);
+  text-transform:uppercase;letter-spacing:0.07em;background:rgba(255,255,255,0.04);
+  padding:2px 8px;border-radius:10px;}
+.card-body{padding:14px 16px;}
+
+/* INPUT ROW */
+.inp-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+.inp-wrap{flex:1;position:relative;}
+.c-input{
+  width:100%;background:#0A0A0E;border:1px solid #1E1E28;
+  border-radius:8px;color:#fff;font-size:15px;font-weight:500;
+  padding:9px 12px;outline:none;font-family:var(--mono);
+  transition:border-color 0.2s;
+}
+.c-input:focus{border-color:var(--red);}
+.c-select{
+  background:#0A0A0E;border:1px solid #1E1E28;
+  border-radius:8px;color:#ccc;font-size:12px;padding:9px 8px;
+  outline:none;font-family:var(--mono);cursor:pointer;min-width:110px;
+  transition:border-color 0.2s;
+}
+.c-select:focus{border-color:var(--red);}
+.c-select option{background:#111;}
+.swap-btn{
+  width:32px;height:32px;background:#0A0A0E;border:1px solid #1E1E28;
+  border-radius:8px;color:var(--muted);cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all 0.2s;
+}
+.swap-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* RESULT ROW */
+.result-row{
+  background:#090910;border:1px solid #151520;border-radius:8px;
+  padding:10px 12px;display:flex;justify-content:space-between;align-items:center;
+}
+.res-val{font-size:18px;font-weight:600;color:#fff;font-family:var(--mono);}
+.res-unit{font-size:11px;color:var(--muted);font-family:var(--mono);}
+.copy-btn{
+  padding:3px 8px;background:rgba(204,0,0,0.15);border:1px solid rgba(204,0,0,0.3);
+  border-radius:5px;color:var(--red);font-size:9px;cursor:pointer;
+  font-family:var(--mono);transition:all 0.15s;letter-spacing:0.05em;
+}
+.copy-btn:hover{background:var(--red);color:#fff;}
+
+/* QUICK RESULTS TABLE */
+.qr-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:11px;}
+.qr-table tr{border-bottom:1px solid #0E0E14;}
+.qr-table tr:last-child{border-bottom:none;}
+.qr-table tr:hover{background:rgba(255,255,255,0.02);}
+.qr-table td{padding:5px 4px;font-family:var(--mono);}
+.qr-table td:first-child{color:var(--muted);}
+.qr-table td:last-child{color:#fff;font-weight:500;text-align:right;}
+
+/* FORMULA BOX */
+.fbox{
+  background:#090910;border-left:2px solid var(--red);
+  border-radius:0 8px 8px 0;padding:8px 12px;
+  margin-top:8px;font-size:10px;color:#555;
+  line-height:1.9;font-family:var(--mono);
+}
+.fbox strong{color:#999;}
+
+/* FULL-WIDTH CONVERTER */
+.full-conv{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+.full-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.full-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:10px;}
+.conv-result{background:#090910;border:1px solid #151520;border-radius:8px;padding:10px 12px;}
+.cr-lbl{font-size:9px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;}
+.cr-val{font-size:15px;font-weight:600;color:#fff;font-family:var(--mono);}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:4px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{flex:1;min-width:80px;padding:8px 6px;background:transparent;border:none;
+  border-radius:8px;color:var(--muted);font-size:11px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);text-transform:uppercase;letter-spacing:0.07em;transition:all 0.2s;}
+.tab:hover{color:#ccc;}
+.tab.on{background:var(--red);color:#fff;box-shadow:0 0 14px var(--red-glow);}
+.panel{display:none;}.panel.on{display:block;}
+
+.sep{height:1px;background:var(--border);margin:14px 0;}
+.ibox{background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);line-height:1.7;font-family:var(--mono);}
+.ibox strong{color:#bbb;}
+
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;}
+.tbl th{text-align:left;padding:7px 10px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.tbl td{padding:7px 10px;color:#bbb;border-bottom:1px solid #0E0E14;font-family:var(--mono);}
+.tbl tr:hover td{background:#111;}
+.tw{color:#fff!important;font-weight:600;}
+
+.foot{background:var(--surface);border-top:1px solid var(--border);margin-top:18px;
+  padding:10px 20px;font-size:10px;color:#333;text-align:center;
+  font-family:var(--mono);border-radius:12px;}
+.foot a{color:var(--red);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-icon">⚗️</div>
+  <div class="hdr-txt">
+    <h1>Oilfield Units Converter</h1>
+    <p>All petroleum engineering unit conversions in one place</p>
+  </div>
+  <div class="hdr-stats">
+    <div class="hdr-stat"><div class="hdr-stat-val">18</div><div class="hdr-stat-lbl">Categories</div></div>
+    <div class="hdr-stat"><div class="hdr-stat-val">200+</div><div class="hdr-stat-lbl">Units</div></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" id="t1" onclick="swt(1)">Converters</button>
+  <button class="tab" id="t2" onclick="swt(2)">Multi-Convert</button>
+  <button class="tab" id="t3" onclick="swt(3)">Field Formulas</button>
+  <button class="tab" id="t4" onclick="swt(4)">Reference Tables</button>
+</div>
+
+<!-- ===== PANEL 1: CONVERTERS ===== -->
+<div class="panel on" id="p1">
+
+  <!-- Search -->
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" type="text" id="search" placeholder="Search converter... e.g. 'pressure', 'barrel', 'density'" oninput="filterCards()">
+    <span class="search-clear" onclick="clearSearch()">✕</span>
+  </div>
+
+  <!-- Category pills -->
+  <div class="cats" id="cat-pills"></div>
+
+  <!-- Converter cards grid -->
+  <div class="conv-grid" id="conv-grid"></div>
+</div>
+
+<!-- ===== PANEL 2: MULTI-CONVERT ===== -->
+<div class="panel" id="p2">
+  <div class="full-conv">
+    <div class="full-title">🔄 Multi-unit pressure converter</div>
+    <div class="inp-row">
+      <input class="c-input" type="number" id="mc-p" value="100" oninput="multiConvert('p')">
+      <select class="c-select" id="mc-p-unit" onchange="multiConvert('p')">
+        <option value="bar">bar</option>
+        <option value="psi">psi</option>
+        <option value="kPa">kPa</option>
+        <option value="MPa">MPa</option>
+        <option value="atm">atm</option>
+        <option value="kg_cm2">kgf/cm2</option>
+        <option value="mH2O">m H2O</option>
+        <option value="ftH2O">ft H2O</option>
+        <option value="mmHg">mmHg</option>
+        <option value="inHg">inHg</option>
+      </select>
+    </div>
+    <div class="full-grid" id="mc-p-out"></div>
+  </div>
+
+  <div class="full-conv">
+    <div class="full-title">🛢️ Multi-unit volume / flow converter</div>
+    <div class="inp-row">
+      <input class="c-input" type="number" id="mc-v" value="1000" oninput="multiConvert('v')">
+      <select class="c-select" id="mc-v-unit" onchange="multiConvert('v')">
+        <option value="bbl">barrel (bbl)</option>
+        <option value="m3">m3</option>
+        <option value="L">litres</option>
+        <option value="ft3">ft3</option>
+        <option value="gal_us">US gallons</option>
+        <option value="gal_uk">UK gallons</option>
+        <option value="bbl_d">bbl/day (flow)</option>
+        <option value="m3_d">m3/day (flow)</option>
+        <option value="m3_hr">m3/hr (flow)</option>
+        <option value="Mcf">Mcf (gas)</option>
+        <option value="MMscf">MMscf (gas)</option>
+        <option value="sm3">Sm3 (gas)</option>
+      </select>
+    </div>
+    <div class="full-grid" id="mc-v-out"></div>
+  </div>
+
+  <div class="full-conv">
+    <div class="full-title">⚖️ Multi-unit density / mud weight converter</div>
+    <div class="inp-row">
+      <input class="c-input" type="number" id="mc-d" value="1.3" step="0.01" oninput="multiConvert('d')">
+      <select class="c-select" id="mc-d-unit" onchange="multiConvert('d')">
+        <option value="sg">SG (g/cm3)</option>
+        <option value="kg_m3">kg/m3</option>
+        <option value="g_cm3">g/cm3</option>
+        <option value="ppg">ppg (lb/gal US)</option>
+        <option value="lb_ft3">lb/ft3</option>
+        <option value="bar_m">bar/m gradient</option>
+        <option value="psi_ft">psi/ft gradient</option>
+      </select>
+    </div>
+    <div class="full-grid" id="mc-d-out"></div>
+  </div>
+
+  <div class="full-conv">
+    <div class="full-title">🌡️ Multi-unit temperature converter</div>
+    <div class="inp-row">
+      <input class="c-input" type="number" id="mc-t" value="100" oninput="multiConvert('t')">
+      <select class="c-select" id="mc-t-unit" onchange="multiConvert('t')">
+        <option value="C">Celsius (°C)</option>
+        <option value="F">Fahrenheit (°F)</option>
+        <option value="K">Kelvin (K)</option>
+        <option value="R">Rankine (°R)</option>
+      </select>
+    </div>
+    <div class="full-grid" id="mc-t-out"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 3: FIELD FORMULAS ===== -->
+<div class="panel" id="p3">
+  <div class="full-conv">
+    <div class="full-title">🛢️ API Gravity ↔ Density</div>
+    <div class="inp-row">
+      <input class="c-input" type="number" id="api-in" value="33.4" step="0.1" oninput="calcAPI()">
+      <select class="c-select" id="api-unit" onchange="calcAPI()">
+        <option value="api">°API → density</option>
+        <option value="sg">SG → °API</option>
+        <option value="rho">kg/m3 → °API</option>
+      </select>
+    </div>
+    <div class="full-grid" id="api-out"></div>
+    <div class="fbox" id="api-formula"></div>
+  </div>
+
+  <div class="full-conv">
+    <div class="full-title">💧 Flow rate conversion + Darcy velocity</div>
+    <div class="row2" style="gap:10px;">
+      <div>
+        <label style="font-size:10px;color:var(--muted);font-family:var(--mono);display:block;margin-bottom:5px;">FLOW RATE</label>
+        <div class="inp-row">
+          <input class="c-input" type="number" id="fl-q" value="398" oninput="calcFlow()">
+          <select class="c-select" id="fl-q-unit" onchange="calcFlow()">
+            <option value="m3_hr">m3/hr</option>
+            <option value="bbl_d">bbl/day</option>
+            <option value="L_s">L/s</option>
+            <option value="m3_s">m3/s</option>
+            <option value="gpm">gal/min (US)</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:10px;color:var(--muted);font-family:var(--mono);display:block;margin-bottom:5px;">PIPE INNER DIAMETER</label>
+        <div class="inp-row">
+          <input class="c-input" type="number" id="fl-d" value="150" oninput="calcFlow()">
+          <select class="c-select" id="fl-d-unit" onchange="calcFlow()">
+            <option value="mm">mm</option>
+            <option value="inch">inch</option>
+            <option value="m">m</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="full-grid" id="fl-out"></div>
+    <div class="fbox" id="fl-formula"></div>
+  </div>
+
+  <div class="full-conv">
+    <div class="full-title">⛽ Gas volume at standard conditions (Boyle's Law)</div>
+    <div class="row2" style="gap:10px;">
+      <div>
+        <label style="font-size:10px;color:var(--muted);font-family:var(--mono);display:block;margin-bottom:5px;">RESERVOIR CONDITIONS</label>
+        <div class="inp-row" style="margin-bottom:6px;">
+          <input class="c-input" type="number" id="gas-Pr" value="200" oninput="calcGas()">
+          <select class="c-select" id="gas-Pr-unit" onchange="calcGas()"><option value="bar">bar</option><option value="psi">psi</option><option value="MPa">MPa</option></select>
+        </div>
+        <div class="inp-row">
+          <input class="c-input" type="number" id="gas-Tr" value="80" oninput="calcGas()">
+          <select class="c-select" id="gas-Tr-unit" onchange="calcGas()"><option value="C">°C</option><option value="F">°F</option><option value="K">K</option></select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:10px;color:var(--muted);font-family:var(--mono);display:block;margin-bottom:5px;">VOLUME + GAS PROPERTIES</label>
+        <div class="inp-row" style="margin-bottom:6px;">
+          <input class="c-input" type="number" id="gas-Vr" value="1" oninput="calcGas()">
+          <select class="c-select" id="gas-Vr-unit" onchange="calcGas()"><option value="m3">m3</option><option value="bbl">bbl</option><option value="ft3">ft3</option></select>
+        </div>
+        <div class="inp-row">
+          <input class="c-input" type="number" id="gas-z" value="0.85" step="0.01" oninput="calcGas()">
+          <span style="font-size:10px;color:var(--muted);font-family:var(--mono);min-width:80px;">Z factor</span>
+        </div>
+      </div>
+    </div>
+    <div class="full-grid" id="gas-out"></div>
+    <div class="fbox" id="gas-formula"></div>
+  </div>
+
+  <div class="full-conv">
+    <div class="full-title">🔩 Torque and power conversion</div>
+    <div class="inp-row">
+      <input class="c-input" type="number" id="pwr-in" value="132" oninput="calcPower()">
+      <select class="c-select" id="pwr-unit" onchange="calcPower()">
+        <option value="kW">kW</option>
+        <option value="HP">HP (metric)</option>
+        <option value="HP_us">HP (US/mechanical)</option>
+        <option value="MW">MW</option>
+        <option value="BTU_hr">BTU/hr</option>
+        <option value="kcal_hr">kcal/hr</option>
+      </select>
+    </div>
+    <div class="full-grid" id="pwr-out"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 4: REFERENCE TABLES ===== -->
+<div class="panel" id="p4">
+  <div class="full-conv">
+    <div class="full-title">📊 Crude oil barrel contents</div>
+    <div class="ibox"><strong>1 barrel of crude oil (42 US gallons = 158.987 L) at 60°F</strong></div>
+    <table class="tbl">
+      <thead><tr><th>Product</th><th>Volume (bbl)</th><th>Volume (L)</th><th>% of barrel</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Gasoline (motor)</td><td>19.40</td><td>3,084</td><td>46.2%</td><td>Largest fraction, primary fuel</td></tr>
+        <tr><td class="tw">Distillate fuel (diesel/HFO)</td><td>9.21</td><td>1,464</td><td>21.9%</td><td>Diesel, jet, heating oil</td></tr>
+        <tr><td class="tw">Jet fuel (kerosene)</td><td>4.07</td><td>647</td><td>9.7%</td><td>Aviation turbine fuel</td></tr>
+        <tr><td class="tw">Residual fuel oil</td><td>1.68</td><td>267</td><td>4.0%</td><td>Bunker fuel, power generation</td></tr>
+        <tr><td class="tw">Liquefied gases (LPG)</td><td>1.72</td><td>273</td><td>4.1%</td><td>Propane, butane</td></tr>
+        <tr><td class="tw">Asphalt / road oil</td><td>1.30</td><td>207</td><td>3.1%</td><td>Paving, roofing</td></tr>
+        <tr><td class="tw">Petrochemicals</td><td>2.18</td><td>347</td><td>5.2%</td><td>Plastics, chemicals feedstock</td></tr>
+        <tr><td class="tw">Processing gain</td><td>~1.0</td><td>~159</td><td>+ve</td><td>Refinery volumetric gain</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="full-conv">
+    <div class="full-title">⚡ Energy equivalents - Petroleum fuels</div>
+    <table class="tbl">
+      <thead><tr><th>Fuel</th><th>Per unit</th><th>MJ/unit</th><th>kWh/unit</th><th>BOE equivalent</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Crude oil</td><td>1 barrel</td><td>6,117</td><td>1,699</td><td>1.000 BOE</td></tr>
+        <tr><td class="tw">Natural gas</td><td>1 Mcf</td><td>1,055</td><td>293</td><td>0.172 BOE</td></tr>
+        <tr><td class="tw">Natural gas</td><td>1 MMBtu</td><td>1,055</td><td>293</td><td>0.172 BOE</td></tr>
+        <tr><td class="tw">LNG</td><td>1 tonne</td><td>50,000</td><td>13,889</td><td>8.17 BOE</td></tr>
+        <tr><td class="tw">LPG (propane)</td><td>1 tonne</td><td>46,400</td><td>12,889</td><td>7.58 BOE</td></tr>
+        <tr><td class="tw">Diesel</td><td>1 litre</td><td>36.9</td><td>10.25</td><td>0.00604 BOE</td></tr>
+        <tr><td class="tw">Gasoline</td><td>1 litre</td><td>34.2</td><td>9.50</td><td>0.00559 BOE</td></tr>
+        <tr><td class="tw">Coal (thermal)</td><td>1 tonne</td><td>27,000</td><td>7,500</td><td>4.42 BOE</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="full-conv">
+    <div class="full-title">🌍 Production rate conversions - Common oilfield rates</div>
+    <table class="tbl">
+      <thead><tr><th>Rate (BOPD)</th><th>m3/day</th><th>m3/hr</th><th>L/s</th><th>Category</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">100 BOPD</td><td>15.9</td><td>0.66</td><td>0.18</td><td>Small well / stripper</td></tr>
+        <tr><td class="tw">1,000 BOPD</td><td>158.9</td><td>6.62</td><td>1.84</td><td>Average well (global)</td></tr>
+        <tr><td class="tw">5,000 BOPD</td><td>795.0</td><td>33.1</td><td>9.20</td><td>Good well, medium field</td></tr>
+        <tr><td class="tw">10,000 BOPD</td><td>1,590</td><td>66.2</td><td>18.4</td><td>Strong well, major field</td></tr>
+        <tr><td class="tw">50,000 BOPD</td><td>7,949</td><td>331</td><td>91.9</td><td>Large field, offshore</td></tr>
+        <tr><td class="tw">100,000 BOPD</td><td>15,899</td><td>662</td><td>184</td><td>Major offshore/onshore</td></tr>
+        <tr><td class="tw">1,000,000 BOPD</td><td>158,987</td><td>6,624</td><td>1,840</td><td>Super-giant field (Ghawar)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="full-conv">
+    <div class="full-title">📐 Key oilfield constants</div>
+    <table class="tbl">
+      <thead><tr><th>Constant</th><th>Value</th><th>Unit</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">1 barrel</td><td>0.158987</td><td>m3</td><td>42 US gallons exactly</td></tr>
+        <tr><td class="tw">1 barrel</td><td>158.987</td><td>litres</td><td>-</td></tr>
+        <tr><td class="tw">1 bbl/day</td><td>1.84013 × 10-6</td><td>m3/s</td><td>Flow rate</td></tr>
+        <tr><td class="tw">Standard conditions (SI)</td><td>15°C / 101.325 kPa</td><td>-</td><td>ISO 13443</td></tr>
+        <tr><td class="tw">Standard conditions (US)</td><td>60°F / 14.696 psi</td><td>-</td><td>API standard</td></tr>
+        <tr><td class="tw">1 psi/ft gradient</td><td>22.621</td><td>kPa/m</td><td>Pressure gradient</td></tr>
+        <tr><td class="tw">Water gradient (fresh)</td><td>0.4335</td><td>psi/ft</td><td>1000 kg/m3</td></tr>
+        <tr><td class="tw">1 Mcf (gas)</td><td>28.317</td><td>m3 (actual)</td><td>1000 cubic feet</td></tr>
+        <tr><td class="tw">1 MMscf/d</td><td>28,317</td><td>Sm3/d</td><td>-</td></tr>
+        <tr><td class="tw">1 tonne crude (~35 API)</td><td>7.28</td><td>barrels</td><td>Varies with density</td></tr>
+        <tr><td class="tw">Gravity of Earth g</td><td>9.80665</td><td>m/s2</td><td>Standard gravity</td></tr>
+        <tr><td class="tw">Universal gas constant R</td><td>8.31446</td><td>J/(mol.K)</td><td>-</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">
+  <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
+  · All conversions per SPE, API, SI and ISO standards · For educational use
+</div>
+</div>
+
+<script>
+/* ============================
+   CONVERTER DEFINITIONS
+   ============================ */
+var converters=[
+  // PRESSURE
+  {id:'press',cat:'Pressure',icon:'🔴',title:'Pressure',keywords:'pressure bar psi kPa MPa atm',
+   units:['bar','psi','kPa','MPa','atm','Pa','kgf/cm2','m H2O','ft H2O','mmHg','inHg'],
+   base:'bar',// all to bar
+   factors:{bar:1,psi:0.0689476,kPa:0.01,MPa:10,atm:1.01325,Pa:1e-5,'kgf/cm2':0.980665,'m H2O':0.0980665,'ft H2O':0.0298907,mmHg:0.00133322,inHg:0.0338639},
+   formula:'P (bar) = P (psi) / 14.504 | P (psi) = P (bar) x 14.504'},
+
+  // VOLUME
+  {id:'vol',cat:'Volume',icon:'🛢️',title:'Volume',keywords:'volume barrel bbl m3 litre gallon',
+   units:['bbl','m3','L','ft3','US gal','UK gal','in3'],
+   base:'bbl',
+   factors:{bbl:1,m3:6.28981,'L':0.00628981,ft3:0.17811,'US gal':0.023810,'UK gal':0.021997,in3:0.0000036373},
+   formula:'1 barrel = 0.158987 m3 = 42 US gallons'},
+
+  // FLOW RATE
+  {id:'flow',cat:'Flow Rate',icon:'💧',title:'Flow Rate',keywords:'flow rate m3/hr bbl/day L/s gpm',
+   units:['m3/hr','bbl/day','L/s','m3/s','gal/min(US)','gal/min(UK)','ft3/min','bbl/hr'],
+   base:'m3/hr',
+   factors:{'m3/hr':1,'bbl/day':0.158987/24,'L/s':3.6,'m3/s':3600,'gal/min(US)':0.22712,'gal/min(UK)':0.18927,'ft3/min':1.69901,'bbl/hr':0.158987},
+   formula:'Q (m3/hr) = Q (bbl/day) x 0.006624'},
+
+  // DENSITY
+  {id:'dens',cat:'Density',icon:'⚖️',title:'Density / Mud Weight',keywords:'density mud weight SG kg/m3 ppg',
+   units:['kg/m3','g/cm3','SG','ppg','lb/ft3','bar/m','psi/ft'],
+   base:'kg/m3',
+   factors:{'kg/m3':1,'g/cm3':1000,'SG':1000,'ppg':119.826,'lb/ft3':16.0185,'bar/m':101971.6,'psi/ft':22620.7},
+   formula:'SG = rho (kg/m3) / 1000 | ppg = kg/m3 / 119.826'},
+
+  // TEMPERATURE
+  {id:'temp',cat:'Temperature',icon:'🌡️',title:'Temperature',keywords:'temperature celsius fahrenheit kelvin',
+   units:['°C','°F','K','°R'],
+   base:'C',special:true,
+   formula:'°F = °C × 9/5 + 32 | K = °C + 273.15'},
+
+  // LENGTH / DEPTH
+  {id:'len',cat:'Length',icon:'📏',title:'Length / Depth',keywords:'length depth meter feet inch km mile',
+   units:['m','ft','km','mile','inch','cm','mm'],
+   base:'m',
+   factors:{m:1,ft:0.3048,km:1000,mile:1609.34,inch:0.0254,cm:0.01,mm:0.001},
+   formula:'1 ft = 0.3048 m | 1 mile = 5280 ft = 1.609 km'},
+
+  // MASS / WEIGHT
+  {id:'mass',cat:'Mass',icon:'🏋️',title:'Mass / Weight',keywords:'mass weight tonne kg lb pound',
+   units:['kg','tonne','lb','short ton','long ton','g'],
+   base:'kg',
+   factors:{kg:1,tonne:1000,lb:0.453592,'short ton':907.185,'long ton':1016.05,g:0.001},
+   formula:'1 tonne = 1000 kg | 1 lb = 0.4536 kg'},
+
+  // FORCE
+  {id:'force',cat:'Force',icon:'💪',title:'Force',keywords:'force newton kN kgf lbf',
+   units:['N','kN','MN','kgf','lbf','tonf'],
+   base:'N',
+   factors:{N:1,kN:1000,MN:1e6,kgf:9.80665,lbf:4.44822,tonf:9806.65},
+   formula:'1 kN = 1000 N | 1 lbf = 4.448 N'},
+
+  // AREA
+  {id:'area',cat:'Area',icon:'⬜',title:'Area',keywords:'area m2 ft2 hectare acre',
+   units:['m2','ft2','km2','hectare','acre','in2','cm2'],
+   base:'m2',
+   factors:{m2:1,ft2:0.092903,km2:1e6,hectare:10000,acre:4046.86,in2:0.000645,cm2:0.0001},
+   formula:'1 hectare = 10,000 m2 | 1 acre = 4,047 m2'},
+
+  // POWER
+  {id:'power',cat:'Power',icon:'⚡',title:'Power',keywords:'power kW HP horsepower MW watt',
+   units:['kW','HP(metric)','HP(US)','MW','W','BTU/hr','kcal/hr','ft.lbf/s'],
+   base:'kW',
+   factors:{kW:1,'HP(metric)':0.735499,'HP(US)':0.745700,MW:1000,W:0.001,'BTU/hr':0.000293071,'kcal/hr':0.001163,'ft.lbf/s':0.0013558},
+   formula:'1 HP (US) = 0.7457 kW | 1 kW = 1.341 HP'},
+
+  // TORQUE
+  {id:'torq',cat:'Torque',icon:'🔄',title:'Torque',keywords:'torque N.m ft.lbf kN.m',
+   units:['N.m','kN.m','ft.lbf','in.lbf','kgf.m'],
+   base:'N.m',
+   factors:{'N.m':1,'kN.m':1000,'ft.lbf':1.35582,'in.lbf':0.112985,'kgf.m':9.80665},
+   formula:'1 ft.lbf = 1.356 N.m | 1 kN.m = 737.6 ft.lbf'},
+
+  // ENERGY
+  {id:'energy',cat:'Energy',icon:'🔋',title:'Energy',keywords:'energy kJ MJ kWh BTU calorie joule',
+   units:['kJ','MJ','kWh','BTU','kcal','J','ft.lbf'],
+   base:'kJ',
+   factors:{kJ:1,MJ:1000,kWh:3600,BTU:1.05506,kcal:4.1868,J:0.001,'ft.lbf':0.00135582},
+   formula:'1 kWh = 3600 kJ | 1 BTU = 1055 J | 1 BOE = 6117 MJ'},
+
+  // VISCOSITY DYNAMIC
+  {id:'visc_d',cat:'Viscosity',icon:'🌊',title:'Dynamic Viscosity',keywords:'viscosity dynamic mPa cP poise',
+   units:['mPa.s (cP)','Pa.s','cP','Poise','lbf.s/ft2','lbm/ft.s'],
+   base:'mPa.s (cP)',
+   factors:{'mPa.s (cP)':1,'Pa.s':1000,'cP':1,'Poise':100,'lbf.s/ft2':47880,'lbm/ft.s':1488.16},
+   formula:'1 cP = 1 mPa.s | water at 20°C ≈ 1 cP | crude oil 5-100 cP'},
+
+  // VISCOSITY KINEMATIC
+  {id:'visc_k',cat:'Viscosity',icon:'💦',title:'Kinematic Viscosity',keywords:'viscosity kinematic cSt mm2/s',
+   units:['cSt (mm2/s)','m2/s','ft2/s','SSU'],
+   base:'cSt (mm2/s)',
+   factors:{'cSt (mm2/s)':1,'m2/s':1e6,'ft2/s':92903,'SSU':0.216},
+   formula:'1 cSt = 1 mm2/s | nu = mu/rho | SSU ≈ 4.63 x cSt (approx)'},
+
+  // GAS VOLUME
+  {id:'gasvol',cat:'Gas Volume',icon:'💨',title:'Gas Volume',keywords:'gas Mcf MMscf Sm3 standard cubic feet',
+   units:['Sm3','Mcf','MMscf','ft3','m3 (actual)','MMBOE'],
+   base:'Sm3',
+   factors:{Sm3:1,Mcf:28.317,MMscf:28317,'ft3':0.028317,'m3 (actual)':1,MMBOE:178107},
+   formula:'1 Mcf = 28.317 Sm3 | 1 MMscfd = 28,317 Sm3/d | 1 BOE = 5.615 Mcf'},
+
+  // CONCENTRATION
+  {id:'conc',cat:'Concentration',icon:'🧪',title:'Concentration',keywords:'concentration ppm ppb mg/L percent',
+   units:['ppm (mg/L)','ppb','mg/kg','g/L','% wt','kg/m3'],
+   base:'ppm (mg/L)',
+   factors:{'ppm (mg/L)':1,'ppb':0.001,'mg/kg':1,'g/L':1000,'% wt':10000,'kg/m3':1000},
+   formula:'1% wt = 10,000 ppm | 1 mg/L ≈ 1 ppm (for water)'},
+
+  // PERMEABILITY
+  {id:'perm',cat:'Reservoir',icon:'🏔️',title:'Permeability',keywords:'permeability darcy millidarcy mD',
+   units:['mD','D (Darcy)','m2','cm2','ft2'],
+   base:'mD',
+   factors:{mD:1,'D (Darcy)':1000,m2:1.01325e12,cm2:1.01325e8,ft2:9.39479e10},
+   formula:'1 Darcy = 1000 mD = 9.87 x 10-13 m2 | Reservoir typical: 1-1000 mD'},
+
+  // ANGLE
+  {id:'angle',cat:'Other',icon:'📐',title:'Angle (for directional drilling)',keywords:'angle degree radian inclination',
+   units:['degrees','radians','grad'],
+   base:'degrees',
+   factors:{degrees:1,radians:57.2958,grad:0.9},
+   formula:'1 radian = 57.296° | DLS (deg/30m): max 3°/30m for standard drilling'},
+];
+
+var currentCat='All';
+
+/* ============================
+   BUILD CATEGORY PILLS
+   ============================ */
+function buildCats(){
+  var cats=['All'];
+  converters.forEach(function(c){if(!cats.includes(c.cat))cats.push(c.cat);});
+  var html=cats.map(function(c){
+    return '<button class="cat'+(c==='All'?' on':'')+'" onclick="setCat(\''+c+'\',this)">'+c+'</button>';
+  }).join('');
+  document.getElementById('cat-pills').innerHTML=html;
+}
+
+function setCat(cat,el){
+  currentCat=cat;
+  document.querySelectorAll('.cat').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  filterCards();
+}
+
+/* ============================
+   SEARCH
+   ============================ */
+function filterCards(){
+  var q=document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.conv-card').forEach(function(card){
+    var kw=card.dataset.kw||'';
+    var cat=card.dataset.cat||'';
+    var matchSearch=!q||kw.includes(q);
+    var matchCat=currentCat==='All'||cat===currentCat;
+    card.classList.toggle('hidden',!(matchSearch&&matchCat));
+  });
+}
+
+function clearSearch(){document.getElementById('search').value='';filterCards();}
+
+/* ============================
+   BUILD CONVERTER CARDS
+   ============================ */
+function buildCards(){
+  var g=document.getElementById('conv-grid');
+  g.innerHTML=converters.map(function(c,idx){
+    var fromOpts=c.units.map(function(u){return '<option value="'+u+'">'+u+'</option>';}).join('');
+    var toOpts=c.units.map(function(u,i){return '<option value="'+u+'"'+(i===1?' selected':'')+'>'+u+'</option>';}).join('');
+    return '<div class="conv-card" id="card-'+c.id+'" data-kw="'+c.keywords+'" data-cat="'+c.cat+'">'
+      +'<div class="card-hdr">'
+        +'<span class="card-icon">'+c.icon+'</span>'
+        +'<span class="card-title">'+c.title+'</span>'
+        +'<span class="card-cat">'+c.cat+'</span>'
+      +'</div>'
+      +'<div class="card-body">'
+        +'<div class="inp-row">'
+          +'<div class="inp-wrap"><input class="c-input" type="number" id="v-'+c.id+'" value="1" oninput="conv(\''+c.id+'\')" style="width:100%;"></div>'
+          +'<select class="c-select" id="fu-'+c.id+'" onchange="conv(\''+c.id+'\')">'+fromOpts+'</select>'
+        +'</div>'
+        +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">'
+          +'<div style="flex:1;height:1px;background:var(--border);"></div>'
+          +'<button class="swap-btn" onclick="swap(\''+c.id+'\')" title="Swap units">⇅</button>'
+          +'<select class="c-select" id="tu-'+c.id+'" onchange="conv(\''+c.id+'\')">'+toOpts+'</select>'
+        +'</div>'
+        +'<div class="result-row" id="res-'+c.id+'">'
+          +'<div><div class="res-val" id="rv-'+c.id+'">-</div><div class="res-unit" id="ru-'+c.id+'">-</div></div>'
+          +'<button class="copy-btn" onclick="copyResult(\''+c.id+'\')">COPY</button>'
+        +'</div>'
+        +'<div class="fbox" style="margin-top:8px;font-size:9px;">'+c.formula+'</div>'
+        +'<div id="qr-'+c.id+'"></div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+/* ============================
+   CONVERT FUNCTION
+   ============================ */
+function conv(id){
+  var c=converters.find(function(x){return x.id===id;});
+  if(!c)return;
+  var val=parseFloat(document.getElementById('v-'+id).value)||0;
+  var fu=document.getElementById('fu-'+id).value;
+  var tu=document.getElementById('tu-'+id).value;
+  var result;
+
+  if(c.special&&id==='temp'){
+    // Temperature special case
+    var inC=toC(val,fu);
+    result=fromC(inC,tu);
+  } else {
+    var toBase=val/c.factors[fu];
+    result=toBase*c.factors[tu];
+  }
+
+  document.getElementById('rv-'+id).textContent=formatNum(result);
+  document.getElementById('ru-'+id).textContent=tu;
+
+  // Quick reference table - 5 common values
+  var qrVals=[0.1,1,10,100,1000];
+  var qrHtml='<table class="qr-table" style="margin-top:8px;">';
+  qrVals.forEach(function(v){
+    var r;
+    if(c.special&&id==='temp'){r=fromC(toC(v,fu),tu);}
+    else{r=(v/c.factors[fu])*c.factors[tu];}
+    qrHtml+='<tr><td>'+formatNum(v)+' '+fu+'</td><td>'+formatNum(r)+' '+tu+'</td></tr>';
+  });
+  qrHtml+='</table>';
+  document.getElementById('qr-'+id).innerHTML=qrHtml;
+}
+
+function toC(v,u){
+  if(u==='°C')return v;
+  if(u==='°F')return (v-32)*5/9;
+  if(u==='K')return v-273.15;
+  if(u==='°R')return (v-491.67)*5/9;
+  return v;
+}
+function fromC(c,u){
+  if(u==='°C')return c;
+  if(u==='°F')return c*9/5+32;
+  if(u==='K')return c+273.15;
+  if(u==='°R')return (c+273.15)*9/5;
+  return c;
+}
+
+function swap(id){
+  var fu=document.getElementById('fu-'+id);
+  var tu=document.getElementById('tu-'+id);
+  var tmp=fu.value;fu.value=tu.value;tu.value=tmp;
+  conv(id);
+}
+
+function copyResult(id){
+  var v=document.getElementById('rv-'+id).textContent;
+  var u=document.getElementById('ru-'+id).textContent;
+  navigator.clipboard&&navigator.clipboard.writeText(v+' '+u);
+}
+
+function formatNum(n){
+  if(isNaN(n))return '-';
+  if(Math.abs(n)>1e9)return n.toExponential(4);
+  if(Math.abs(n)>1e6)return (n/1e6).toFixed(4)+' M';
+  if(Math.abs(n)>=1000)return n.toFixed(2);
+  if(Math.abs(n)>=1)return n.toPrecision(6).replace(/\.?0+$/,'');
+  if(Math.abs(n)>=0.001)return n.toPrecision(4);
+  return n.toExponential(3);
+}
+
+/* ============================
+   TABS
+   ============================ */
+function swt(n){
+  for(var i=1;i<=4;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    document.getElementById('t'+i).className='tab'+(i===n?' on':'');
+  }
+}
+
+/* ============================
+   MULTI-CONVERT
+   ============================ */
+var pFactors={bar:1,psi:0.0689476,kPa:0.01,MPa:10,atm:1.01325,'kg_cm2':0.980665,'mH2O':0.0980665,'ftH2O':0.02989,'mmHg':0.00133322,inHg:0.0338639};
+var pUnits=[['bar','bar'],['psi','psi'],['kPa','kPa'],['MPa','MPa'],['atm','atm'],['kg_cm2','kgf/cm2'],['mH2O','m H2O'],['ftH2O','ft H2O'],['mmHg','mmHg'],['inHg','inHg']];
+
+var vFactors={bbl:0.158987,m3:1,L:0.001,ft3:0.028317,'gal_us':0.003785,'gal_uk':0.004546,'bbl_d':0.158987/86400,'m3_d':1/86400,'m3_hr':1/3600,'Mcf':28.317,'MMscf':28317,'sm3':1};
+var vUnits=[['bbl','barrel'],['m3','m3'],['L','litre'],['ft3','ft3'],['gal_us','US gal'],['gal_uk','UK gal'],['bbl_d','bbl/day'],['m3_d','m3/day'],['m3_hr','m3/hr'],['Mcf','Mcf'],['MMscf','MMscf'],['sm3','Sm3']];
+
+var dFactors={sg:1000,kg_m3:1,'g_cm3':1000,'ppg':119.826,'lb_ft3':16.0185,'bar_m':101971.6,'psi_ft':22620.7};
+var dUnits=[['kg_m3','kg/m3'],['sg','SG / g/cm3'],['g_cm3','g/cm3'],['ppg','ppg'],['lb_ft3','lb/ft3'],['bar_m','bar/m'],['psi_ft','psi/ft']];
+
+function multiConvert(type){
+  if(type==='p'){
+    var v=parseFloat(document.getElementById('mc-p').value)||0;
+    var u=document.getElementById('mc-p-unit').value;
+    var inBar=v*pFactors[u];
+    document.getElementById('mc-p-out').innerHTML=pUnits.map(function(pu){
+      var r=inBar/pFactors[pu[0]];
+      return '<div class="conv-result"><div class="cr-lbl">'+pu[1]+'</div><div class="cr-val">'+formatNum(r)+'</div></div>';
+    }).join('');
+  }
+  else if(type==='v'){
+    var v=parseFloat(document.getElementById('mc-v').value)||0;
+    var u=document.getElementById('mc-v-unit').value;
+    var inM3=v*vFactors[u];
+    document.getElementById('mc-v-out').innerHTML=vUnits.map(function(vu){
+      var r=inM3/vFactors[vu[0]];
+      return '<div class="conv-result"><div class="cr-lbl">'+vu[1]+'</div><div class="cr-val">'+formatNum(r)+'</div></div>';
+    }).join('');
+  }
+  else if(type==='d'){
+    var v=parseFloat(document.getElementById('mc-d').value)||0;
+    var u=document.getElementById('mc-d-unit').value;
+    var inKgm3=v*dFactors[u];
+    document.getElementById('mc-d-out').innerHTML=dUnits.map(function(du){
+      var r=inKgm3/dFactors[du[0]];
+      return '<div class="conv-result"><div class="cr-lbl">'+du[1]+'</div><div class="cr-val">'+formatNum(r)+'</div></div>';
+    }).join('');
+  }
+  else if(type==='t'){
+    var v=parseFloat(document.getElementById('mc-t').value)||0;
+    var u=document.getElementById('mc-t-unit').value;
+    var inC=toC(v,u==='C'?'°C':u==='F'?'°F':u==='K'?'K':'°R');
+    var units2=[['°C','Celsius'],['°F','Fahrenheit'],['K','Kelvin'],['°R','Rankine']];
+    document.getElementById('mc-t-out').innerHTML=units2.map(function(tu){
+      var r=fromC(inC,tu[0]);
+      return '<div class="conv-result"><div class="cr-lbl">'+tu[1]+'</div><div class="cr-val">'+formatNum(r)+'</div></div>';
+    }).join('');
+  }
+}
+
+/* ============================
+   FIELD FORMULAS
+   ============================ */
+function calcAPI(){
+  var v=parseFloat(document.getElementById('api-in').value)||33.4;
+  var u=document.getElementById('api-unit').value;
+  var api,sg,rho,mass_bbl;
+  if(u==='api'){api=v;sg=141.5/(api+131.5);rho=sg*1000;}
+  else if(u==='sg'){sg=v;api=(141.5/sg)-131.5;rho=sg*1000;}
+  else{rho=v;sg=rho/1000;api=(141.5/sg)-131.5;}
+  mass_bbl=rho*0.158987;
+  var type=api>35?'Light crude':api>25?'Medium crude':api>10?'Heavy crude':'Extra-heavy / bitumen';
+  document.getElementById('api-out').innerHTML=[
+    ['°API gravity',api.toFixed(2)],
+    ['Specific gravity SG',sg.toFixed(4)],
+    ['Density',rho.toFixed(1)+' kg/m3'],
+    ['Mass per barrel',mass_bbl.toFixed(1)+' kg/bbl'],
+    ['Classification',type],
+    ['Mass per tonne',(1000/rho*1000).toFixed(1)+' L/t'],
+  ].map(function(r){return '<div class="conv-result"><div class="cr-lbl">'+r[0]+'</div><div class="cr-val">'+r[1]+'</div></div>';}).join('');
+  document.getElementById('api-formula').innerHTML='<strong>API to SG:</strong> SG = 141.5 / (API + 131.5)<br><strong>SG to API:</strong> API = 141.5 / SG - 131.5<br><strong>Result:</strong> API = '+api.toFixed(2)+'° | SG = '+sg.toFixed(4)+' | rho = '+rho.toFixed(1)+' kg/m3';
+}
+
+function calcFlow(){
+  var qVal=parseFloat(document.getElementById('fl-q').value)||398;
+  var qUnit=document.getElementById('fl-q-unit').value;
+  var dVal=parseFloat(document.getElementById('fl-d').value)||150;
+  var dUnit=document.getElementById('fl-d-unit').value;
+  // Convert to m3/s and m
+  var qFact={'m3_hr':1/3600,'bbl_d':0.158987/86400,'L_s':0.001,'m3_s':1,'gpm':6.30902e-5};
+  var dFact={mm:0.001,inch:0.0254,m:1};
+  var q_m3s=qVal*qFact[qUnit];
+  var d_m=dVal*dFact[dUnit];
+  var A=Math.PI/4*d_m*d_m;
+  var v=q_m3s/A;
+  var Re=1000*v*d_m/0.001; // approx for water
+  var regime=Re<2300?'Laminar':Re<4000?'Transitional':'Turbulent';
+  document.getElementById('fl-out').innerHTML=[
+    ['Velocity',v.toFixed(3)+' m/s'],
+    ['Q in m3/hr',(q_m3s*3600).toFixed(2)+' m3/hr'],
+    ['Q in bbl/day',(q_m3s*86400/0.158987).toFixed(1)+' bbl/d'],
+    ['Q in L/s',(q_m3s*1000).toFixed(2)+' L/s'],
+    ['Pipe area',(A*1e6).toFixed(1)+' cm2'],
+    ['Reynolds (water)',Math.round(Re).toLocaleString()+' - '+regime],
+  ].map(function(r){return '<div class="conv-result"><div class="cr-lbl">'+r[0]+'</div><div class="cr-val">'+r[1]+'</div></div>';}).join('');
+  document.getElementById('fl-formula').innerHTML='<strong>v = Q / A</strong> | Q = '+qVal+' '+qUnit+' = '+(q_m3s*3600).toFixed(3)+' m3/hr<br><strong>A = pi/4 x D2</strong> = pi/4 x '+d_m.toFixed(3)+'2 = '+A.toFixed(5)+' m2<br><strong>v = '+(q_m3s*3600).toFixed(3)+' / 3600 / '+A.toFixed(5)+' = '+v.toFixed(3)+' m/s</strong>';
+}
+
+function calcGas(){
+  var Pr_v=parseFloat(document.getElementById('gas-Pr').value)||200;
+  var Pr_u=document.getElementById('gas-Pr-unit').value;
+  var Tr_v=parseFloat(document.getElementById('gas-Tr').value)||80;
+  var Tr_u=document.getElementById('gas-Tr-unit').value;
+  var Vr_v=parseFloat(document.getElementById('gas-Vr').value)||1;
+  var Vr_u=document.getElementById('gas-Vr-unit').value;
+  var z=parseFloat(document.getElementById('gas-z').value)||0.85;
+  // To SI
+  var pFact={bar:1e5,psi:6894.76,MPa:1e6};
+  var Pr_Pa=Pr_v*pFact[Pr_u];
+  var Tr_K=toC(Tr_v,Tr_u==='C'?'°C':Tr_u==='F'?'°F':'K')+273.15;
+  var vFact={m3:1,bbl:0.158987,ft3:0.028317};
+  var Vr_m3=Vr_v*vFact[Vr_u];
+  // Standard conditions: 101325 Pa, 288.15 K (15°C)
+  var Psc=101325,Tsc=288.15;
+  // Vsc = Vr x Pr/Psc x Tsc/Tr / z (corrected)
+  var Vsc=Vr_m3*(Pr_Pa/Psc)*(Tsc/Tr_K)/z;
+  document.getElementById('gas-out').innerHTML=[
+    ['Volume at std (Sm3)',Vsc.toFixed(2)+' Sm3'],
+    ['Volume at std (Mcf)',(Vsc/28.317).toFixed(3)+' Mcf'],
+    ['Volume at std (ft3)',(Vsc/0.028317).toFixed(0)+' scf'],
+    ['Expansion ratio',(Vsc/Vr_m3).toFixed(1)+'x (res to surface)'],
+    ['Z factor used',z.toFixed(3)+' (compressibility)'],
+    ['Reservoir P',Pr_v+' '+Pr_u+' = '+(Pr_Pa/1e5).toFixed(1)+' bar'],
+  ].map(function(r){return '<div class="conv-result"><div class="cr-lbl">'+r[0]+'</div><div class="cr-val">'+r[1]+'</div></div>';}).join('');
+  document.getElementById('gas-formula').innerHTML='<strong>Vsc = Vr x (Pr/Psc) x (Tsc/Tr) / z</strong><br>= '+Vr_m3.toFixed(3)+' x ('+Pr_Pa.toFixed(0)+' / 101325) x (288.15 / '+Tr_K.toFixed(1)+') / '+z+'<br>= <strong>'+Vsc.toFixed(2)+' Sm3</strong>';
+}
+
+function calcPower(){
+  var v=parseFloat(document.getElementById('pwr-in').value)||132;
+  var u=document.getElementById('pwr-unit').value;
+  var pFact={kW:1,'HP(metric)':0.7355,'HP(US)':0.7457,MW:1000,W:0.001,'BTU/hr':0.000293,'kcal/hr':0.001163,'ft.lbf/s':0.001356};
+  var inKW=v*pFact[u];
+  var units3=[['kW','kilowatt'],['HP(metric)','HP (metric)'],['HP(US)','HP (US/mech)'],['MW','megawatt'],['W','watt'],['BTU/hr','BTU/hr'],['kcal/hr','kcal/hr']];
+  document.getElementById('pwr-out').innerHTML=units3.map(function(pu){
+    var r=inKW/pFact[pu[0]];
+    return '<div class="conv-result"><div class="cr-lbl">'+pu[1]+'</div><div class="cr-val">'+formatNum(r)+'</div></div>';
+  }).join('');
+}
+
+/* ============================
+   INIT
+   ============================ */
+buildCats();
+buildCards();
+converters.forEach(function(c){conv(c.id);});
+multiConvert('p');multiConvert('v');multiConvert('d');multiConvert('t');
+calcAPI();calcFlow();calcGas();calcPower();
+</script>
+</body>
+</html>
