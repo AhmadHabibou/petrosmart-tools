@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cetane Index Calculator - Petrosmart Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#CC0000;--red2:#FF2222;--red-dim:rgba(204,0,0,0.18);
+  --bg:#05050A;--surf:#0C0C14;--card:#101018;
+  --border:#1A1A28;--text:#DEDEE8;--muted:#4A4A60;
+  --ok:#00BB55;--warn:#FF8800;--err:#FF3333;--info:#2266DD;
+  --gold:#FFAA00;--mono:'IBM Plex Mono',monospace;--sans:'Exo 2',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+
+/* HEXAGON PATTERN BACKGROUND */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='52' viewBox='0 0 60 52'%3E%3Cpath d='M30 2L58 18v16L30 50 2 34V18z' fill='none' stroke='rgba(204,0,0,0.04)' stroke-width='1'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;
+}
+
+.wrap{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:18px 14px;}
+
+/* HEADER */
+.hdr{
+  background:linear-gradient(135deg,#0C0C14,#180808,#0C0C14);
+  border:1px solid rgba(204,0,0,0.35);
+  border-radius:18px;padding:20px 24px;margin-bottom:18px;
+  display:flex;align-items:center;gap:16px;
+  box-shadow:0 0 50px rgba(204,0,0,0.08),inset 0 1px 0 rgba(255,255,255,0.04);
+  position:relative;overflow:hidden;
+}
+.hdr::before{
+  content:'CI';position:absolute;right:24px;top:50%;transform:translateY(-50%);
+  font-size:80px;font-weight:800;color:rgba(204,0,0,0.06);font-family:var(--sans);
+  letter-spacing:-0.05em;pointer-events:none;
+}
+.hdr-icon{
+  width:54px;height:54px;
+  background:linear-gradient(135deg,var(--red),#880000);
+  border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-size:26px;flex-shrink:0;
+  box-shadow:0 4px 20px rgba(204,0,0,0.4);
+}
+.hdr h1{font-size:20px;font-weight:800;color:#fff;letter-spacing:0.01em;}
+.hdr p{font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--mono);}
+.hdr-specs{margin-left:auto;display:flex;gap:10px;flex-shrink:0;}
+.spec-pill{background:rgba(204,0,0,0.12);border:1px solid rgba(204,0,0,0.25);
+  border-radius:8px;padding:6px 12px;text-align:center;}
+.spec-val{font-size:15px;font-weight:700;color:var(--red);font-family:var(--mono);}
+.spec-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--surf);border:1px solid var(--border);
+  border-radius:12px;padding:4px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{flex:1;min-width:80px;padding:9px 6px;background:transparent;border:none;
+  border-radius:9px;color:var(--muted);font-size:11px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);text-transform:uppercase;letter-spacing:0.08em;transition:all 0.2s;}
+.tab:hover{color:#bbb;}
+.tab.on{background:var(--red);color:#fff;box-shadow:0 0 16px rgba(204,0,0,0.4);}
+.panel{display:none;}.panel.on{display:block;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px;}
+.stitle{font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;
+  letter-spacing:0.1em;border-bottom:1px solid #131322;padding-bottom:7px;
+  margin-bottom:14px;font-family:var(--mono);display:flex;align-items:center;gap:6px;}
+
+/* FORM */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.field{margin-bottom:12px;}
+.lbl{font-size:10px;color:var(--muted);margin-bottom:5px;display:block;
+  text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.lbl-hint{font-size:9px;color:#333;margin-left:6px;font-weight:400;}
+.ir{display:flex;gap:6px;align-items:center;}
+input[type=number],select{
+  width:100%;background:#080810;border:1px solid #1C1C2C;
+  border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;
+  font-family:var(--mono);transition:border-color 0.2s,box-shadow 0.2s;
+}
+input:focus,select:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(204,0,0,0.12);}
+select option{background:#111;}
+.unit{font-size:10px;color:#333;min-width:50px;text-align:right;
+  white-space:nowrap;font-family:var(--mono);}
+
+/* CI GAUGE */
+.ci-gauge{
+  background:linear-gradient(135deg,#080810,#10101C);
+  border:1px solid var(--border);border-radius:14px;
+  padding:20px;margin-top:16px;text-align:center;
+}
+.ci-number{
+  font-size:72px;font-weight:800;font-family:var(--mono);
+  line-height:1;margin:8px 0;
+  background:linear-gradient(135deg,#fff,var(--red));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.ci-label{font-size:13px;font-weight:600;color:var(--red);
+  text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;}
+.ci-sub{font-size:11px;color:var(--muted);font-family:var(--mono);}
+
+/* GRADE BAR */
+.grade-bar{
+  background:#0A0A14;border:1px solid var(--border);
+  border-radius:10px;padding:12px 16px;margin-top:12px;
+}
+.grade-track{
+  height:12px;border-radius:6px;position:relative;margin:8px 0;
+  background:linear-gradient(90deg,#FF3333 0%,#FF8800 25%,#FFAA00 45%,#00BB55 65%,#00DDAA 85%,#0088FF 100%);
+}
+.grade-marker{
+  position:absolute;top:-4px;width:20px;height:20px;
+  background:#fff;border:3px solid var(--red);border-radius:50%;
+  transform:translateX(-50%);transition:left 0.5s;
+  box-shadow:0 0 12px rgba(204,0,0,0.6);
+}
+.grade-labels{display:flex;justify-content:space-between;font-size:9px;
+  color:var(--muted);font-family:var(--mono);margin-top:4px;}
+
+/* RESULTS */
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.rgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;}
+.rc{background:#080810;border:1px solid var(--border);border-radius:12px;
+  padding:13px 15px;position:relative;overflow:hidden;}
+.rc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.rc.hl::before{background:var(--red);}
+.rc.ok::before{background:var(--ok);}
+.rc.wn::before{background:var(--warn);}
+.rc.er::before{background:var(--err);}
+.rc.inf::before{background:var(--info);}
+.rc.gold::before{background:var(--gold);}
+.rc.hl{border-color:rgba(204,0,0,0.25);}
+.rc.ok{border-color:rgba(0,187,85,0.25);}
+.rc.wn{border-color:rgba(255,136,0,0.25);}
+.rc.er{border-color:rgba(255,51,51,0.25);}
+.rc.inf{border-color:rgba(34,102,221,0.25);}
+.rc.gold{border-color:rgba(255,170,0,0.25);}
+.rl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;
+  margin-bottom:3px;font-family:var(--mono);}
+.rv{font-size:20px;font-weight:700;color:#fff;font-family:var(--mono);}
+.rv span{font-size:10px;color:#444;font-weight:400;}
+.rsub{font-size:10px;color:#444;margin-top:3px;font-family:var(--mono);}
+
+/* FORMULA BOX */
+.fbox{background:#060610;border-left:3px solid var(--red);
+  border-radius:0 10px 10px 0;padding:12px 16px;margin-top:14px;
+  font-size:11px;color:#666;line-height:2.0;font-family:var(--mono);}
+.fbox strong{color:#bbb;}
+.fbox .hi{color:var(--red);font-weight:600;}
+
+/* ANALYSIS */
+.analysis{background:#070710;border:1px solid #121222;
+  border-radius:12px;padding:16px;margin-top:14px;}
+.atitle{font-size:10px;font-weight:700;color:var(--red);margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:0.09em;font-family:var(--mono);}
+.arow{display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #0C0C18;}
+.arow:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;flex-shrink:0;}
+.d-ok{background:var(--ok);box-shadow:0 0 8px var(--ok);}
+.d-wn{background:var(--warn);box-shadow:0 0 8px var(--warn);}
+.d-er{background:var(--err);box-shadow:0 0 8px var(--err);}
+.d-info{background:var(--info);box-shadow:0 0 8px var(--info);}
+.d-gold{background:var(--gold);box-shadow:0 0 8px var(--gold);}
+.atxt strong{color:#eee;font-size:12px;display:block;margin-bottom:3px;}
+.atxt p{font-size:11px;color:#666;line-height:1.7;margin:0;}
+.asugg{font-size:11px;color:var(--gold);margin-top:4px;line-height:1.6;}
+
+/* ALERTS */
+.alert{border-radius:10px;padding:10px 14px;margin-top:10px;font-size:11px;line-height:1.7;font-weight:500;}
+.a-ok{background:rgba(0,187,85,0.07);border:1px solid rgba(0,187,85,0.2);color:var(--ok);}
+.a-er{background:rgba(255,51,51,0.07);border:1px solid rgba(255,51,51,0.2);color:var(--err);}
+.a-wn{background:rgba(255,136,0,0.07);border:1px solid rgba(255,136,0,0.2);color:var(--warn);}
+.a-info{background:rgba(34,102,221,0.07);border:1px solid rgba(34,102,221,0.2);color:#88AAFF;}
+.a-gold{background:rgba(255,170,0,0.07);border:1px solid rgba(255,170,0,0.2);color:var(--gold);}
+
+/* FUEL PRESETS */
+.fuel-btns{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.fbtn{
+  padding:6px 12px;background:#0A0A14;border:1px solid var(--border);
+  border-radius:8px;color:var(--muted);font-size:10px;cursor:pointer;
+  font-family:var(--mono);transition:all 0.15s;letter-spacing:0.03em;
+}
+.fbtn:hover,.fbtn.on{background:var(--red-dim);border-color:var(--red);color:#eee;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.tbl th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;
+  letter-spacing:0.07em;font-family:var(--mono);}
+.tbl td{padding:7px 10px;color:#aaa;border-bottom:1px solid #0C0C18;font-family:var(--mono);}
+.tbl tr:hover td{background:#0C0C14;}
+.tw{color:#fff!important;font-weight:600;}
+.ibox{background:var(--surf);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);
+  line-height:1.7;font-family:var(--mono);}
+.ibox strong{color:#bbb;}
+.sep{height:1px;background:var(--border);margin:14px 0;}
+
+.foot{background:var(--surf);border-top:1px solid var(--border);margin-top:18px;
+  padding:10px 20px;font-size:10px;color:#222;text-align:center;
+  font-family:var(--mono);border-radius:12px;}
+.foot a{color:var(--red);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-icon">⛽</div>
+  <div>
+    <h1>Cetane Index Calculator</h1>
+    <p>Diesel fuel quality assessment - ASTM D976 / D4737 / EN 15195</p>
+  </div>
+  <div class="hdr-specs">
+    <div class="spec-pill"><div class="spec-val">40-55</div><div class="spec-lbl">EN 590 range</div></div>
+    <div class="spec-pill"><div class="spec-val">D976/D4737</div><div class="spec-lbl">Methods</div></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" id="t1" onclick="sw(1)">CI Calculator</button>
+  <button class="tab" id="t2" onclick="sw(2)">CN Estimator</button>
+  <button class="tab" id="t3" onclick="sw(3)">Blend Calculator</button>
+  <button class="tab" id="t4" onclick="sw(4)">Fuel Comparison</button>
+  <button class="tab" id="t5" onclick="sw(5)">Standards Ref.</button>
+</div>
+
+<!-- ===== PANEL 1: CI CALCULATOR ===== -->
+<div class="panel on" id="p1">
+  <div class="card">
+    <div class="stitle">⛽ Fuel type and reference presets</div>
+    <div class="fuel-btns" id="fuel-btns">
+      <button class="fbtn on" onclick="setFuel('en590',840,250,295,'EN 590 Diesel')">EN 590 Diesel</button>
+      <button class="fbtn" onclick="setFuel('astm',845,254,297,'ASTM No.2 Diesel')">ASTM No.2</button>
+      <button class="fbtn" onclick="setFuel('jet_a',800,205,260,'Jet A-1 / Kerosene')">Jet A-1</button>
+      <button class="fbtn" onclick="setFuel('hfo',970,340,390,'Heavy Fuel Oil')">Heavy FO</button>
+      <button class="fbtn" onclick="setFuel('biodiesel',885,340,360,'FAME B100 Biodiesel')">Biodiesel B100</button>
+      <button class="fbtn" onclick="setFuel('gtl',780,240,285,'GTL Diesel (Shell)')">GTL Diesel</button>
+      <button class="fbtn" onclick="setFuel('custom',0,0,0,'Custom fuel')">Custom</button>
+    </div>
+
+    <div class="stitle">/// measured fuel properties</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Density at 15°C <span class="lbl-hint">(ASTM D1298)</span></label>
+        <div class="ir"><input type="number" id="rho15" value="840" step="0.1" oninput="calcCI()"><span class="unit">kg/m3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">T10 - 10% distillation point <span class="lbl-hint">(ASTM D86)</span></label>
+        <div class="ir"><input type="number" id="T10" value="250" step="0.5" oninput="calcCI()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">T50 - 50% distillation point <span class="lbl-hint">(ASTM D86)</span></label>
+        <div class="ir"><input type="number" id="T50" value="280" step="0.5" oninput="calcCI()"><span class="unit">°C</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">T90 - 90% distillation point <span class="lbl-hint">(ASTM D86)</span></label>
+        <div class="ir"><input type="number" id="T90" value="295" step="0.5" oninput="calcCI()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Flash point <span class="lbl-hint">(ASTM D93)</span></label>
+        <div class="ir"><input type="number" id="flash" value="65" step="0.5" oninput="calcCI()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Sulfur content <span class="lbl-hint">(ASTM D5453)</span></label>
+        <div class="ir"><input type="number" id="sulfur" value="10" step="1" oninput="calcCI()"><span class="unit">mg/kg</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Viscosity at 40°C <span class="lbl-hint">(ASTM D445)</span></label>
+        <div class="ir"><input type="number" id="visc" value="3.2" step="0.1" oninput="calcCI()"><span class="unit">mm2/s</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Aromatics content <span class="lbl-hint">(ASTM D5186)</span></label>
+        <div class="ir"><input type="number" id="arom" value="25" step="0.5" oninput="calcCI()"><span class="unit">% vol</span></div>
+      </div>
+    </div>
+
+    <!-- CI GAUGE -->
+    <div class="ci-gauge" id="ci-gauge">
+      <div class="ci-label">Cetane Index (ASTM D4737)</div>
+      <div class="ci-number" id="ci-number">--</div>
+      <div class="ci-sub" id="ci-sub">Enter fuel properties to calculate</div>
+      <div class="grade-bar">
+        <div style="font-size:9px;color:var(--muted);font-family:var(--mono);margin-bottom:4px;">CETANE SCALE (30 - 75)</div>
+        <div class="grade-track"><div class="grade-marker" id="grade-mk" style="left:50%"></div></div>
+        <div class="grade-labels">
+          <span>30 - Very poor</span>
+          <span>40 - Min spec</span>
+          <span>51 - EN 590</span>
+          <span>55 - Premium</span>
+          <span>70 - GTL/synthetics</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="r1"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 2: CN ESTIMATOR ===== -->
+<div class="panel" id="p2">
+  <div class="card">
+    <div class="stitle">/// cetane number estimator from molecular composition</div>
+    <div class="ibox">
+      <strong>Cetane Number (CN) vs Cetane Index (CI):</strong> CN is measured by ASTM D613 engine test (expensive, ~$2,000/test). CI is calculated from distillation and density data per ASTM D976 or D4737 and correlates well with CN for conventional petroleum diesel (±2 CN units typically). CI cannot be used for oxygenated fuels (biodiesel, alcohols) or additized fuels.
+    </div>
+    <div class="stitle">/// molecular class composition (% vol)</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">n-Paraffins (n-alkanes)</label>
+        <div class="ir"><input type="number" id="npar" value="20" step="0.5" oninput="calcCN()"><span class="unit">% vol</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">iso-Paraffins (branched)</label>
+        <div class="ir"><input type="number" id="ipar" value="30" step="0.5" oninput="calcCN()"><span class="unit">% vol</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Naphthenes (cycloalkanes)</label>
+        <div class="ir"><input type="number" id="naph" value="25" step="0.5" oninput="calcCN()"><span class="unit">% vol</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Mono-aromatics</label>
+        <div class="ir"><input type="number" id="monoar" value="18" step="0.5" oninput="calcCN()"><span class="unit">% vol</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Di-aromatics (naphthalenes)</label>
+        <div class="ir"><input type="number" id="diar" value="5" step="0.5" oninput="calcCN()"><span class="unit">% vol</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Poly-aromatics (3+ rings)</label>
+        <div class="ir"><input type="number" id="polyar" value="2" step="0.5" oninput="calcCN()"><span class="unit">% vol</span></div>
+      </div>
+    </div>
+    <div id="r2"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 3: BLEND CALCULATOR ===== -->
+<div class="panel" id="p3">
+  <div class="card">
+    <div class="stitle">/// diesel blend cetane index calculator (up to 4 components)</div>
+    <div class="ibox">
+      <strong>Blending rule:</strong> Cetane Index blends approximately linearly by volume fraction. Cetane Improver additives (2-EHN, di-tert-butyl peroxide) can raise CN by 3-8 units at 0.1-0.5% dose. Biodiesel (FAME) has higher CI (~55-65) but lower energy density.
+    </div>
+    <div id="blend-comps"></div>
+    <div class="field" style="margin-top:10px;">
+      <label class="lbl">Cetane improver additive (2-EHN equivalent)</label>
+      <div class="ir"><input type="number" id="add-dose" value="0" step="0.05" min="0" max="1" oninput="calcBlend()"><span class="unit">% vol</span></div>
+    </div>
+    <div id="r3"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 4: FUEL COMPARISON ===== -->
+<div class="panel" id="p4">
+  <div class="card">
+    <div class="stitle">/// diesel fuel quality comparison - global specifications</div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>EN 590 (EU)</th>
+          <th>ASTM D975 No.2</th>
+          <th>IS 1460 (India)</th>
+          <th>Unit</th>
+          <th>Test method</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="tw">Cetane Number (min)</td><td>51</td><td>40</td><td>51</td><td>-</td><td>ASTM D613</td></tr>
+        <tr><td class="tw">Cetane Index (min)</td><td>46</td><td>40</td><td>46</td><td>-</td><td>ASTM D4737</td></tr>
+        <tr><td class="tw">Density at 15°C</td><td>820-845</td><td>820-850</td><td>820-845</td><td>kg/m3</td><td>ASTM D1298</td></tr>
+        <tr><td class="tw">T95 distillation (max)</td><td>360</td><td>338</td><td>360</td><td>°C</td><td>ASTM D86</td></tr>
+        <tr><td class="tw">Flash point (min)</td><td>55</td><td>52</td><td>35</td><td>°C</td><td>ASTM D93</td></tr>
+        <tr><td class="tw">Sulfur (max)</td><td>10</td><td>500</td><td>10</td><td>mg/kg</td><td>ASTM D5453</td></tr>
+        <tr><td class="tw">Viscosity at 40°C</td><td>2.0-4.5</td><td>1.9-4.1</td><td>2.0-5.0</td><td>mm2/s</td><td>ASTM D445</td></tr>
+        <tr><td class="tw">CFPP (max, winter)</td><td>-20</td><td>-</td><td>-</td><td>°C</td><td>EN 116</td></tr>
+        <tr><td class="tw">PAH (max)</td><td>8</td><td>-</td><td>11</td><td>% wt</td><td>IP 391</td></tr>
+        <tr><td class="tw">Lubricity (max, HFRR)</td><td>460</td><td>-</td><td>460</td><td>µm</td><td>EN ISO 12156</td></tr>
+        <tr><td class="tw">FAME content (max)</td><td>7</td><td>5</td><td>7</td><td>% vol</td><td>EN 14078</td></tr>
+        <tr><td class="tw">Net calorific value (min)</td><td>~42,600</td><td>~42,500</td><td>~43,000</td><td>kJ/kg</td><td>ASTM D240</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sep"></div>
+    <div class="stitle">/// cetane number of pure compounds</div>
+    <table class="tbl">
+      <thead><tr><th>Compound</th><th>Class</th><th>CN</th><th>Boiling point (°C)</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">n-hexadecane (cetane)</td><td>n-paraffin</td><td>100</td><td>287</td><td>CN reference standard = 100</td></tr>
+        <tr><td class="tw">n-dodecane (C12)</td><td>n-paraffin</td><td>74</td><td>216</td><td>High CN, jet fuel range</td></tr>
+        <tr><td class="tw">n-tetradecane (C14)</td><td>n-paraffin</td><td>95</td><td>254</td><td>Very high CN</td></tr>
+        <tr><td class="tw">Isocetane (2,2,4,4,6,8,8-heptamethylnonane)</td><td>iso-paraffin</td><td>15</td><td>240</td><td>CN reference = 15</td></tr>
+        <tr><td class="tw">Decalin (decahydronaphthalene)</td><td>naphthene</td><td>48</td><td>189</td><td>Moderate CN</td></tr>
+        <tr><td class="tw">1-methylnaphthalene</td><td>di-aromatic</td><td>0</td><td>241</td><td>CN = 0, strong inhibitor</td></tr>
+        <tr><td class="tw">α-methylnaphthalene</td><td>di-aromatic</td><td>-2</td><td>244</td><td>Negative CN - antiknock</td></tr>
+        <tr><td class="tw">Toluene</td><td>mono-aromatic</td><td>5</td><td>111</td><td>Strong CN depressant</td></tr>
+        <tr><td class="tw">n-butyl benzene</td><td>mono-aromatic</td><td>17</td><td>183</td><td>Low CN aromatic</td></tr>
+        <tr><td class="tw">FAME (methyl palmitate)</td><td>ester</td><td>74</td><td>415</td><td>Biodiesel component</td></tr>
+        <tr><td class="tw">FAME (methyl oleate)</td><td>ester</td><td>59</td><td>349</td><td>Unsaturated FAME</td></tr>
+        <tr><td class="tw">2-EHN (cetane improver)</td><td>nitrate ester</td><td>~200</td><td>227</td><td>Additive: +3-8 CN at 0.1-0.5%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== PANEL 5: STANDARDS REFERENCE ===== -->
+<div class="panel" id="p5">
+  <div class="card">
+    <div class="stitle">/// ASTM D4737 four-variable cetane index formula</div>
+    <div class="fbox">
+      <strong>ASTM D4737 (recommended, 4-variable):</strong><br>
+      CI = 45.2 + 0.0892 x (T10N) + [0.131 + 0.901 x B] x (T50N) + [0.0523 - 0.420 x B] x (T90N) + 0.00049 x [(T10N)^2 - (T90N)^2] + 107 x B + 60 x B^2<br><br>
+      <strong>where:</strong><br>
+      T10N = T10 - 215 | T50N = T50 - 260 | T90N = T90 - 310<br>
+      B = exp(-0.0035 x (rho15 - 850)) - 1<br>
+      T10, T50, T90 = 10%, 50%, 90% distillation temperatures (°C) per ASTM D86<br>
+      rho15 = density at 15°C (kg/m3) per ASTM D1298 / D4052<br><br>
+      <strong>ASTM D976 (2-variable, older, less accurate):</strong><br>
+      CI = 454.74 - 1641.416 x D + 774.74 x D^2 - 0.554 x B + 97.803 x (log B)^2<br>
+      where D = density at 15°C (g/mL) | B = T50 (°C)<br><br>
+      <strong>Applicability: ASTM D4737 is valid for:</strong><br>
+      - Petroleum-derived middle distillates (diesel, kerosene, jet fuel)<br>
+      - Density range: 800-900 kg/m3<br>
+      - T10: 150-280°C | T50: 200-320°C | T90: 280-380°C<br>
+      - NOT valid for: biodiesel (FAME), oxygenated fuels, additized fuels<br>
+      - Accuracy: ±2 CN units vs measured CN (ASTM D613) for conventional diesel
+    </div>
+    <div class="sep"></div>
+    <div class="stitle">/// cetane number and engine combustion - engineering guide</div>
+    <table class="tbl">
+      <thead><tr><th>CN Range</th><th>Classification</th><th>Ignition delay</th><th>Applications</th><th>Combustion issues</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">&lt; 35</td><td>Very poor</td><td>&gt; 5 ms</td><td>Industrial boilers only</td><td>Severe knock, white smoke, high HC</td></tr>
+        <tr><td class="tw">35-40</td><td>Poor</td><td>3-5 ms</td><td>Non-road, older engines</td><td>Cold start problems, knock, noise</td></tr>
+        <tr><td class="tw">40-46</td><td>Acceptable</td><td>2-3 ms</td><td>Minimum for EN 590</td><td>Marginal cold start, moderate noise</td></tr>
+        <tr><td class="tw">46-51</td><td>Good</td><td>1.5-2 ms</td><td>Standard EN 590 diesel</td><td>Normal operation</td></tr>
+        <tr><td class="tw">51-55</td><td>Very good</td><td>1-1.5 ms</td><td>Premium diesel, EURO 6 vehicles</td><td>Excellent cold start, low noise</td></tr>
+        <tr><td class="tw">55-65</td><td>Excellent</td><td>&lt; 1 ms</td><td>High-performance engines, GTL</td><td>Near-ideal combustion</td></tr>
+        <tr><td class="tw">&gt; 65</td><td>Premium / Synthetic</td><td>&lt; 0.8 ms</td><td>GTL, synthetic paraffinic fuel</td><td>May need pre-injection management</td></tr>
+      </tbody>
+    </table>
+    <div class="sep"></div>
+    <div class="stitle">/// effect of cetane number on engine performance</div>
+    <table class="tbl">
+      <thead><tr><th>Engine parameter</th><th>CN increases from 40 to 55</th><th>Mechanism</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Cold start ability</td><td>Major improvement</td><td>Shorter ignition delay reduces crank time needed</td></tr>
+        <tr><td class="tw">Combustion noise (diesel knock)</td><td>-5 to -8 dB(A)</td><td>Less premixed charge at ignition = softer pressure rise</td></tr>
+        <tr><td class="tw">HC and CO emissions</td><td>-10 to -20%</td><td>More complete combustion during ignition delay</td></tr>
+        <tr><td class="tw">NOx emissions</td><td>-2 to -5%</td><td>Lower peak pressure and temperature</td></tr>
+        <tr><td class="tw">Fuel consumption</td><td>-1 to -2%</td><td>Improved combustion phasing</td></tr>
+        <tr><td class="tw">Particulate (PM) emissions</td><td>-5 to -10%</td><td>Better air-fuel mixing during delay period</td></tr>
+        <tr><td class="tw">White smoke (cold start)</td><td>Eliminated</td><td>Complete oxidation of unburned fuel droplets</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">
+  <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
+  · ASTM D4737 / D976 / D613 / EN 590 · Educational tool - verify results with certified laboratory
+</div>
+</div>
+
+<script>
+/* ====== UTILS ====== */
+function sw(n){
+  for(var i=1;i<=5;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    document.getElementById('t'+i).className='tab'+(i===n?' on':'');
+  }
+}
+function rc(cls,lbl,val,unit,sub){
+  return '<div class="rc '+(cls||'')+'">'
+    +'<div class="rl">'+lbl+'</div>'
+    +'<div class="rv">'+val+(unit?' <span>'+unit+'</span>':'')+'</div>'
+    +(sub?'<div class="rsub">'+sub+'</div>':'')+'</div>';
+}
+function ar(type,title,body,sugg){
+  var d={ok:'d-ok',wn:'d-wn',er:'d-er',info:'d-info',gold:'d-gold'}[type]||'d-info';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+}
+
+/* ====== FUEL PRESETS ====== */
+function setFuel(id,rho,T10,T90,name){
+  document.querySelectorAll('.fbtn').forEach(function(b){b.classList.remove('on');});
+  event.target.classList.add('on');
+  if(rho>0){
+    document.getElementById('rho15').value=rho;
+    document.getElementById('T10').value=T10;
+    document.getElementById('T50').value=Math.round((T10+T90)/2);
+    document.getElementById('T90').value=T90;
+    // Set typical props for each fuel
+    var props={
+      en590:{flash:65,sulfur:10,visc:3.2,arom:25},
+      astm:{flash:60,sulfur:500,visc:3.5,arom:28},
+      jet_a:{flash:38,sulfur:3000,visc:1.5,arom:18},
+      hfo:{flash:60,sulfur:25000,visc:380,arom:40},
+      biodiesel:{flash:120,sulfur:5,visc:4.5,arom:0},
+      gtl:{flash:70,sulfur:1,visc:2.8,arom:0},
+    };
+    if(props[id]){
+      document.getElementById('flash').value=props[id].flash;
+      document.getElementById('sulfur').value=props[id].sulfur;
+      document.getElementById('visc').value=props[id].visc;
+      document.getElementById('arom').value=props[id].arom;
+    }
+  }
+  calcCI();
+}
+
+/* ====== PANEL 1: CI CALCULATOR ====== */
+function calcCI(){
+  var rho=parseFloat(document.getElementById('rho15').value)||840;
+  var T10=parseFloat(document.getElementById('T10').value)||250;
+  var T50=parseFloat(document.getElementById('T50').value)||280;
+  var T90=parseFloat(document.getElementById('T90').value)||295;
+  var flash=parseFloat(document.getElementById('flash').value)||65;
+  var sulfur=parseFloat(document.getElementById('sulfur').value)||10;
+  var visc=parseFloat(document.getElementById('visc').value)||3.2;
+  var arom=parseFloat(document.getElementById('arom').value)||25;
+
+  // ASTM D4737 (4-variable)
+  var T10N=T10-215,T50N=T50-260,T90N=T90-310;
+  var B=Math.exp(-0.0035*(rho-850))-1;
+  var CI_D4737=45.2+0.0892*T10N+(0.131+0.901*B)*T50N+(0.0523-0.420*B)*T90N
+    +0.00049*(T10N*T10N-T90N*T90N)+107*B+60*B*B;
+
+  // ASTM D976 (2-variable)
+  var D=rho/1000;
+  var CI_D976=454.74-1641.416*D+774.74*D*D-0.554*T50+97.803*Math.pow(Math.log10(T50),2);
+
+  // Density correction for comparison
+  var API=(141.5/(rho/1000))-131.5;
+  var SG=rho/1000;
+
+  // Grade
+  var grade,gradeCls,gradeBar;
+  if(CI_D4737>=65){grade='Synthetic / GTL Premium';gradeCls='ok';gradeBar=90;}
+  else if(CI_D4737>=55){grade='Premium Diesel';gradeCls='ok';gradeBar=75;}
+  else if(CI_D4737>=51){grade='EN 590 Compliant';gradeCls='ok';gradeBar=62;}
+  else if(CI_D4737>=46){grade='Min. EN 590 CI spec';gradeCls='wn';gradeBar=49;}
+  else if(CI_D4737>=40){grade='Below EN 590 CN min';gradeCls='wn';gradeBar=33;}
+  else{grade='Off-spec - Very poor ignition';gradeCls='er';gradeBar=15;}
+
+  // Update CI gauge
+  document.getElementById('ci-number').textContent=CI_D4737.toFixed(1);
+  document.getElementById('ci-sub').textContent=grade+' | ASTM D976 result: '+CI_D976.toFixed(1);
+  document.getElementById('grade-mk').style.left=gradeBar+'%';
+
+  // Results
+  var html='<div class="rgrid">';
+  html+=rc('hl','Cetane Index (D4737)',CI_D4737.toFixed(2),'-','4-variable formula (recommended)');
+  html+=rc('','Cetane Index (D976)',CI_D976.toFixed(2),'-','2-variable formula (older)');
+  html+=rc('','Difference D4737-D976',(CI_D4737-CI_D976).toFixed(2),'-','Typically < 2 units');
+  html+=rc('','API Gravity',API.toFixed(1),'°API','SG = '+SG.toFixed(3));
+  html+=rc(gradeCls,'Quality grade',CI_D4737.toFixed(1),'-',grade);
+  html+=rc('','Est. ignition delay',CI_D4737>55?'< 1.0 ms':CI_D4737>46?'1.0-2.0 ms':CI_D4737>40?'2.0-3.5 ms':'> 3.5 ms','-','At rated conditions');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>ASTM D4737:</strong> T10N = '+T10+'-215 = '+T10N.toFixed(1)+' | T50N = '+T50+'-260 = '+T50N.toFixed(1)+' | T90N = '+T90+'-310 = '+T90N.toFixed(1)+'<br>'
+    +'B = exp(-0.0035 x ('+rho+'-850)) - 1 = exp('+(-0.0035*(rho-850)).toFixed(4)+') - 1 = <span class="hi">'+B.toFixed(5)+'</span><br>'
+    +'CI = 45.2 + 0.0892×'+T10N.toFixed(1)+' + (0.131+0.901×'+B.toFixed(4)+')×'+T50N.toFixed(1)+' + (0.0523-0.420×'+B.toFixed(4)+')×'+T90N.toFixed(1)+'<br>'
+    +'   + 0.00049×('+T10N.toFixed(1)+'² - '+T90N.toFixed(1)+'²) + 107×'+B.toFixed(4)+' + 60×'+B.toFixed(4)+'²<br>'
+    +'CI = <span class="hi">'+CI_D4737.toFixed(2)+'</span> (ASTM D4737) | <span class="hi">'+CI_D976.toFixed(2)+'</span> (ASTM D976)'
+    +'</div>';
+
+  // Analysis
+  var rows='';
+
+  // Grade analysis
+  if(CI_D4737<46){
+    rows+=ar('er','BELOW EN 590 / EN 590 MINIMUM CETANE INDEX (46)','Cetane Index of '+CI_D4737.toFixed(1)+' is below the minimum CI of 46 required by EN 590. Even if CN (ASTM D613 engine test) meets the 51 minimum, this CI value triggers regulatory non-compliance for the calculated index.','Options: (1) Add cetane improver (2-EHN or DTBP): +3-8 CI at 0.1-0.5% dose. (2) Blend with high-CI stock (GTL, HVO, paraffinic components). (3) Reduce aromatics by hydrotreatment: each -5% aromatics typically adds +1-2 CI. (4) Adjust distillation by reducing heavy cracker fractions.');
+  } else if(CI_D4737<51){
+    rows+=ar('wn','CI meets EN 590 minimum (46) but below CN minimum (51)','CI of '+CI_D4737.toFixed(1)+' satisfies the calculated index limit (46 min per EN 590) but does not guarantee CN ≥ 51 (engine test required). The gap between CI and CN can be significant for distillates with unusual composition.','Request ASTM D613 engine test to confirm CN ≥ 51. CI is a proxy, not a substitute for CN in the EN 590 specification. For borderline cases, CI ± 2 units uncertainty means this sample could be on either side of the 51 CN limit.');
+  } else {
+    rows+=ar('ok','Cetane Index meets EN 590 specification (CI = '+CI_D4737.toFixed(1)+')','CI of '+CI_D4737.toFixed(1)+' is '+(CI_D4737-51).toFixed(1)+' units above the EN 590 minimum. For conventional petroleum diesel, this correlates with estimated CN of '+(CI_D4737+Math.random()*0.5-0.25).toFixed(0)+' ± 2 units.','');
+  }
+
+  // Sulfur
+  if(sulfur>10&&sulfur<=500){
+    rows+=ar('wn','Sulfur above Euro 5/6 standard ('+sulfur+' mg/kg)','EN 590:2022 max sulfur = 10 mg/kg (Ultra-Low Sulfur Diesel, ULSD). At '+sulfur+' mg/kg, this fuel is not compliant with European emissions regulations. High sulfur accelerates catalyst poisoning in SCR and DPF aftertreatment systems.','Hydrodesulfurization (HDS) required: typical deep HDS removes 99% of sulfur. For 500 mg/kg feed → 10 mg/kg product, the process operates at 350-380°C, 50-80 bar H2, CoMo or NiMo catalyst. Product must also pass ASTM D5453 sulfur test after processing.');
+  } else if(sulfur<=10){
+    rows+=ar('ok','Sulfur content ULSD compliant ('+sulfur+' mg/kg ≤ 10 mg/kg)','Sulfur content meets EN 590 and EPA Ultra-Low Sulfur Diesel requirements. Compatible with all modern diesel aftertreatment systems (SCR, DPF, DOC).','');
+  }
+
+  // Aromatics
+  if(arom>30){
+    rows+=ar('wn','High aromatics content ('+arom+'% vol)','EN 590 does not directly limit mono-aromatics but limits polyaromatics (PAH) to 8% wt. High total aromatics content reduces CN (aromatics: CN ≈ 5-25 vs paraffins: CN ≈ 50-100) and increases particulate emissions.','Aromatics reduction via catalytic hydrogenation (ring saturation) or by blending with paraffinic stocks (GTL, HVO, Fischer-Tropsch distillate). Each -10% aromatics typically increases CI by 2-4 units and reduces PM by 5-8%.');
+  } else if(arom<8){
+    rows+=ar('info','Very low aromatics ('+arom+'% vol) - likely synthetic or HVO fuel','Aromatics below 8% suggests paraffinic synthetic fuel (GTL, HVO, Fischer-Tropsch). These fuels typically have CI > 70 and excellent cold flow properties but may have low lubricity requiring additive treatment (FAME blend or lubricity improver at 50-200 mg/kg).','Verify HFRR lubricity ≤ 460 µm (EN ISO 12156). Neat synthetic paraffins (CI > 70) may require lubricity improver additization if no FAME is blended. Typical dose: Milezyme 5000 or equivalent at 100-200 mg/kg.');
+  }
+
+  // Flash point safety
+  if(flash<55){
+    rows+=ar('wn','Flash point below EN 590 minimum ('+flash+'°C < 55°C)','Flash point of '+flash+'°C is below the EN 590 minimum of 55°C. This indicates possible contamination with gasoline or lighter fractions, which creates a fire hazard during storage, transport and handling.','Investigate source of light contamination. Possible causes: gasoline splash from retail pump, contaminated tankage, refinery fractionation column misoperation. ASTM D93 (Pensky-Martens closed cup) is the required test. Discard or reprocess if flash point < 55°C.');
+  }
+
+  // Viscosity
+  if(visc<2.0||visc>4.5){
+    rows+=ar('wn','Viscosity out of EN 590 range ('+visc+' mm2/s vs 2.0-4.5 mm2/s)','Viscosity '+visc+' mm2/s is outside the EN 590 range of 2.0-4.5 mm2/s at 40°C. Low viscosity causes poor injection system lubrication; high viscosity causes poor atomization and incomplete combustion.','For viscosity blending: log(visc_blend) = x1×log(visc1) + x2×log(visc2) (volume fraction weighted). Low-viscosity stock: kerosene at ~1.5 mm2/s. High-viscosity cutter: light VGO at ~8-15 mm2/s. Adjust blend ratio to target 3.0-4.0 mm2/s for optimal performance.');
+  }
+
+  html+='<div class="analysis"><div class="atitle">/// FUEL QUALITY ANALYSIS AND RECOMMENDATIONS</div>'+rows+'</div>';
+  document.getElementById('r1').innerHTML=html;
+}
+
+/* ====== PANEL 2: CN ESTIMATOR ====== */
+function calcCN(){
+  var npar=parseFloat(document.getElementById('npar').value)||20;
+  var ipar=parseFloat(document.getElementById('ipar').value)||30;
+  var naph=parseFloat(document.getElementById('naph').value)||25;
+  var monoar=parseFloat(document.getElementById('monoar').value)||18;
+  var diar=parseFloat(document.getElementById('diar').value)||5;
+  var polyar=parseFloat(document.getElementById('polyar').value)||2;
+  var total=npar+ipar+naph+monoar+diar+polyar;
+
+  // CN of each molecular class (literature values)
+  // n-paraffins C12-C16: CN 74-100, avg ~82
+  // iso-paraffins: CN 15-50, avg ~30
+  // naphthenes: CN 40-55, avg ~48
+  // mono-aromatics: CN 5-20, avg ~12
+  // di-aromatics: CN 0-5, avg ~3
+  // poly-aromatics: CN < 0, avg ~-5
+  var CN_npar=82,CN_ipar=30,CN_naph=48,CN_monoar=12,CN_diar=3,CN_polyar=-3;
+
+  // Volume-fraction weighted CN
+  var CN_est;
+  if(total>0){
+    CN_est=(npar*CN_npar+ipar*CN_ipar+naph*CN_naph+monoar*CN_monoar+diar*CN_diar+polyar*CN_polyar)/total;
+  } else CN_est=0;
+
+  // Accuracy note: this is approximate. Real CN depends on specific carbon number distribution.
+  var totalCheck=total!==100;
+  var html='';
+
+  if(Math.abs(total-100)>0.1){
+    html+='<div class="alert a-wn">Total composition = '+total.toFixed(1)+'% (should be 100%). Results are normalized.</div>';
+  }
+
+  html+='<div class="rgrid">';
+  html+=rc('hl','Estimated CN',CN_est.toFixed(1),'-','Molecular class model');
+  html+=rc('','n-Paraffins contribution',(npar/Math.max(total,1)*CN_npar).toFixed(1),'-',npar.toFixed(1)+'% x CN='+CN_npar);
+  html+=rc('','iso-Paraffins contribution',(ipar/Math.max(total,1)*CN_ipar).toFixed(1),'-',ipar.toFixed(1)+'% x CN='+CN_ipar);
+  html+=rc('','Naphthenes contribution',(naph/Math.max(total,1)*CN_naph).toFixed(1),'-',naph.toFixed(1)+'% x CN='+CN_naph);
+  html+=rc('','Mono-aromatics contribution',(monoar/Math.max(total,1)*CN_monoar).toFixed(1),'-',monoar.toFixed(1)+'% x CN='+CN_monoar);
+  html+=rc((diar+polyar>10)?'wn':'','Di+Poly-aromatics contribution',((diar*CN_diar+polyar*CN_polyar)/Math.max(total,1)).toFixed(1),'-',(diar+polyar).toFixed(1)+'% total PAH');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>CN (estimated):</strong> = SUM(xi x CNi) / SUM(xi)<br>'
+    +'= ('+npar+'×'+CN_npar+' + '+ipar+'×'+CN_ipar+' + '+naph+'×'+CN_naph+' + '+monoar+'×'+CN_monoar+' + '+diar+'×'+CN_diar+' + '+polyar+'×'+CN_polyar+') / '+total.toFixed(1)+'<br>'
+    +'= <span class="hi">'+CN_est.toFixed(2)+'</span><br>'
+    +'<strong>Note:</strong> Model uses class-average CN values. Accuracy ±5-8 CN units.<br>'
+    +'<strong>For precise CN:</strong> ASTM D613 engine test required (~$2,000 per test).'
+    +'</div>';
+
+  var rows='';
+  if((diar+polyar)>10){
+    rows+=ar('wn','High polyaromatic content ('+(diar+polyar).toFixed(1)+'% di+poly aromatics)','Poly-aromatic hydrocarbons (PAH) significantly depress CN. Di-aromatics (CN ≈ 3) and poly-aromatics (CN < 0) reduce ignition quality and increase particulate emissions. At '+(diar+polyar).toFixed(1)+'%, PAH impact is significant.','PAH reduction: catalytic hydrogenation (ring saturation) converts naphthalenes → decalins (CN ≈ 48). Operating conditions: 300-380°C, 60-80 bar H2, NiMo catalyst. Cost: $2-5/bbl for deep PAH saturation.');
+  }
+  if(npar>50){
+    rows+=ar('ok','High n-paraffin content ('+npar+'%) - excellent CN potential','Rich n-paraffin content drives high estimated CN of '+CN_est.toFixed(0)+'. This composition is typical of GTL (Gas-to-Liquid) or Fischer-Tropsch distillates. Such fuels have excellent ignition quality but may have cold flow issues (high pour point, high cloud point).','For cold climates: blend with iso-paraffin-rich streams to lower cloud point. CFPP additive treatment (ethylene-vinyl acetate copolymers) can extend cold operability by 10-15°C without significantly impacting CN.');
+  }
+  if(!rows) rows=ar('info','Molecular composition within typical diesel range','Estimated CN of '+CN_est.toFixed(0)+' is consistent with a '+(CN_est>51?'good quality commercial diesel':CN_est>46?'standard diesel':CN_est>40?'marginal quality diesel':'poor quality diesel')+'. For production control, monitor refinery LIMS for real-time molecular class data from GC-MS or PIONA analysis.','');
+
+  html+='<div class="analysis"><div class="atitle">/// MOLECULAR COMPOSITION ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r2').innerHTML=html;
+}
+
+/* ====== PANEL 3: BLEND CALCULATOR ====== */
+var blendComps=[
+  {name:'EN 590 Base Diesel',ci:52,vol:70,rho:840},
+  {name:'GTL Diesel',ci:73,vol:20,rho:780},
+  {name:'FAME Biodiesel B100',ci:58,vol:10,rho:885},
+];
+
+function renderBlend(){
+  var f=document.getElementById('blend-comps');
+  f.innerHTML=blendComps.map(function(c,i){
+    return '<div style="background:#080810;border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;">'
+      +'<div style="font-size:10px;color:var(--red);font-family:var(--mono);margin-bottom:10px;">COMPONENT '+(i+1)+'</div>'
+      +'<div class="row3">'
+        +'<div class="field"><label class="lbl">Fuel name</label><input type="text" id="bn'+i+'" value="'+c.name+'" oninput="updateBlend('+i+')" style="width:100%;background:#0A0A14;border:1px solid var(--border);border-radius:8px;color:#fff;font-size:13px;padding:8px 10px;font-family:var(--mono);"></div>'
+        +'<div class="field"><label class="lbl">Cetane Index</label><div class="ir"><input type="number" id="bci'+i+'" value="'+c.ci+'" oninput="updateBlend('+i+')" style="background:#0A0A14;border:1px solid var(--border);border-radius:8px;color:#fff;font-size:13px;padding:8px 10px;font-family:var(--mono);width:100%;"><span class="unit">CI</span></div></div>'
+        +'<div class="field"><label class="lbl">Volume fraction</label><div class="ir"><input type="number" id="bvol'+i+'" value="'+c.vol+'" oninput="updateBlend('+i+')" style="background:#0A0A14;border:1px solid var(--border);border-radius:8px;color:#fff;font-size:13px;padding:8px 10px;font-family:var(--mono);width:100%;"><span class="unit">%</span></div></div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  calcBlend();
+}
+
+function updateBlend(i){
+  blendComps[i].name=document.getElementById('bn'+i).value||blendComps[i].name;
+  blendComps[i].ci=parseFloat(document.getElementById('bci'+i).value)||blendComps[i].ci;
+  blendComps[i].vol=parseFloat(document.getElementById('bvol'+i).value)||blendComps[i].vol;
+  calcBlend();
+}
+
+function calcBlend(){
+  var totalVol=0,weightedCI=0;
+  blendComps.forEach(function(c,i){
+    totalVol+=c.vol;
+    weightedCI+=c.ci*c.vol;
+  });
+  var addDose=parseFloat(document.getElementById('add-dose').value)||0;
+  // Cetane improver effect: each 0.1% 2-EHN adds ~3-4 CI (diminishing returns)
+  var addEffect=addDose>0?Math.min(addDose*35*(1-addDose*0.5),8):0;
+  var blendCI=totalVol>0?weightedCI/totalVol:0;
+  var finalCI=blendCI+addEffect;
+
+  var html='';
+  if(Math.abs(totalVol-100)>0.5){
+    html+='<div class="alert a-wn">Total volume = '+totalVol.toFixed(1)+'% (should be 100%). Results normalized.</div>';
+  }
+
+  html+='<div class="rgrid">';
+  html+=rc('hl','Blend CI (volume-weighted)',blendCI.toFixed(2),'-','Before additive');
+  html+=rc('hl','Final CI (with improver)',finalCI.toFixed(2),'-',addDose>0?'+'+addEffect.toFixed(1)+' from '+addDose+'% 2-EHN':'No additive');
+  html+=rc(finalCI>=51?'ok':finalCI>=46?'wn':'er','EN 590 CN compliance',finalCI>=51?'PASS':finalCI>=46?'CI OK / CN test req.':'FAIL','-',finalCI>=51?'CI ≥ 46, CN likely ≥ 51':'Below EN 590 requirements');
+  html+=rc('','Additive CI boost',addEffect.toFixed(1),'CI units',addDose>0?addDose+'% 2-EHN equivalent':'0% additive dose');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Blending rule (linear by volume):</strong><br>'
+    +blendComps.map(function(c,i){return 'Component '+(i+1)+' ('+c.name+'): '+c.vol+'% x CI '+c.ci+' = '+(c.vol*c.ci/100).toFixed(2);}).join('<br>')+'\n'
+    +'Blend CI (before additive) = '+(weightedCI/Math.max(totalVol,1)).toFixed(2)+'<br>'
+    +(addDose>0?'2-EHN boost = +'+addEffect.toFixed(2)+' CI at '+addDose+'% dose<br>Final CI = <span class="hi">'+finalCI.toFixed(2)+'</span>':'Final CI = <span class="hi">'+finalCI.toFixed(2)+'</span>')
+    +'</div>';
+
+  var rows='';
+  if(finalCI>=51){
+    rows+=ar('ok','Blend meets EN 590 minimum cetane requirements','Final CI of '+finalCI.toFixed(1)+' exceeds the EN 590 minimum CN of 51 (CI minimum 46). The blend appears compliant. Recommend verifying with ASTM D613 engine test before product release, especially for first-time blends.','');
+  } else if(finalCI>=46){
+    rows+=ar('wn','Blend CI acceptable but CN engine test required','CI of '+finalCI.toFixed(1)+' meets the minimum CI of 46 but may not guarantee CN ≥ 51 (the EN 590 engine test requirement). EN 590 mandates both CI ≥ 46 AND CN ≥ 51 when tested.','Increase cetane improver dose to '+(addDose+0.1).toFixed(1)+'% for an additional '+(0.1*30).toFixed(0)+' CI points. Alternatively increase GTL/paraffinic fraction in the blend by '+(Math.ceil((51-finalCI)/0.3))+'% to achieve target CI.');
+  } else {
+    rows+=ar('er','Blend FAILS minimum cetane specification','Final CI of '+finalCI.toFixed(1)+' is '+(51-finalCI).toFixed(1)+' units below the minimum. Significant reformulation required.','Required additional cetane improvement: +'+(51-finalCI).toFixed(1)+' CI units. Options: Increase cetane improver to '+Math.min(0.5,addDose+(51-finalCI)/30).toFixed(2)+'% or increase paraffinic blending stock by '+Math.round((51-finalCI)/0.3)+'% volume.');
+  }
+
+  html+='<div class="analysis"><div class="atitle">/// BLEND ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r3').innerHTML=html;
+}
+
+/* ====== INIT ====== */
+renderBlend();
+calcCI();
+calcCN();
+</script>
+</body>
+</html>
