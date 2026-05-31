@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipe Wall Thickness Calculator - Petrosmart Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#CC0000;--red2:#FF2222;--dark:#070707;--card:#101010;
+  --border:#1E1E1E;--text:#E0E0E0;--muted:#555;
+  --ok:#00CC66;--warn:#FF8800;--err:#FF3333;--info:#3388FF;
+  --mono:'JetBrains Mono',monospace;--sans:'Rajdhani',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--dark);color:var(--text);font-family:var(--sans);min-height:100vh;}
+
+/* BACKGROUND PATTERN */
+body::before{content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(204,0,0,0.03) 39px,rgba(204,0,0,0.03) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(204,0,0,0.03) 39px,rgba(204,0,0,0.03) 40px);
+  pointer-events:none;z-index:0;}
+
+.wrap{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:20px 16px;}
+
+/* HEADER */
+.hdr{background:linear-gradient(120deg,#AA0000,#CC0000 60%,#880000);
+  border-radius:16px;padding:18px 24px;margin-bottom:20px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 6px 30px rgba(204,0,0,0.3);overflow:hidden;position:relative;}
+.hdr::before{content:'';position:absolute;right:-30px;top:-30px;
+  width:140px;height:140px;border-radius:50%;border:2px solid rgba(255,255,255,0.08);}
+.hdr::after{content:'';position:absolute;right:20px;top:20px;
+  width:70px;height:70px;border-radius:50%;border:1px solid rgba(255,255,255,0.06);}
+.hdr-icon{width:48px;height:48px;background:rgba(0,0,0,0.3);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.hdr h1{font-size:20px;font-weight:700;color:#fff;letter-spacing:0.05em;}
+.hdr p{font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;font-family:var(--mono);}
+.hdr-badge{margin-left:auto;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);
+  border-radius:8px;padding:6px 12px;text-align:center;flex-shrink:0;}
+.hdr-badge div:first-child{font-size:9px;color:rgba(255,255,255,0.6);font-family:var(--mono);text-transform:uppercase;}
+.hdr-badge div:last-child{font-size:12px;color:#fff;font-weight:600;font-family:var(--mono);}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:#0A0A0A;border:1px solid var(--border);
+  border-radius:12px;padding:4px;margin-bottom:20px;flex-wrap:wrap;}
+.tab{flex:1;min-width:90px;padding:9px 6px;background:transparent;border:none;
+  border-radius:9px;color:var(--muted);font-size:11px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);text-transform:uppercase;letter-spacing:0.08em;transition:all 0.2s;}
+.tab:hover{color:#ccc;}
+.tab.on{background:var(--red);color:#fff;box-shadow:0 0 16px rgba(204,0,0,0.35);}
+
+.panel{display:none;} .panel.on{display:block;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px;}
+.stitle{font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;
+  letter-spacing:0.1em;border-bottom:1px solid #161616;padding-bottom:7px;margin-bottom:14px;font-family:var(--mono);}
+
+/* GRID */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+
+/* FORM */
+.field{margin-bottom:12px;}
+.lbl{font-size:10px;color:var(--muted);margin-bottom:5px;display:block;
+  text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.ir{display:flex;gap:6px;align-items:center;}
+input[type=number],select{width:100%;background:#0D0D0D;border:1px solid #252525;
+  border-radius:8px;color:#fff;font-size:13px;padding:8px 11px;outline:none;
+  font-family:var(--mono);transition:border-color 0.2s;}
+input:focus,select:focus{border-color:var(--red);}
+select option{background:#111;}
+.unit{font-size:10px;color:#444;min-width:50px;text-align:right;white-space:nowrap;font-family:var(--mono);}
+
+/* RESULT CARDS */
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px;}
+.rgrid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;}
+.rc{background:#0A0A0A;border:1px solid var(--border);border-radius:12px;padding:13px 15px;
+  position:relative;overflow:hidden;}
+.rc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.rc.hl::after{background:var(--red);}
+.rc.ok::after{background:var(--ok);}
+.rc.wn::after{background:var(--warn);}
+.rc.er::after{background:var(--err);}
+.rc.inf::after{background:var(--info);}
+.rc.hl{border-color:rgba(204,0,0,0.25);}
+.rc.ok{border-color:rgba(0,204,102,0.25);}
+.rc.wn{border-color:rgba(255,136,0,0.25);}
+.rc.er{border-color:rgba(255,51,51,0.25);}
+.rc.inf{border-color:rgba(51,136,255,0.25);}
+.rl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;font-family:var(--mono);}
+.rv{font-size:20px;font-weight:700;color:#fff;font-family:var(--mono);}
+.rv span{font-size:10px;color:#555;font-weight:400;}
+.rsub{font-size:10px;color:#555;margin-top:3px;font-family:var(--mono);}
+
+/* FORMULA */
+.fbox{background:#090909;border-left:3px solid var(--red);border-radius:0 10px 10px 0;
+  padding:12px 16px;margin-top:14px;font-size:11px;color:#777;line-height:2.0;font-family:var(--mono);}
+.fbox strong{color:#ccc;}
+.fbox .hi{color:var(--red);font-weight:600;}
+
+/* ANALYSIS */
+.analysis{background:#080808;border:1px solid #141414;border-radius:12px;padding:16px;margin-top:14px;}
+.atitle{font-size:10px;font-weight:700;color:var(--red);margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:0.09em;font-family:var(--mono);}
+.arow{display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #0E0E0E;}
+.arow:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.d-ok{background:var(--ok);box-shadow:0 0 8px var(--ok);}
+.d-wn{background:var(--warn);box-shadow:0 0 8px var(--warn);}
+.d-er{background:var(--err);box-shadow:0 0 8px var(--err);}
+.d-info{background:var(--info);box-shadow:0 0 8px var(--info);}
+.atxt strong{color:#eee;font-size:12px;display:block;margin-bottom:3px;}
+.atxt p{font-size:11px;color:#777;line-height:1.7;margin:0;}
+.asugg{font-size:11px;color:#FFAA00;margin-top:4px;line-height:1.6;}
+
+/* ALERTS */
+.alert{border-radius:10px;padding:10px 14px;margin-top:10px;font-size:11px;line-height:1.7;}
+.a-ok{background:rgba(0,204,102,0.07);border:1px solid rgba(0,204,102,0.2);color:#00CC66;}
+.a-er{background:rgba(255,51,51,0.07);border:1px solid rgba(255,51,51,0.2);color:#FF5555;}
+.a-wn{background:rgba(255,136,0,0.07);border:1px solid rgba(255,136,0,0.2);color:#FFA500;}
+.a-info{background:rgba(51,136,255,0.07);border:1px solid rgba(51,136,255,0.2);color:#88AAFF;}
+
+/* PIPE VISUAL */
+.pipe-vis{display:flex;align-items:center;justify-content:center;
+  padding:20px;background:#090909;border-radius:12px;margin-top:14px;}
+.pipe-svg{width:100%;max-width:400px;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.tbl th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid #181818;font-size:9px;text-transform:uppercase;
+  letter-spacing:0.07em;font-family:var(--mono);}
+.tbl td{padding:7px 10px;color:#bbb;border-bottom:1px solid #0E0E0E;font-family:var(--mono);}
+.tbl tr:hover td{background:#111;cursor:pointer;}
+.tw{color:#fff!important;font-weight:600;}
+
+/* SCHEDULE SELECTOR */
+.sch-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px;}
+.sch-btn{background:#0D0D0D;border:1px solid #222;border-radius:8px;
+  padding:8px 6px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.sch-btn:hover,.sch-btn.on{background:rgba(204,0,0,0.15);border-color:var(--red);}
+.sch-name{font-size:11px;color:#ccc;font-weight:600;}
+.sch-t{font-size:10px;color:var(--muted);font-family:var(--mono);}
+
+.sep{height:1px;background:#141414;margin:16px 0;}
+.ibox{background:#0D0D0D;border:1px solid #1A1A1A;border-radius:8px;
+  padding:10px 14px;margin-bottom:12px;font-size:11px;color:#777;line-height:1.7;font-family:var(--mono);}
+.ibox strong{color:#bbb;}
+
+.foot{background:#090909;border-top:1px solid #141414;margin-top:20px;
+  padding:12px 20px;font-size:10px;color:#333;text-align:center;
+  font-family:var(--mono);border-radius:12px;}
+.foot a{color:var(--red);text-decoration:none;}
+
+/* MATERIAL PRESETS */
+.mat-btns{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.mbtn{padding:5px 11px;background:#0D0D0D;border:1px solid #222;
+  border-radius:6px;color:#999;font-size:10px;cursor:pointer;
+  font-family:var(--mono);transition:all 0.15s;letter-spacing:0.03em;}
+.mbtn:hover,.mbtn.on{background:rgba(204,0,0,0.15);border-color:var(--red);color:#eee;}
+
+/* COMPLIANCE BADGE */
+.comply{display:inline-flex;align-items:center;gap:6px;
+  padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;
+  font-family:var(--mono);margin-top:6px;}
+.comply.pass{background:rgba(0,204,102,0.12);color:var(--ok);border:1px solid rgba(0,204,102,0.25);}
+.comply.fail{background:rgba(255,51,51,0.12);color:var(--err);border:1px solid rgba(255,51,51,0.25);}
+.comply.check{background:rgba(255,136,0,0.12);color:var(--warn);border:1px solid rgba(255,136,0,0.25);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-icon">🔩</div>
+  <div>
+    <h1>Pipe Wall Thickness Calculator</h1>
+    <p>ASME B31.3 / B31.4 / B31.8 / API 5L - Petroleum Pipeline Design</p>
+  </div>
+  <div class="hdr-badge">
+    <div>Standard</div>
+    <div>ASME B31.3</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" id="t1" onclick="sw(1)">B31.3 Design</button>
+  <button class="tab" id="t2" onclick="sw(2)">Pressure Rating</button>
+  <button class="tab" id="t3" onclick="sw(3)">Hoop Stress</button>
+  <button class="tab" id="t4" onclick="sw(4)">Schedule Selector</button>
+  <button class="tab" id="t5" onclick="sw(5)">Material Reference</button>
+</div>
+
+<!-- ===== PANEL 1: B31.3 DESIGN ===== -->
+<div class="panel on" id="p1">
+  <div class="card">
+    <div class="stitle">/// material selection</div>
+    <div class="mat-btns" id="mat-btns">
+      <button class="mbtn on" onclick="setMat('a106b',241,'A106 Gr.B CS')">A106 Gr.B</button>
+      <button class="mbtn" onclick="setMat('a53b',207,'A53 Gr.B CS')">A53 Gr.B</button>
+      <button class="mbtn" onclick="setMat('api5lx52',358,'API 5L X52')">API 5L X52</button>
+      <button class="mbtn" onclick="setMat('api5lx65',448,'API 5L X65')">API 5L X65</button>
+      <button class="mbtn" onclick="setMat('api5lx70',482,'API 5L X70')">API 5L X70</button>
+      <button class="mbtn" onclick="setMat('304ss',138,'304 SS')">304 SS</button>
+      <button class="mbtn" onclick="setMat('316ss',138,'316 SS')">316 SS</button>
+      <button class="mbtn" onclick="setMat('duplex',450,'Duplex 2205')">Duplex 2205</button>
+      <button class="mbtn" onclick="setMat('custom',0,'Custom')">Custom</button>
+    </div>
+
+    <div class="stitle">/// design parameters</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Design pressure P</label>
+        <div class="ir"><input type="number" id="P" value="100" step="1" oninput="calc1()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Outside diameter OD</label>
+        <div class="ir"><input type="number" id="OD" value="168.3" step="0.1" oninput="calc1()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Allowable stress S</label>
+        <div class="ir"><input type="number" id="S" value="241" step="1" oninput="calc1()"><span class="unit">MPa</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Quality factor E</label>
+        <select id="E" onchange="calc1()">
+          <option value="1.0">1.0 - Seamless pipe</option>
+          <option value="0.85">0.85 - ERW / SAW</option>
+          <option value="0.80">0.80 - Furnace butt weld</option>
+          <option value="0.60">0.60 - Furnace lap weld</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Weld joint factor W</label>
+        <select id="W" onchange="calc1()">
+          <option value="1.0">1.0 - Weld examined</option>
+          <option value="0.85">0.85 - Random exam</option>
+          <option value="0.70">0.70 - No examination</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Temperature factor Y</label>
+        <select id="Y" onchange="calc1()">
+          <option value="0.4">0.4 - T ≤ 482°C (ferritics)</option>
+          <option value="0.5">0.5 - T 482-510°C</option>
+          <option value="0.7">0.7 - T 510-566°C</option>
+          <option value="0.4">0.4 - Austenitic SS all T</option>
+        </select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Corrosion allowance c</label>
+        <div class="ir"><input type="number" id="c1" value="3" step="0.5" oninput="calc1()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Mill tolerance (negative)</label>
+        <div class="ir"><input type="number" id="mill" value="12.5" step="0.5" oninput="calc1()"><span class="unit">%</span></div>
+      </div>
+    </div>
+
+    <div id="r1"></div>
+
+    <!-- Pipe cross-section SVG -->
+    <div class="pipe-vis" id="pipe-vis1">
+      <svg class="pipe-svg" viewBox="0 0 400 200" id="pipe-svg1">
+        <text x="200" y="100" text-anchor="middle" fill="#333" font-size="12" font-family="JetBrains Mono">Calculate to see pipe cross-section</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 2: PRESSURE RATING ===== -->
+<div class="panel" id="p2">
+  <div class="card">
+    <div class="stitle">/// pressure rating from existing pipe dimensions</div>
+    <div class="ibox">Given actual pipe dimensions and material, calculate the maximum allowable operating pressure (MAOP / MAWP) per ASME B31.3 and API 5L.</div>
+
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Outside diameter OD</label>
+        <div class="ir"><input type="number" id="p2_OD" value="168.3" step="0.1" oninput="calc2()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Nominal wall thickness t</label>
+        <div class="ir"><input type="number" id="p2_t" value="7.11" step="0.01" oninput="calc2()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Corrosion allowance c</label>
+        <div class="ir"><input type="number" id="p2_c" value="3" step="0.5" oninput="calc2()"><span class="unit">mm</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Allowable stress S</label>
+        <div class="ir"><input type="number" id="p2_S" value="241" step="1" oninput="calc2()"><span class="unit">MPa</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Quality factor E</label>
+        <select id="p2_E" onchange="calc2()">
+          <option value="1.0">1.0 - Seamless</option>
+          <option value="0.85">0.85 - ERW/SAW</option>
+          <option value="0.80">0.80 - Butt weld</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Mill tolerance</label>
+        <div class="ir"><input type="number" id="p2_mill" value="12.5" step="0.5" oninput="calc2()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Operating pressure to check</label>
+      <div class="ir"><input type="number" id="p2_Pop" value="80" step="1" oninput="calc2()"><span class="unit">bar</span></div>
+    </div>
+
+    <div id="r2"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 3: HOOP STRESS ===== -->
+<div class="panel" id="p3">
+  <div class="card">
+    <div class="stitle">/// hoop stress and stress analysis</div>
+    <div class="ibox">Calculates circumferential (hoop), longitudinal and radial stresses using Lamé equations for thick-walled cylinders or thin-wall approximation (Barlow formula). Includes von Mises equivalent stress and safety factor.</div>
+
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Outside diameter OD</label>
+        <div class="ir"><input type="number" id="h_OD" value="168.3" step="0.1" oninput="calc3()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Wall thickness t</label>
+        <div class="ir"><input type="number" id="h_t" value="7.11" step="0.01" oninput="calc3()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Internal pressure P</label>
+        <div class="ir"><input type="number" id="h_P" value="100" step="1" oninput="calc3()"><span class="unit">bar</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Material yield strength SMYS</label>
+        <div class="ir"><input type="number" id="h_SMYS" value="241" step="1" oninput="calc3()"><span class="unit">MPa</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Axial load F (tension +)</label>
+        <div class="ir"><input type="number" id="h_F" value="0" step="1" oninput="calc3()"><span class="unit">kN</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Design factor (SMYS fraction)</label>
+        <div class="ir"><input type="number" id="h_df" value="0.72" step="0.01" oninput="calc3()"><span class="unit">-</span></div>
+      </div>
+    </div>
+
+    <div id="r3"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 4: SCHEDULE SELECTOR ===== -->
+<div class="panel" id="p4">
+  <div class="card">
+    <div class="stitle">/// ASME B36.10 / B36.19 pipe schedule selector</div>
+    <div class="ibox">Select nominal pipe size (NPS) and schedule. Displays all available schedules with wall thickness, weight and pressure rating.</div>
+
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Nominal pipe size NPS</label>
+        <select id="nps-sel" onchange="calcSch()">
+          <option value="0.5">NPS 1/2 (DN 15)</option>
+          <option value="0.75">NPS 3/4 (DN 20)</option>
+          <option value="1">NPS 1 (DN 25)</option>
+          <option value="1.5">NPS 1-1/2 (DN 40)</option>
+          <option value="2">NPS 2 (DN 50)</option>
+          <option value="3">NPS 3 (DN 80)</option>
+          <option value="4">NPS 4 (DN 100)</option>
+          <option value="6" selected>NPS 6 (DN 150)</option>
+          <option value="8">NPS 8 (DN 200)</option>
+          <option value="10">NPS 10 (DN 250)</option>
+          <option value="12">NPS 12 (DN 300)</option>
+          <option value="14">NPS 14 (DN 350)</option>
+          <option value="16">NPS 16 (DN 400)</option>
+          <option value="18">NPS 18 (DN 450)</option>
+          <option value="20">NPS 20 (DN 500)</option>
+          <option value="24">NPS 24 (DN 600)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Material allowable stress (for P rating)</label>
+        <div class="ir"><input type="number" id="sch-S" value="241" step="1" oninput="calcSch()"><span class="unit">MPa</span></div>
+      </div>
+    </div>
+
+    <div id="r4"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 5: MATERIAL REFERENCE ===== -->
+<div class="panel" id="p5">
+  <div class="card">
+    <div class="stitle">/// material properties reference - click to load</div>
+    <table class="tbl">
+      <thead>
+        <tr><th>Material</th><th>Grade</th><th>SMYS (MPa)</th><th>SMTS (MPa)</th><th>Allow. S (MPa)</th><th>Max T (°C)</th><th>Application</th></tr>
+      </thead>
+      <tbody id="mat-tb"></tbody>
+    </table>
+    <div class="sep"></div>
+    <div class="stitle">/// key formulas - ASME B31.3 and B31.8</div>
+    <div class="fbox">
+      <strong>ASME B31.3 - Required wall thickness:</strong><br>
+      t_min = (P x OD) / (2 x S x E x W + 2 x P x Y) + c + mill_allowance<br>
+      <strong>where:</strong> P = design pressure (MPa) | OD = outside diameter (mm)<br>
+      S = allowable stress (MPa) | E = quality factor | W = weld joint factor<br>
+      Y = temperature derating factor | c = corrosion allowance (mm)<br><br>
+      <strong>MAOP from existing pipe (B31.3):</strong><br>
+      P_max = (2 x S x E x (t_nom x (1 - mill/100) - c)) / (OD - 2 x Y x (t - c))<br><br>
+      <strong>Hoop stress (Barlow - thin wall, D/t > 20):</strong><br>
+      sigma_h = P x D / (2 x t) [MPa, with P in MPa and D,t in same unit]<br><br>
+      <strong>Hoop stress (Lame - thick wall, D/t ≤ 20):</strong><br>
+      sigma_h = P x (ri^2 + ro^2) / (ro^2 - ri^2) [at inner wall]<br>
+      sigma_h_outer = 2 x P x ri^2 / (ro^2 - ri^2) [at outer wall]<br><br>
+      <strong>Longitudinal stress:</strong> sigma_L = P x ri^2 / (ro^2 - ri^2) + F / A<br>
+      <strong>Radial stress (inner):</strong> sigma_r = -P (compressive)<br>
+      <strong>Von Mises:</strong> sigma_vm = sqrt(sigma_h^2 - sigma_h x sigma_L + sigma_L^2 + 3 x tau^2)<br>
+      <strong>Design factor B31.8:</strong> t = P x D / (2 x SMYS x F x E x T)<br>
+      F = 0.72 (Class 1 Div 2) | 0.60 (Class 2) | 0.50 (Class 3) | 0.40 (Class 4)
+    </div>
+    <div class="sep"></div>
+    <div class="stitle">/// API 5L pipe grades quick reference</div>
+    <table class="tbl">
+      <thead><tr><th>Grade</th><th>SMYS min (MPa)</th><th>SMTS min (MPa)</th><th>C max (%)</th><th>Typical application</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">A25</td><td>172</td><td>310</td><td>0.29</td><td>Low pressure gas gathering</td></tr>
+        <tr><td class="tw">A</td><td>207</td><td>331</td><td>0.22</td><td>Low pressure distribution</td></tr>
+        <tr><td class="tw">B</td><td>241</td><td>414</td><td>0.22</td><td>Standard oil and gas pipelines</td></tr>
+        <tr><td class="tw">X42</td><td>290</td><td>414</td><td>0.26</td><td>Cross-country pipelines</td></tr>
+        <tr><td class="tw">X46</td><td>317</td><td>434</td><td>0.26</td><td>Cross-country pipelines</td></tr>
+        <tr><td class="tw">X52</td><td>358</td><td>455</td><td>0.26</td><td>High pressure oil/gas pipelines</td></tr>
+        <tr><td class="tw">X56</td><td>386</td><td>490</td><td>0.26</td><td>High pressure transmission</td></tr>
+        <tr><td class="tw">X60</td><td>413</td><td>517</td><td>0.12</td><td>Long distance transmission</td></tr>
+        <tr><td class="tw">X65</td><td>448</td><td>531</td><td>0.12</td><td>Offshore and deepwater</td></tr>
+        <tr><td class="tw">X70</td><td>482</td><td>565</td><td>0.12</td><td>HPHT and subsea</td></tr>
+        <tr><td class="tw">X80</td><td>551</td><td>621</td><td>0.10</td><td>Ultra-high pressure</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">
+  <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
+  · ASME B31.3 / B31.4 / B31.8 / API 5L calculations · For educational use - verify with qualified engineer
+</div>
+</div>
+
+<script>
+/* ====== DATA ====== */
+var materials=[
+  {mat:'Carbon steel',grade:'ASTM A106 Gr.B',smys:241,smts:414,S:241,Tmax:450,app:'General piping, oil & gas'},
+  {mat:'Carbon steel',grade:'ASTM A53 Gr.B',smys:241,smts:414,S:207,Tmax:370,app:'Standard pipelines'},
+  {mat:'Carbon steel',grade:'API 5L Gr.B',smys:241,smts:414,S:241,Tmax:400,app:'Oil and gas pipelines'},
+  {mat:'HSLA steel',grade:'API 5L X42',smys:290,smts:414,S:290,Tmax:400,app:'Cross-country pipelines'},
+  {mat:'HSLA steel',grade:'API 5L X52',smys:358,smts:455,S:358,Tmax:400,app:'High pressure pipelines'},
+  {mat:'HSLA steel',grade:'API 5L X60',smys:413,smts:517,S:413,Tmax:400,app:'Long distance gas'},
+  {mat:'HSLA steel',grade:'API 5L X65',smys:448,smts:531,S:448,Tmax:400,app:'Offshore pipelines'},
+  {mat:'HSLA steel',grade:'API 5L X70',smys:482,smts:565,S:482,Tmax:400,app:'HPHT applications'},
+  {mat:'Stainless steel',grade:'ASTM A312 TP304',smys:206,smts:515,S:138,Tmax:815,app:'Corrosive service, chemical'},
+  {mat:'Stainless steel',grade:'ASTM A312 TP316',smys:206,smts:515,S:138,Tmax:815,app:'Chloride environments'},
+  {mat:'Stainless steel',grade:'ASTM A312 TP316L',smys:170,smts:485,S:115,Tmax:815,app:'Low temp, cryogenic'},
+  {mat:'Duplex SS',grade:'SAF 2205',smys:450,smts:620,S:300,Tmax:300,app:'Sour service, offshore'},
+  {mat:'Duplex SS',grade:'Super Duplex 2507',smys:550,smts:750,S:367,Tmax:260,app:'HPHT sour, deepwater'},
+  {mat:'Nickel alloy',grade:'Alloy 625 (N06625)',smys:275,smts:690,S:183,Tmax:815,app:'Subsea, extreme corrosion'},
+  {mat:'Carbon steel',grade:'ASTM A333 Gr.6 (LT)',smys:241,smts:414,S:241,Tmax:null,app:'Low temperature service'},
+];
+
+/* NPS data: OD (mm) + schedules {name, t} */
+var npsData={
+  0.5:{OD:21.3,schs:[{n:'Sch 40',t:2.77},{n:'Sch 80',t:3.73},{n:'Sch 160',t:4.78},{n:'XXS',t:7.47}]},
+  0.75:{OD:26.7,schs:[{n:'Sch 40',t:2.87},{n:'Sch 80',t:3.91},{n:'Sch 160',t:5.56},{n:'XXS',t:7.82}]},
+  1:{OD:33.4,schs:[{n:'Sch 40',t:3.38},{n:'Sch 80',t:4.55},{n:'Sch 160',t:6.35},{n:'XXS',t:9.09}]},
+  1.5:{OD:48.3,schs:[{n:'Sch 40',t:3.68},{n:'Sch 80',t:5.08},{n:'Sch 160',t:7.14},{n:'XXS',t:10.16}]},
+  2:{OD:60.3,schs:[{n:'Sch 40',t:3.91},{n:'Sch 80',t:5.54},{n:'Sch 160',t:8.74},{n:'XXS',t:11.07}]},
+  3:{OD:88.9,schs:[{n:'Sch 40',t:5.49},{n:'Sch 80',t:7.62},{n:'Sch 160',t:11.13},{n:'XXS',t:15.24}]},
+  4:{OD:114.3,schs:[{n:'Sch 40',t:6.02},{n:'Sch 80',t:8.56},{n:'Sch 120',t:11.13},{n:'Sch 160',t:13.49},{n:'XXS',t:17.12}]},
+  6:{OD:168.3,schs:[{n:'Sch 40',t:7.11},{n:'Sch 80',t:10.97},{n:'Sch 120',t:14.27},{n:'Sch 160',t:18.26},{n:'XXS',t:21.95}]},
+  8:{OD:219.1,schs:[{n:'Sch 40',t:8.18},{n:'Sch 80',t:12.70},{n:'Sch 120',t:15.09},{n:'Sch 160',t:20.62},{n:'XXS',t:22.23}]},
+  10:{OD:273.1,schs:[{n:'Sch 40',t:9.27},{n:'Sch 80',t:12.70},{n:'Sch 100',t:15.09},{n:'Sch 120',t:18.26},{n:'Sch 160',t:21.44}]},
+  12:{OD:323.8,schs:[{n:'Sch 40',t:9.53},{n:'Sch 80',t:12.70},{n:'Sch 120',t:17.48},{n:'Sch 160',t:21.44},{n:'XXS',t:25.40}]},
+  14:{OD:355.6,schs:[{n:'Sch 20',t:7.92},{n:'Sch 40',t:9.53},{n:'Sch 80',t:12.70},{n:'Sch 120',t:19.05},{n:'Sch 160',t:23.83}]},
+  16:{OD:406.4,schs:[{n:'Sch 20',t:7.92},{n:'Sch 40',t:9.53},{n:'Sch 80',t:12.70},{n:'Sch 120',t:19.05},{n:'Sch 160',t:26.19}]},
+  18:{OD:457.2,schs:[{n:'Sch 20',t:7.92},{n:'Sch 40',t:9.53},{n:'Sch 80',t:12.70},{n:'Sch 120',t:19.05},{n:'Sch 160',t:29.36}]},
+  20:{OD:508.0,schs:[{n:'Sch 20',t:9.53},{n:'Sch 40',t:9.53},{n:'Sch 60',t:12.70},{n:'Sch 80',t:15.09},{n:'Sch 120',t:20.62}]},
+  24:{OD:609.6,schs:[{n:'Sch 20',t:9.53},{n:'Sch 30',t:9.53},{n:'Sch 40',t:9.53},{n:'Sch 60',t:14.27},{n:'Sch 80',t:17.48},{n:'Sch 120',t:24.61}]},
+};
+
+/* ====== UTILS ====== */
+function sw(n){
+  for(var i=1;i<=5;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    document.getElementById('t'+i).className='tab'+(i===n?' on':'');
+  }
+}
+function rc(cls,lbl,val,unit,sub){
+  return '<div class="rc '+(cls||'')+'">'
+    +'<div class="rl">'+lbl+'</div>'
+    +'<div class="rv">'+val+(unit?' <span>'+unit+'</span>':'')+'</div>'
+    +(sub?'<div class="rsub">'+sub+'</div>':'')+'</div>';
+}
+function ar(type,title,body,sugg){
+  var d={ok:'d-ok',wn:'d-wn',er:'d-er',info:'d-info'}[type]||'d-info';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+}
+function barToMPa(b){return b/10;}
+
+/* ====== MATERIAL PRESETS ====== */
+function setMat(id,S,name){
+  document.querySelectorAll('.mbtn').forEach(function(b){b.classList.remove('on');});
+  event.target.classList.add('on');
+  if(S>0) document.getElementById('S').value=S;
+  calc1();
+}
+
+/* ====== PANEL 1: B31.3 DESIGN ====== */
+function calc1(){
+  var P_bar=+document.getElementById('P').value||100;
+  var OD=+document.getElementById('OD').value||168.3;
+  var S=+document.getElementById('S').value||241;
+  var E=+document.getElementById('E').value||1.0;
+  var W=+document.getElementById('W').value||1.0;
+  var Y=+document.getElementById('Y').value||0.4;
+  var c=+document.getElementById('c1').value||3;
+  var mill=+document.getElementById('mill').value||12.5;
+
+  var P=barToMPa(P_bar); // MPa
+
+  // ASME B31.3 minimum required thickness (before mill/corrosion)
+  var t_calc=P*OD/(2*S*E*W+2*P*Y);
+  // Add corrosion
+  var t_with_c=t_calc+c;
+  // Add mill tolerance
+  var t_required=t_with_c/(1-mill/100);
+
+  // Find next available schedule
+  var nps=findNPS(OD);
+  var t_nom=findNextSch(nps,t_required);
+
+  var ID_nom=OD-2*t_nom.t;
+  var A_metal=Math.PI/4*(OD*OD-ID_nom*ID_nom);
+  var weight_per_m=A_metal/1e6*7850; // kg/m (steel density)
+  var flow_area=Math.PI/4*ID_nom*ID_nom; // mm2
+  var DR=OD/t_nom.t; // diameter ratio
+
+  // MAOP with selected schedule
+  var t_eff=t_nom.t*(1-mill/100)-c;
+  var MAOP_MPa=(2*S*E*t_eff)/(OD-2*Y*t_eff);
+  var MAOP_bar=MAOP_MPa*10;
+
+  var thick_ratio=t_required/t_nom.t*100;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Required t (calc)',t_calc.toFixed(2),'mm','Per ASME B31.3 formula');
+  html+=rc('hl','Required t (with c + mill)',t_required.toFixed(2),'mm','Ready for schedule selection');
+  html+=rc('ok','Recommended schedule',t_nom.n,'',t_nom.t.toFixed(2)+' mm wall');
+  html+=rc('','MAOP with selected sch.',MAOP_bar.toFixed(1),'bar','Design P: '+P_bar+' bar');
+  html+=rc('','Inside diameter ID',ID_nom.toFixed(1),'mm','With selected schedule');
+  html+=rc('','D/R ratio',DR.toFixed(1),'OD/t',DR>20?'Thin wall':'Thick wall (use Lamé)');
+  html+=rc('','Pipe weight',weight_per_m.toFixed(1),'kg/m','Steel density 7850 kg/m3');
+  html+=rc('','Flow area',Math.round(flow_area/100)/100,'cm2','ID = '+ID_nom.toFixed(1)+' mm');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>ASME B31.3 formula:</strong> t = P x D / (2 x S x E x W + 2 x P x Y)<br>'
+    +'t_calc = '+P.toFixed(3)+' x '+OD+' / (2 x '+S+' x '+E+' x '+W+' + 2 x '+P.toFixed(3)+' x '+Y+')<br>'
+    +'t_calc = <span class="hi">'+t_calc.toFixed(3)+' mm</span><br>'
+    +'t_with_corrosion = '+t_calc.toFixed(3)+' + '+c+' = '+t_with_c.toFixed(3)+' mm<br>'
+    +'t_required = '+t_with_c.toFixed(3)+' / (1 - '+mill+'/100) = <span class="hi">'+t_required.toFixed(3)+' mm</span><br>'
+    +'Selected schedule: '+t_nom.n+' (t = '+t_nom.t+' mm) - Utilization: '+(t_required/t_nom.t*100).toFixed(0)+'%'
+    +'</div>';
+
+  // Analysis
+  var rows='';
+
+  // Schedule utilization
+  if(thick_ratio>95){
+    rows+=ar('wn','Schedule fully utilized ('+thick_ratio.toFixed(0)+'% of wall used)','The required wall thickness ('+t_required.toFixed(2)+'mm) uses '+thick_ratio.toFixed(0)+'% of the selected schedule wall ('+t_nom.t+'mm). Very little margin remains. Any underrun in actual wall thickness will be critical.','Consider upgrading to next heavier schedule. At 95%+ utilization, hydrotest margins (1.5x MAWP per ASME B31.3) may be tight. Verify actual mill certificates before installation.');
+  } else if(thick_ratio<60){
+    rows+=ar('info','Schedule significantly over-rated ('+thick_ratio.toFixed(0)+'% utilized)','Required wall is only '+thick_ratio.toFixed(0)+'% of the selected schedule. This adds unnecessary weight and cost. Weight difference vs next lighter schedule: ~'+(Math.round((weight_per_m-weight_per_m*0.85)*10)/10)+' kg/m.','Evaluate a lighter schedule if pressure is the only loading. Consider that piping may have other loads (thermal, mechanical) requiring heavier wall. Confirm with stress analysis before downgrading.');
+  } else {
+    rows+=ar('ok','Schedule selection appropriate ('+thick_ratio.toFixed(0)+'% utilized)','Required wall '+t_required.toFixed(2)+'mm uses '+thick_ratio.toFixed(0)+'% of selected '+t_nom.n+' wall ('+t_nom.t+'mm). The '+((t_nom.t-t_required)).toFixed(2)+'mm margin provides adequate buffer against mill tolerance and localized corrosion.','');
+  }
+
+  // Pressure class guidance
+  if(P_bar<=20){
+    rows+=ar('ok','Low design pressure ('+P_bar+' bar) - Cl. 150 flanges adequate','Pressure is in ASME Class 150 flange range. Standard carbon steel flanges, gaskets and fittings are adequate. No special pressure containment concerns. Corrosion ('+c+'mm) likely governs over pressure.','Verify corrosion allowance is appropriate for the fluid. For petroleum service with H2S or CO2, increase to 3-6mm and specify inhibited service or CRA-lined pipe for high-risk zones.');
+  } else if(P_bar<=50){
+    rows+=ar('ok','Medium design pressure ('+P_bar+' bar) - Cl. 300/600 flanges','Pressure requires Class 300-600 ASME flanges. Standard pipe schedules available for all common sizes. ERW pipe with E=0.85 may be adequate if weld quality is verified.','Specify hydrostatic test at 1.5x design pressure ('+Math.round(P_bar*1.5)+' bar) per ASME B31.3. For corrosive service, use seamless pipe (E=1.0) to avoid weld seam corrosion issues.');
+  } else if(P_bar<=200){
+    rows+=ar('wn','High design pressure ('+P_bar+' bar) - Cl. 900/1500 flanges required','Design pressure requires ASME Class 900 or 1500 flanges. Thick-wall schedules (Sch 80-160) likely required. Stress analysis per ASME B31.3 Appendix D mandatory. D/R = '+DR.toFixed(1)+' - '+( DR<=20?'thick wall Lamé equations apply':'thin wall approximation valid')+'.','For high-pressure petroleum service: specify NACE MR0175/ISO 15156 for sour service (H2S > 0.0003 MPa partial pressure). Require full radiography (RT) on all butt welds. Material certification to EN 10204 Type 3.2 for critical service.');
+  } else {
+    rows+=ar('er','Very high design pressure ('+P_bar+' bar) - HPHT engineering required','Pressure above 200 bar requires specialized HPHT design. ASME Class 2500 flanges minimum. Thick wall piping with D/R < 10 likely required. Full Lamé stress analysis essential. Third-party verification mandatory.','Engage specialist HPHT piping engineer. Design per ASME VIII Div 2 rules if pressure x diameter > 3500 bar.mm. Specify hydrogen embrittlement testing for high-strength steel (SMYS > 690 MPa). Consider forged fittings only - no fabricated fittings at this pressure class.');
+  }
+
+  // Corrosion
+  if(c>=6){
+    rows+=ar('wn','High corrosion allowance ('+c+'mm) - verify adequacy','A '+c+'mm corrosion allowance suggests aggressive service. Verify this is based on actual corrosion rate data. At typical oil and gas corrosion rate of 0.1-0.5 mm/year, '+c+'mm provides '+Math.round(c/0.3)+' years design life.','Implement online corrosion monitoring (Microcor or UT thickness probes). Consider glass-reinforced epoxy (GRE) or CRA-clad pipe for highly corrosive service instead of carbon steel with heavy corrosion allowance. Calculate inspection interval: T_inspect = c/2 / corrosion_rate.');
+  } else if(c<1.5){
+    rows+=ar('info','Low corrosion allowance ('+c+'mm) - verify fluid service','Only '+c+'mm corrosion allowance. This may be insufficient for petroleum service with CO2 or H2S which can cause 0.5-2 mm/year corrosion in untreated conditions.','Verify fluid is dry gas, treated crude, or a non-corrosive service. If water-containing service, increase to 3mm minimum. For sour service, 3-6mm is industry standard. Specify corrosion inhibitor injection for wet gas or water-cut crude service.');
+  } else {
+    rows+=ar('ok','Standard corrosion allowance ('+c+'mm)','The '+c+'mm corrosion allowance is in the standard range (1.5-3mm) for general oil and gas service with corrosion inhibitor treatment. Design life ≈ '+Math.round(c/0.2)+' years at typical 0.2mm/year treated service corrosion rate.','');
+  }
+
+  html+='<div class="analysis"><div class="atitle">/// DESIGN ANALYSIS AND ENGINEERING GUIDANCE</div>'+rows+'</div>';
+  document.getElementById('r1').innerHTML=html;
+
+  // Draw pipe SVG
+  drawPipeSVG(OD,t_nom.t,t_required);
+}
+
+function drawPipeSVG(OD,t_nom,t_req){
+  var cx=200,cy=100,scale=0.45;
+  var ro=Math.min(OD/2*scale,85);
+  var ri=ro-(t_nom*scale);
+  var ri_min=ro-(t_req*scale);
+  var svg=document.getElementById('pipe-svg1');
+  svg.innerHTML=
+    // Outer circle
+    '<circle cx="'+cx+'" cy="'+cy+'" r="'+ro+'" fill="none" stroke="#333" stroke-width="1.5"/>'
+    // Steel wall
+    +'<circle cx="'+cx+'" cy="'+cy+'" r="'+ro+'" fill="rgba(204,0,0,0.15)" stroke="#CC0000" stroke-width="2"/>'
+    +'<circle cx="'+cx+'" cy="'+cy+'" r="'+ri+'" fill="#080808" stroke="#444" stroke-width="1"/>'
+    // Required minimum wall
+    +'<circle cx="'+cx+'" cy="'+cy+'" r="'+ri_min+'" fill="none" stroke="rgba(255,136,0,0.5)" stroke-width="1" stroke-dasharray="4,3"/>'
+    // Labels
+    +'<text x="'+(cx+ro+8)+'" y="'+cy+'" fill="#CC0000" font-size="10" font-family="JetBrains Mono">OD '+OD+'mm</text>'
+    +'<text x="'+(cx+ri+4)+'" y="'+(cy-8)+'" fill="#888" font-size="9" font-family="JetBrains Mono">ID '+(OD-2*t_nom).toFixed(1)+'mm</text>'
+    +'<text x="'+(cx-10)+'" y="'+(cy+4)+'" fill="#555" font-size="9" font-family="JetBrains Mono" text-anchor="middle">FLOW</text>'
+    // Wall annotation
+    +'<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+ro)+'" y2="'+cy+'" stroke="#444" stroke-width="0.5" stroke-dasharray="2,2"/>'
+    +'<text x="'+(cx+ro/2)+'" y="'+(cy-6)+'" fill="#888" font-size="9" font-family="JetBrains Mono" text-anchor="middle">t='+t_nom+'mm</text>'
+    // Required wall indicator
+    +'<text x="'+cx+'" y="'+(cy+ro+20)+'" fill="#FFAA00" font-size="9" font-family="JetBrains Mono" text-anchor="middle">-- min required: '+t_req.toFixed(2)+'mm</text>';
+}
+
+/* ====== PANEL 2: PRESSURE RATING ====== */
+function calc2(){
+  var OD=+document.getElementById('p2_OD').value||168.3;
+  var t=+document.getElementById('p2_t').value||7.11;
+  var c=+document.getElementById('p2_c').value||3;
+  var S=+document.getElementById('p2_S').value||241;
+  var E=+document.getElementById('p2_E').value||1.0;
+  var mill=+document.getElementById('p2_mill').value||12.5;
+  var Pop_bar=+document.getElementById('p2_Pop').value||80;
+
+  var Y=0.4;
+  var t_actual=t*(1-mill/100); // after mill tolerance
+  var t_eff=t_actual-c; // effective after corrosion
+  if(t_eff<=0){document.getElementById('r2').innerHTML='<div class="alert a-er">Effective wall thickness is zero or negative. Corrosion allowance exceeds pipe wall. Pipe has reached end of design life.</div>';return;}
+
+  var MAOP_MPa=2*S*E*t_eff/(OD-2*Y*t_eff);
+  var MAOP_bar=MAOP_MPa*10;
+  var hydrotest_bar=MAOP_bar*1.5;
+  var Pop_MPa=barToMPa(Pop_bar);
+  var utilization=Pop_bar/MAOP_bar*100;
+  var DR=OD/t;
+  var ID=OD-2*t;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','MAOP (MAWP)',MAOP_bar.toFixed(1),'bar','Maximum allowable operating P');
+  html+=rc('hl','MAOP in psi',(MAOP_bar*14.504).toFixed(0),'psi','= '+MAOP_MPa.toFixed(2)+' MPa');
+  html+=rc('','Hydrotest pressure',hydrotest_bar.toFixed(1),'bar','1.5 x MAOP per B31.3');
+  html+=rc('','Effective wall t_eff',t_eff.toFixed(2),'mm','After mill tol. + corrosion');
+  html+=rc(utilization<=100?'ok':'er','Operating pressure',Pop_bar,'bar',utilization.toFixed(0)+'% of MAOP - '+(utilization<=100?'SAFE':'EXCEEDS MAOP'));
+  html+=rc('','Pressure utilization',utilization.toFixed(1),'%','Operating / MAOP');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>MAOP (B31.3):</strong> P = 2 x S x E x t_eff / (OD - 2 x Y x t_eff)<br>'
+    +'t_actual (after mill) = '+t+' x (1 - '+mill+'/100) = '+t_actual.toFixed(3)+' mm<br>'
+    +'t_eff (after corrosion) = '+t_actual.toFixed(3)+' - '+c+' = <strong>'+t_eff.toFixed(3)+' mm</strong><br>'
+    +'MAOP = 2 x '+S+' x '+E+' x '+t_eff.toFixed(3)+' / ('+OD+' - 2 x 0.4 x '+t_eff.toFixed(3)+')<br>'
+    +'MAOP = <span class="hi">'+MAOP_MPa.toFixed(3)+' MPa = '+MAOP_bar.toFixed(1)+' bar</span>'
+    +'</div>';
+
+  var rows='';
+  if(Pop_bar>MAOP_bar){
+    rows+=ar('er','OPERATING PRESSURE EXCEEDS MAOP - IMMEDIATE ACTION REQUIRED','Operating pressure '+Pop_bar+' bar is '+(Pop_bar-MAOP_bar).toFixed(1)+' bar above MAOP ('+MAOP_bar.toFixed(1)+' bar). This pipe is operating beyond its code-calculated limit. Risk of failure is elevated.','Immediately reduce operating pressure to below MAOP. Initiate engineering assessment of remaining life. If corrosion has reduced wall thickness, schedule inspection (UT thickness survey). Consider replacing pipe or reducing design pressure through relief valve setting adjustment.');
+  } else if(utilization>90){
+    rows+=ar('wn','High operating pressure utilization ('+utilization.toFixed(0)+'%)','Operating at '+utilization.toFixed(0)+'% of MAOP. Only '+(MAOP_bar-Pop_bar).toFixed(1)+' bar margin to MAOP. Consider that pressure surges (water hammer) can temporarily exceed this by 10-30%.','Ensure surge analysis has been performed. Hydrotest at '+hydrotest_bar.toFixed(0)+' bar before commissioning or re-commissioning. Monitor for any increase in operating pressure. Inspect wall thickness annually at minimum.');
+  } else {
+    rows+=ar('ok','Operating pressure within limits ('+utilization.toFixed(0)+'% of MAOP)','The pipe operates at '+Pop_bar+' bar which is '+utilization.toFixed(0)+'% of its MAOP ('+MAOP_bar.toFixed(1)+' bar). Adequate safety margin of '+(MAOP_bar-Pop_bar).toFixed(1)+' bar is available.','');
+  }
+
+  if(t_eff/t<0.5){
+    rows+=ar('wn','More than 50% of wall consumed by corrosion + mill tolerance','Effective wall '+t_eff.toFixed(2)+'mm is '+(t_eff/t*100).toFixed(0)+'% of nominal '+t+'mm. When effective wall drops below 50% of nominal, fitness-for-service assessment per API 579 / ASME FFS-1 is recommended.','Commission UT (ultrasonic thickness) inspection survey to map remaining wall thickness. If minimum measured thickness < t_eff assumed here, immediate integrity assessment required. Consider a corrosion growth model to predict remaining life.');
+  }
+
+  rows+=ar('info','Hydrotest pressure requirement','Hydrostatic pressure test at '+hydrotest_bar.toFixed(0)+' bar (1.5x MAOP per ASME B31.3 Clause 345.4). Hold time: 10 minutes minimum, preferably 30 minutes. Inspect all joints, fittings and welds during pressurized hold.','Hydrotest medium: water (preferred) at ambient temperature. If pneumatic test required, apply safety exclusion zone per ASME B31.3. Verify gauge calibration (±0.5% accuracy) before test.');
+
+  html+='<div class="analysis"><div class="atitle">/// PRESSURE RATING ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r2').innerHTML=html;
+}
+
+/* ====== PANEL 3: HOOP STRESS ====== */
+function calc3(){
+  var OD=+document.getElementById('h_OD').value||168.3;
+  var t=+document.getElementById('h_t').value||7.11;
+  var P_bar=+document.getElementById('h_P').value||100;
+  var SMYS=+document.getElementById('h_SMYS').value||241;
+  var F=+document.getElementById('h_F').value||0; // kN
+  var df=+document.getElementById('h_df').value||0.72;
+
+  var P=barToMPa(P_bar); // MPa
+  var ro=OD/2;
+  var ri=ro-t;
+  var ID=OD-2*t;
+  var DR=OD/t;
+  var A=Math.PI*(ro*ro-ri*ri); // mm2
+
+  var sigma_h,sigma_L,sigma_r;
+
+  if(DR>20){
+    // Thin wall (Barlow)
+    sigma_h=P*OD/(2*t); // MPa
+    sigma_L=P*ID*ID/(OD*OD-ID*ID)/2+(F*1000/A); // hoop/2 + axial
+    sigma_L=P*ri*ri/(ro*ro-ri*ri)+(F*1000/A);
+    sigma_r=-P/2; // average
+  } else {
+    // Thick wall (Lamé) at inner wall (maximum)
+    sigma_h=P*(ri*ri+ro*ro)/(ro*ro-ri*ri); // at inner wall
+    sigma_L=P*ri*ri/(ro*ro-ri*ri)+(F*1000/A);
+    sigma_r=-P; // at inner wall
+  }
+
+  // Simple thin-wall hoop for display
+  var sigma_h_barlows=P*OD/(2*t);
+  // Von Mises
+  var sigma_vm=Math.sqrt(sigma_h*sigma_h - sigma_h*sigma_L + sigma_L*sigma_L);
+  var SF_hoop=SMYS/sigma_h_barlows;
+  var SF_vm=SMYS/sigma_vm;
+  var allow=SMYS*df;
+  var hoop_ok=sigma_h_barlows<=allow;
+  var vm_ok=sigma_vm<=allow;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Hoop stress (Barlow)',sigma_h_barlows.toFixed(2),'MPa','sigma_h = P x OD / (2 x t)');
+  html+=rc(DR>20?'inf':'hl','Hoop stress (Lamé inner)',sigma_h.toFixed(2),'MPa',DR>20?'Thin wall - same as Barlow':'Thick wall formula');
+  html+=rc('','Longitudinal stress',sigma_L.toFixed(2),'MPa','Pressure + axial load');
+  html+=rc('','Radial stress',sigma_r.toFixed(2),'MPa','At inner wall');
+  html+=rc(vm_ok?'ok':'er','Von Mises equivalent',sigma_vm.toFixed(2),'MPa',vm_ok?'< Allow. '+allow.toFixed(0)+' MPa - PASS':'> Allow. '+allow.toFixed(0)+' MPa - FAIL');
+  html+=rc(hoop_ok?'ok':'er','Safety factor (hoop)',SF_hoop.toFixed(2),'-',hoop_ok?'SMYS/sigma_h - ADEQUATE':'< 1.0 - FAILURE');
+  html+=rc(vm_ok?'ok':'er','Safety factor (VM)',SF_vm.toFixed(2),'-',vm_ok?'Adequate margin':'INSUFFICIENT');
+  html+=rc('','Thin/thick wall regime',DR>20?'THIN WALL':'THICK WALL','D/t='+DR.toFixed(1),DR>20?'Barlow valid':'Use Lamé equations');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Thin wall check:</strong> D/t = '+OD+'/'+t+' = '+DR.toFixed(1)+' → '+(DR>20?'THIN (Barlow valid)':'THICK (Lamé required)')+' wall<br>'
+    +'<strong>Hoop (Barlow):</strong> sigma_h = P x OD / (2t) = '+P.toFixed(3)+' x '+OD+' / (2 x '+t+') = <span class="hi">'+sigma_h_barlows.toFixed(2)+' MPa</span><br>'
+    +'<strong>Lamé (inner):</strong> sigma_h = P x (ri^2+ro^2)/(ro^2-ri^2) = '+P.toFixed(3)+' x ('+ri.toFixed(1)+'^2+'+ro.toFixed(1)+'^2)/('+ro.toFixed(1)+'^2-'+ri.toFixed(1)+'^2) = <span class="hi">'+sigma_h.toFixed(2)+' MPa</span><br>'
+    +'<strong>Longitudinal:</strong> sigma_L = P x ri^2/(ro^2-ri^2) + F/A = '+P.toFixed(3)+' x '+ri.toFixed(1)+'^2/('+ro.toFixed(1)+'^2-'+ri.toFixed(1)+'^2) + '+(F*1000/A).toFixed(2)+' = <span class="hi">'+sigma_L.toFixed(2)+' MPa</span><br>'
+    +'<strong>Von Mises:</strong> sigma_VM = sqrt(sh^2 - sh.sL + sL^2) = <span class="hi">'+sigma_vm.toFixed(2)+' MPa</span><br>'
+    +'<strong>Allowable:</strong> SMYS x design_factor = '+SMYS+' x '+df+' = <span class="hi">'+allow.toFixed(0)+' MPa</span>'
+    +'</div>';
+
+  var rows='';
+  if(!hoop_ok){
+    rows+=ar('er','HOOP STRESS EXCEEDS ALLOWABLE - PIPE INADEQUATE','Hoop stress '+sigma_h_barlows.toFixed(1)+' MPa exceeds allowable '+allow.toFixed(0)+' MPa ('+(sigma_h_barlows/allow*100).toFixed(0)+'% of limit). At this stress level, pipe will yield under pressure. Risk of burst failure.','Increase wall thickness. Required minimum t = P x OD / (2 x SMYS x '+df+') = '+(P*OD/(2*SMYS*df)).toFixed(2)+' mm. Select next heavier schedule or upgrade to higher-grade material (e.g. API 5L X52 SMYS=358 MPa).');
+  } else {
+    rows+=ar('ok','Hoop stress within limit ('+((sigma_h_barlows/allow)*100).toFixed(0)+'% of allowable)','Hoop stress '+sigma_h_barlows.toFixed(2)+' MPa is '+(allow-sigma_h_barlows).toFixed(1)+' MPa below allowable '+allow.toFixed(0)+' MPa. Safety factor of '+SF_hoop.toFixed(2)+'x against yielding is adequate.','');
+  }
+  if(!vm_ok){
+    rows+=ar('er','VON MISES STRESS EXCEEDS ALLOWABLE','Combined equivalent stress (VM) of '+sigma_vm.toFixed(1)+' MPa exceeds allowable '+allow.toFixed(0)+' MPa. Multiaxial stress state is more critical than hoop stress alone. Axial loading significantly increases combined stress.','Reduce axial load or increase wall thickness. If thermal expansion creates axial loads, design adequate flexibility with expansion loops or bellows. Perform formal piping flexibility analysis per ASME B31.3 Appendix S.');
+  }
+  if(DR<=20){
+    rows+=ar('info','Thick-wall cylinder - Lamé equations required (D/t = '+DR.toFixed(1)+')','Diameter-to-thickness ratio D/t = '+DR.toFixed(1)+' ≤ 20. The thin-wall (Barlow) approximation is not valid. Hoop stress varies significantly through the wall thickness - highest at inner surface ('+sigma_h.toFixed(1)+' MPa) and lowest at outer surface ('+( P*(2*ri*ri)/(ro*ro-ri*ri)).toFixed(1)+' MPa).','Use Lamé equations for all stress calculations. For ASME pressure vessel design (closed end caps), use ASME VIII Division 1 thick-shell equations. Ensure FEA (Finite Element Analysis) is used for complex geometries with D/t < 10.');
+  }
+  if(Math.abs(F)>0){
+    rows+=ar('info','Axial load applied (F = '+F+' kN)','Axial force creates longitudinal stress of '+(F*1000/A).toFixed(1)+' MPa additional to pressure-induced longitudinal stress. Total longitudinal stress: '+sigma_L.toFixed(1)+' MPa. This changes the Von Mises equivalent stress from pure pressure.','For buried pipelines, thermal expansion creates axial compressive stress: sigma_thermal = E x alpha x Delta_T. For steel: E=200 GPa, alpha=12x10-6/°C. For Delta_T=30°C: additional stress = 200000 x 12e-6 x 30 = 72 MPa compressive in restrained pipe.');
+  }
+
+  html+='<div class="analysis"><div class="atitle">/// STRESS ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r3').innerHTML=html;
+}
+
+/* ====== PANEL 4: SCHEDULE SELECTOR ====== */
+function calcSch(){
+  var nps=+document.getElementById('nps-sel').value||6;
+  var S=+document.getElementById('sch-S').value||241;
+  var data=npsData[nps];
+  if(!data){document.getElementById('r4').innerHTML='<div class="alert a-wn">NPS not found in database.</div>';return;}
+
+  var E=1.0,Y=0.4,c=3,mill=12.5;
+  var html='<div class="stitle" style="margin-top:0;">NPS '+nps+' (DN '+(nps*25|0)+') - OD = '+data.OD+' mm</div>';
+  html+='<table class="tbl"><thead><tr><th>Schedule</th><th>Wall (mm)</th><th>ID (mm)</th><th>Weight (kg/m)</th><th>MAOP (bar)</th><th>t_eff (mm)</th><th>Status</th></tr></thead><tbody>';
+
+  data.schs.forEach(function(s){
+    var ID=data.OD-2*s.t;
+    var A=Math.PI/4*(data.OD*data.OD-ID*ID);
+    var wt=A/1e6*7850;
+    var t_eff=s.t*(1-mill/100)-c;
+    var MAOP=t_eff>0?2*S*E*t_eff/(data.OD-2*Y*t_eff)*10:0;
+    var status=t_eff>0?'<span style="color:var(--ok);">OK</span>':'<span style="color:var(--err);">Corroded through</span>';
+    html+='<tr onclick="loadSch('+data.OD+','+s.t+')">'
+      +'<td class="tw">'+s.n+'</td>'
+      +'<td style="font-family:var(--mono);">'+s.t.toFixed(2)+'</td>'
+      +'<td style="font-family:var(--mono);">'+ID.toFixed(1)+'</td>'
+      +'<td style="font-family:var(--mono);">'+wt.toFixed(1)+'</td>'
+      +'<td class="tw" style="font-family:var(--mono);">'+MAOP.toFixed(0)+'</td>'
+      +'<td style="font-family:var(--mono);">'+Math.max(t_eff,0).toFixed(2)+'</td>'
+      +'<td>'+status+'</td>'
+      +'</tr>';
+  });
+  html+='</tbody></table>';
+  html+='<div class="a-info alert" style="margin-top:10px;">MAOP calculated with: S='+S+' MPa, E=1.0 (seamless), c='+c+'mm corrosion, mill tolerance='+mill+'%. Click any row to load into B31.3 Design tab.</div>';
+  document.getElementById('r4').innerHTML=html;
+}
+
+function loadSch(OD,t){
+  sw(1);
+  document.getElementById('OD').value=OD;
+  // find t in schedule - set directly
+  document.getElementById('c1').value=3;
+  calc1();
+}
+
+/* ====== PANEL 5: MATERIAL TABLE ====== */
+function buildMatTable(){
+  var tb=document.getElementById('mat-tb');
+  tb.innerHTML=materials.map(function(m){
+    return '<tr onclick="loadMat('+m.S+')">'
+      +'<td>'+m.mat+'</td>'
+      +'<td class="tw">'+m.grade+'</td>'
+      +'<td>'+m.smys+'</td>'
+      +'<td>'+m.smts+'</td>'
+      +'<td class="tw">'+m.S+'</td>'
+      +'<td>'+(m.Tmax||'varies')+'</td>'
+      +'<td>'+m.app+'</td>'
+    +'</tr>';
+  }).join('');
+}
+
+function loadMat(S){
+  sw(1);
+  document.getElementById('S').value=S;
+  calc1();
+}
+
+/* ====== SCHEDULE FINDER ====== */
+function findNPS(OD){
+  var keys=Object.keys(npsData).map(Number).sort(function(a,b){return a-b;});
+  for(var i=0;i<keys.length;i++){
+    if(Math.abs(npsData[keys[i]].OD-OD)<1) return keys[i];
+  }
+  return null;
+}
+
+function findNextSch(nps,t_req){
+  if(!nps||!npsData[nps]) return {n:'Custom',t:Math.ceil(t_req*2)/2};
+  var schs=npsData[nps].schs;
+  for(var i=0;i<schs.length;i++){
+    if(schs[i].t>=t_req) return schs[i];
+  }
+  return schs[schs.length-1];
+}
+
+/* ====== INIT ====== */
+buildMatTable();
+calc1();
+calc2();
+calc3();
+calcSch();
+</script>
+</body>
+</html>
