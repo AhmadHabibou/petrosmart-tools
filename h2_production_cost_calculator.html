@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>H2 Production Cost Calculator - Petrosmart Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --red:#CC0000;--red2:#EE1111;--red-dim:rgba(204,0,0,0.15);
+  --bg:#050508;--surf:#0A0A10;--card:#0E0E16;
+  --border:#181824;--text:#E2E2EE;--muted:#484860;
+  --ok:#00BB55;--warn:#FF8800;--err:#FF3333;--info:#2266EE;
+  --h2blue:#0099FF;--h2green:#00BB55;--h2gray:#888;
+  --mono:'Roboto Mono',monospace;--sans:'Outfit',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+
+/* MOLECULAR BACKGROUND */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(circle 300px at 10% 20%,rgba(0,153,255,0.04),transparent),
+    radial-gradient(circle 200px at 90% 70%,rgba(204,0,0,0.04),transparent),
+    radial-gradient(circle 400px at 50% 50%,rgba(0,187,85,0.02),transparent);
+  pointer-events:none;z-index:0;
+}
+
+.wrap{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:16px;}
+
+/* HEADER */
+.hdr{
+  background:linear-gradient(135deg,#050510,#0A0520,#05050E);
+  border:1px solid rgba(0,153,255,0.2);
+  border-radius:18px;padding:18px 22px;margin-bottom:18px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 0 60px rgba(0,153,255,0.06),0 0 30px rgba(204,0,0,0.04);
+  position:relative;overflow:hidden;
+}
+.hdr::before{
+  content:'H₂';position:absolute;right:20px;top:50%;transform:translateY(-50%);
+  font-size:90px;font-weight:800;color:rgba(0,153,255,0.05);
+  font-family:var(--sans);pointer-events:none;
+}
+.hdr-icon{
+  width:52px;height:52px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--h2blue),#0055AA);
+  box-shadow:0 4px 20px rgba(0,153,255,0.35);
+}
+.hdr h1{font-size:19px;font-weight:800;color:#fff;}
+.hdr p{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+.hdr-colors{margin-left:auto;display:flex;gap:8px;flex-shrink:0;}
+.color-tag{display:flex;align-items:center;gap:5px;padding:5px 10px;
+  border-radius:8px;border:1px solid;font-size:10px;font-weight:600;font-family:var(--mono);}
+.ct-gray{background:rgba(136,136,136,0.1);border-color:rgba(136,136,136,0.25);color:#aaa;}
+.ct-blue{background:rgba(0,153,255,0.1);border-color:rgba(0,153,255,0.25);color:#00BBFF;}
+.ct-green{background:rgba(0,187,85,0.1);border-color:rgba(0,187,85,0.25);color:#00CC66;}
+.ct-dot{width:8px;height:8px;border-radius:50%;}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--surf);border:1px solid var(--border);
+  border-radius:12px;padding:4px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{flex:1;min-width:80px;padding:9px 5px;background:transparent;border:none;
+  border-radius:9px;color:var(--muted);font-size:11px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);text-transform:uppercase;letter-spacing:0.07em;transition:all 0.2s;}
+.tab:hover{color:#bbb;}
+.tab.on{color:#fff;box-shadow:0 0 14px rgba(0,0,0,0.3);}
+.tab.on.t-gray{background:#666;}
+.tab.on.t-blue{background:var(--h2blue);}
+.tab.on.t-green{background:var(--h2green);}
+.tab.on.t-red{background:var(--red);}
+.tab.on.t-gold{background:#CC8800;}
+.tab.on.t-purple{background:#6633CC;}
+.panel{display:none;}.panel.on{display:block;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+.card.blue-accent{border-color:rgba(0,153,255,0.2);}
+.card.green-accent{border-color:rgba(0,187,85,0.2);}
+.card.red-accent{border-color:rgba(204,0,0,0.2);}
+.stitle{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;
+  letter-spacing:0.1em;border-bottom:1px solid var(--border);padding-bottom:7px;
+  margin-bottom:14px;font-family:var(--mono);display:flex;align-items:center;gap:6px;}
+.stitle.blue{color:var(--h2blue);}
+.stitle.green{color:var(--h2green);}
+.stitle.red{color:var(--red);}
+.stitle.gold{color:#FFAA00;}
+
+/* FORM */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.field{margin-bottom:12px;}
+.lbl{font-size:10px;color:var(--muted);margin-bottom:5px;display:block;
+  text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.ir{display:flex;gap:6px;align-items:center;}
+input[type=number],select{width:100%;background:#070710;border:1px solid #1A1A28;
+  border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;
+  font-family:var(--mono);transition:border-color 0.2s;}
+input:focus,select:focus{border-color:var(--h2blue);}
+select option{background:#0A0A14;}
+.unit{font-size:10px;color:#333;min-width:52px;text-align:right;
+  white-space:nowrap;font-family:var(--mono);}
+
+/* RESULT CARDS */
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.rgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;}
+.rc{background:#070710;border:1px solid var(--border);border-radius:12px;
+  padding:13px 15px;position:relative;overflow:hidden;}
+.rc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.rc.hl-blue::after{background:var(--h2blue);}
+.rc.hl-green::after{background:var(--h2green);}
+.rc.hl-red::after{background:var(--red);}
+.rc.hl-gold::after{background:#FFAA00;}
+.rc.ok::after{background:var(--ok);}
+.rc.wn::after{background:var(--warn);}
+.rc.er::after{background:var(--err);}
+.rc.hl-blue{border-color:rgba(0,153,255,0.25);}
+.rc.hl-green{border-color:rgba(0,187,85,0.25);}
+.rc.hl-red{border-color:rgba(204,0,0,0.25);}
+.rc.hl-gold{border-color:rgba(255,170,0,0.25);}
+.rc.ok{border-color:rgba(0,187,85,0.25);}
+.rc.wn{border-color:rgba(255,136,0,0.25);}
+.rc.er{border-color:rgba(255,51,51,0.25);}
+.rl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;
+  margin-bottom:3px;font-family:var(--mono);}
+.rv{font-size:20px;font-weight:700;color:#fff;font-family:var(--mono);}
+.rv span{font-size:10px;color:#333;font-weight:400;}
+.rsub{font-size:10px;color:#333;margin-top:3px;font-family:var(--mono);}
+
+/* FORMULA BOX */
+.fbox{background:#05050E;border-left:3px solid var(--h2blue);border-radius:0 10px 10px 0;
+  padding:12px 16px;margin-top:14px;font-size:11px;color:#555;line-height:2.0;font-family:var(--mono);}
+.fbox strong{color:#aaa;}
+.fbox .hi{color:var(--h2blue);font-weight:600;}
+.fbox .hi-g{color:var(--h2green);font-weight:600;}
+.fbox .hi-r{color:var(--red);font-weight:600;}
+
+/* ANALYSIS */
+.analysis{background:#060610;border:1px solid #111120;border-radius:12px;padding:16px;margin-top:14px;}
+.atitle{font-size:10px;font-weight:700;color:var(--h2blue);margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:0.09em;font-family:var(--mono);}
+.atitle.green{color:var(--h2green);}
+.atitle.red{color:var(--red);}
+.arow{display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #0C0C1C;}
+.arow:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.d-ok{background:var(--ok);box-shadow:0 0 8px var(--ok);}
+.d-wn{background:var(--warn);box-shadow:0 0 8px var(--warn);}
+.d-er{background:var(--err);box-shadow:0 0 8px var(--err);}
+.d-blue{background:var(--h2blue);box-shadow:0 0 8px var(--h2blue);}
+.d-green{background:var(--h2green);box-shadow:0 0 8px var(--h2green);}
+.atxt strong{color:#eee;font-size:12px;display:block;margin-bottom:3px;}
+.atxt p{font-size:11px;color:#555;line-height:1.7;margin:0;}
+.asugg{font-size:11px;color:#FFAA00;margin-top:4px;line-height:1.6;}
+
+/* ALERTS */
+.alert{border-radius:10px;padding:10px 14px;margin-top:10px;font-size:11px;line-height:1.7;font-weight:500;}
+.a-ok{background:rgba(0,187,85,0.07);border:1px solid rgba(0,187,85,0.2);color:var(--ok);}
+.a-er{background:rgba(255,51,51,0.07);border:1px solid rgba(255,51,51,0.2);color:var(--err);}
+.a-wn{background:rgba(255,136,0,0.07);border:1px solid rgba(255,136,0,0.2);color:var(--warn);}
+.a-blue{background:rgba(0,153,255,0.07);border:1px solid rgba(0,153,255,0.2);color:#66CCFF;}
+.a-green{background:rgba(0,187,85,0.07);border:1px solid rgba(0,187,85,0.2);color:#66EE99;}
+
+/* CHART */
+.chart-wrap{background:#06060E;border:1px solid var(--border);border-radius:12px;
+  padding:14px;margin-top:14px;}
+.chart-title{font-size:11px;color:var(--h2blue);font-weight:600;
+  text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;font-family:var(--mono);}
+
+/* COST BREAKDOWN BAR */
+.cost-bar{margin-top:14px;}
+.cb-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.cb-label{font-size:10px;color:#888;font-family:var(--mono);min-width:130px;text-align:right;}
+.cb-track{flex:1;height:10px;background:#0A0A18;border-radius:5px;overflow:hidden;}
+.cb-fill{height:100%;border-radius:5px;transition:width 0.5s;}
+.cb-val{font-size:10px;color:#fff;font-family:var(--mono);min-width:70px;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.tbl th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;
+  letter-spacing:0.07em;font-family:var(--mono);}
+.tbl td{padding:7px 10px;color:#999;border-bottom:1px solid #0C0C18;font-family:var(--mono);}
+.tbl tr:hover td{background:#0A0A14;}
+.tw{color:#fff!important;font-weight:600;}
+.ibox{background:var(--surf);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);
+  line-height:1.7;font-family:var(--mono);}
+.ibox strong{color:#bbb;}
+.sep{height:1px;background:var(--border);margin:14px 0;}
+
+/* H2 TYPE SELECTOR */
+.h2-types{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;}
+.h2-type{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:14px 12px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.h2-type:hover{border-color:#444;}
+.h2-type.on-gray{border-color:#666;background:rgba(100,100,100,0.1);}
+.h2-type.on-blue{border-color:var(--h2blue);background:rgba(0,153,255,0.08);}
+.h2-type.on-green{border-color:var(--h2green);background:rgba(0,187,85,0.08);}
+.h2-icon{font-size:26px;margin-bottom:6px;}
+.h2-name{font-size:12px;font-weight:700;color:#fff;margin-bottom:3px;}
+.h2-desc{font-size:9px;color:var(--muted);font-family:var(--mono);}
+.h2-badge{display:inline-block;padding:2px 8px;border-radius:10px;
+  font-size:9px;font-weight:700;margin-top:5px;font-family:var(--mono);}
+.bg-gray{background:rgba(136,136,136,0.15);color:#999;}
+.bg-blue{background:rgba(0,153,255,0.15);color:#66CCFF;}
+.bg-green{background:rgba(0,187,85,0.15);color:#66EE99;}
+
+.foot{background:var(--surf);border-top:1px solid var(--border);margin-top:18px;
+  padding:10px 20px;font-size:10px;color:#222;text-align:center;
+  font-family:var(--mono);border-radius:12px;}
+.foot a{color:var(--h2blue);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-icon">⚛️</div>
+  <div>
+    <h1>H2 Production Cost Calculator</h1>
+    <p>Grey / Blue / Green hydrogen - Levelized Cost of Hydrogen (LCOH)</p>
+  </div>
+  <div class="hdr-colors">
+    <div class="color-tag ct-gray"><div class="ct-dot" style="background:#888;"></div>Grey H2</div>
+    <div class="color-tag ct-blue"><div class="ct-dot" style="background:#0099FF;"></div>Blue H2</div>
+    <div class="color-tag ct-green"><div class="ct-dot" style="background:#00BB55;"></div>Green H2</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on t-gray" id="t1" onclick="sw(1)">⚙️ Grey H2 (SMR)</button>
+  <button class="tab t-blue" id="t2" onclick="sw(2)">💧 Blue H2 (SMR+CCS)</button>
+  <button class="tab t-green" id="t3" onclick="sw(3)">⚡ Green H2 (PEM)</button>
+  <button class="tab t-red" id="t4" onclick="sw(4)">📊 Comparison</button>
+  <button class="tab t-gold" id="t5" onclick="sw(5)">🎯 Break-even</button>
+  <button class="tab t-purple" id="t6" onclick="sw(6)">📚 Reference</button>
+</div>
+
+<!-- ===== PANEL 1: GREY H2 (SMR) ===== -->
+<div class="panel on" id="p1">
+  <div class="card blue-accent">
+    <div class="stitle blue">/// grey hydrogen - steam methane reforming (SMR)</div>
+    <div class="ibox">
+      <strong>SMR process:</strong> CH4 + H2O → CO + 3H2 (reforming) | CO + H2O → CO2 + H2 (WGS reaction)<br>
+      Overall: CH4 + 2H2O → CO2 + 4H2 | ΔH = +206 kJ/mol (endothermic)<br>
+      <strong>Typical plant:</strong> 100,000 Nm3/hr H2, operating at 800-900°C, 20-35 bar. CO2 is vented (grey H2) or captured (blue H2).
+    </div>
+
+    <div class="stitle">/// natural gas feedstock and energy</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Natural gas price</label>
+        <div class="ir"><input type="number" id="ng-price" value="8.5" step="0.1" oninput="calcSMR()"><span class="unit">USD/MMBtu</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Specific NG consumption</label>
+        <div class="ir"><input type="number" id="ng-cons" value="3.4" step="0.05" oninput="calcSMR()"><span class="unit">Nm3 NG/Nm3 H2</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Steam export credit</label>
+        <div class="ir"><input type="number" id="steam-cr" value="15" step="1" oninput="calcSMR()"><span class="unit">USD/tonne</span></div>
+      </div>
+    </div>
+
+    <div class="stitle">/// plant economics</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Plant capacity</label>
+        <div class="ir"><input type="number" id="smr-cap" value="100000" step="1000" oninput="calcSMR()"><span class="unit">Nm3/hr</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Capital cost (CAPEX)</label>
+        <div class="ir"><input type="number" id="smr-capex" value="120" step="5" oninput="calcSMR()"><span class="unit">M USD</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Plant lifetime</label>
+        <div class="ir"><input type="number" id="smr-life" value="25" step="1" oninput="calcSMR()"><span class="unit">years</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Discount rate (WACC)</label>
+        <div class="ir"><input type="number" id="smr-wacc" value="8" step="0.5" oninput="calcSMR()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Capacity factor</label>
+        <div class="ir"><input type="number" id="smr-cf" value="90" step="1" oninput="calcSMR()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Fixed O&M (% CAPEX/yr)</label>
+        <div class="ir"><input type="number" id="smr-om" value="3.5" step="0.1" oninput="calcSMR()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">CO2 emission (vented)</label>
+        <div class="ir"><input type="number" id="smr-co2" value="9.5" step="0.1" oninput="calcSMR()"><span class="unit">kg CO2/kg H2</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Carbon price (ETS)</label>
+        <div class="ir"><input type="number" id="smr-cprice" value="85" step="5" oninput="calcSMR()"><span class="unit">USD/tonne CO2</span></div>
+      </div>
+    </div>
+    <div id="r1"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 2: BLUE H2 (SMR+CCS) ===== -->
+<div class="panel" id="p2">
+  <div class="card blue-accent">
+    <div class="stitle blue">/// blue hydrogen - SMR with carbon capture and storage (CCS)</div>
+    <div class="ibox">
+      <strong>Blue H2:</strong> Same SMR process as grey H2, but CO2 is captured (typically 85-95% capture rate) and permanently stored underground (geological sequestration) or utilized (CCUS). Higher CAPEX and OPEX than grey H2 due to CCS unit, but significantly lower CO2 intensity.
+    </div>
+
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Natural gas price</label>
+        <div class="ir"><input type="number" id="b-ng" value="8.5" step="0.1" oninput="calcBlue()"><span class="unit">USD/MMBtu</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">SMR+CCS CAPEX</label>
+        <div class="ir"><input type="number" id="b-capex" value="200" step="5" oninput="calcBlue()"><span class="unit">M USD</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">CCS transport + storage</label>
+        <div class="ir"><input type="number" id="b-ccs-cost" value="25" step="1" oninput="calcBlue()"><span class="unit">USD/tonne CO2</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">CO2 capture rate</label>
+        <div class="ir"><input type="number" id="b-cap-rate" value="90" step="1" oninput="calcBlue()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gross CO2 emissions</label>
+        <div class="ir"><input type="number" id="b-co2-gross" value="9.5" step="0.1" oninput="calcBlue()"><span class="unit">kg CO2/kg H2</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Carbon price (ETS)</label>
+        <div class="ir"><input type="number" id="b-cprice" value="85" step="5" oninput="calcBlue()"><span class="unit">USD/tonne CO2</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Plant capacity</label>
+        <div class="ir"><input type="number" id="b-cap" value="100000" step="1000" oninput="calcBlue()"><span class="unit">Nm3/hr</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Discount rate</label>
+        <div class="ir"><input type="number" id="b-wacc" value="8" step="0.5" oninput="calcBlue()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Capacity factor</label>
+        <div class="ir"><input type="number" id="b-cf" value="90" step="1" oninput="calcBlue()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div id="r2"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 3: GREEN H2 (PEM) ===== -->
+<div class="panel" id="p3">
+  <div class="card green-accent">
+    <div class="stitle green">/// green hydrogen - PEM electrolysis (Proton Exchange Membrane)</div>
+    <div class="ibox">
+      <strong>PEM electrolysis:</strong> H2O → H2 + ½O2 (ΔG = 237 kJ/mol at STP)<br>
+      <strong>Energy requirement:</strong> Minimum thermodynamic = 39.4 kWh/kg H2 | Actual PEM efficiency = 65-75% → 50-60 kWh/kg H2<br>
+      <strong>Key drivers:</strong> Electricity cost dominates (60-75% of LCOH). Solar/wind at $20-40/MWh enables $2-3/kg green H2 by 2030.
+    </div>
+
+    <div class="stitle green">/// electricity and electrolyzer parameters</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Electricity cost</label>
+        <div class="ir"><input type="number" id="g-elec" value="40" step="1" oninput="calcGreen()"><span class="unit">USD/MWh</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Electrolyzer efficiency</label>
+        <div class="ir"><input type="number" id="g-eff" value="70" step="0.5" oninput="calcGreen()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Stack capacity</label>
+        <div class="ir"><input type="number" id="g-cap" value="100" step="10" oninput="calcGreen()"><span class="unit">MW</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Electrolyzer CAPEX</label>
+        <div class="ir"><input type="number" id="g-capex" value="800" step="50" oninput="calcGreen()"><span class="unit">USD/kW</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Stack replacement (% CAPEX)</label>
+        <div class="ir"><input type="number" id="g-stack" value="40" step="5" oninput="calcGreen()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Stack lifetime</label>
+        <div class="ir"><input type="number" id="g-stlife" value="80000" step="5000" oninput="calcGreen()"><span class="unit">hours</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Capacity factor</label>
+        <div class="ir"><input type="number" id="g-cf" value="45" step="1" oninput="calcGreen()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Plant lifetime</label>
+        <div class="ir"><input type="number" id="g-life" value="20" step="1" oninput="calcGreen()"><span class="unit">years</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Discount rate (WACC)</label>
+        <div class="ir"><input type="number" id="g-wacc" value="8" step="0.5" oninput="calcGreen()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Water cost</label>
+        <div class="ir"><input type="number" id="g-water" value="2" step="0.5" oninput="calcGreen()"><span class="unit">USD/m3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Fixed O&M (% CAPEX/yr)</label>
+        <div class="ir"><input type="number" id="g-om" value="2.5" step="0.1" oninput="calcGreen()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div id="r3"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 4: COMPARISON ===== -->
+<div class="panel" id="p4">
+  <div class="card">
+    <div class="stitle blue">/// LCOH comparison - grey vs blue vs green hydrogen</div>
+    <div class="ibox">All values calculated from your inputs in tabs 1-3. Adjust parameters in each tab to update this comparison automatically.</div>
+    <div id="comp-kpis"></div>
+    <div class="chart-wrap">
+      <div class="chart-title">LCOH breakdown by cost component (USD/kg H2)</div>
+      <canvas id="compChart" height="200"></canvas>
+    </div>
+    <div class="chart-wrap" style="margin-top:10px;">
+      <div class="chart-title">Sensitivity: LCOH vs electricity price (Green H2) and NG price (Grey/Blue H2)</div>
+      <canvas id="sensChart" height="200"></canvas>
+    </div>
+    <div id="comp-analysis" style="margin-top:14px;"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 5: BREAK-EVEN ===== -->
+<div class="panel" id="p5">
+  <div class="card">
+    <div class="stitle gold">/// break-even analysis - when does green H2 compete?</div>
+    <div class="ibox">Calculate the electricity price at which green H2 LCOH equals grey or blue H2 LCOH. Also calculates the carbon price needed to make grey H2 uncompetitive versus alternatives.</div>
+
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Green H2 LCOH target</label>
+        <div class="ir"><input type="number" id="be-target" value="2.0" step="0.1" oninput="calcBreakeven()"><span class="unit">USD/kg H2</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Grey H2 current LCOH</label>
+        <div class="ir"><input type="number" id="be-grey" value="1.5" step="0.1" oninput="calcBreakeven()"><span class="unit">USD/kg H2</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Electrolyzer CAPEX (future)</label>
+        <div class="ir"><input type="number" id="be-capex" value="400" step="50" oninput="calcBreakeven()"><span class="unit">USD/kW</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Efficiency</label>
+        <div class="ir"><input type="number" id="be-eff" value="75" step="0.5" oninput="calcBreakeven()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Capacity factor</label>
+        <div class="ir"><input type="number" id="be-cf" value="50" step="1" oninput="calcBreakeven()"><span class="unit">%</span></div>
+      </div>
+    </div>
+
+    <div id="r5"></div>
+
+    <div class="chart-wrap" style="margin-top:14px;">
+      <div class="chart-title">Green H2 LCOH vs electricity price at different electrolyzer CAPEX (USD/kW)</div>
+      <canvas id="beChart" height="220"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 6: REFERENCE ===== -->
+<div class="panel" id="p6">
+  <div class="card">
+    <div class="stitle">/// hydrogen production - global technology overview</div>
+    <table class="tbl">
+      <thead>
+        <tr><th>Technology</th><th>Color</th><th>Feedstock</th><th>LCOH 2024 (USD/kg)</th><th>CO2 (kg/kg H2)</th><th>Maturity</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="tw">SMR (Steam Methane Reforming)</td><td>Grey</td><td>Natural gas</td><td>1.0-2.5</td><td>9-12</td><td>Commercial</td></tr>
+        <tr><td class="tw">SMR + CCS (90% capture)</td><td>Blue</td><td>Natural gas + CCS</td><td>1.5-3.5</td><td>0.9-1.2</td><td>Commercial</td></tr>
+        <tr><td class="tw">ATR + CCS (autothermal ref.)</td><td>Blue</td><td>Natural gas + CCS</td><td>1.4-3.0</td><td>0.5-0.9</td><td>Demonstration</td></tr>
+        <tr><td class="tw">PEM Electrolysis (grid)</td><td>Yellow</td><td>Electricity (grid)</td><td>3.0-8.0</td><td>varies</td><td>Commercial</td></tr>
+        <tr><td class="tw">PEM Electrolysis (solar/wind)</td><td>Green</td><td>Renewable electricity</td><td>1.5-6.0</td><td>&lt; 1</td><td>Commercial</td></tr>
+        <tr><td class="tw">Alkaline Electrolysis</td><td>Green</td><td>Renewable electricity</td><td>1.5-5.5</td><td>&lt; 1</td><td>Commercial</td></tr>
+        <tr><td class="tw">SOEC (Solid Oxide)</td><td>Green</td><td>Electricity + heat</td><td>2.0-5.0</td><td>&lt; 0.5</td><td>Pilot</td></tr>
+        <tr><td class="tw">Coal gasification</td><td>Brown/Black</td><td>Coal</td><td>1.0-2.0</td><td>18-20</td><td>Commercial</td></tr>
+        <tr><td class="tw">Coal gasification + CCS</td><td>Blue</td><td>Coal + CCS</td><td>2.0-4.0</td><td>0.9-2.0</td><td>Demonstration</td></tr>
+        <tr><td class="tw">Biomass gasification</td><td>Green/Bio</td><td>Biomass</td><td>2.0-4.5</td><td>0-negative</td><td>Pilot</td></tr>
+        <tr><td class="tw">Nuclear thermochemical (HTE)</td><td>Pink</td><td>Nuclear heat</td><td>2.5-5.0</td><td>~0</td><td>R&D</td></tr>
+        <tr><td class="tw">Methane pyrolysis</td><td>Turquoise</td><td>Natural gas (no CO2)</td><td>1.5-3.5</td><td>~0 (solid C)</td><td>Pilot</td></tr>
+      </tbody>
+    </table>
+    <div class="sep"></div>
+    <div class="stitle">/// key physical constants - hydrogen</div>
+    <table class="tbl">
+      <thead><tr><th>Property</th><th>Value</th><th>Unit</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Molecular weight</td><td>2.016</td><td>g/mol</td><td>H2</td></tr>
+        <tr><td class="tw">LHV (Lower Heating Value)</td><td>119.96</td><td>MJ/kg</td><td>33.33 kWh/kg</td></tr>
+        <tr><td class="tw">HHV (Higher Heating Value)</td><td>141.86</td><td>MJ/kg</td><td>39.41 kWh/kg</td></tr>
+        <tr><td class="tw">Energy density (gas, ambient)</td><td>0.01005</td><td>MJ/L</td><td>At STP (0°C, 1 atm)</td></tr>
+        <tr><td class="tw">Energy density (liquid H2)</td><td>8.491</td><td>MJ/L</td><td>At -253°C, 1 atm</td></tr>
+        <tr><td class="tw">Energy density (700 bar CGH2)</td><td>5.32</td><td>MJ/L</td><td>Compressed gas, 700 bar</td></tr>
+        <tr><td class="tw">Density (gas, ambient)</td><td>0.0899</td><td>kg/Nm3</td><td>At 0°C, 1 atm</td></tr>
+        <tr><td class="tw">Boiling point</td><td>-252.9</td><td>°C</td><td>At 1 atm</td></tr>
+        <tr><td class="tw">Minimum thermodynamic energy</td><td>39.4</td><td>kWh/kg H2</td><td>ΔG = 237 kJ/mol</td></tr>
+        <tr><td class="tw">Faraday constant</td><td>96485</td><td>C/mol</td><td>For electrolysis calculation</td></tr>
+        <tr><td class="tw">Water consumption (electrolysis)</td><td>9.0</td><td>L H2O / Nm3 H2</td><td>Or ~11 kg H2O/kg H2</td></tr>
+        <tr><td class="tw">1 kg H2 equivalent to</td><td>~33.3</td><td>kWh</td><td>LHV basis</td></tr>
+        <tr><td class="tw">SMR CH4 consumption (ideal)</td><td>0.25</td><td>kg CH4 / kg H2</td><td>Stoichiometric: CH4+2H2O→CO2+4H2</td></tr>
+        <tr><td class="tw">SMR CH4 consumption (real)</td><td>0.40-0.45</td><td>kg CH4 / kg H2</td><td>Including heat duty</td></tr>
+      </tbody>
+    </table>
+    <div class="sep"></div>
+    <div class="stitle">/// LCOH formula reference</div>
+    <div class="fbox">
+      <strong>LCOH (Levelized Cost of Hydrogen) = (CAPEX annuity + OPEX_fixed + OPEX_variable) / Annual H2 production</strong><br><br>
+      <strong>CAPEX annuity:</strong> CAPEX x r(1+r)^n / ((1+r)^n - 1) where r = WACC, n = lifetime<br>
+      <strong>Annual H2 (kg/yr):</strong> Capacity (kW) x CF x 8760 / Energy_per_kg (kWh/kg)<br>
+      <strong>For SMR:</strong> LCOH (USD/kg) = [NG_cost + CAPEX_ann + O&M] / H2_annual - steam_credit<br>
+      <strong>For PEM:</strong> LCOH (USD/kg) = Elec_cost x SEC + CAPEX_ann/H2_annual + O&M/H2_annual + water_cost<br>
+      <strong>SEC (Specific Energy Consumption):</strong> SEC = HHV_H2 / electrolyzer_efficiency = 39.4 / eta kWh/kg<br>
+      <strong>Carbon cost impact:</strong> Delta_LCOH = CO2_intensity (kg CO2/kg H2) x carbon_price / 1000
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
+  · H2 cost calculations per IEA Hydrogen Report / IRENA Green Hydrogen Cost Reduction · Educational tool
+</div>
+</div>
+
+<script>
+var compChart=null,sensChart=null,beChart=null;
+var lastSMR={},lastBlue={},lastGreen={};
+
+function sw(n){
+  for(var i=1;i<=6;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    document.getElementById('t'+i).className='tab'+(i===n?(' on t-'+['gray','blue','green','red','gold','purple'][i-1]):'');
+  }
+  if(n===4)setTimeout(function(){updateComparison();},100);
+  if(n===5)setTimeout(function(){calcBreakeven();},100);
+}
+
+/* ====== UTILS ====== */
+function rc(cls,lbl,val,unit,sub){
+  return '<div class="rc '+(cls||'')+'">'
+    +'<div class="rl">'+lbl+'</div>'
+    +'<div class="rv">'+val+(unit?' <span>'+unit+'</span>':'')+'</div>'
+    +(sub?'<div class="rsub">'+sub+'</div>':'')+'</div>';
+}
+function ar(type,title,body,sugg){
+  var d={ok:'d-ok',wn:'d-wn',er:'d-er',blue:'d-blue',green:'d-green'}[type]||'d-blue';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+}
+
+/* Capital annuity */
+function annuity(capex,r,n){
+  var R=r/100;
+  return capex*R*Math.pow(1+R,n)/(Math.pow(1+R,n)-1);
+}
+
+/* H2 density conversion */
+var H2_kg_per_Nm3=0.0899; // kg/Nm3
+var H2_HHV=39.4; // kWh/kg (HHV)
+var H2_LHV=33.3; // kWh/kg
+
+/* ====== PANEL 1: GREY SMR ====== */
+function calcSMR(){
+  var ng=parseFloat(document.getElementById('ng-price').value)||8.5; // USD/MMBtu
+  var ng_cons=parseFloat(document.getElementById('ng-cons').value)||3.4; // Nm3 NG / Nm3 H2
+  var steam_cr=parseFloat(document.getElementById('steam-cr').value)||15; // USD/t steam
+  var cap_nm3=parseFloat(document.getElementById('smr-cap').value)||100000; // Nm3/hr
+  var capex=parseFloat(document.getElementById('smr-capex').value)||120; // M USD
+  var life=parseFloat(document.getElementById('smr-life').value)||25;
+  var wacc=parseFloat(document.getElementById('smr-wacc').value)||8;
+  var cf=parseFloat(document.getElementById('smr-cf').value)||90;
+  var om_pct=parseFloat(document.getElementById('smr-om').value)||3.5;
+  var co2=parseFloat(document.getElementById('smr-co2').value)||9.5; // kg CO2/kg H2
+  var cprice=parseFloat(document.getElementById('smr-cprice').value)||85; // USD/tonne
+
+  // Annual H2 production
+  var h2_annual_Nm3=cap_nm3*8760*(cf/100); // Nm3/yr
+  var h2_annual_kg=h2_annual_Nm3*H2_kg_per_Nm3; // kg/yr
+  var h2_annual_t=h2_annual_kg/1000; // t/yr
+
+  // NG cost: convert Nm3 NG to MMBtu
+  // 1 Nm3 natural gas ≈ 36 MJ = 0.03412 MMBtu
+  var ng_per_MMBtu=0.03412; // MMBtu per Nm3 NG
+  var ng_cost_per_kg_h2=ng*ng_cons*ng_per_MMBtu/H2_kg_per_Nm3;
+  var ng_cost_annual=ng_cost_per_kg_h2*h2_annual_kg/1e6; // M USD
+
+  // Steam credit: SMR exports ~0.6 t steam per Nm3 H2 (typical)
+  var steam_export=0.6; // t steam / kg H2 (rough)
+  var steam_credit_per_kg=steam_cr*steam_export/1000;
+  var steam_credit_annual=steam_credit_per_kg*h2_annual_kg/1e6;
+
+  // CAPEX annuity
+  var capex_ann=annuity(capex,wacc,life); // M USD/yr
+  var capex_per_kg=capex_ann*1e6/h2_annual_kg;
+
+  // O&M
+  var om_annual=capex*(om_pct/100); // M USD/yr
+  var om_per_kg=om_annual*1e6/h2_annual_kg;
+
+  // Carbon cost (if applicable)
+  var carbon_cost_per_kg=co2*cprice/1000; // USD/kg H2
+
+  // LCOH without carbon cost
+  var lcoh_no_carbon=ng_cost_per_kg_h2+capex_per_kg+om_per_kg-steam_credit_per_kg;
+  // LCOH with carbon cost
+  var lcoh_with_carbon=lcoh_no_carbon+carbon_cost_per_kg;
+
+  lastSMR={ng:ng_cost_per_kg_h2,capex:capex_per_kg,om:om_per_kg,steam:-steam_credit_per_kg,
+    carbon:carbon_cost_per_kg,lcoh:lcoh_no_carbon,lcoh_c:lcoh_with_carbon,
+    co2:co2,h2_t:h2_annual_t};
+
+  var html='<div class="rgrid">';
+  html+=rc('hl-gray','LCOH (excl. carbon cost)',lcoh_no_carbon.toFixed(2),'USD/kg H2','Grey hydrogen');
+  html+=rc('hl-gray','LCOH (incl. carbon cost)',lcoh_with_carbon.toFixed(2),'USD/kg H2','At $'+cprice+'/t CO2');
+  html+=rc('','Feedstock cost',ng_cost_per_kg_h2.toFixed(3),'USD/kg H2',(ng_cost_per_kg_h2/lcoh_no_carbon*100).toFixed(0)+'% of LCOH');
+  html+=rc('','CAPEX contribution',capex_per_kg.toFixed(3),'USD/kg H2',(capex_per_kg/lcoh_no_carbon*100).toFixed(0)+'% of LCOH');
+  html+=rc('','O&M contribution',om_per_kg.toFixed(3),'USD/kg H2',(om_per_kg/lcoh_no_carbon*100).toFixed(0)+'% of LCOH');
+  html+=rc('','CO2 cost exposure',carbon_cost_per_kg.toFixed(3),'USD/kg H2',co2.toFixed(1)+' kg CO2/kg H2 x $'+cprice+'/t');
+  html+=rc('','Annual H2 production',Math.round(h2_annual_t).toLocaleString(),'t H2/yr',cap_nm3.toLocaleString()+' Nm3/hr at '+cf+'% CF');
+  html+=rc('','CO2 emissions',Math.round(h2_annual_t*co2).toLocaleString(),'t CO2/yr','Vented to atmosphere');
+  html+='</div>';
+
+  // Cost breakdown visual
+  var max=lcoh_no_carbon;
+  html+='<div class="cost-bar">'
+    +'<div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:8px;">COST BREAKDOWN (USD/kg H2)</div>'
+    +costBar('Natural gas',ng_cost_per_kg_h2,max,'#FF8800')
+    +costBar('CAPEX annuity',capex_per_kg,max,'#0099FF')
+    +costBar('O&M',om_per_kg,max,'#6633CC')
+    +costBar('Steam credit',-steam_credit_per_kg,max,'#00BB55')
+    +'</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>NG cost:</strong> '+ng+' USD/MMBtu x '+ng_cons+' Nm3/Nm3 x 0.03412 MMBtu/Nm3 / '+H2_kg_per_Nm3+' kg/Nm3 = <span class="hi">'+ng_cost_per_kg_h2.toFixed(3)+' USD/kg H2</span><br>'
+    +'<strong>CAPEX annuity:</strong> '+capex+' M$ x CRF('+wacc+'%,'+life+'yr) = '+capex_ann.toFixed(2)+' M$/yr → <span class="hi">'+capex_per_kg.toFixed(3)+' USD/kg H2</span><br>'
+    +'<strong>Carbon exposure:</strong> '+co2+' kg CO2/kg H2 x $'+cprice+'/t / 1000 = <span class="hi-r">+'+carbon_cost_per_kg.toFixed(3)+' USD/kg H2</span><br>'
+    +'<strong>LCOH (no carbon):</strong> '+ng_cost_per_kg_h2.toFixed(3)+' + '+capex_per_kg.toFixed(3)+' + '+om_per_kg.toFixed(3)+' - '+steam_credit_per_kg.toFixed(3)+' = <span class="hi">'+lcoh_no_carbon.toFixed(3)+' USD/kg H2</span>'
+    +'</div>';
+
+  var rows='';
+  if(ng>12){
+    rows+=ar('wn','High natural gas price ('+ng+' USD/MMBtu)','At this gas price, grey H2 LCOH reaches '+lcoh_no_carbon.toFixed(2)+' USD/kg. Feedstock represents '+(ng_cost_per_kg_h2/lcoh_no_carbon*100).toFixed(0)+'% of cost. Europe experienced NG prices of $25-40/MMBtu in 2022, making SMR LCOH > $4/kg.','Hedge natural gas price with long-term supply contracts. Consider LNG diversification if pipeline gas is primary supply. At $'+ng+'/MMBtu, break-even electricity price for green H2 parity = $'+(ng_cost_per_kg_h2*H2_HHV*1000/1000).toFixed(0)+'/MWh (approx).');
+  }
+  if(carbon_cost_per_kg>0.5){
+    rows+=ar('wn','Significant carbon cost exposure ($'+carbon_cost_per_kg.toFixed(2)+'/kg H2)','At $'+cprice+'/tonne CO2, the carbon cost adds '+carbon_cost_per_kg.toFixed(2)+' USD/kg to grey H2 effective cost, making LCOH with carbon = '+lcoh_with_carbon.toFixed(2)+' USD/kg. If carbon price reaches $150/t (EU 2030 forecast), grey H2 LCOH rises to '+(lcoh_no_carbon+co2*150/1000).toFixed(2)+' USD/kg.','Grey H2 operators face increasing carbon price risk. Blue H2 with 90% capture reduces carbon exposure by 90%. At $'+Math.round((lcoh_no_carbon-1.5)/co2*1000)+'+ /t CO2, blue H2 becomes cost-competitive with grey H2 (rough estimate).');
+  }
+  rows+=ar('blue','Grey H2 global cost context','Current global grey H2 LCOH: $0.90-2.50/kg depending on natural gas price and location. US ($3-4/MMBtu NG): LCOH ≈ $1.0-1.5/kg. Middle East ($1-2/MMBtu): LCOH ≈ $0.8-1.2/kg. Europe ($8-15/MMBtu): LCOH ≈ $1.8-3.0/kg.','Grey H2 remains the lowest-cost production route today but faces increasing risk from carbon pricing and stranded asset risk as energy transition accelerates. Investment in new SMR capacity without CCS is risky beyond 2030 in carbon-regulated markets.');
+
+  html+='<div class="analysis"><div class="atitle">/// GREY H2 COST ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r1').innerHTML=html;
+}
+
+function costBar(label,val,max,color){
+  var pct=Math.max(0,Math.min(100,Math.abs(val)/max*100));
+  var sign=val<0?'-':'';
+  return '<div class="cb-row">'
+    +'<div class="cb-label">'+label+'</div>'
+    +'<div class="cb-track"><div class="cb-fill" style="width:'+pct+'%;background:'+color+';"></div></div>'
+    +'<div class="cb-val">'+sign+'$'+Math.abs(val).toFixed(3)+'</div>'
+    +'</div>';
+}
+
+/* ====== PANEL 2: BLUE H2 ====== */
+function calcBlue(){
+  var ng=parseFloat(document.getElementById('b-ng').value)||8.5;
+  var capex=parseFloat(document.getElementById('b-capex').value)||200;
+  var ccs_cost=parseFloat(document.getElementById('b-ccs-cost').value)||25;
+  var cap_rate=parseFloat(document.getElementById('b-cap-rate').value)||90;
+  var co2_gross=parseFloat(document.getElementById('b-co2-gross').value)||9.5;
+  var cprice=parseFloat(document.getElementById('b-cprice').value)||85;
+  var cap_nm3=parseFloat(document.getElementById('b-cap').value)||100000;
+  var wacc=parseFloat(document.getElementById('b-wacc').value)||8;
+  var cf=parseFloat(document.getElementById('b-cf').value)||90;
+
+  var h2_annual_kg=cap_nm3*8760*(cf/100)*H2_kg_per_Nm3;
+  var ng_per_MMBtu=0.03412;
+  var ng_cons=3.4;
+  var ng_cost_per_kg=ng*ng_cons*ng_per_MMBtu/H2_kg_per_Nm3;
+  var capex_ann=annuity(capex,wacc,25)*1e6/h2_annual_kg;
+  var om_per_kg=capex*0.04*1e6/h2_annual_kg;
+  var co2_captured=co2_gross*(cap_rate/100);
+  var co2_vented=co2_gross*(1-cap_rate/100);
+  var ccs_per_kg=co2_captured*ccs_cost/1000;
+  var carbon_residual=co2_vented*cprice/1000;
+  var steam_credit_per_kg=0.6*15/1000;
+  var lcoh=ng_cost_per_kg+capex_ann+om_per_kg+ccs_per_kg-steam_credit_per_kg;
+  var lcoh_c=lcoh+carbon_residual;
+
+  lastBlue={ng:ng_cost_per_kg,capex:capex_ann,om:om_per_kg,ccs:ccs_per_kg,
+    steam:-steam_credit_per_kg,lcoh:lcoh,lcoh_c:lcoh_c,co2:co2_vented,
+    co2_captured:co2_captured,h2_t:h2_annual_kg/1000};
+
+  var html='<div class="rgrid">';
+  html+=rc('hl-blue','LCOH (excl. residual carbon)',lcoh.toFixed(2),'USD/kg H2','Blue hydrogen');
+  html+=rc('hl-blue','LCOH (incl. residual carbon)',lcoh_c.toFixed(2),'USD/kg H2','At $'+cprice+'/t CO2');
+  html+=rc('','CCS premium vs grey H2',(lcoh-lastSMR.lcoh||0).toFixed(2),'USD/kg H2','Additional cost of CCS');
+  html+=rc('','CO2 captured',co2_captured.toFixed(2),'kg CO2/kg H2',cap_rate+'% capture rate');
+  html+=rc('ok','CO2 vented (residual)',co2_vented.toFixed(2),'kg CO2/kg H2','vs '+co2_gross+' grey baseline');
+  html+=rc('','CCS transport+storage cost',ccs_per_kg.toFixed(3),'USD/kg H2','$'+ccs_cost+'/t x '+co2_captured.toFixed(1)+' kg/kg H2');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Blue H2 = Grey H2 cost + CCS cost - Carbon cost savings</strong><br>'
+    +'CCS additional: $'+ccs_cost+'/t x '+co2_captured.toFixed(2)+' kg CO2/kg H2 / 1000 = <span class="hi">+$'+ccs_per_kg.toFixed(3)+'/kg H2</span><br>'
+    +'CO2 vented: '+co2_gross+' x (1-'+cap_rate/100+') = '+co2_vented.toFixed(2)+' kg CO2/kg H2 (residual)<br>'
+    +'Carbon cost on residual: '+co2_vented.toFixed(2)+' x $'+cprice+'/1000 = <span class="hi-r">$'+carbon_residual.toFixed(3)+'/kg H2</span><br>'
+    +'LCOH Blue = <span class="hi">$'+lcoh.toFixed(3)+'/kg H2</span> (before residual carbon) | $'+lcoh_c.toFixed(3)+'/kg (incl.)'
+    +'</div>';
+
+  var rows='';
+  rows+=ar('blue','Blue H2 CCS premium analysis','CCS adds $'+ccs_per_kg.toFixed(2)+'/kg H2 (transport + geological storage at $'+ccs_cost+'/tonne). Total LCOH of $'+lcoh.toFixed(2)+'/kg is '+(lcoh>lastSMR.lcoh?(lcoh-lastSMR.lcoh).toFixed(2)+' more':'about equal to')+' grey H2 ($'+lastSMR.lcoh.toFixed(2)+'/kg).','CCS cost competitiveness with grey H2 improves at carbon prices above $'+Math.round((lcoh-lastSMR.lcoh)/co2_captured*1000)+'/ t CO2. At EU ETS $150/t forecast (2030), blue H2 will be '+((lastSMR.lcoh+co2_gross*150/1000)>lcoh?'cheaper':'more expensive')+' than grey H2.');
+  rows+=ar('ok','CO2 intensity reduction','Blue H2 emits '+co2_vented.toFixed(2)+' kg CO2/kg H2 vs '+co2_gross+' kg for grey H2 - a '+(cap_rate)+'% reduction. This makes blue H2 significantly lower carbon than grey H2, though not zero-carbon (unlike green H2).','Increasing capture rate from 90% to 95% reduces residual from '+co2_vented.toFixed(2)+' to '+(co2_gross*0.05).toFixed(2)+' kg CO2/kg H2 but adds approximately $0.15-0.25/kg additional CCS cost (diminishing returns on capture rate).');
+
+  html+='<div class="analysis"><div class="atitle blue">/// BLUE H2 COST ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r2').innerHTML=html;
+}
+
+/* ====== PANEL 3: GREEN H2 ====== */
+function calcGreen(){
+  var elec=parseFloat(document.getElementById('g-elec').value)||40; // USD/MWh
+  var eff=parseFloat(document.getElementById('g-eff').value)||70; // %
+  var cap_mw=parseFloat(document.getElementById('g-cap').value)||100; // MW
+  var capex_kw=parseFloat(document.getElementById('g-capex').value)||800; // USD/kW
+  var stack_pct=parseFloat(document.getElementById('g-stack').value)||40; // %
+  var stack_hr=parseFloat(document.getElementById('g-stlife').value)||80000; // hours
+  var cf=parseFloat(document.getElementById('g-cf').value)||45; // %
+  var life=parseFloat(document.getElementById('g-life').value)||20; // years
+  var wacc=parseFloat(document.getElementById('g-wacc').value)||8; // %
+  var water=parseFloat(document.getElementById('g-water').value)||2; // USD/m3
+  var om_pct=parseFloat(document.getElementById('g-om').value)||2.5; // % CAPEX/yr
+
+  // Specific energy consumption
+  var sec=H2_HHV/(eff/100); // kWh/kg H2 (HHV basis)
+  // Annual H2 production
+  var op_hours=8760*(cf/100);
+  var h2_rate=cap_mw*1000/(sec); // kg/hr (kW/kWh per kg)
+  var h2_annual=h2_rate*op_hours; // kg/yr
+
+  // Electricity cost
+  var elec_per_kg=sec*elec/1000; // USD/kg H2
+
+  // Total CAPEX (M USD)
+  var total_capex=cap_mw*1000*capex_kw/1e6; // M USD
+  var capex_ann=annuity(total_capex,wacc,life)*1e6/h2_annual; // USD/kg H2
+
+  // Stack replacement
+  var n_replacements=Math.max(0,Math.floor(life*op_hours/stack_hr)-1);
+  var stack_cost_per_rep=total_capex*(stack_pct/100); // M USD
+  var stack_ann=n_replacements*stack_cost_per_rep/life*1e6/h2_annual; // USD/kg H2
+
+  // O&M
+  var om_per_kg=total_capex*(om_pct/100)*1e6/h2_annual;
+
+  // Water: 9 L H2O per Nm3 H2 = 9/0.0899 = ~100 L H2O / kg H2 (approx 11 kg H2O / kg H2)
+  var water_per_kg=water*11/1000; // USD/kg H2 (11 kg H2O/kg H2)
+
+  var lcoh=elec_per_kg+capex_ann+stack_ann+om_per_kg+water_per_kg;
+
+  lastGreen={elec:elec_per_kg,capex:capex_ann,stack:stack_ann,om:om_per_kg,
+    water:water_per_kg,lcoh:lcoh,co2:0.3,h2_t:h2_annual/1000,sec:sec,cf:cf,
+    elec_price:elec,eff:eff};
+
+  var html='<div class="rgrid">';
+  html+=rc('hl-green','LCOH (Green H2)',lcoh.toFixed(2),'USD/kg H2','PEM electrolysis');
+  html+=rc('hl-green','Electricity component',elec_per_kg.toFixed(2),'USD/kg H2',(elec_per_kg/lcoh*100).toFixed(0)+'% of LCOH');
+  html+=rc('','Specific energy (SEC)',sec.toFixed(1),'kWh/kg H2','At '+eff+'% efficiency (HHV)');
+  html+=rc('','CAPEX contribution',capex_ann.toFixed(3),'USD/kg H2',(capex_ann/lcoh*100).toFixed(0)+'% of LCOH');
+  html+=rc('','Stack replacement cost',stack_ann.toFixed(3),'USD/kg H2',n_replacements+' replacements over '+life+' yr');
+  html+=rc('','Annual H2 production',(h2_annual/1000).toFixed(0),'t H2/yr',h2_rate.toFixed(1)+' kg/hr at '+cf+'% CF');
+  html+=rc('ok','CO2 emissions',lcoh<2?'~0':'~0.3','kg CO2/kg H2','Renewable electricity source');
+  html+=rc('','Water consumption',((h2_annual/1000)*11).toFixed(0),'t H2O/yr','11 kg H2O per kg H2');
+  html+='</div>';
+
+  html+='<div class="cost-bar">'
+    +'<div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:8px;">COST BREAKDOWN (USD/kg H2)</div>'
+    +costBar('Electricity',elec_per_kg,lcoh,'#FF8800')
+    +costBar('CAPEX annuity',capex_ann,lcoh,'#0099FF')
+    +costBar('Stack replacement',stack_ann,lcoh,'#CC0000')
+    +costBar('O&M',om_per_kg,lcoh,'#6633CC')
+    +costBar('Water',water_per_kg,lcoh,'#00AAFF')
+    +'</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>SEC</strong> = HHV_H2 / eta = '+H2_HHV+' / '+(eff/100)+' = <span class="hi-g">'+sec.toFixed(2)+' kWh/kg H2</span><br>'
+    +'<strong>Electricity cost</strong> = '+sec.toFixed(2)+' kWh/kg x $'+elec+'/MWh / 1000 = <span class="hi-g">$'+elec_per_kg.toFixed(3)+'/kg H2</span><br>'
+    +'<strong>H2 annual</strong> = '+cap_mw+' MW x 1000 x '+op_hours.toFixed(0)+' hr / '+sec.toFixed(1)+' kWh/kg = <span class="hi-g">'+(h2_annual/1000).toFixed(0)+' t H2/yr</span><br>'
+    +'<strong>LCOH</strong> = '+elec_per_kg.toFixed(3)+' + '+capex_ann.toFixed(3)+' + '+stack_ann.toFixed(3)+' + '+om_per_kg.toFixed(3)+' + '+water_per_kg.toFixed(3)+' = <span class="hi-g">$'+lcoh.toFixed(3)+'/kg H2</span>'
+    +'</div>';
+
+  var rows='';
+  if(elec>60){
+    rows+=ar('wn','Electricity cost too high for competitive green H2 ('+elec+' USD/MWh)','At $'+elec+'/MWh, electricity represents $'+elec_per_kg.toFixed(2)+'/kg H2 ('+(elec_per_kg/lcoh*100).toFixed(0)+'% of LCOH). Green H2 requires $20-40/MWh electricity to compete with grey/blue H2.','Target solar/wind PPA prices of $20-35/MWh for competitive green H2. MENA region (Saudi Arabia, UAE, Morocco): solar $15-25/MWh achievable. Each $10/MWh electricity reduction lowers LCOH by $'+((10*sec/1000)).toFixed(2)+'/kg H2 at this efficiency.');
+  } else if(elec<=30){
+    rows+=ar('green','Competitive electricity cost ('+elec+' USD/MWh)','At $'+elec+'/MWh, electricity cost is $'+elec_per_kg.toFixed(2)+'/kg H2. This is within the range where green H2 can approach cost parity with grey/blue H2 in high carbon-price environments. LCOH of $'+lcoh.toFixed(2)+'/kg is '+(lcoh<2?'below':'above')+' the $2/kg target.','');
+  }
+  if(capex_kw>600){
+    rows+=ar('wn','Electrolyzer CAPEX above current best-in-class ('+capex_kw+' USD/kW)','PEM electrolyzer CAPEX is declining rapidly: $1,200-1,500/kW (2020) → $600-900/kW (2024) → projected $200-400/kW (2030). At current '+capex_kw+' USD/kW, CAPEX contributes $'+capex_ann.toFixed(2)+'/kg H2.','CAPEX reduction roadmap: standardization + automation + scale-up. Nel, ITM Power, ThyssenKrupp Nucera are targeting $200-400/kW by 2030. This would reduce CAPEX contribution from $'+capex_ann.toFixed(2)+' to $'+(capex_ann*250/capex_kw).toFixed(2)+'/kg H2.');
+  }
+  if(cf<40){
+    rows+=ar('wn','Low capacity factor ('+cf+'%) reduces H2 output and increases CAPEX/kg','At '+cf+'% capacity factor, annual operating hours = '+op_hours.toFixed(0)+' hr/yr. Low CF (solar-only: 20-25%, wind-only: 35-45%) increases fixed cost allocation per kg H2. Hybrid solar+wind or grid backup can raise CF to 60-80%.','Optimize CF vs electricity cost tradeoff: lower CF = cheaper renewable electricity but higher fixed cost per kg. Use optimization model: LCOH_optimal = f(CF, electricity_price). For this plant: target CF of '+(elec<30?'45-55%':'55-70%')+' with hybrid renewable source.');
+  }
+
+  html+='<div class="analysis"><div class="atitle green">/// GREEN H2 COST ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r3').innerHTML=html;
+}
+
+/* ====== PANEL 4: COMPARISON ====== */
+function updateComparison(){
+  calcSMR();calcBlue();calcGreen();
+
+  var g=lastSMR.lcoh||1.5,b=lastBlue.lcoh||2.5,gr=lastGreen.lcoh||4.0;
+  var gCo2=lastSMR.co2||9.5,bCo2=lastBlue.co2||0.95,grCo2=0.3;
+
+  var html='<div class="rgrid3">';
+  html+=rc('hl-gray','Grey H2 LCOH','$'+g.toFixed(2),'USD/kg','SMR, no carbon cost');
+  html+=rc('hl-blue','Blue H2 LCOH','$'+b.toFixed(2),'USD/kg','SMR + CCS 90%');
+  html+=rc('hl-green','Green H2 LCOH','$'+gr.toFixed(2),'USD/kg','PEM electrolysis');
+  html+='</div>';
+
+  html+='<div class="rgrid3" style="margin-top:8px;">';
+  html+=rc('','Grey CO2 intensity',gCo2.toFixed(1),'kg CO2/kg H2','Fully vented');
+  html+=rc('','Blue CO2 intensity',bCo2.toFixed(2),'kg CO2/kg H2','90% capture');
+  html+=rc('ok','Green CO2 intensity','~0.3','kg CO2/kg H2','Renewable source');
+  html+='</div>';
+
+  document.getElementById('comp-kpis').innerHTML=html;
+
+  // Chart
+  var ctx=document.getElementById('compChart').getContext('2d');
+  if(compChart){compChart.destroy();}
+  compChart=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Grey H2 (SMR)','Blue H2 (SMR+CCS)','Green H2 (PEM)'],
+      datasets:[
+        {label:'Feedstock/Electricity',data:[lastSMR.ng||1.0,lastBlue.ng||1.0,lastGreen.elec||2.5],backgroundColor:'#FF8800'},
+        {label:'CAPEX',data:[lastSMR.capex||0.2,lastBlue.capex||0.4,lastGreen.capex||0.5],backgroundColor:'#0099FF'},
+        {label:'O&M',data:[lastSMR.om||0.1,lastBlue.om||0.2,lastGreen.om||0.1],backgroundColor:'#6633CC'},
+        {label:'CCS / Stack',data:[0,lastBlue.ccs||0.3,lastGreen.stack||0.1],backgroundColor:'#CC0000'},
+        {label:'Steam credit',data:[lastSMR.steam||0,lastBlue.steam||0,0],backgroundColor:'#00BB55'},
+      ]
+    },
+    options:{
+      responsive:true,indexAxis:'y',
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}},
+        tooltip:{backgroundColor:'#111',borderColor:'#333',borderWidth:1,titleColor:'#fff',bodyColor:'#aaa'}},
+      scales:{
+        x:{stacked:true,ticks:{color:'#888',font:{size:10}},grid:{color:'#111'},
+          title:{display:true,text:'USD/kg H2',color:'#666'}},
+        y:{stacked:true,ticks:{color:'#ccc',font:{size:11}},grid:{color:'#111'}}
+      }
+    }
+  });
+
+  // Sensitivity chart
+  var ngPrices=[3,5,7,9,11,13,15];
+  var elPrices=[20,30,40,50,60,70,80];
+  // Grey LCOH vs NG price (simplified)
+  var greyLCOH=ngPrices.map(function(ng){
+    return (ng*3.4*0.03412/H2_kg_per_Nm3+(lastSMR.capex||0.2)+(lastSMR.om||0.1)-(lastSMR.steam||0));
+  });
+  // Green LCOH vs electricity price
+  var greenLCOH=elPrices.map(function(el){
+    var sec_=(lastGreen.sec||56.3);
+    return el*sec_/1000+(lastGreen.capex||0.5)+(lastGreen.stack||0.1)+(lastGreen.om||0.1)+0.02;
+  });
+
+  var ctx2=document.getElementById('sensChart').getContext('2d');
+  if(sensChart){sensChart.destroy();}
+  sensChart=new Chart(ctx2,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'Grey H2 vs NG price ($/MMBtu)',data:ngPrices.map(function(ng,i){return{x:ng,y:greyLCOH[i]};}),
+          borderColor:'#888',backgroundColor:'transparent',borderWidth:2,pointRadius:4,
+          xAxisID:'x1',tension:0.3},
+        {label:'Green H2 vs electricity ($/MWh)',data:elPrices.map(function(el,i){return{x:el,y:greenLCOH[i]};}),
+          borderColor:'#00BB55',backgroundColor:'transparent',borderWidth:2,pointRadius:4,
+          xAxisID:'x2',tension:0.3},
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x1:{type:'linear',position:'bottom',title:{display:true,text:'NG price ($/MMBtu) - for Grey H2',color:'#888'},ticks:{color:'#888'},grid:{color:'#111'}},
+        x2:{type:'linear',position:'top',title:{display:true,text:'Electricity ($/MWh) - for Green H2',color:'#00BB55'},ticks:{color:'#00BB55'},grid:{display:false}},
+        y:{title:{display:true,text:'LCOH (USD/kg H2)',color:'#666'},ticks:{color:'#888'},grid:{color:'#111'}}
+      }
+    }
+  });
+
+  var rows='';
+  var cheapest=g<=b&&g<=gr?'Grey':b<=g&&b<=gr?'Blue':'Green';
+  rows+=ar('blue','Current cost comparison','Grey H2: $'+g.toFixed(2)+'/kg | Blue H2: $'+b.toFixed(2)+'/kg | Green H2: $'+gr.toFixed(2)+'/kg. '+(cheapest)+' H2 is currently lowest cost at these input assumptions. Green H2 needs to decline by $'+(gr-g).toFixed(2)+'/kg to match grey H2.','');
+  rows+=ar('green','CO2 intensity comparison','Grey H2 emits '+gCo2.toFixed(1)+' kg CO2/kg H2 (fully vented). Blue H2 with 90% capture: '+bCo2.toFixed(2)+' kg CO2/kg H2. Green H2: ~0.3 kg CO2/kg H2 (renewable electricity transmission losses). To achieve < 1 kg CO2/kg H2 specification (EU taxonomy), green H2 or blue H2 (90%+ capture) is required.','');
+  document.getElementById('comp-analysis').innerHTML='<div class="analysis"><div class="atitle">/// COMPARATIVE ANALYSIS</div>'+rows+'</div>';
+}
+
+/* ====== PANEL 5: BREAK-EVEN ====== */
+function calcBreakeven(){
+  var target=parseFloat(document.getElementById('be-target').value)||2.0;
+  var grey_lcoh=parseFloat(document.getElementById('be-grey').value)||1.5;
+  var capex_kw=parseFloat(document.getElementById('be-capex').value)||400;
+  var eff=parseFloat(document.getElementById('be-eff').value)||75;
+  var cf=parseFloat(document.getElementById('be-cf').value)||50;
+
+  var sec=H2_HHV/(eff/100);
+  // Other costs (non-electricity): CAPEX + O&M + stack + water
+  var op_hours=8760*(cf/100);
+  var cap_mw=100; // reference
+  var total_capex=cap_mw*1000*capex_kw/1e6;
+  var h2_annual=cap_mw*1000/sec*op_hours;
+  var capex_ann=annuity(total_capex,8,20)*1e6/h2_annual;
+  var other=capex_ann+total_capex*0.025*1e6/h2_annual+0.05; // capex+om+water
+
+  // Break-even electricity price for target LCOH
+  // LCOH = elec*sec/1000 + other → elec = (target - other)*1000/sec
+  var be_elec=(target-other)*1000/sec;
+  var be_elec_parity=(grey_lcoh-other)*1000/sec;
+
+  // Carbon price to make grey H2 uncompetitive (grey LCOH + carbon cost = target)
+  var co2_grey=9.5;
+  var be_carbon=(target-grey_lcoh)*1000/co2_grey;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl-green','Break-even electricity price (target $'+target+'/kg)',be_elec.toFixed(1),'USD/MWh','For LCOH = $'+target+'/kg H2');
+  html+=rc('hl-blue','Electricity price for grey parity',be_elec_parity.toFixed(1),'USD/MWh','Match grey H2 at $'+grey_lcoh+'/kg');
+  html+=rc(be_elec>0?'ok':'er','Feasibility',be_elec>0&&be_elec<80?'ACHIEVABLE':be_elec<=0?'OTHER COSTS EXCEED TARGET':'HIGH - NEED LOWER CAPEX','-',be_elec>0?'Solar/wind at $'+be_elec.toFixed(0)+'/MWh required':'Non-electricity costs = $'+other.toFixed(2)+'/kg already');
+  html+=rc('hl-gold','Carbon price for grey parity',be_carbon.toFixed(0),'USD/tonne CO2','Makes grey H2 = green H2 cost');
+  html+=rc('','Non-electricity fixed costs',other.toFixed(3),'USD/kg H2','CAPEX + O&M + stack + water');
+  html+=rc('','Specific energy consumption',sec.toFixed(1),'kWh/kg H2','At '+eff+'% efficiency');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>LCOH = elec x SEC / 1000 + fixed_costs</strong><br>'
+    +'<strong>Break-even elec for $'+target+'/kg target:</strong> elec = ('+target+' - '+other.toFixed(3)+') x 1000 / '+sec.toFixed(1)+' = <span class="hi-g">$'+be_elec.toFixed(1)+'/MWh</span><br>'
+    +'<strong>Grey H2 parity ($'+grey_lcoh+'/kg):</strong> elec = ('+grey_lcoh+' - '+other.toFixed(3)+') x 1000 / '+sec.toFixed(1)+' = <span class="hi-g">$'+be_elec_parity.toFixed(1)+'/MWh</span><br>'
+    +'<strong>Carbon price for grey H2 parity:</strong> $'+be_carbon.toFixed(0)+'/t CO2 x 9.5 kg CO2/kg H2 / 1000 = $'+(be_carbon*9.5/1000).toFixed(2)+'/kg additional cost on grey H2'
+    +'</div>';
+
+  // Chart: LCOH vs electricity for 3 CAPEX scenarios
+  var capexScenarios=[{v:300,n:'$300/kW (2030 target)',c:'#00BB55'},{v:500,n:'$500/kW (2025)',c:'#0099FF'},{v:800,n:'$800/kW (2023)',c:'#FF8800'}];
+  var elPts=[];for(var e=10;e<=100;e+=5)elPts.push(e);
+
+  var ctx=document.getElementById('beChart').getContext('2d');
+  if(beChart){beChart.destroy();}
+  beChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:capexScenarios.map(function(sc){
+        return {
+          label:sc.n,
+          data:elPts.map(function(el){
+            var tc=100*1000*sc.v/1e6;
+            var ha=100*1000/sec*op_hours;
+            var ca=annuity(tc,8,20)*1e6/ha;
+            var oth=ca+tc*0.025*1e6/ha+0.05;
+            return {x:el,y:el*sec/1000+oth};
+          }),
+          borderColor:sc.c,backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.3
+        };
+      }).concat([{
+        label:'Grey H2 cost ($'+grey_lcoh+'/kg)',
+        data:elPts.map(function(el){return{x:el,y:grey_lcoh};}),
+        borderColor:'#888',backgroundColor:'transparent',borderWidth:1.5,
+        pointRadius:0,borderDash:[6,3],tension:0
+      },{
+        label:'Target $'+target+'/kg',
+        data:elPts.map(function(el){return{x:el,y:target};}),
+        borderColor:'#FFAA00',backgroundColor:'transparent',borderWidth:1.5,
+        pointRadius:0,borderDash:[4,4],tension:0
+      }])
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Electricity price (USD/MWh)',color:'#666'},ticks:{color:'#888'},grid:{color:'#111'}},
+        y:{title:{display:true,text:'Green H2 LCOH (USD/kg)',color:'#666'},ticks:{color:'#888'},grid:{color:'#111'},min:0,max:8}
+      }
+    }
+  });
+  document.getElementById('r5').innerHTML=html;
+}
+
+/* ====== INIT ====== */
+calcSMR();calcBlue();calcGreen();calcBreakeven();
+</script>
+</body>
+</html>
