@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Separator Sizing Calculator - Petrosmart Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --red:#CC0000;--red-dim:rgba(204,0,0,0.15);
+  --bg:#050508;--surf:#0C0C12;--card:#101016;
+  --border:#1A1A26;--text:#E0E0EE;--muted:#464660;
+  --ok:#00BB55;--warn:#FF8800;--err:#FF3333;--info:#2277EE;
+  --steel:#5588AA;--steel2:#336688;
+  --oil:#AA6600;--gas:#2266EE;--water:#0099CC;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(85,136,170,0.04),transparent),
+    radial-gradient(ellipse 40% 60% at 80% 80%,rgba(204,0,0,0.03),transparent);
+  pointer-events:none;z-index:0;
+}
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:16px;}
+
+/* HEADER */
+.hdr{
+  background:linear-gradient(135deg,#0A0A14,#101422,#0A0A14);
+  border:1px solid rgba(85,136,170,0.25);border-radius:18px;
+  padding:18px 22px;margin-bottom:18px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 0 60px rgba(85,136,170,0.06);
+  position:relative;overflow:hidden;
+}
+.hdr::before{
+  content:'';position:absolute;right:0;top:0;bottom:0;width:200px;
+  background:linear-gradient(90deg,transparent,rgba(85,136,170,0.04));
+}
+.hdr-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  background:linear-gradient(135deg,var(--steel),var(--steel2));
+  box-shadow:0 4px 20px rgba(85,136,170,0.3);}
+.hdr h1{font-size:19px;font-weight:700;color:#fff;}
+.hdr p{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+.hdr-phases{margin-left:auto;display:flex;gap:6px;flex-shrink:0;}
+.phase-tag{display:flex;align-items:center;gap:5px;padding:5px 10px;
+  border-radius:8px;border:1px solid;font-size:10px;font-weight:600;font-family:var(--mono);}
+.pt-oil{background:rgba(170,102,0,0.1);border-color:rgba(170,102,0,0.3);color:#CC8800;}
+.pt-gas{background:rgba(34,102,238,0.1);border-color:rgba(34,102,238,0.3);color:#4499FF;}
+.pt-water{background:rgba(0,153,204,0.1);border-color:rgba(0,153,204,0.3);color:#33BBDD;}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--surf);border:1px solid var(--border);
+  border-radius:12px;padding:4px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{flex:1;min-width:80px;padding:9px 5px;background:transparent;border:none;
+  border-radius:9px;color:var(--muted);font-size:10px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);text-transform:uppercase;
+  letter-spacing:0.07em;transition:all 0.2s;}
+.tab:hover{color:#bbb;}
+.tab.on{background:var(--steel2);color:#fff;box-shadow:0 0 14px rgba(51,102,136,0.4);}
+.panel{display:none;}.panel.on{display:block;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:18px;margin-bottom:14px;}
+.card.steel-accent{border-color:rgba(85,136,170,0.2);}
+.stitle{font-size:10px;font-weight:700;color:var(--steel);text-transform:uppercase;
+  letter-spacing:0.1em;border-bottom:1px solid #121218;padding-bottom:7px;
+  margin-bottom:14px;font-family:var(--mono);}
+
+/* FORM */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+.field{margin-bottom:12px;}
+.lbl{font-size:10px;color:var(--muted);margin-bottom:5px;display:block;
+  text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.ir{display:flex;gap:6px;align-items:center;}
+input[type=number],select{
+  width:100%;background:#07070E;border:1px solid #161622;
+  border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;
+  font-family:var(--mono);transition:border-color 0.2s;}
+input:focus,select:focus{border-color:var(--steel);}
+select option{background:#0A0A12;}
+.unit{font-size:10px;color:#2A2A3A;min-width:52px;text-align:right;
+  white-space:nowrap;font-family:var(--mono);}
+
+/* RESULTS */
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.rgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.rgrid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;}
+.rc{background:#07070E;border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px;position:relative;overflow:hidden;}
+.rc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.rc.hl::after{background:var(--steel);}
+.rc.ok::after{background:var(--ok);}
+.rc.wn::after{background:var(--warn);}
+.rc.er::after{background:var(--err);}
+.rc.oil::after{background:var(--oil);}
+.rc.gas::after{background:var(--gas);}
+.rc.water::after{background:var(--water);}
+.rc.hl{border-color:rgba(85,136,170,0.3);}
+.rc.ok{border-color:rgba(0,187,85,0.25);}
+.rc.wn{border-color:rgba(255,136,0,0.25);}
+.rc.er{border-color:rgba(255,51,51,0.25);}
+.rc.oil{border-color:rgba(170,102,0,0.3);}
+.rc.gas{border-color:rgba(34,102,238,0.3);}
+.rc.water{border-color:rgba(0,153,204,0.3);}
+.rl{font-size:9px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:0.07em;margin-bottom:3px;font-family:var(--mono);}
+.rv{font-size:19px;font-weight:700;color:#fff;font-family:var(--mono);}
+.rv span{font-size:10px;color:#2A2A3A;font-weight:400;}
+.rsub{font-size:10px;color:#2A2A3A;margin-top:3px;font-family:var(--mono);}
+
+/* FORMULA */
+.fbox{background:#05050C;border-left:3px solid var(--steel);
+  border-radius:0 10px 10px 0;padding:12px 16px;margin-top:14px;
+  font-size:11px;color:#444;line-height:2.0;font-family:var(--mono);}
+.fbox strong{color:#999;}
+.fbox .hi{color:var(--steel);font-weight:600;}
+.fbox .hio{color:#CC8800;font-weight:600;}
+.fbox .hig{color:#4499FF;font-weight:600;}
+.fbox .hiw{color:#33BBDD;font-weight:600;}
+
+/* ANALYSIS */
+.analysis{background:#060610;border:1px solid #101020;
+  border-radius:12px;padding:16px;margin-top:14px;}
+.atitle{font-size:10px;font-weight:700;color:var(--steel);margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:0.09em;font-family:var(--mono);}
+.arow{display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;
+  border-bottom:1px solid #0C0C18;}
+.arow:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.d-ok{background:var(--ok);box-shadow:0 0 8px var(--ok);}
+.d-wn{background:var(--warn);box-shadow:0 0 8px var(--warn);}
+.d-er{background:var(--err);box-shadow:0 0 8px var(--err);}
+.d-st{background:var(--steel);box-shadow:0 0 8px var(--steel);}
+.d-info{background:var(--info);box-shadow:0 0 8px var(--info);}
+.atxt strong{color:#eee;font-size:12px;display:block;margin-bottom:3px;}
+.atxt p{font-size:11px;color:#444;line-height:1.7;margin:0;}
+.asugg{font-size:11px;color:#FFAA00;margin-top:4px;line-height:1.6;}
+
+/* ALERTS */
+.alert{border-radius:10px;padding:10px 14px;margin-top:10px;
+  font-size:11px;line-height:1.7;font-weight:500;}
+.a-ok{background:rgba(0,187,85,0.07);border:1px solid rgba(0,187,85,0.2);color:#00CC66;}
+.a-er{background:rgba(255,51,51,0.07);border:1px solid rgba(255,51,51,0.2);color:#FF5555;}
+.a-wn{background:rgba(255,136,0,0.07);border:1px solid rgba(255,136,0,0.2);color:#FFA500;}
+.a-st{background:rgba(85,136,170,0.07);border:1px solid rgba(85,136,170,0.2);color:#88BBDD;}
+
+/* SEPARATOR VISUAL */
+.sep-vis{background:#05050C;border:1px solid var(--border);
+  border-radius:12px;padding:16px;margin-top:14px;}
+.sep-title{font-size:10px;color:var(--steel);font-weight:600;
+  font-family:var(--mono);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;}
+
+/* CHART */
+.chart-wrap{background:#05050C;border:1px solid var(--border);
+  border-radius:12px;padding:14px;margin-top:14px;}
+.chart-title{font-size:11px;color:var(--steel);font-weight:600;
+  text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;font-family:var(--mono);}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.tbl th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;
+  letter-spacing:0.07em;font-family:var(--mono);}
+.tbl td{padding:7px 10px;color:#888;border-bottom:1px solid #0C0C18;font-family:var(--mono);}
+.tbl tr:hover td{background:#0A0A12;}
+.tw{color:#fff!important;font-weight:600;}
+
+.ibox{background:var(--surf);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);
+  line-height:1.7;font-family:var(--mono);}
+.ibox strong{color:#bbb;}
+.sep-line{height:1px;background:var(--border);margin:14px 0;}
+
+/* PHASE SELECTOR */
+.phase-btns{display:flex;gap:6px;margin-bottom:16px;}
+.pbtn{padding:7px 16px;border-radius:9px;border:1px solid var(--border);
+  background:var(--card);color:var(--muted);font-size:11px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);transition:all 0.2s;}
+.pbtn:hover{color:#ccc;border-color:#444;}
+.pbtn.on-2ph{background:rgba(34,102,238,0.15);border-color:rgba(34,102,238,0.4);color:#4499FF;}
+.pbtn.on-3ph{background:rgba(85,136,170,0.15);border-color:rgba(85,136,170,0.4);color:#88BBDD;}
+.pbtn.on-horiz{background:rgba(170,102,0,0.15);border-color:rgba(170,102,0,0.4);color:#CC8800;}
+.pbtn.on-vert{background:rgba(0,187,85,0.15);border-color:rgba(0,187,85,0.4);color:#00CC66;}
+
+.foot{background:var(--surf);border-top:1px solid var(--border);margin-top:18px;
+  padding:10px 20px;font-size:10px;color:#1A1A28;text-align:center;
+  font-family:var(--mono);border-radius:12px;}
+.foot a{color:var(--steel);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-icon">🫧</div>
+  <div>
+    <h1>Separator Sizing Calculator</h1>
+    <p>Two-phase and three-phase - horizontal and vertical - API 12J / GPSA Engineering Data Book</p>
+  </div>
+  <div class="hdr-phases">
+    <div class="phase-tag pt-gas"><span>⬆</span>GAS</div>
+    <div class="phase-tag pt-oil"><span>●</span>OIL</div>
+    <div class="phase-tag pt-water"><span>💧</span>WATER</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" id="t1" onclick="sw(1)">📥 Inlet Conditions</button>
+  <button class="tab" id="t2" onclick="sw(2)">📐 Sizing - Horiz.</button>
+  <button class="tab" id="t3" onclick="sw(3)">📐 Sizing - Vert.</button>
+  <button class="tab" id="t4" onclick="sw(4)">💧 3-Phase Design</button>
+  <button class="tab" id="t5" onclick="sw(5)">🔍 Nozzle and Internals</button>
+  <button class="tab" id="t6" onclick="sw(6)">📚 GPSA Reference</button>
+</div>
+
+<!-- ===== PANEL 1: INLET CONDITIONS ===== -->
+<div class="panel on" id="p1">
+  <div class="card steel-accent">
+    <div class="stitle">/// separator type and service</div>
+    <div class="phase-btns">
+      <button class="pbtn on-2ph" id="ph-2" onclick="setPhase(2)">2-Phase (Gas/Liquid)</button>
+      <button class="pbtn" id="ph-3" onclick="setPhase(3)">3-Phase (Gas/Oil/Water)</button>
+    </div>
+
+    <div class="stitle">/// operating conditions</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Operating pressure</label>
+        <div class="ir"><input type="number" id="P_op" value="50" step="1" oninput="calcInlet()"><span class="unit">bar(g)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Operating temperature</label>
+        <div class="ir"><input type="number" id="T_op" value="60" step="1" oninput="calcInlet()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Design pressure (MAWP)</label>
+        <div class="ir"><input type="number" id="P_design" value="65" step="1" oninput="calcInlet()"><span class="unit">bar(g)</span></div>
+      </div>
+    </div>
+
+    <div class="stitle">/// gas phase</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Gas flow rate (actual)</label>
+        <div class="ir"><input type="number" id="Qg" value="500000" step="1000" oninput="calcInlet()"><span class="unit">Sm3/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas molecular weight</label>
+        <div class="ir"><input type="number" id="MW_g" value="18" step="0.5" oninput="calcInlet()"><span class="unit">g/mol</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas compressibility Z</label>
+        <div class="ir"><input type="number" id="Z_g" value="0.88" step="0.01" oninput="calcInlet()"><span class="unit">-</span></div>
+      </div>
+    </div>
+
+    <div class="stitle">/// liquid phase</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Oil/liquid flow rate</label>
+        <div class="ir"><input type="number" id="Ql_oil" value="2000" step="100" oninput="calcInlet()"><span class="unit">bbl/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Oil API gravity</label>
+        <div class="ir"><input type="number" id="API" value="35" step="0.5" oninput="calcInlet()"><span class="unit">°API</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Water flow rate</label>
+        <div class="ir"><input type="number" id="Ql_water" value="500" step="100" oninput="calcInlet()"><span class="unit">bbl/d</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Liquid droplet size (gas phase)</label>
+        <div class="ir"><input type="number" id="dp_liq" value="100" step="10" oninput="calcInlet()"><span class="unit">micron</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas bubble size (liquid phase)</label>
+        <div class="ir"><input type="number" id="dp_gas" value="200" step="10" oninput="calcInlet()"><span class="unit">micron</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">GLR (Gas-Liquid Ratio)</label>
+        <div class="ir"><input type="number" id="GLR" value="1000" step="100" oninput="calcInlet()"><span class="unit">Sm3/m3</span></div>
+      </div>
+    </div>
+    <div id="r1"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 2: HORIZONTAL SIZING ===== -->
+<div class="panel" id="p2">
+  <div class="card steel-accent">
+    <div class="stitle">/// horizontal separator sizing (gas capacity governs)</div>
+    <div class="ibox">
+      <strong>Horizontal separator:</strong> Better gas-liquid separation for high GOR streams. Gas flows horizontally while liquid droplets settle by gravity. L/D ratio typically 3-5. Sizing based on gas capacity (Souders-Brown) and liquid retention time.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Gas flow rate</label>
+        <div class="ir"><input type="number" id="h_Qg" value="500000" step="1000" oninput="calcHoriz()"><span class="unit">Sm3/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Liquid flow rate (total)</label>
+        <div class="ir"><input type="number" id="h_Ql" value="397" step="10" oninput="calcHoriz()"><span class="unit">m3/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas density at op. conditions</label>
+        <div class="ir"><input type="number" id="h_rhog" value="45" step="1" oninput="calcHoriz()"><span class="unit">kg/m3</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Liquid density</label>
+        <div class="ir"><input type="number" id="h_rhol" value="830" step="5" oninput="calcHoriz()"><span class="unit">kg/m3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Liquid retention time</label>
+        <div class="ir"><input type="number" id="h_tr" value="3" step="0.5" oninput="calcHoriz()"><span class="unit">min</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Liquid level (% of diameter)</label>
+        <div class="ir"><input type="number" id="h_ll" value="50" step="5" oninput="calcHoriz()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">K-factor (Souders-Brown)</label>
+        <div class="ir"><input type="number" id="h_K" value="0.107" step="0.001" oninput="calcHoriz()"><span class="unit">m/s</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">L/D ratio target</label>
+        <div class="ir"><input type="number" id="h_LD" value="4" step="0.5" oninput="calcHoriz()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Mist extractor efficiency</label>
+        <div class="ir"><input type="number" id="h_me" value="99" step="0.5" oninput="calcHoriz()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div id="r2"></div>
+    <div class="sep-vis">
+      <div class="sep-title">Horizontal separator cross-section</div>
+      <svg width="100%" height="180" viewBox="0 0 600 180" id="horiz-svg">
+        <text x="300" y="90" text-anchor="middle" fill="#333" font-family="DM Mono" font-size="12">Calculate to render</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 3: VERTICAL SIZING ===== -->
+<div class="panel" id="p3">
+  <div class="card steel-accent">
+    <div class="stitle">/// vertical separator sizing</div>
+    <div class="ibox">
+      <strong>Vertical separator:</strong> Better for high liquid/low gas ratios, slugging flow, or when footprint is limited. Gas flows upward against falling liquid droplets. Sizing based on gas velocity (Souders-Brown) and liquid surge volume.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Gas flow rate</label>
+        <div class="ir"><input type="number" id="v_Qg" value="500000" step="1000" oninput="calcVert()"><span class="unit">Sm3/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas density at op. cond.</label>
+        <div class="ir"><input type="number" id="v_rhog" value="45" step="1" oninput="calcVert()"><span class="unit">kg/m3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Liquid density</label>
+        <div class="ir"><input type="number" id="v_rhol" value="830" step="5" oninput="calcVert()"><span class="unit">kg/m3</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Liquid flow rate</label>
+        <div class="ir"><input type="number" id="v_Ql" value="397" step="10" oninput="calcVert()"><span class="unit">m3/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Liquid retention time</label>
+        <div class="ir"><input type="number" id="v_tr" value="3" step="0.5" oninput="calcVert()"><span class="unit">min</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">K-factor (Souders-Brown)</label>
+        <div class="ir"><input type="number" id="v_K" value="0.061" step="0.001" oninput="calcVert()"><span class="unit">m/s</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Surge volume (slug catcher)</label>
+        <div class="ir"><input type="number" id="v_surge" value="2" step="0.5" oninput="calcVert()"><span class="unit">m3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Liquid section height (H/D)</label>
+        <div class="ir"><input type="number" id="v_HD" value="1.5" step="0.1" oninput="calcVert()"><span class="unit">-</span></div>
+      </div>
+    </div>
+    <div id="r3"></div>
+    <div class="sep-vis">
+      <div class="sep-title">Vertical separator cross-section</div>
+      <svg width="100%" height="220" viewBox="0 0 300 220" id="vert-svg">
+        <text x="150" y="110" text-anchor="middle" fill="#333" font-family="DM Mono" font-size="12">Calculate to render</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 4: THREE-PHASE ===== -->
+<div class="panel" id="p4">
+  <div class="card steel-accent">
+    <div class="stitle">/// three-phase separator (gas / oil / water)</div>
+    <div class="ibox">
+      <strong>Three-phase separation:</strong> Oil-water separation governed by Stokes' Law settling velocity of oil droplets in water and water droplets in oil. The weir height determines oil pad thickness and water leg depth.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Oil flow rate</label>
+        <div class="ir"><input type="number" id="tp_Qo" value="2000" step="100" oninput="calc3Ph()"><span class="unit">bbl/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Water flow rate</label>
+        <div class="ir"><input type="number" id="tp_Qw" value="800" step="100" oninput="calc3Ph()"><span class="unit">bbl/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas flow rate</label>
+        <div class="ir"><input type="number" id="tp_Qg" value="500000" oninput="calc3Ph()"><span class="unit">Sm3/d</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Oil API gravity</label>
+        <div class="ir"><input type="number" id="tp_API" value="35" step="0.5" oninput="calc3Ph()"><span class="unit">°API</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Oil viscosity at op. T</label>
+        <div class="ir"><input type="number" id="tp_muo" value="3.5" step="0.1" oninput="calc3Ph()"><span class="unit">cP</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Water density</label>
+        <div class="ir"><input type="number" id="tp_rhow" value="1080" step="10" oninput="calc3Ph()"><span class="unit">kg/m3</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Oil-water retention time (oil)</label>
+        <div class="ir"><input type="number" id="tp_tro" value="10" step="1" oninput="calc3Ph()"><span class="unit">min</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Oil-water retention time (water)</label>
+        <div class="ir"><input type="number" id="tp_trw" value="5" step="1" oninput="calc3Ph()"><span class="unit">min</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Water droplet size (in oil)</label>
+        <div class="ir"><input type="number" id="tp_dp" value="500" step="50" oninput="calc3Ph()"><span class="unit">micron</span></div>
+      </div>
+    </div>
+    <div id="r4"></div>
+    <div class="chart-wrap" style="margin-top:14px;">
+      <div class="chart-title">Three-phase separator - fluid volumes breakdown</div>
+      <canvas id="ph3Chart" height="160"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 5: NOZZLES ===== -->
+<div class="panel" id="p5">
+  <div class="card steel-accent">
+    <div class="stitle">/// nozzle sizing and internals</div>
+    <div class="ibox">
+      <strong>Inlet nozzle sizing:</strong> Inlet momentum governs choice of inlet device. rho x v2 &lt; 1500 Pa for half-open pipe; use cyclonic inlet diverter if rho x v2 > 2000 Pa. Outlet nozzles: size for &lt; 3-5 m/s gas velocity.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Separator diameter D</label>
+        <div class="ir"><input type="number" id="nz_D" value="1200" step="50" oninput="calcNozzle()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Total inlet flow (liquid + gas)</label>
+        <div class="ir"><input type="number" id="nz_Q" value="0.25" step="0.01" oninput="calcNozzle()"><span class="unit">m3/s</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Inlet mixture density</label>
+        <div class="ir"><input type="number" id="nz_rho" value="120" step="5" oninput="calcNozzle()"><span class="unit">kg/m3</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Gas outlet flow rate</label>
+        <div class="ir"><input type="number" id="nz_Qg_out" value="0.22" step="0.01" oninput="calcNozzle()"><span class="unit">m3/s (actual)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Liquid outlet flow rate</label>
+        <div class="ir"><input type="number" id="nz_Ql_out" value="0.005" step="0.001" oninput="calcNozzle()"><span class="unit">m3/s</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas outlet density</label>
+        <div class="ir"><input type="number" id="nz_rhog_out" value="45" step="1" oninput="calcNozzle()"><span class="unit">kg/m3</span></div>
+      </div>
+    </div>
+    <div id="r5"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 6: REFERENCE ===== -->
+<div class="panel" id="p6">
+  <div class="card">
+    <div class="stitle">/// Souders-Brown K-factor guidelines (GPSA 14th Ed.)</div>
+    <table class="tbl">
+      <thead><tr><th>Separator type</th><th>Service</th><th>K (m/s)</th><th>K (ft/s)</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Vertical 2-phase</td><td>General gas/liquid</td><td>0.046-0.076</td><td>0.15-0.25</td><td>Without mist extractor</td></tr>
+        <tr><td class="tw">Vertical 2-phase</td><td>With wire mesh</td><td>0.107-0.122</td><td>0.35-0.40</td><td>Wire mesh mist extractor</td></tr>
+        <tr><td class="tw">Horizontal 2-phase</td><td>General gas/liquid</td><td>0.107-0.137</td><td>0.35-0.45</td><td>Based on gas cross-sectional area</td></tr>
+        <tr><td class="tw">Horizontal 2-phase</td><td>High liquid loading</td><td>0.076-0.107</td><td>0.25-0.35</td><td>GOR &lt; 500 Sm3/m3</td></tr>
+        <tr><td class="tw">Vertical 3-phase</td><td>Oil/water/gas</td><td>0.046-0.061</td><td>0.15-0.20</td><td>Conservative</td></tr>
+        <tr><td class="tw">Horizontal 3-phase</td><td>Oil/water/gas</td><td>0.107-0.122</td><td>0.35-0.40</td><td>Weir type</td></tr>
+        <tr><td class="tw">Slug catcher</td><td>Pipeline inlet</td><td>0.046-0.061</td><td>0.15-0.20</td><td>Slug handling duty</td></tr>
+        <tr><td class="tw">Scrubber</td><td>Gas only</td><td>0.107-0.152</td><td>0.35-0.50</td><td>Compressor inlet</td></tr>
+        <tr><td class="tw">Flash drum</td><td>High pressure</td><td>0.046-0.076</td><td>0.15-0.25</td><td>P &gt; 70 bar</td></tr>
+      </tbody>
+    </table>
+    <div class="sep-line"></div>
+    <div class="stitle">/// retention time guidelines (API 12J / GPSA)</div>
+    <table class="tbl">
+      <thead><tr><th>Service</th><th>Phase</th><th>Retention time (min)</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Two-phase (low GOR)</td><td>Liquid</td><td>1-3</td><td>Gas scrubbers</td></tr>
+        <tr><td class="tw">Two-phase (production)</td><td>Liquid</td><td>3-5</td><td>Field separators</td></tr>
+        <tr><td class="tw">Three-phase (oil)</td><td>Oil</td><td>5-10</td><td>Clean crude</td></tr>
+        <tr><td class="tw">Three-phase (oil, foaming)</td><td>Oil</td><td>10-20</td><td>Foaming crude</td></tr>
+        <tr><td class="tw">Three-phase (water)</td><td>Water</td><td>3-5</td><td>Clean water</td></tr>
+        <tr><td class="tw">Three-phase (water, emulsion)</td><td>Water</td><td>5-10</td><td>Tight emulsions</td></tr>
+        <tr><td class="tw">Slug catcher</td><td>Liquid slug</td><td>10-30</td><td>Pipeline pigging</td></tr>
+        <tr><td class="tw">Test separator</td><td>Oil/water</td><td>10-15</td><td>Accurate metering</td></tr>
+      </tbody>
+    </table>
+    <div class="sep-line"></div>
+    <div class="stitle">/// key formulas - separator sizing</div>
+    <div class="fbox">
+      <strong>Souders-Brown gas velocity:</strong> Vg_max = K x sqrt((rho_L - rho_G) / rho_G)<br>
+      <strong>Gas cross-sectional area:</strong> A_gas = Qg_actual (m3/s) / Vg_max<br>
+      <strong>Horizontal L/D sizing (gas):</strong> L_eff = A_gas x (L/D) / (pi/4 x D)<br>
+      <strong>Liquid retention volume:</strong> V_liq = Q_liq (m3/s) x t_retention (s)<br>
+      <strong>Stokes' Law (droplet settling):</strong> V_s = (dp^2 x g x (rho_L - rho_G)) / (18 x mu_G)<br>
+      <strong>Droplet settling (liquid in gas):</strong> V_s (m/s) = dp^2(m) x 9.81 x delta_rho / (18 x mu_G (Pa.s))<br>
+      <strong>Nozzle momentum:</strong> M = rho x v^2 (Pa) - limit: &lt; 4000 Pa for standard inlet<br>
+      <strong>Weir height (3-phase):</strong> h_weir = D x (1 - 2 x fw) / 2 + D/2<br>
+      <strong>Oil pad thickness:</strong> h_oil = V_oil / (D x L_eff) per unit width<br>
+      <strong>Demister pad pressure drop:</strong> dP = C x rho_G x V^2 (C ~ 0.1-0.5 for wire mesh)
+    </div>
+    <div class="sep-line"></div>
+    <div class="stitle">/// standard separator shell sizes (API 12J)</div>
+    <table class="tbl">
+      <thead><tr><th>Nominal OD (mm)</th><th>Nominal OD (inches)</th><th>Typical L range (m)</th><th>L/D range</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">610</td><td>24</td><td>1.5 - 3.7</td><td>2.5 - 6</td></tr>
+        <tr><td class="tw">762</td><td>30</td><td>1.8 - 4.6</td><td>2.5 - 6</td></tr>
+        <tr><td class="tw">914</td><td>36</td><td>2.4 - 6.1</td><td>2.5 - 6.5</td></tr>
+        <tr><td class="tw">1067</td><td>42</td><td>3.0 - 7.6</td><td>3 - 7</td></tr>
+        <tr><td class="tw">1219</td><td>48</td><td>3.7 - 9.1</td><td>3 - 7.5</td></tr>
+        <tr><td class="tw">1372</td><td>54</td><td>4.6 - 10.7</td><td>3.5 - 8</td></tr>
+        <tr><td class="tw">1524</td><td>60</td><td>4.6 - 12.2</td><td>3 - 8</td></tr>
+        <tr><td class="tw">1829</td><td>72</td><td>6.1 - 15.2</td><td>3.5 - 8</td></tr>
+        <tr><td class="tw">2134</td><td>84</td><td>7.6 - 18.3</td><td>3.5 - 8.5</td></tr>
+        <tr><td class="tw">2438</td><td>96</td><td>9.1 - 21.3</td><td>3.7 - 8.7</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">
+  <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
+  · GPSA Engineering Data Book / API 12J / API RP 11V10 separator sizing · Educational tool only
+</div>
+</div>
+
+<script>
+var ph3Chart=null;
+var nPhases=2;
+
+/* ====== UTILS ====== */
+function sw(n){
+  for(var i=1;i<=6;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    document.getElementById('t'+i).className='tab'+(i===n?' on':'');
+  }
+  if(n===2)setTimeout(calcHoriz,80);
+  if(n===3)setTimeout(calcVert,80);
+  if(n===4)setTimeout(calc3Ph,80);
+}
+function rc(cls,lbl,val,unit,sub){
+  return '<div class="rc '+(cls||'')+'">'
+    +'<div class="rl">'+lbl+'</div>'
+    +'<div class="rv">'+val+(unit?' <span>'+unit+'</span>':'')+'</div>'
+    +(sub?'<div class="rsub">'+sub+'</div>':'')+'</div>';
+}
+function ar(type,title,body,sugg){
+  var d={ok:'d-ok',wn:'d-wn',er:'d-er',st:'d-st',info:'d-info'}[type]||'d-st';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+}
+
+function setPhase(n){
+  nPhases=n;
+  document.getElementById('ph-2').className='pbtn'+(n===2?' on-2ph':'');
+  document.getElementById('ph-3').className='pbtn'+(n===3?' on-3ph':'');
+  calcInlet();
+}
+
+/* Standard shell sizes */
+var stdSizes=[610,762,914,1067,1219,1372,1524,1829,2134,2438];
+function nextStdSize(D_mm){
+  for(var i=0;i<stdSizes.length;i++){if(stdSizes[i]>=D_mm)return stdSizes[i];}
+  return Math.ceil(D_mm/100)*100;
+}
+
+/* ====== PANEL 1: INLET CONDITIONS ====== */
+function calcInlet(){
+  var P=parseFloat(document.getElementById('P_op').value)||50; // bar(g)
+  var T=parseFloat(document.getElementById('T_op').value)||60; // °C
+  var Qg_std=parseFloat(document.getElementById('Qg').value)||500000; // Sm3/d
+  var MW=parseFloat(document.getElementById('MW_g').value)||18;
+  var Z=parseFloat(document.getElementById('Z_g').value)||0.88;
+  var Ql_oil_bbl=parseFloat(document.getElementById('Ql_oil').value)||2000; // bbl/d
+  var API=parseFloat(document.getElementById('API').value)||35;
+  var Ql_water_bbl=parseFloat(document.getElementById('Ql_water').value)||500;
+
+  // Gas density at operating conditions
+  var P_abs=(P+1.01325); // bar abs
+  var T_K=T+273.15;
+  var rho_g=P_abs*1e5*MW/(Z*8314*T_K); // kg/m3 (ideal gas law corrected)
+  var rho_air=1.2; // kg/m3 at std
+
+  // Gas actual volumetric flow
+  var Qg_act=Qg_std/86400*Z*T_K/273.15*(1.01325/P_abs); // m3/s
+  var Qg_act_m3d=Qg_act*86400; // m3/d actual
+
+  // Oil density
+  var rho_oil=141.5/(API+131.5)*1000; // kg/m3
+  var Ql_oil_m3d=Ql_oil_bbl*0.158987; // m3/d
+  var Ql_water_m3d=Ql_water_bbl*0.158987; // m3/d
+  var Ql_total_m3d=Ql_oil_m3d+Ql_water_m3d;
+
+  // GOR actual
+  var GOR_actual=Qg_std/1000/Ql_total_m3d; // km3/m3 = x1000 Sm3/m3 approx
+
+  // Mixture density (inlet)
+  var mass_total=(rho_g*Qg_act_m3d+rho_oil*Ql_oil_m3d+1050*Ql_water_m3d); // kg/d
+  var vol_total=Qg_act_m3d+Ql_total_m3d;
+  var rho_mix=mass_total/vol_total;
+
+  // WOR
+  var WOR=Ql_water_m3d/Math.max(Ql_oil_m3d,0.001);
+
+  var html='<div class="rgrid">';
+  html+=rc('gas','Gas density (actual cond.)',rho_g.toFixed(2),'kg/m3','At '+P+' bar(g), '+T+'°C, Z='+Z);
+  html+=rc('oil','Oil density',rho_oil.toFixed(0),'kg/m3',API.toFixed(1)+'°API = SG '+(rho_oil/1000).toFixed(3));
+  html+=rc('gas','Gas actual flow',Qg_act_m3d.toFixed(0),'m3/d (actual)','= '+(Qg_act*1000).toFixed(2)+' L/s');
+  html+=rc('oil','Oil flow',Ql_oil_m3d.toFixed(1),'m3/d','= '+Ql_oil_bbl+' bbl/d');
+  html+=rc('water','Water flow',Ql_water_m3d.toFixed(1),'m3/d','= '+Ql_water_bbl+' bbl/d');
+  html+=rc('','WOR (water-oil ratio)',WOR.toFixed(2),'-',WOR>1?'Water continuous likely':'Oil continuous likely');
+  html+=rc('','GOR (gas-oil ratio)',(Qg_std/Ql_oil_m3d).toFixed(0),'Sm3/m3','Standard conditions');
+  html+=rc('hl','Inlet mixture density',rho_mix.toFixed(1),'kg/m3','Volume-weighted average');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Gas density (real gas):</strong> rho = P_abs x MW / (Z x R x T)<br>'
+    +'= '+P_abs.toFixed(3)+' x 1e5 x '+MW+' / ('+Z+' x 8314 x '+T_K.toFixed(1)+') = <span class="hi">'+rho_g.toFixed(2)+' kg/m3</span><br>'
+    +'<strong>Gas actual flow:</strong> Qg_act = '+Qg_std.toLocaleString()+' Sm3/d x Z x T/273.15 x P_std/P_abs / 86400<br>'
+    +'= <span class="hi">'+Qg_act_m3d.toFixed(0)+' m3/d actual = '+(Qg_act*1000).toFixed(2)+' L/s</span><br>'
+    +'<strong>Oil density:</strong> rho_oil = 141.5/('+API+'+131.5) x 1000 = <span class="hio">'+rho_oil.toFixed(0)+' kg/m3</span>'
+    +'</div>';
+
+  var rows='';
+  if(WOR>3){
+    rows+=ar('wn','High water-oil ratio (WOR = '+WOR.toFixed(1)+')','Water dominates the liquid phase at WOR = '+WOR.toFixed(1)+'. Water-continuous emulsion is likely. Three-phase separation becomes critical. Oil droplet settling in water controls sizing, not just retention time.','For high WOR: increase water retention time to 5-10 min minimum. Consider electrostatic coalescer (Electrostatic Treater) downstream for tight oil-water emulsions. Demulsifier chemical injection at inlet may be required to break stable water-in-oil emulsions.');
+  }
+  if(rho_g>100){
+    rows+=ar('wn','High gas density ('+rho_g.toFixed(0)+' kg/m3) - use lower K-factor','At gas density above 100 kg/m3 (typical at P > 100 bar), the Souders-Brown K-factor should be derated. High-pressure gas has properties approaching liquids, reducing separation efficiency.','For rho_G > 80 kg/m3: derate K by multiplying by 0.75-0.85. Consider using K = 0.046-0.061 m/s regardless of separator type. Verify with CFD simulation for critical separators at P > 150 bar.');
+  }
+  rows+=ar('st','Fluid characterization summary','Gas: '+rho_g.toFixed(2)+' kg/m3 at operating conditions | Oil: '+rho_oil.toFixed(0)+' kg/m3 ('+API+'°API) | WOR: '+WOR.toFixed(2)+' | GOR: '+(Qg_std/Ql_oil_m3d).toFixed(0)+' Sm3/m3. These values are pre-populated into sizing tabs.','');
+
+  html+='<div class="analysis"><div class="atitle">/// INLET FLUID ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r1').innerHTML=html;
+
+  // Auto-populate sizing tabs
+  document.getElementById('h_Qg').value=Qg_std;
+  document.getElementById('h_Ql').value=Ql_total_m3d.toFixed(1);
+  document.getElementById('h_rhog').value=rho_g.toFixed(2);
+  document.getElementById('h_rhol').value=rho_oil.toFixed(0);
+  document.getElementById('v_Qg').value=Qg_std;
+  document.getElementById('v_Ql').value=Ql_total_m3d.toFixed(1);
+  document.getElementById('v_rhog').value=rho_g.toFixed(2);
+  document.getElementById('v_rhol').value=rho_oil.toFixed(0);
+  document.getElementById('tp_API').value=API;
+  document.getElementById('tp_Qo').value=Ql_oil_bbl;
+  document.getElementById('tp_Qw').value=Ql_water_bbl;
+  document.getElementById('tp_Qg').value=Qg_std;
+  document.getElementById('nz_rho').value=rho_mix.toFixed(0);
+}
+
+/* ====== PANEL 2: HORIZONTAL ====== */
+function calcHoriz(){
+  var Qg_std=parseFloat(document.getElementById('h_Qg').value)||500000;
+  var Ql_m3d=parseFloat(document.getElementById('h_Ql').value)||397;
+  var rho_g=parseFloat(document.getElementById('h_rhog').value)||45;
+  var rho_l=parseFloat(document.getElementById('h_rhol').value)||830;
+  var tr=parseFloat(document.getElementById('h_tr').value)||3;
+  var ll_pct=parseFloat(document.getElementById('h_ll').value)||50;
+  var K=parseFloat(document.getElementById('h_K').value)||0.107;
+  var LD=parseFloat(document.getElementById('h_LD').value)||4;
+  var me=parseFloat(document.getElementById('h_me').value)||99;
+
+  // Souders-Brown terminal velocity
+  var Vt=K*Math.sqrt((rho_l-rho_g)/rho_g); // m/s
+
+  // Gas actual flow (approx using same conditions as tab 1)
+  var P_op=parseFloat(document.getElementById('P_op').value)||50;
+  var T_op=parseFloat(document.getElementById('T_op').value)||60;
+  var Z=parseFloat(document.getElementById('Z_g').value)||0.88;
+  var P_abs=P_op+1.01325;
+  var T_K=T_op+273.15;
+  var Qg_act=Qg_std/86400*Z*T_K/273.15*(1.01325/P_abs); // m3/s
+
+  // Gas capacity requirement
+  // For horizontal: Vg < Vt (acts over full cross section above liquid level)
+  // A_gas = pi/4 * D^2 * (1 - ll_pct/100)
+  // Qg_act = Vg * A_gas
+  // D from gas: D_gas^2 * (1-ll_pct/100) = 4*Qg_act / (pi * Vt)
+  var gas_frac=1-ll_pct/100;
+  var D_gas_sq=4*Qg_act/(Math.PI*Vt*gas_frac);
+  var D_gas=Math.sqrt(D_gas_sq); // m
+
+  // Liquid retention volume
+  var V_liq=Ql_m3d/86400*tr*60; // m3
+  // Liquid occupies ll_pct% of cross section x length
+  var A_liq=Math.PI/4*D_gas*D_gas*(ll_pct/100);
+  var L_liq=V_liq/A_liq; // m
+
+  // L/D check
+  var LD_calc=L_liq/D_gas;
+  var LD_ok=LD_calc>=3&&LD_calc<=6;
+
+  // If LD too low or high, iterate on D
+  var L_eff=Math.max(L_liq,D_gas*3);
+  if(LD_calc>6) L_eff=D_gas*6;
+
+  // Minimum L from gas (gas travels length L with settling time)
+  // t_settle = d_droplet^2 * (rho_l-rho_g) * g / (18 * mu_g) for droplet
+  // L_gas_min = Vg * D / Vt (for 100 micron droplet)
+  var dp_m=100e-6; // 100 micron
+  var mu_g=0.000015; // Pa.s typical gas
+  var Vs=dp_m*dp_m*9.81*(rho_l-rho_g)/(18*mu_g); // settling velocity m/s
+  var Vg_actual=Qg_act/(Math.PI/4*D_gas*D_gas*gas_frac);
+  var t_gas=L_eff/Vg_actual; // gas residence time
+  var t_settle=D_gas*gas_frac/Vs; // time to settle across gas space
+  var settle_ok=t_gas>=t_settle;
+
+  var D_std=nextStdSize(D_gas*1000);
+  var D_sel=D_std/1000;
+  var L_sel=D_sel*LD;
+  var V_shell=Math.PI/4*D_sel*D_sel*L_sel;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Gas terminal velocity',Vt.toFixed(3),'m/s','Souders-Brown Vt = K x sqrt(delta_rho/rho_G)');
+  html+=rc('hl','Actual gas velocity',Vg_actual.toFixed(3),'m/s',Vg_actual<Vt?'< Vt - ADEQUATE':'> Vt - OVERLOADED');
+  html+=rc('gas','Min. D from gas capacity',(D_gas*1000).toFixed(0),'mm','Calculated diameter');
+  html+=rc('gas','Selected std. diameter',D_std,'mm','Next API 12J standard size');
+  html+=rc('oil','L from liquid retention',L_liq.toFixed(2),'m','At '+tr+' min, '+ll_pct+'% liquid level');
+  html+=rc('','Selected L (L/D='+LD+')',L_sel.toFixed(2),'m','L = D x '+LD);
+  html+=rc(LD_calc>=3&&LD_calc<=6?'ok':'wn','L/D ratio (check)',LD_calc.toFixed(2),'-',LD_calc>=3&&LD_calc<=6?'OPTIMAL (3-6)':LD_calc<3?'Too short - increase L or decrease D':'Too long - increase D');
+  html+=rc('','Shell volume',V_shell.toFixed(1),'m3',D_std+' mm OD x '+L_sel.toFixed(2)+'m L');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Souders-Brown:</strong> Vt = '+K+' x sqrt(('+rho_l+'-'+rho_g+')/'+rho_g+') = <span class="hi">'+Vt.toFixed(3)+' m/s</span><br>'
+    +'<strong>Gas area:</strong> A = Qg/(Vt) = '+(Qg_act*1000).toFixed(2)+' L/s / '+Vt.toFixed(3)+' = '+(Qg_act/Vt).toFixed(4)+' m2 → D_gas = <span class="hig">'+(D_gas*1000).toFixed(0)+' mm</span><br>'
+    +'<strong>Liquid vol.:</strong> V_liq = '+Ql_m3d.toFixed(1)+' m3/d / 86400 x '+tr+' min x 60 = <span class="hio">'+V_liq.toFixed(3)+' m3</span><br>'
+    +'<strong>L from liquid:</strong> V_liq / A_liq = '+V_liq.toFixed(3)+' / '+(A_liq).toFixed(4)+' = <span class="hi">'+L_liq.toFixed(2)+' m</span><br>'
+    +'<strong>Selected:</strong> D = '+D_std+' mm | L = '+L_sel.toFixed(2)+' m | L/D = '+(L_sel/D_sel).toFixed(1)
+    +'</div>';
+
+  var rows='';
+  if(Vg_actual>Vt){
+    rows+=ar('er','GAS OVERLOADS SEPARATOR (Vg = '+Vg_actual.toFixed(3)+' m/s > Vt = '+Vt.toFixed(3)+' m/s)','Actual gas velocity exceeds Souders-Brown terminal velocity. Liquid carryover into gas outlet will occur. Droplets will not have sufficient time to settle before being swept out with the gas stream.','Increase diameter to '+(Math.ceil(D_gas*1.15*1000/100)*100)+' mm or higher. Alternatively, reduce K-factor to '+(Qg_act/(Math.PI/4*D_gas*D_gas*gas_frac)/Math.sqrt((rho_l-rho_g)/rho_g)).toFixed(3)+' m/s. Consider adding high-efficiency mist extractor (vane pack or cyclones).');
+  } else {
+    rows+=ar('ok','Gas capacity adequate ('+((Vg_actual/Vt)*100).toFixed(0)+'% of Souders-Brown limit)','Actual gas velocity '+Vg_actual.toFixed(3)+' m/s is '+(100-Vg_actual/Vt*100).toFixed(0)+'% below terminal velocity. Adequate margin for liquid droplet settling. Mist extractor efficiency '+me+'% will remove remaining entrained droplets.','');
+  }
+  if(!settle_ok){
+    rows+=ar('wn','100-micron droplet settling time marginal','Gas residence time ('+t_gas.toFixed(1)+'s) may be insufficient for 100-micron droplet settling (requires '+t_settle.toFixed(1)+'s across '+D_gas.toFixed(2)+'m gas space). Fine mist particles may be carried to outlet.','Increase effective length or install cyclonic inlet diverter to reduce initial liquid droplet loading. Mist extractor at gas outlet captures residual droplets. Verify droplet size distribution from inlet device tests.');
+  }
+  rows+=ar('st','Recommended separator size','Standard horizontal separator: '+D_std+' mm OD x '+L_sel.toFixed(2)+' m T/T (tangent-to-tangent). L/D = '+(L_sel/D_sel).toFixed(1)+'. Gas volume = '+(V_shell*(1-ll_pct/100)).toFixed(1)+' m3, liquid volume = '+(V_shell*ll_pct/100).toFixed(1)+' m3.','Verify with: (1) Nozzle sizing in Tab 5. (2) Three-phase if water > 5% (Tab 4). (3) Slug volume check if pipeline inlet. (4) Full vessel mechanical design per ASME VIII Div. 1.');
+
+  html+='<div class="analysis"><div class="atitle">/// HORIZONTAL SEPARATOR ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r2').innerHTML=html;
+  drawHorizSVG(D_sel*1000,L_sel,ll_pct);
+}
+
+/* ====== PANEL 3: VERTICAL ====== */
+function calcVert(){
+  var Qg_std=parseFloat(document.getElementById('v_Qg').value)||500000;
+  var rho_g=parseFloat(document.getElementById('v_rhog').value)||45;
+  var rho_l=parseFloat(document.getElementById('v_rhol').value)||830;
+  var Ql_m3d=parseFloat(document.getElementById('v_Ql').value)||397;
+  var tr=parseFloat(document.getElementById('v_tr').value)||3;
+  var K=parseFloat(document.getElementById('v_K').value)||0.061;
+  var surge=parseFloat(document.getElementById('v_surge').value)||2;
+  var HD=parseFloat(document.getElementById('v_HD').value)||1.5;
+
+  var P_op=parseFloat(document.getElementById('P_op').value)||50;
+  var T_op=parseFloat(document.getElementById('T_op').value)||60;
+  var Z=parseFloat(document.getElementById('Z_g').value)||0.88;
+  var P_abs=P_op+1.01325;
+  var T_K=T_op+273.15;
+  var Qg_act=Qg_std/86400*Z*T_K/273.15*(1.01325/P_abs);
+
+  // Terminal velocity
+  var Vt=K*Math.sqrt((rho_l-rho_g)/rho_g);
+
+  // Gas cross-sectional area needed
+  var A_gas=Qg_act/Vt;
+  var D_gas=Math.sqrt(4*A_gas/Math.PI);
+
+  // Actual gas velocity
+  var Vg_act=Qg_act/A_gas;
+
+  // Liquid retention volume
+  var V_ret=Ql_m3d/86400*tr*60;
+  var V_liq_total=V_ret+surge;
+
+  // Liquid section diameter (same as vessel diameter)
+  var D_std=nextStdSize(D_gas*1000);
+  var D_sel=D_std/1000;
+  var A_sel=Math.PI/4*D_sel*D_sel;
+
+  // Liquid height
+  var H_liq=V_liq_total/A_sel;
+  var H_gas=D_sel*HD; // gas disengagement section
+  var H_total=H_liq+H_gas+0.6+0.6; // + inlet nozzle + top section
+
+  var H_D_ratio=H_total/D_sel;
+  var hd_ok=H_D_ratio>=2.5&&H_D_ratio<=8;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Terminal velocity',Vt.toFixed(3),'m/s','Souders-Brown K = '+K);
+  html+=rc('hl','Required diameter',(D_gas*1000).toFixed(0),'mm','From gas capacity');
+  html+=rc('gas','Selected std. diameter',D_std,'mm','Next API 12J standard');
+  html+=rc('gas','Actual gas velocity',Vg_act.toFixed(3),'m/s',Vg_act<Vt?'OK - below Vt':'OVERLOADED');
+  html+=rc('oil','Liquid section height',H_liq.toFixed(2),'m','Retention + surge');
+  html+=rc('','Total vessel height',H_total.toFixed(2),'m','Including gas section');
+  html+=rc(hd_ok?'ok':'wn','H/D ratio',H_D_ratio.toFixed(2),'-',hd_ok?'OPTIMAL (2.5-8)':H_D_ratio<2.5?'Too short':'Too tall');
+  html+=rc('','Liquid retention vol.',V_ret.toFixed(2),'m3',tr+' min at '+Ql_m3d.toFixed(0)+' m3/d');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Vt (Souders-Brown):</strong> '+K+' x sqrt(('+rho_l+'-'+rho_g+')/'+rho_g+') = <span class="hi">'+Vt.toFixed(3)+' m/s</span><br>'
+    +'<strong>D required (gas):</strong> sqrt(4 x Qg_act / (pi x Vt)) = sqrt(4 x '+(Qg_act).toFixed(4)+' / (pi x '+Vt.toFixed(3)+')) = <span class="hig">'+(D_gas*1000).toFixed(0)+' mm</span><br>'
+    +'<strong>V_liquid:</strong> '+Ql_m3d.toFixed(1)+' m3/d / 86400 x '+tr+' min x 60 + '+surge+' m3 surge = <span class="hio">'+V_liq_total.toFixed(3)+' m3</span><br>'
+    +'<strong>H_liquid:</strong> '+V_liq_total.toFixed(3)+' / '+A_sel.toFixed(4)+' = '+H_liq.toFixed(2)+' m<br>'
+    +'<strong>H_total:</strong> '+H_liq.toFixed(2)+' + '+H_gas.toFixed(2)+' (gas section) + 1.2 m (ends) = <span class="hi">'+H_total.toFixed(2)+' m</span>'
+    +'</div>';
+
+  var rows='';
+  if(H_D_ratio>8){
+    rows+=ar('wn','Vessel very tall (H/D = '+H_D_ratio.toFixed(1)+')','H/D > 8 creates structural challenges (wind load, foundation, access). For H/D > 6, consider horizontal orientation or two smaller vertical separators in parallel.','Increase diameter to next standard size ('+stdSizes[stdSizes.indexOf(D_std)+1]+' mm) to reduce height. Or split the liquid retention volume between primary separator and downstream accumulator drum. H/D ≤ 5 is preferred for onshore installations.');
+  } else if(H_D_ratio<2.5){
+    rows+=ar('wn','Vessel short (H/D = '+H_D_ratio.toFixed(1)+')','Very short vessels can cause inlet turbulence to disturb liquid surface and re-entrain droplets. Minimum H/D = 2.5 ensures adequate gas disengagement above the liquid level.','Increase vessel height by adding a bottom sump for liquid collection, or specifying a minimum seam-to-seam height of 2.5 x D = '+(D_sel*2.5).toFixed(2)+' m.');
+  } else {
+    rows+=ar('ok','Vessel proportions acceptable (H/D = '+H_D_ratio.toFixed(1)+')','Vertical separator proportions are within the recommended H/D range of 2.5-8. Structural design is straightforward. Foundation and access platforms are standard.','');
+  }
+  rows+=ar('st','Recommended vertical separator','D = '+D_std+' mm OD | H = '+H_total.toFixed(2)+' m (T/T) | H/D = '+H_D_ratio.toFixed(1)+'. Liquid section: '+H_liq.toFixed(2)+' m ('+V_liq_total.toFixed(2)+' m3 including '+surge+' m3 surge). Gas section: '+H_gas.toFixed(2)+' m.','');
+
+  html+='<div class="analysis"><div class="atitle">/// VERTICAL SEPARATOR ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r3').innerHTML=html;
+  drawVertSVG(D_sel*1000,H_total,H_liq/H_total);
+}
+
+/* ====== PANEL 4: THREE-PHASE ====== */
+function calc3Ph(){
+  var Qo_bbl=parseFloat(document.getElementById('tp_Qo').value)||2000;
+  var Qw_bbl=parseFloat(document.getElementById('tp_Qw').value)||800;
+  var Qg_std=parseFloat(document.getElementById('tp_Qg').value)||500000;
+  var API=parseFloat(document.getElementById('tp_API').value)||35;
+  var mu_o=parseFloat(document.getElementById('tp_muo').value)||3.5; // cP
+  var rho_w=parseFloat(document.getElementById('tp_rhow').value)||1080;
+  var tro=parseFloat(document.getElementById('tp_tro').value)||10; // min oil
+  var trw=parseFloat(document.getElementById('tp_trw').value)||5; // min water
+  var dp_w=parseFloat(document.getElementById('tp_dp').value)||500; // micron
+
+  var rho_o=141.5/(API+131.5)*1000;
+  var Qo_m3d=Qo_bbl*0.158987;
+  var Qw_m3d=Qw_bbl*0.158987;
+  var Ql_total=Qo_m3d+Qw_m3d;
+
+  // Stokes settling of water droplets in oil
+  var dp_m=dp_w*1e-6;
+  var mu_o_pas=mu_o*0.001;
+  var g=9.81;
+  var Vs_water=dp_m*dp_m*(rho_w-rho_o)*g/(18*mu_o_pas); // m/s
+
+  // Retention volumes
+  var V_oil=Qo_m3d/86400*tro*60; // m3
+  var V_water=Qw_m3d/86400*trw*60; // m3
+  var V_liquid=V_oil+V_water;
+
+  // Use gas sizing result to get diameter (simplified: use horiz D from Tab 2)
+  // Or calculate here using K=0.107 for 3-phase horizontal
+  var P_op=parseFloat(document.getElementById('P_op').value)||50;
+  var T_op=parseFloat(document.getElementById('T_op').value)||60;
+  var Z=parseFloat(document.getElementById('Z_g').value)||0.88;
+  var MW=parseFloat(document.getElementById('MW_g').value)||18;
+  var P_abs=P_op+1.01325;
+  var T_K=T_op+273.15;
+  var rho_g=P_abs*1e5*MW/(Z*8314*T_K);
+  var Qg_act=Qg_std/86400*Z*T_K/273.15*(1.01325/P_abs);
+  var K_3ph=0.107;
+  var Vt=K_3ph*Math.sqrt((rho_o-rho_g)/rho_g);
+  var D_gas=Math.sqrt(4*Qg_act/(Math.PI*Vt*0.5)); // 50% gas section
+  var D_std=nextStdSize(D_gas*1000);
+  var D_sel=D_std/1000;
+  var A_sel=Math.PI/4*D_sel*D_sel;
+
+  // Oil pad thickness from Stokes: oil must flow across oil section while water droplets settle
+  // L_oil (required) = Vg x V_oil / (A_gas x Vs_water) ... simplified
+  // h_oil = V_oil / (D_sel x L_eff) -- need L_eff
+  var L_from_liq=V_liquid/(A_sel*0.5); // 50% liquid fill
+  var L_eff=Math.max(L_from_liq,D_sel*4);
+
+  // Water fraction of liquid section
+  var fw=Qw_m3d/Ql_total;
+  var fo=Qo_m3d/Ql_total;
+
+  // Oil pad height
+  var h_oil=D_sel*fo*0.5; // rough: oil fraction of lower half
+  var h_water=D_sel*fw*0.5;
+
+  // Settling time check
+  var t_oil_residence=V_oil/(Qo_m3d/86400); // s
+  var h_settle=h_water; // water droplets must travel through oil pad
+  var t_settle_w=h_settle/Vs_water; // s
+  var settle_ok=t_oil_residence>=t_settle_w;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Separator diameter',D_std,'mm','API 12J standard size');
+  html+=rc('hl','Effective length',L_eff.toFixed(2),'m','L/D = '+(L_eff/D_sel).toFixed(1));
+  html+=rc('oil','Oil retention volume',V_oil.toFixed(2),'m3',tro+' min at '+Qo_m3d.toFixed(1)+' m3/d');
+  html+=rc('water','Water retention volume',V_water.toFixed(2),'m3',trw+' min at '+Qw_m3d.toFixed(1)+' m3/d');
+  html+=rc('','Water droplet settling',Vs_water.toFixed(4),'m/s',dp_w+' µm in oil, µ_oil='+mu_o+' cP');
+  html+=rc(settle_ok?'ok':'wn','Settling check',settle_ok?'PASS':'CHECK','',settle_ok?'Droplets settle in retention time':'Increase retention time');
+  html+=rc('','Water fraction',( fw*100).toFixed(1),'%','WOR = '+(Qw_m3d/Qo_m3d).toFixed(2));
+  html+=rc('','Oil density / water density',rho_o.toFixed(0)+' / '+rho_w,'kg/m3','Delta rho = '+(rho_w-rho_o).toFixed(0)+' kg/m3');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Stokes settling (water in oil):</strong> Vs = dp^2 x g x (rho_w - rho_o) / (18 x mu_o)<br>'
+    +'= ('+dp_w+'e-6)^2 x 9.81 x ('+rho_w+' - '+rho_o.toFixed(0)+') / (18 x '+mu_o_pas+')<br>'
+    +'= <span class="hiw">'+Vs_water.toExponential(3)+' m/s</span><br>'
+    +'<strong>Oil retention vol:</strong> '+Qo_m3d.toFixed(2)+' m3/d / 86400 x '+tro+'min x 60 = <span class="hio">'+V_oil.toFixed(3)+' m3</span><br>'
+    +'<strong>Water retention vol:</strong> '+Qw_m3d.toFixed(2)+' m3/d / 86400 x '+trw+'min x 60 = <span class="hiw">'+V_water.toFixed(3)+' m3</span>'
+    +'</div>';
+
+  var rows='';
+  if(!settle_ok){
+    rows+=ar('wn','Water droplet settling time insufficient','Oil retention time ('+t_oil_residence.toFixed(0)+'s) is less than time required for '+dp_w+'µm water droplets to settle through '+h_settle.toFixed(3)+'m oil pad ('+t_settle_w.toFixed(0)+'s required).','Increase oil retention time to '+(t_settle_w/60*1.2).toFixed(0)+' min minimum. Or install a water wash system with water injection at the bottom to coalesce fine water droplets. Consider plate pack (lamella) coalescer internals to reduce settling distance by factor 10-50x.');
+  }
+  if(Vs_water<0.0001){
+    rows+=ar('er','Very slow water droplet settling ('+Vs_water.toExponential(2)+' m/s)','At '+dp_w+'µm droplet size and '+mu_o+' cP oil viscosity, settling velocity is extremely low. This indicates a likely stable emulsion that gravity separation alone cannot resolve.','Apply demulsifier chemical upstream (0.5-5 ppm typical dose). Consider electrostatic coalescers (Treats O/W to 0.1-0.5% BS&W). Evaluate reducing inlet velocity to allow larger droplet coalescence. Retention time > 30 min may be needed for heavy crude emulsions.');
+  }
+  rows+=ar('st','3-Phase separator: '+D_std+' mm x '+L_eff.toFixed(1)+' m','Oil section: '+V_oil.toFixed(2)+' m3 ('+tro+' min) | Water section: '+V_water.toFixed(2)+' m3 ('+trw+' min) | Total liquid: '+V_liquid.toFixed(2)+' m3. Weir design required to maintain separate oil and water compartments.','Install interface level control (ILNC) between oil and water sections. Weir height controls oil pad thickness. Boot or sump at water end for water drawoff. Gas outlet through mist extractor at top.');
+
+  html+='<div class="analysis"><div class="atitle">/// THREE-PHASE ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r4').innerHTML=html;
+
+  // Chart
+  var ctx=document.getElementById('ph3Chart').getContext('2d');
+  if(ph3Chart){ph3Chart.destroy();}
+  ph3Chart=new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:['Oil volume (m3)','Water volume (m3)','Gas space (m3)'],
+      datasets:[{
+        data:[V_oil.toFixed(2),V_water.toFixed(2),(A_sel*L_eff-V_liquid).toFixed(2)],
+        backgroundColor:['rgba(170,102,0,0.7)','rgba(0,153,204,0.7)','rgba(34,102,238,0.4)'],
+        borderColor:['#AA6600','#0099CC','#2266EE'],borderWidth:1
+      }]
+    },
+    options:{responsive:true,plugins:{legend:{labels:{color:'#888',font:{size:10}}},
+      tooltip:{backgroundColor:'#111',titleColor:'#fff',bodyColor:'#aaa'}}}
+  });
+}
+
+/* ====== PANEL 5: NOZZLES ====== */
+function calcNozzle(){
+  var D=parseFloat(document.getElementById('nz_D').value)||1200; // mm vessel
+  var Q_in=parseFloat(document.getElementById('nz_Q').value)||0.25; // m3/s total
+  var rho_in=parseFloat(document.getElementById('nz_rho').value)||120; // kg/m3 mixture
+  var Qg_out=parseFloat(document.getElementById('nz_Qg_out').value)||0.22; // m3/s
+  var Ql_out=parseFloat(document.getElementById('nz_Ql_out').value)||0.005; // m3/s
+  var rhog_out=parseFloat(document.getElementById('nz_rhog_out').value)||45;
+
+  // Inlet nozzle sizing: target v < 5 m/s, check momentum rho*v2 < 4000 Pa
+  var v_in_targets=[1,2,3,4,5]; // m/s
+  var D_in_needed=v_in_targets.map(function(v){return Math.sqrt(4*Q_in/(Math.PI*v))*1000;}); // mm
+
+  // Select inlet nozzle for ~3 m/s
+  var D_in_sel=Math.ceil(Math.sqrt(4*Q_in/(Math.PI*3))*1000/25)*25; // round to 25mm
+  var v_in=Q_in/(Math.PI/4*(D_in_sel/1000)*(D_in_sel/1000));
+  var M_in=rho_in*v_in*v_in; // Pa momentum
+
+  // Gas outlet nozzle: target v < 5 m/s
+  var D_gout_sel=Math.ceil(Math.sqrt(4*Qg_out/(Math.PI*5))*1000/25)*25;
+  var v_gout=Qg_out/(Math.PI/4*(D_gout_sel/1000)*(D_gout_sel/1000));
+
+  // Liquid outlet nozzle: target v < 1 m/s
+  var D_lout_sel=Math.ceil(Math.sqrt(4*Ql_out/(Math.PI*1.0))*1000/25)*25;
+  var D_lout_min=Math.max(D_lout_sel,50); // min 2 inch
+  var v_lout=Ql_out/(Math.PI/4*(D_lout_min/1000)*(D_lout_min/1000));
+
+  // Inlet device recommendation
+  var inletDevice;
+  if(M_in<1500) inletDevice='Half-open pipe / diverter plate';
+  else if(M_in<4000) inletDevice='Inlet diverter (baffle plate)';
+  else if(M_in<8000) inletDevice='Cyclonic inlet device (recommended)';
+  else inletDevice='Multi-cyclone inlet manifold';
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Inlet nozzle diameter',D_in_sel,'mm','At ~'+v_in.toFixed(1)+' m/s');
+  html+=rc('','Inlet momentum (rho.v2)',M_in.toFixed(0),'Pa',M_in<4000?'< 4000 Pa - Standard inlet':'> 4000 Pa - Cyclonic device needed');
+  html+=rc('gas','Gas outlet nozzle',D_gout_sel,'mm','At '+v_gout.toFixed(1)+' m/s gas velocity');
+  html+=rc('oil','Liquid outlet nozzle',D_lout_min,'mm','At '+v_lout.toFixed(2)+' m/s liquid');
+  html+=rc('hl','Recommended inlet device',inletDevice,'-','Based on inlet momentum');
+  html+=rc('','Vessel diameter',D,'mm','For reference');
+  html+=rc('','D_inlet / D_vessel',(D_in_sel/D*100).toFixed(0),'%','Typical < 40% of vessel OD');
+  html+=rc('','Nozzle to vessel ratio',D_in_sel/D<0.4?'OK':'LARGE','-',D_in_sel/D<0.4?'< 40% - acceptable':'Increase vessel D or reduce nozzle V');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Inlet nozzle:</strong> D = sqrt(4 x Q / (pi x v)) = sqrt(4 x '+Q_in+' / (pi x 3)) = <span class="hi">'+D_in_sel+' mm</span><br>'
+    +'<strong>Inlet momentum:</strong> rho x v^2 = '+rho_in+' x '+v_in.toFixed(2)+'^2 = <span class="hi">'+M_in.toFixed(0)+' Pa</span> → '+inletDevice+'<br>'
+    +'<strong>Gas outlet:</strong> D = sqrt(4 x '+Qg_out+' / (pi x 5)) = <span class="hig">'+D_gout_sel+' mm</span> at '+v_gout.toFixed(1)+' m/s<br>'
+    +'<strong>Liquid outlet:</strong> D = sqrt(4 x '+Ql_out+' / (pi x 1.0)) = <span class="hio">'+D_lout_min+' mm</span> at '+v_lout.toFixed(2)+' m/s'
+    +'</div>';
+
+  var rows='';
+  if(M_in>8000){
+    rows+=ar('er','Very high inlet momentum ('+M_in.toFixed(0)+' Pa) - multi-cyclone required','Inlet momentum of '+M_in.toFixed(0)+' Pa is extremely high. Standard inlet diverters and single cyclones may not provide sufficient impact protection and initial gas-liquid separation. High momentum causes severe droplet re-entrainment and liquid level disturbance.','Use multi-cyclone inlet manifold. Design for maximum inlet velocity 3 m/s in each cyclone tube. Consider splitting inlet into two nozzles at 180° to each other. Consult vessel internals specialist (Peerless, Sulzer, Exterran).');
+  } else if(M_in>4000){
+    rows+=ar('wn','High inlet momentum ('+M_in.toFixed(0)+' Pa) - cyclonic device recommended','Inlet momentum exceeds the 4000 Pa limit for standard diverter plates. A cyclonic inlet device provides superior primary gas-liquid separation and protects vessel internals from erosion.','Specify cyclonic inlet device: Schoepentoeter (Shell), Inlet Cyclone (NATCO), or equivalent. These provide 90-99% primary separation efficiency and reduce vessel sizing requirements by 15-25%.');
+  } else {
+    rows+=ar('ok','Inlet momentum acceptable ('+M_in.toFixed(0)+' Pa) - standard inlet device','Momentum is within the range for standard half-pipe or diverter plate inlet devices. No special inlet cyclone required.','');
+  }
+  rows+=ar('st','Nozzle summary','Inlet: '+D_in_sel+' mm ('+v_in.toFixed(1)+' m/s) | Gas outlet: '+D_gout_sel+' mm ('+v_gout.toFixed(1)+' m/s) | Liquid outlet: '+D_lout_min+' mm ('+v_lout.toFixed(2)+' m/s). Inlet device: '+inletDevice+'.','All nozzle flanges per ASME B16.5. Inlet and outlet nozzle reinforcement per ASME VIII. Minimum nozzle size: 2 inch (50mm) for all process connections. Instrument nozzles: 1.5 inch minimum.');
+
+  html+='<div class="analysis"><div class="atitle">/// NOZZLE AND INTERNALS ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r5').innerHTML=html;
+}
+
+/* ====== SVG DRAWINGS ====== */
+function drawHorizSVG(D_mm,L_m,ll_pct){
+  var svg=document.getElementById('horiz-svg');
+  var W=580,H=160;
+  var margin=40;
+  var rx=20;
+  var shellH=90;
+  var shellY=(H-shellH)/2;
+  var shellW=W-2*margin;
+  var gasH=shellH*(1-ll_pct/100);
+  var liqH=shellH*ll_pct/100;
+
+  var out='';
+  // Shell outline
+  out+='<rect x="'+margin+'" y="'+shellY+'" width="'+shellW+'" height="'+shellH+'" rx="'+rx+'" fill="#0A1020" stroke="#3366AA" stroke-width="2"/>';
+  // Liquid phase
+  out+='<rect x="'+margin+'" y="'+(shellY+gasH)+'" width="'+shellW+'" height="'+liqH+'" rx="0" fill="rgba(170,102,0,0.4)" stroke="none"/>';
+  // Gas phase label
+  out+='<text x="'+(margin+shellW/2)+'" y="'+(shellY+gasH/2+5)+'" text-anchor="middle" fill="#4499FF" font-size="11" font-family="DM Mono">GAS '+((1-ll_pct/100)*100).toFixed(0)+'%</text>';
+  // Liquid label
+  out+='<text x="'+(margin+shellW/2)+'" y="'+(shellY+gasH+liqH/2+5)+'" text-anchor="middle" fill="#CC8800" font-size="11" font-family="DM Mono">LIQUID '+ll_pct+'%</text>';
+  // Gas-liquid interface
+  out+='<line x1="'+margin+'" y1="'+(shellY+gasH)+'" x2="'+(margin+shellW)+'" y2="'+(shellY+gasH)+'" stroke="#666" stroke-width="1" stroke-dasharray="4,3"/>';
+  // Inlet nozzle
+  out+='<rect x="'+(margin-20)+'" y="'+(shellY+shellH*0.3)+'" width="20" height="20" fill="#555" stroke="#888" stroke-width="1"/>';
+  out+='<text x="'+(margin-22)+'" y="'+(shellY+shellH*0.3-5)+'" text-anchor="middle" fill="#666" font-size="9" font-family="DM Mono">IN</text>';
+  // Gas outlet
+  out+='<rect x="'+(margin+shellW*0.8)+'" y="'+(shellY-20)+'" width="20" height="20" fill="#2244AA" stroke="#4488CC" stroke-width="1"/>';
+  out+='<text x="'+(margin+shellW*0.8+10)+'" y="'+(shellY-22)+'" text-anchor="middle" fill="#4499FF" font-size="9" font-family="DM Mono">GAS</text>';
+  // Liquid outlet
+  out+='<rect x="'+(margin+shellW*0.9)+'" y="'+(shellY+shellH)+'" width="20" height="20" fill="#664400" stroke="#AA6600" stroke-width="1"/>';
+  out+='<text x="'+(margin+shellW*0.9+10)+'" y="'+(shellY+shellH+35)+'" text-anchor="middle" fill="#CC8800" font-size="9" font-family="DM Mono">LIQ</text>';
+  // Dimensions
+  out+='<text x="'+(W/2)+'" y="155" text-anchor="middle" fill="#555" font-size="10" font-family="DM Mono">D='+D_mm+'mm | L='+L_m.toFixed(2)+'m | L/D='+(L_m/(D_mm/1000)).toFixed(1)+'</text>';
+  // Mist extractor
+  out+='<rect x="'+(margin+shellW*0.7)+'" y="'+(shellY+2)+'" width="'+(shellW*0.15)+'" height="'+(gasH*0.6)+'" fill="rgba(68,136,204,0.15)" stroke="#3366AA" stroke-width="1" stroke-dasharray="3,2"/>';
+  out+='<text x="'+(margin+shellW*0.775)+'" y="'+(shellY+gasH*0.35)+'" text-anchor="middle" fill="#3366AA" font-size="8" font-family="DM Mono">MIST EXT.</text>';
+
+  svg.innerHTML=out;
+}
+
+function drawVertSVG(D_mm,H_m,liq_frac){
+  var svg=document.getElementById('vert-svg');
+  var W=120,H=200;
+  var shellW=80;
+  var shellX=(W-shellW)/2;
+  var shellH=160;
+  var shellY=20;
+  var liqH=shellH*liq_frac;
+  var gasH=shellH*(1-liq_frac);
+
+  var out='';
+  // Shell
+  out+='<rect x="'+shellX+'" y="'+shellY+'" width="'+shellW+'" height="'+shellH+'" rx="8" fill="#0A1020" stroke="#3366AA" stroke-width="2"/>';
+  // Liquid zone
+  out+='<rect x="'+shellX+'" y="'+(shellY+gasH)+'" width="'+shellW+'" height="'+liqH+'" fill="rgba(170,102,0,0.4)" rx="0"/>';
+  // Labels
+  out+='<text x="'+(shellX+shellW/2)+'" y="'+(shellY+gasH/2+5)+'" text-anchor="middle" fill="#4499FF" font-size="9" font-family="DM Mono">GAS</text>';
+  out+='<text x="'+(shellX+shellW/2)+'" y="'+(shellY+gasH+liqH/2+5)+'" text-anchor="middle" fill="#CC8800" font-size="9" font-family="DM Mono">LIQ.</text>';
+  // Interface
+  out+='<line x1="'+shellX+'" y1="'+(shellY+gasH)+'" x2="'+(shellX+shellW)+'" y2="'+(shellY+gasH)+'" stroke="#666" stroke-width="1" stroke-dasharray="3,2"/>';
+  // Gas outlet top
+  out+='<rect x="'+(shellX+shellW/2-8)+'" y="'+(shellY-18)+'" width="16" height="18" fill="#2244AA" stroke="#4488CC" stroke-width="1"/>';
+  out+='<text x="'+(shellX+shellW/2)+'" y="'+(shellY-20)+'" text-anchor="middle" fill="#4499FF" font-size="8" font-family="DM Mono">GAS↑</text>';
+  // Inlet
+  out+='<rect x="'+(shellX-16)+'" y="'+(shellY+gasH*0.6)+'" width="16" height="12" fill="#555" stroke="#888" stroke-width="1"/>';
+  // Liquid outlet bottom
+  out+='<rect x="'+(shellX+shellW/2-8)+'" y="'+(shellY+shellH)+'" width="16" height="18" fill="#664400" stroke="#AA6600" stroke-width="1"/>';
+  // Dimensions
+  out+='<text x="'+(W/2)+'" y="196" text-anchor="middle" fill="#555" font-size="8" font-family="DM Mono">D='+D_mm+'mm H='+H_m.toFixed(1)+'m</text>';
+  svg.innerHTML=out;
+}
+
+/* ====== INIT ====== */
+calcInlet();
+setTimeout(function(){calcHoriz();calcVert();calc3Ph();calcNozzle();},300);
+</script>
+</body>
+</html>
