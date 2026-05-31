@@ -1,472 +1,239 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API Gravity Calculator - Petrosmart Academy</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
-  :root {
-    --ps-red: #CC0000;
-    --ps-red-light: #FF3333;
-    --ps-red-dark: #990000;
-    --ps-black: #0A0A0A;
-    --ps-card: #141414;
-    --ps-border: #2A2A2A;
-    --ps-text: #FFFFFF;
-    --ps-muted: #999999;
-    --ps-success: #00CC66;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: var(--font-sans, 'Inter', sans-serif); }
-
-  .ps-wrap {
-    background: var(--ps-black);
-    border-radius: 16px;
-    border: 1px solid var(--ps-border);
-    padding: 0;
-    overflow: hidden;
-    max-width: 680px;
-    margin: 0 auto;
-  }
-
-  .ps-header {
-    background: var(--ps-red);
-    padding: 18px 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .ps-header-icon {
-    width: 36px; height: 36px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; color: #fff;
-  }
-  .ps-header h2 {
-    font-size: 16px; font-weight: 500; color: #fff; margin: 0;
-  }
-  .ps-header p {
-    font-size: 12px; color: rgba(255,255,255,0.75); margin: 0;
-  }
-
-  .ps-body { padding: 24px; }
-
-  .ps-tabs {
-    display: flex; gap: 4px;
-    background: #1A1A1A;
-    border-radius: 10px;
-    padding: 4px;
-    margin-bottom: 24px;
-  }
-  .ps-tab {
-    flex: 1; padding: 8px 12px;
-    background: transparent;
-    border: none; border-radius: 8px;
-    color: var(--ps-muted);
-    font-size: 13px; font-weight: 500;
-    cursor: pointer; transition: all 0.2s;
-    font-family: var(--font-sans, inherit);
-  }
-  .ps-tab.active {
-    background: var(--ps-red);
-    color: #fff;
-  }
-
-  .ps-panel { display: none; }
-  .ps-panel.active { display: block; }
-
-  .ps-field { margin-bottom: 16px; }
-  .ps-label {
-    font-size: 12px; color: var(--ps-muted);
-    margin-bottom: 6px; display: block;
-    text-transform: uppercase; letter-spacing: 0.05em;
-  }
-  .ps-input-row {
-    display: flex; gap: 8px; align-items: center;
-  }
-  .ps-input {
-    flex: 1;
-    background: #1A1A1A;
-    border: 1px solid var(--ps-border);
-    border-radius: 8px;
-    color: #fff;
-    font-size: 15px;
-    padding: 10px 14px;
-    outline: none;
-    transition: border-color 0.2s;
-    font-family: var(--font-sans, inherit);
-    width: 100%;
-  }
-  .ps-input:focus { border-color: var(--ps-red); }
-  .ps-unit {
-    font-size: 13px; color: var(--ps-muted);
-    min-width: 60px; text-align: right;
-  }
-
-  .ps-btn {
-    width: 100%;
-    background: var(--ps-red);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 14px; font-weight: 500;
-    cursor: pointer;
-    margin-top: 8px;
-    transition: background 0.2s;
-    font-family: var(--font-sans, inherit);
-  }
-  .ps-btn:hover { background: var(--ps-red-light); }
-  .ps-btn:active { background: var(--ps-red-dark); }
-
-  .ps-result-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-top: 20px;
-  }
-  .ps-result-card {
-    background: #1A1A1A;
-    border: 1px solid var(--ps-border);
-    border-radius: 10px;
-    padding: 14px 16px;
-  }
-  .ps-result-card.highlight {
-    border-color: var(--ps-red);
-    background: rgba(204,0,0,0.08);
-  }
-  .ps-result-label {
-    font-size: 11px; color: var(--ps-muted);
-    text-transform: uppercase; letter-spacing: 0.05em;
-    margin-bottom: 4px;
-  }
-  .ps-result-value {
-    font-size: 22px; font-weight: 500; color: #fff;
-  }
-  .ps-result-value span {
-    font-size: 13px; color: var(--ps-muted); font-weight: 400;
-  }
-
-  .ps-badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 12px; font-weight: 500;
-    margin-top: 6px;
-  }
-  .badge-light { background: rgba(0,204,102,0.15); color: #00CC66; }
-  .badge-medium { background: rgba(255,165,0,0.15); color: #FFA500; }
-  .badge-heavy { background: rgba(204,0,0,0.15); color: #FF4444; }
-  .badge-xheavy { background: rgba(120,0,0,0.2); color: #FF6666; }
-
-  .ps-formula {
-    background: #1A1A1A;
-    border-left: 3px solid var(--ps-red);
-    border-radius: 0 8px 8px 0;
-    padding: 12px 16px;
-    margin-top: 16px;
-    font-size: 13px;
-    color: var(--ps-muted);
-    line-height: 1.6;
-  }
-  .ps-formula strong { color: #fff; }
-
-  .ps-divider {
-    height: 1px; background: var(--ps-border);
-    margin: 20px 0;
-  }
-
-  .ps-density-bar {
-    margin-top: 16px;
-  }
-  .ps-density-track {
-    height: 8px; border-radius: 4px;
-    background: linear-gradient(to right, #00CC66, #FFA500, #CC0000, #880000);
-    position: relative; margin: 8px 0;
-  }
-  .ps-density-marker {
-    position: absolute; top: -4px;
-    width: 16px; height: 16px;
-    background: #fff;
-    border: 2px solid var(--ps-red);
-    border-radius: 50%;
-    transform: translateX(-50%);
-    transition: left 0.3s;
-  }
-  .ps-density-labels {
-    display: flex; justify-content: space-between;
-    font-size: 11px; color: var(--ps-muted);
-    margin-top: 4px;
-  }
-
-  .ps-ref-table {
-    width: 100%; border-collapse: collapse;
-    margin-top: 16px; font-size: 13px;
-  }
-  .ps-ref-table th {
-    text-align: left; padding: 8px 10px;
-    color: var(--ps-muted); font-weight: 500;
-    border-bottom: 1px solid var(--ps-border);
-    font-size: 11px; text-transform: uppercase;
-  }
-  .ps-ref-table td {
-    padding: 8px 10px; color: #ccc;
-    border-bottom: 1px solid #1E1E1E;
-  }
-  .ps-ref-table tr:hover td { background: #1A1A1A; }
-  .ps-ref-table .val { color: #fff; font-weight: 500; }
-
-  .ps-footer {
-    background: #0D0D0D;
-    border-top: 1px solid var(--ps-border);
-    padding: 12px 24px;
-    font-size: 11px; color: var(--ps-muted);
-    text-align: center;
-  }
-  .ps-footer a { color: var(--ps-red); text-decoration: none; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#111;font-family:Arial,sans-serif;padding:16px;min-height:100vh;}
+.wrap{background:#0A0A0A;border-radius:16px;border:1px solid #2A2A2A;overflow:hidden;max-width:660px;margin:0 auto;}
+.hdr{background:#CC0000;padding:16px 20px;display:flex;align-items:center;gap:12px;}
+.hdr-icon{width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;}
+.hdr h2{font-size:15px;font-weight:600;color:#fff;margin:0;}
+.hdr p{font-size:11px;color:rgba(255,255,255,0.8);margin:0;}
+.body{padding:20px;}
+.tabs{display:flex;gap:4px;background:#1A1A1A;border-radius:10px;padding:4px;margin-bottom:20px;}
+.tab{flex:1;padding:7px 4px;background:transparent;border:none;border-radius:8px;color:#888;font-size:12px;font-weight:500;cursor:pointer;font-family:Arial,sans-serif;transition:all 0.2s;}
+.tab.on{background:#CC0000;color:#fff;}
+.panel{display:none;}
+.panel.on{display:block;}
+.lbl{font-size:10px;color:#888;margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:0.06em;}
+.field{margin-bottom:14px;}
+.row{display:flex;gap:8px;align-items:center;}
+input[type=number]{flex:1;background:#1A1A1A;border:1px solid #333;border-radius:8px;color:#fff;font-size:14px;padding:9px 12px;outline:none;font-family:Arial,sans-serif;width:100%;}
+input[type=number]:focus{border-color:#CC0000;}
+.unit{font-size:12px;color:#888;min-width:75px;text-align:right;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;}
+.card{background:#1A1A1A;border:1px solid #2A2A2A;border-radius:10px;padding:12px 14px;}
+.card.hl{border-color:#CC0000;background:rgba(204,0,0,0.09);}
+.clbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;}
+.cval{font-size:20px;font-weight:600;color:#fff;}
+.cval span{font-size:12px;color:#888;font-weight:400;}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500;margin-top:5px;}
+.formula{background:#1A1A1A;border-left:3px solid #CC0000;border-radius:0 8px 8px 0;padding:10px 14px;margin-top:14px;font-size:12px;color:#888;line-height:1.7;}
+.formula strong{color:#fff;}
+.bar-wrap{margin-top:14px;}
+.bar-lbl{font-size:11px;color:#888;margin-bottom:5px;}
+.track{height:8px;border-radius:4px;background:linear-gradient(to right,#00CC66,#FFA500,#CC0000,#880000);position:relative;margin:6px 0;}
+.marker{position:absolute;top:-4px;width:16px;height:16px;background:#fff;border:2px solid #CC0000;border-radius:50%;transform:translateX(-50%);transition:left 0.3s;}
+.scale{display:flex;justify-content:space-between;font-size:10px;color:#888;margin-top:3px;}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px;}
+th{text-align:left;padding:7px 8px;color:#888;font-weight:500;border-bottom:1px solid #2A2A2A;font-size:10px;text-transform:uppercase;}
+td{padding:7px 8px;color:#ccc;border-bottom:1px solid #1E1E1E;}
+tr:hover td{background:#1A1A1A;cursor:pointer;}
+.tdw{color:#fff;font-weight:500;}
+.foot{background:#0D0D0D;border-top:1px solid #2A2A2A;padding:10px 20px;font-size:10px;color:#666;text-align:center;}
+.foot a{color:#CC0000;text-decoration:none;}
 </style>
+</head>
+<body>
 
-<div class="ps-wrap">
-  <div class="ps-header">
-    <div class="ps-header-icon"><i class="ti ti-droplet" aria-hidden="true"></i></div>
+<div class="wrap">
+  <div class="hdr">
+    <div class="hdr-icon"><i class="ti ti-droplet"></i></div>
     <div>
       <h2>API Gravity Calculator</h2>
       <p>Petrosmart Academy - Crude Oil Properties Tool</p>
     </div>
   </div>
 
-  <div class="ps-body">
-    <div class="ps-tabs">
-      <button class="ps-tab active" onclick="switchTab('sg2api')">SG - API</button>
-      <button class="ps-tab" onclick="switchTab('api2sg')">API - SG</button>
-      <button class="ps-tab" onclick="switchTab('mass')">Mass per barrel</button>
-      <button class="ps-tab" onclick="switchTab('refs')">Reference crudes</button>
+  <div class="body">
+    <div class="tabs">
+      <button class="tab on" id="t1" onclick="sw(1)">SG - API</button>
+      <button class="tab" id="t2" onclick="sw(2)">API - SG</button>
+      <button class="tab" id="t3" onclick="sw(3)">Mass/barrel</button>
+      <button class="tab" id="t4" onclick="sw(4)">Ref. crudes</button>
     </div>
 
-    <div id="panel-sg2api" class="ps-panel active">
-      <div class="ps-field">
-        <label class="ps-label">Specific gravity (SG) at 60°F/60°F</label>
-        <div class="ps-input-row">
-          <input class="ps-input" type="number" id="sg-input" value="0.858" step="0.001" min="0.600" max="1.100" oninput="calcSG2API()">
-          <span class="ps-unit">dimensionless</span>
+    <!-- Panel 1 -->
+    <div class="panel on" id="p1">
+      <div class="field">
+        <label class="lbl">Specific gravity (SG) at 60°F / 60°F</label>
+        <div class="row">
+          <input type="number" id="sg" value="0.858" step="0.001" min="0.6" max="1.1" oninput="c1()">
+          <span class="unit">dimensionless</span>
         </div>
       </div>
-      <div id="api-result" class="ps-result-grid"></div>
-      <div class="ps-density-bar">
-        <div style="font-size:12px; color:var(--ps-muted); margin-bottom:4px;">Classification scale</div>
-        <div class="ps-density-track">
-          <div class="ps-density-marker" id="sg-marker" style="left:50%"></div>
-        </div>
-        <div class="ps-density-labels">
+      <div class="grid" id="r1"></div>
+      <div class="bar-wrap">
+        <div class="bar-lbl">Classification scale</div>
+        <div class="track"><div class="marker" id="mk" style="left:50%"></div></div>
+        <div class="scale">
           <span>Extra-heavy (&lt;10)</span>
           <span>Heavy (10-25)</span>
           <span>Medium (25-35)</span>
           <span>Light (&gt;35)</span>
         </div>
       </div>
-      <div class="ps-formula">
-        <strong>Formula:</strong> API = 141.5 / SG - 131.5
+      <div class="formula"><strong>Formula:</strong> API = 141.5 / SG - 131.5</div>
+    </div>
+
+    <!-- Panel 2 -->
+    <div class="panel" id="p2">
+      <div class="field">
+        <label class="lbl">API Gravity</label>
+        <div class="row">
+          <input type="number" id="ap" value="33.4" step="0.1" min="1" max="80" oninput="c2()">
+          <span class="unit">°API</span>
+        </div>
+      </div>
+      <div class="grid" id="r2"></div>
+      <div class="formula"><strong>Formula:</strong> SG = 141.5 / (API + 131.5)</div>
+    </div>
+
+    <!-- Panel 3 -->
+    <div class="panel" id="p3">
+      <div class="field">
+        <label class="lbl">API Gravity</label>
+        <div class="row">
+          <input type="number" id="apm" value="33.4" step="0.1" min="1" max="80" oninput="c3()">
+          <span class="unit">°API</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="lbl">Volume</label>
+        <div class="row">
+          <input type="number" id="vol" value="1" step="1" min="1" oninput="c3()">
+          <span class="unit">barrels</span>
+        </div>
+      </div>
+      <div class="grid" id="r3"></div>
+      <div class="formula">
+        <strong>Formula:</strong> Mass (kg) = SG x 158.99 x Volume (bbl)<br>
+        <strong>Note:</strong> 1 barrel = 0.158987 m3
       </div>
     </div>
 
-    <div id="panel-api2sg" class="ps-panel">
-      <div class="ps-field">
-        <label class="ps-label">API Gravity (°API)</label>
-        <div class="ps-input-row">
-          <input class="ps-input" type="number" id="api-input" value="33.4" step="0.1" min="1" max="80" oninput="calcAPI2SG()">
-          <span class="ps-unit">°API</span>
-        </div>
-      </div>
-      <div id="sg-result" class="ps-result-grid"></div>
-      <div class="ps-formula">
-        <strong>Formula:</strong> SG = 141.5 / (API + 131.5)
-      </div>
-    </div>
-
-    <div id="panel-mass" class="ps-panel">
-      <div class="ps-field">
-        <label class="ps-label">API Gravity (°API)</label>
-        <div class="ps-input-row">
-          <input class="ps-input" type="number" id="api-mass-input" value="33.4" step="0.1" min="1" max="80" oninput="calcMass()">
-          <span class="ps-unit">°API</span>
-        </div>
-      </div>
-      <div class="ps-field">
-        <label class="ps-label">Volume (barrels)</label>
-        <div class="ps-input-row">
-          <input class="ps-input" type="number" id="vol-input" value="1" step="1" min="1" oninput="calcMass()">
-          <span class="ps-unit">bbl</span>
-        </div>
-      </div>
-      <div id="mass-result" class="ps-result-grid"></div>
-      <div class="ps-formula">
-        <strong>Formula:</strong> Mass (kg) = SG x 158.99 kg/bbl x Volume (bbl)<br>
-        <strong>Note:</strong> 1 barrel = 0.158987 m3 - density at 60°F/60°F
-      </div>
-    </div>
-
-    <div id="panel-refs" class="ps-panel">
-      <div style="font-size:13px; color:var(--ps-muted); margin-bottom:12px;">
-        Key crude benchmarks - click any row to load values
-      </div>
-      <table class="ps-ref-table">
+    <!-- Panel 4 -->
+    <div class="panel" id="p4">
+      <div style="font-size:12px;color:#888;margin-bottom:10px;">Key crude benchmarks - click any row to load values</div>
+      <table>
         <thead>
-          <tr>
-            <th>Crude</th>
-            <th>Origin</th>
-            <th>°API</th>
-            <th>SG</th>
-            <th>Type</th>
-          </tr>
+          <tr><th>Crude</th><th>Origin</th><th>°API</th><th>SG</th><th>Type</th></tr>
         </thead>
-        <tbody id="ref-body"></tbody>
+        <tbody id="tb"></tbody>
       </table>
     </div>
   </div>
 
-  <div class="ps-footer">
+  <div class="foot">
     <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
-    - API gravity formulas per ASTM D1298 / API Manual of Petroleum Measurement Standards
+    - Formulas per ASTM D1298 / API Manual of Petroleum Measurement Standards
   </div>
 </div>
 
 <script>
-const crudes = [
-  { name: 'Brent', origin: 'North Sea', api: 38.3, s: 0.37 },
-  { name: 'WTI', origin: 'USA', api: 39.6, s: 0.24 },
-  { name: 'Arabian Light', origin: 'Saudi Arabia', api: 33.4, s: 1.80 },
-  { name: 'Iranian Heavy', origin: 'Iran', api: 30.9, s: 1.73 },
-  { name: 'Arab Heavy', origin: 'Saudi Arabia', api: 27.4, s: 2.90 },
-  { name: 'Marlim', origin: 'Brazil', api: 19.2, s: 0.68 },
-  { name: 'Doba', origin: 'Chad', api: 21.0, s: 0.17 },
-  { name: 'Athabasca', origin: 'Canada', api: 8.0, s: 4.80 },
+var crudes=[
+  {n:'Brent',o:'North Sea',a:38.3},
+  {n:'WTI',o:'USA',a:39.6},
+  {n:'Arabian Light',o:'Saudi Arabia',a:33.4},
+  {n:'Iranian Heavy',o:'Iran',a:30.9},
+  {n:'Arab Heavy',o:'Saudi Arabia',a:27.4},
+  {n:'Marlim',o:'Brazil',a:19.2},
+  {n:'Doba',o:'Chad',a:21.0},
+  {n:'Athabasca',o:'Canada',a:8.0}
 ];
 
-function apiToSG(api) { return 141.5 / (api + 131.5); }
-function sgToAPI(sg) { return (141.5 / sg) - 131.5; }
-
-function classify(api) {
-  if (api > 35) return { label: 'Light crude', cls: 'badge-light' };
-  if (api > 25) return { label: 'Medium crude', cls: 'badge-medium' };
-  if (api > 10) return { label: 'Heavy crude', cls: 'badge-heavy' };
-  return { label: 'Extra-heavy / bitumen', cls: 'badge-xheavy' };
+function toSG(a){return 141.5/(a+131.5);}
+function toAPI(s){return (141.5/s)-131.5;}
+function cls(a){
+  if(a>35)return{l:'Light',c:'#00CC66',b:'rgba(0,204,102,0.15)'};
+  if(a>25)return{l:'Medium',c:'#FFA500',b:'rgba(255,165,0,0.15)'};
+  if(a>10)return{l:'Heavy',c:'#FF4444',b:'rgba(204,0,0,0.15)'};
+  return{l:'Extra-heavy',c:'#FF6666',b:'rgba(120,0,0,0.2)'};
+}
+function mkpct(a){return((Math.max(1,Math.min(70,a))-1)/69*100).toFixed(1)+'%';}
+function card(hl,lbl,val,unit,cl){
+  var b=hl?'border:1px solid #CC0000;background:rgba(204,0,0,0.09);':'border:1px solid #2A2A2A;background:#1A1A1A;';
+  var badge=cl?'<div class="badge" style="background:'+cl.b+';color:'+cl.c+';">'+cl.l+'</div>':'';
+  return '<div class="card'+(hl?' hl':'')+'" style="'+b+'"><div class="clbl">'+lbl+'</div><div class="cval">'+val+' <span>'+unit+'</span></div>'+badge+'</div>';
 }
 
-function markerLeft(api) {
-  const clamped = Math.max(1, Math.min(70, api));
-  return ((clamped - 1) / 69 * 100).toFixed(1) + '%';
+function c1(){
+  var s=parseFloat(document.getElementById('sg').value);
+  if(isNaN(s)||s<=0)return;
+  var a=toAPI(s),cl2=cls(a),m=s*158.99;
+  document.getElementById('mk').style.left=mkpct(a);
+  document.getElementById('r1').innerHTML=
+    card(true,'API Gravity',a.toFixed(1),'°API',cl2)+
+    card(false,'Mass per barrel',m.toFixed(1),'kg/bbl',null)+
+    card(false,'Density at 15°C',(s*1000).toFixed(1),'kg/m3',null)+
+    card(false,'Volume equiv.',(1/s).toFixed(3),'m3/t',null);
 }
 
-function calcSG2API() {
-  const sg = parseFloat(document.getElementById('sg-input').value);
-  if (isNaN(sg) || sg <= 0) return;
-  const api = sgToAPI(sg);
-  const cls = classify(api);
-  const marker = document.getElementById('sg-marker');
-  if (marker) marker.style.left = markerLeft(api);
-  const mass = sg * 158.99;
-  document.getElementById('api-result').innerHTML = `
-    <div class="ps-result-card highlight">
-      <div class="ps-result-label">API Gravity</div>
-      <div class="ps-result-value">${api.toFixed(1)} <span>°API</span></div>
-      <div class="ps-badge ${cls.cls}">${cls.label}</div>
-    </div>
-    <div class="ps-result-card">
-      <div class="ps-result-label">Mass per barrel</div>
-      <div class="ps-result-value">${mass.toFixed(1)} <span>kg/bbl</span></div>
-    </div>
-    <div class="ps-result-card">
-      <div class="ps-result-label">Density at 15°C</div>
-      <div class="ps-result-value">${(sg * 1000).toFixed(1)} <span>kg/m3</span></div>
-    </div>
-    <div class="ps-result-card">
-      <div class="ps-result-label">Volume equivalent</div>
-      <div class="ps-result-value">${(1000 / (sg * 1000) * 1000).toFixed(2)} <span>L/kg</span></div>
-    </div>`;
+function c2(){
+  var a=parseFloat(document.getElementById('ap').value);
+  if(isNaN(a)||a<1)return;
+  var s=toSG(a),cl2=cls(a),m=s*158.99;
+  document.getElementById('r2').innerHTML=
+    card(true,'Specific Gravity',s.toFixed(4),'SG',cl2)+
+    card(false,'Mass per barrel',m.toFixed(1),'kg/bbl',null)+
+    card(false,'Density at 15°C',(s*1000).toFixed(1),'kg/m3',null)+
+    card(false,'Classification',cl2.l,'',null);
 }
 
-function calcAPI2SG() {
-  const api = parseFloat(document.getElementById('api-input').value);
-  if (isNaN(api) || api < 1) return;
-  const sg = apiToSG(api);
-  const cls = classify(api);
-  const mass = sg * 158.99;
-  document.getElementById('sg-result').innerHTML = `
-    <div class="ps-result-card highlight">
-      <div class="ps-result-label">Specific Gravity</div>
-      <div class="ps-result-value">${sg.toFixed(4)} <span>SG</span></div>
-      <div class="ps-badge ${cls.cls}">${cls.label}</div>
-    </div>
-    <div class="ps-result-card">
-      <div class="ps-result-label">Mass per barrel</div>
-      <div class="ps-result-value">${mass.toFixed(1)} <span>kg/bbl</span></div>
-    </div>
-    <div class="ps-result-card">
-      <div class="ps-result-label">Density at 15°C</div>
-      <div class="ps-result-value">${(sg * 1000).toFixed(1)} <span>kg/m3</span></div>
-    </div>
-    <div class="ps-result-card">
-      <div class="ps-result-label">Classification</div>
-      <div class="ps-result-value" style="font-size:15px;">${api > 35 ? 'Light' : api > 25 ? 'Medium' : api > 10 ? 'Heavy' : 'Extra-heavy'}</div>
-    </div>`;
+function c3(){
+  var a=parseFloat(document.getElementById('apm').value);
+  var v=parseFloat(document.getElementById('vol').value)||1;
+  if(isNaN(a)||a<1)return;
+  var s=toSG(a),cl2=cls(a),mbb=s*158.99,tot=mbb*v;
+  document.getElementById('r3').innerHTML=
+    card(true,'Total mass',tot.toFixed(0),'kg',cl2)+
+    card(false,'Mass/barrel',mbb.toFixed(1),'kg/bbl',null)+
+    card(false,'In tonnes',(tot/1000).toFixed(2),'t',null)+
+    card(false,'SG (calc.)',s.toFixed(4),'',null);
 }
 
-function calcMass() {
-  const api = parseFloat(document.getElementById('api-mass-input').value);
-  const vol = parseFloat(document.getElementById('vol-input').value) || 1;
-  if (isNaN(api) || api < 1) return;
-  const sg = apiToSG(api);
-  const massPerBbl = sg * 158.99;
-  const total = massPerBbl * vol;
-  const cls = classify(api);
-  document.getElementById('mass-result').innerHTML = `
-    <div class="ps-result-card highlight">
-      <div class="ps-result-label">Total mass</div>
-      <div class="ps-result-value">${total.toFixed(0)} <span>kg</span></div>
-      <div class="ps-badge ${cls.cls}">${cls.label}</div>
-    </div>
-    <div class="ps-result-card">
-      <div class="ps-result-label">Mass per barrel</div>
-      <div class="ps-result-value">${massPerBbl.toFixed(1)} <span>kg/bbl</span></div>
-    </div>
-    <div class="ps-result-card">
-      <div class="ps-result-label">In tonnes</div>
-      <div class="ps-result-value">${(total / 1000).toFixed(2)} <span>t</span></div>
-    </div>
-    <div class="ps-result-card">
-      <div class="ps-result-label">SG (calculated)</div>
-      <div class="ps-result-value">${sg.toFixed(4)}</div>
-    </div>`;
+function sw(n){
+  for(var i=1;i<=4;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    document.getElementById('t'+i).className='tab'+(i===n?' on':'');
+  }
 }
 
-function switchTab(id) {
-  document.querySelectorAll('.ps-tab').forEach((t, i) => {
-    const ids = ['sg2api', 'api2sg', 'mass', 'refs'];
-    t.classList.toggle('active', ids[i] === id);
-  });
-  document.querySelectorAll('.ps-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel-' + id).classList.add('active');
+function loadCrude(a){
+  sw(2);
+  document.getElementById('ap').value=a;
+  c2();
 }
 
-function buildRefTable() {
-  const tbody = document.getElementById('ref-body');
-  tbody.innerHTML = crudes.map(c => {
-    const sg = apiToSG(c.api);
-    const cls = classify(c.api);
-    return `<tr style="cursor:pointer" onclick="loadCrude(${c.api})">
-      <td class="val">${c.name}</td>
-      <td>${c.origin}</td>
-      <td class="val">${c.api.toFixed(1)}</td>
-      <td>${sg.toFixed(4)}</td>
-      <td><span class="ps-badge ${cls.cls}" style="font-size:11px;">${cls.label.split(' ')[0]}</span></td>
-    </tr>`;
+function buildTable(){
+  var tb=document.getElementById('tb');
+  tb.innerHTML=crudes.map(function(cr){
+    var s=toSG(cr.a),cl2=cls(cr.a);
+    return '<tr onclick="loadCrude('+cr.a+')">'+
+      '<td class="tdw">'+cr.n+'</td>'+
+      '<td>'+cr.o+'</td>'+
+      '<td class="tdw">'+cr.a.toFixed(1)+'</td>'+
+      '<td>'+s.toFixed(4)+'</td>'+
+      '<td><span class="badge" style="font-size:10px;background:'+cl2.b+';color:'+cl2.c+';">'+cl2.l+'</span></td>'+
+    '</tr>';
   }).join('');
 }
 
-function loadCrude(api) {
-  switchTab('api2sg');
-  document.getElementById('api-input').value = api;
-  calcAPI2SG();
-}
-
-calcSG2API();
-calcAPI2SG();
-calcMass();
-buildRefTable();
+c1();c2();c3();buildTable();
 </script>
+</body>
+</html>
