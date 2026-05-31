@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compressor and Pump Power Calculator - Petrosmart Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --red:#CC0000;--red-dim:rgba(204,0,0,0.12);
+  --bg:#04040A;--surf:#0A0A12;--card:#0E0E18;
+  --border:#181828;--text:#DDDDF0;--muted:#40405A;
+  --ok:#00BB55;--warn:#FF8800;--err:#FF3333;--info:#2266EE;
+  --comp:#7744EE;--comp-dim:rgba(119,68,238,0.12);
+  --pump:#2299DD;--pump-dim:rgba(34,153,221,0.12);
+  --hot:#EE5533;--cold:#2266EE;
+  --mono:'Fira Code',monospace;--sans:'Plus Jakarta Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 50% 40% at 20% 20%,rgba(119,68,238,0.04),transparent),
+    radial-gradient(ellipse 40% 50% at 80% 70%,rgba(34,153,221,0.03),transparent),
+    radial-gradient(ellipse 30% 30% at 50% 50%,rgba(204,0,0,0.02),transparent);
+  pointer-events:none;z-index:0;
+}
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:16px;}
+
+/* HEADER */
+.hdr{
+  background:linear-gradient(135deg,#080814,#0C0820,#080814);
+  border:1px solid rgba(119,68,238,0.25);border-radius:18px;
+  padding:18px 22px;margin-bottom:18px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 0 60px rgba(119,68,238,0.06);
+  position:relative;overflow:hidden;
+}
+.hdr::before{content:'⚙';position:absolute;right:16px;top:50%;
+  transform:translateY(-50%);font-size:90px;opacity:0.04;pointer-events:none;}
+.hdr-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  background:linear-gradient(135deg,var(--comp),#4422AA);
+  box-shadow:0 4px 20px rgba(119,68,238,0.35);}
+.hdr h1{font-size:19px;font-weight:800;color:#fff;}
+.hdr p{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+.hdr-tags{margin-left:auto;display:flex;gap:7px;flex-shrink:0;}
+.htag{padding:5px 11px;border-radius:8px;border:1px solid;
+  font-size:10px;font-weight:600;font-family:var(--mono);}
+.ht-comp{background:var(--comp-dim);border-color:rgba(119,68,238,0.3);color:#AA88FF;}
+.ht-pump{background:var(--pump-dim);border-color:rgba(34,153,221,0.3);color:#55BBFF;}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--surf);border:1px solid var(--border);
+  border-radius:12px;padding:4px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{flex:1;min-width:80px;padding:9px 5px;background:transparent;border:none;
+  border-radius:9px;color:var(--muted);font-size:10px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);text-transform:uppercase;letter-spacing:0.07em;transition:all 0.2s;}
+.tab:hover{color:#bbb;}
+.tab.on-comp{background:var(--comp);color:#fff;box-shadow:0 0 16px rgba(119,68,238,0.4);}
+.tab.on-pump{background:var(--pump);color:#fff;box-shadow:0 0 16px rgba(34,153,221,0.4);}
+.tab.on-red{background:var(--red);color:#fff;box-shadow:0 0 14px rgba(204,0,0,0.35);}
+.panel{display:none;}.panel.on{display:block;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+.card.comp-accent{border-color:rgba(119,68,238,0.2);}
+.card.pump-accent{border-color:rgba(34,153,221,0.2);}
+.stitle{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  border-bottom:1px solid #101020;padding-bottom:7px;margin-bottom:14px;font-family:var(--mono);}
+.stitle.comp{color:var(--comp);}
+.stitle.pump{color:var(--pump);}
+.stitle.neu{color:var(--muted);}
+
+/* FORM */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+.field{margin-bottom:12px;}
+.lbl{font-size:10px;color:var(--muted);margin-bottom:5px;display:block;
+  text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.ir{display:flex;gap:6px;align-items:center;}
+input[type=number],select{width:100%;background:#07070F;border:1px solid #141426;
+  border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;
+  font-family:var(--mono);transition:border-color 0.2s;}
+input:focus,select:focus{border-color:var(--comp);}
+select option{background:#0A0A16;}
+.unit{font-size:10px;color:#222;min-width:52px;text-align:right;
+  white-space:nowrap;font-family:var(--mono);}
+
+/* GAS PRESETS */
+.gas-btns{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.gbtn{padding:5px 11px;background:#0A0A14;border:1px solid var(--border);
+  border-radius:7px;color:var(--muted);font-size:10px;cursor:pointer;
+  font-family:var(--mono);transition:all 0.15s;}
+.gbtn:hover,.gbtn.on{background:var(--comp-dim);border-color:var(--comp);color:#CC99FF;}
+
+/* RESULTS */
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.rgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.rgrid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;}
+.rc{background:#07070E;border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px;position:relative;overflow:hidden;}
+.rc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.rc.hl::before{background:var(--comp);}
+.rc.hl-p::before{background:var(--pump);}
+.rc.ok::before{background:var(--ok);}
+.rc.wn::before{background:var(--warn);}
+.rc.er::before{background:var(--err);}
+.rc.hot::before{background:var(--hot);}
+.rc.hl{border-color:rgba(119,68,238,0.25);}
+.rc.hl-p{border-color:rgba(34,153,221,0.25);}
+.rc.ok{border-color:rgba(0,187,85,0.25);}
+.rc.wn{border-color:rgba(255,136,0,0.25);}
+.rc.er{border-color:rgba(255,51,51,0.25);}
+.rc.hot{border-color:rgba(238,85,51,0.25);}
+.rl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;font-family:var(--mono);}
+.rv{font-size:19px;font-weight:700;color:#fff;font-family:var(--mono);}
+.rv span{font-size:10px;color:#222;font-weight:400;}
+.rsub{font-size:10px;color:#222;margin-top:3px;font-family:var(--mono);}
+
+/* FORMULA */
+.fbox{background:#05050C;border-left:3px solid var(--comp);border-radius:0 10px 10px 0;
+  padding:12px 16px;margin-top:14px;font-size:11px;color:#444;line-height:2.0;font-family:var(--mono);}
+.fbox strong{color:#999;}
+.fbox .hi{color:var(--comp);font-weight:600;}
+.fbox .hib{color:var(--pump);font-weight:600;}
+.fbox .hiok{color:var(--ok);font-weight:600;}
+
+/* ANALYSIS */
+.analysis{background:#05050E;border:1px solid #0E0E20;border-radius:12px;padding:16px;margin-top:14px;}
+.atitle{font-size:10px;font-weight:700;color:var(--comp);margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:0.09em;font-family:var(--mono);}
+.atitle.pump{color:var(--pump);}
+.arow{display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #0C0C1C;}
+.arow:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.d-ok{background:var(--ok);box-shadow:0 0 8px var(--ok);}
+.d-wn{background:var(--warn);box-shadow:0 0 8px var(--warn);}
+.d-er{background:var(--err);box-shadow:0 0 8px var(--err);}
+.d-comp{background:var(--comp);box-shadow:0 0 8px var(--comp);}
+.d-pump{background:var(--pump);box-shadow:0 0 8px var(--pump);}
+.atxt strong{color:#eee;font-size:12px;display:block;margin-bottom:3px;}
+.atxt p{font-size:11px;color:#444;line-height:1.7;margin:0;}
+.asugg{font-size:11px;color:#FFAA00;margin-top:4px;line-height:1.6;}
+
+/* ALERTS */
+.alert{border-radius:10px;padding:10px 14px;margin-top:10px;font-size:11px;line-height:1.7;font-weight:500;}
+.a-ok{background:rgba(0,187,85,0.07);border:1px solid rgba(0,187,85,0.2);color:#00CC66;}
+.a-er{background:rgba(255,51,51,0.07);border:1px solid rgba(255,51,51,0.2);color:#FF5555;}
+.a-wn{background:rgba(255,136,0,0.07);border:1px solid rgba(255,136,0,0.2);color:#FFA500;}
+.a-comp{background:rgba(119,68,238,0.07);border:1px solid rgba(119,68,238,0.2);color:#AA88FF;}
+
+/* CHART */
+.chart-wrap{background:#05050C;border:1px solid var(--border);border-radius:12px;
+  padding:14px;margin-top:14px;}
+.chart-title{font-size:11px;color:var(--comp);font-weight:600;text-transform:uppercase;
+  letter-spacing:0.05em;margin-bottom:10px;font-family:var(--mono);}
+.chart-title.pump{color:var(--pump);}
+
+/* STAGE DISPLAY */
+.stages-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:14px;}
+.stage-card{background:#07070E;border:1px solid var(--border);border-radius:10px;
+  padding:12px;text-align:center;}
+.stage-num{font-size:9px;color:var(--comp);font-family:var(--mono);
+  text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+.stage-val{font-size:16px;font-weight:700;color:#fff;font-family:var(--mono);}
+.stage-lbl{font-size:9px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.tbl th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;
+  letter-spacing:0.07em;font-family:var(--mono);}
+.tbl td{padding:7px 10px;color:#888;border-bottom:1px solid #0C0C18;font-family:var(--mono);}
+.tbl tr:hover td{background:#0A0A14;}
+.tw{color:#fff!important;font-weight:600;}
+.ibox{background:var(--surf);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);
+  line-height:1.7;font-family:var(--mono);}
+.ibox strong{color:#bbb;}
+.sep{height:1px;background:var(--border);margin:14px 0;}
+
+.foot{background:var(--surf);border-top:1px solid var(--border);margin-top:18px;
+  padding:10px 20px;font-size:10px;color:#111;text-align:center;
+  font-family:var(--mono);border-radius:12px;}
+.foot a{color:var(--comp);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-icon">⚙️</div>
+  <div>
+    <h1>Compressor and Pump Power Calculator</h1>
+    <p>Isentropic / Polytropic compression - Multi-stage - Pump power - API 617 / ASME PTC 10</p>
+  </div>
+  <div class="hdr-tags">
+    <div class="htag ht-comp">COMPRESSOR</div>
+    <div class="htag ht-pump">PUMP</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on-comp" id="t1" onclick="sw(1)">🌀 Single-Stage Comp.</button>
+  <button class="tab" id="t2" onclick="sw(2)">🔢 Multi-Stage Comp.</button>
+  <button class="tab" id="t3" onclick="sw(3)">💧 Pump Power</button>
+  <button class="tab" id="t4" onclick="sw(4)">📊 Performance Map</button>
+  <button class="tab" id="t5" onclick="sw(5)">🔄 Intercooling</button>
+  <button class="tab" id="t6" onclick="sw(6)">📚 Reference</button>
+</div>
+
+<!-- ===== PANEL 1: SINGLE STAGE COMPRESSOR ===== -->
+<div class="panel on" id="p1">
+  <div class="card comp-accent">
+    <div class="stitle comp">/// gas properties and presets</div>
+    <div class="gas-btns">
+      <button class="gbtn on" onclick="setGas('methane',16.04,1.307)">Methane (CH4)</button>
+      <button class="gbtn" onclick="setGas('natgas',18.0,1.28)">Natural gas</button>
+      <button class="gbtn" onclick="setGas('air',28.97,1.400)">Air</button>
+      <button class="gbtn" onclick="setGas('h2',2.016,1.405)">Hydrogen H2</button>
+      <button class="gbtn" onclick="setGas('co2',44.01,1.289)">CO2</button>
+      <button class="gbtn" onclick="setGas('n2',28.01,1.400)">Nitrogen N2</button>
+      <button class="gbtn" onclick="setGas('propane',44.10,1.131)">Propane C3H8</button>
+      <button class="gbtn" onclick="setGas('custom',0,0)">Custom</button>
+    </div>
+
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Molecular weight MW</label>
+        <div class="ir"><input type="number" id="MW" value="16.04" step="0.01" oninput="calcComp()"><span class="unit">g/mol</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Heat capacity ratio γ (Cp/Cv)</label>
+        <div class="ir"><input type="number" id="gamma" value="1.307" step="0.001" oninput="calcComp()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas compressibility Z (inlet)</label>
+        <div class="ir"><input type="number" id="Z1" value="0.98" step="0.01" oninput="calcComp()"><span class="unit">-</span></div>
+      </div>
+    </div>
+
+    <div class="stitle comp">/// operating conditions</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Inlet pressure P1</label>
+        <div class="ir"><input type="number" id="P1" value="5" step="0.1" oninput="calcComp()"><span class="unit">bar(a)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Outlet pressure P2</label>
+        <div class="ir"><input type="number" id="P2" value="25" step="0.1" oninput="calcComp()"><span class="unit">bar(a)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Inlet temperature T1</label>
+        <div class="ir"><input type="number" id="T1_c" value="35" step="0.5" oninput="calcComp()"><span class="unit">°C</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Mass flow rate</label>
+        <div class="ir"><input type="number" id="mdot" value="10" step="0.1" oninput="calcComp()"><span class="unit">kg/s</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Isentropic efficiency η_is</label>
+        <div class="ir"><input type="number" id="eta_is" value="78" step="0.5" oninput="calcComp()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Mechanical efficiency η_mech</label>
+        <div class="ir"><input type="number" id="eta_mech" value="98" step="0.5" oninput="calcComp()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Polytropic efficiency η_p (if known)</label>
+        <div class="ir"><input type="number" id="eta_p" value="82" step="0.5" oninput="calcComp()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Driver efficiency (motor/turbine)</label>
+        <div class="ir"><input type="number" id="eta_driver" value="95" step="0.5" oninput="calcComp()"><span class="unit">%</span></div>
+      </div>
+    </div>
+
+    <div id="r1"></div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">P-V diagram: isentropic vs polytropic vs isothermal compression</div>
+      <canvas id="pvChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 2: MULTI-STAGE ===== -->
+<div class="panel" id="p2">
+  <div class="card comp-accent">
+    <div class="stitle comp">/// multi-stage compression with intercooling</div>
+    <div class="ibox">
+      <strong>Optimal staging:</strong> For minimum total work with perfect intercooling, the compression ratio per stage is equal: r_stage = (P_final/P_inlet)^(1/N_stages). Intercooling reduces discharge temperature and improves efficiency by approaching isothermal compression.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Inlet pressure P1</label>
+        <div class="ir"><input type="number" id="ms_P1" value="1.013" step="0.01" oninput="calcMulti()"><span class="unit">bar(a)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Final outlet pressure Pn</label>
+        <div class="ir"><input type="number" id="ms_Pn" value="200" step="1" oninput="calcMulti()"><span class="unit">bar(a)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Inlet temperature T1</label>
+        <div class="ir"><input type="number" id="ms_T1" value="35" step="0.5" oninput="calcMulti()"><span class="unit">°C</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Number of stages</label>
+        <div class="ir"><input type="number" id="ms_N" value="3" min="1" max="8" oninput="calcMulti()"><span class="unit">stages</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Molecular weight MW</label>
+        <div class="ir"><input type="number" id="ms_MW" value="16.04" step="0.01" oninput="calcMulti()"><span class="unit">g/mol</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">γ (Cp/Cv)</label>
+        <div class="ir"><input type="number" id="ms_gamma" value="1.307" step="0.001" oninput="calcMulti()"><span class="unit">-</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Mass flow rate</label>
+        <div class="ir"><input type="number" id="ms_mdot" value="10" step="0.1" oninput="calcMulti()"><span class="unit">kg/s</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Isentropic efficiency</label>
+        <div class="ir"><input type="number" id="ms_eta" value="78" step="0.5" oninput="calcMulti()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Intercooler outlet T</label>
+        <div class="ir"><input type="number" id="ms_Tic" value="40" step="0.5" oninput="calcMulti()"><span class="unit">°C</span></div>
+      </div>
+    </div>
+    <div id="r2"></div>
+    <div id="stages-display"></div>
+    <div class="chart-wrap" style="margin-top:14px;">
+      <div class="chart-title">Pressure and temperature profile - multi-stage compression</div>
+      <canvas id="msChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 3: PUMP POWER ===== -->
+<div class="panel" id="p3">
+  <div class="card pump-accent">
+    <div class="stitle pump">/// pump power calculation</div>
+    <div class="ibox">
+      <strong>Pump power:</strong> Unlike compressors, liquids are incompressible (density constant). Hydraulic power = rho x g x Q x H. Pump efficiency and motor efficiency are applied to get shaft power and installed motor power. NPSH check is critical to avoid cavitation.
+    </div>
+
+    <div class="stitle pump">/// liquid properties</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Liquid density</label>
+        <div class="ir"><input type="number" id="p_rho" value="850" step="5" oninput="calcPump()"><span class="unit">kg/m3</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Liquid viscosity</label>
+        <div class="ir"><input type="number" id="p_visc" value="3.5" step="0.1" oninput="calcPump()"><span class="unit">cP</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Vapor pressure</label>
+        <div class="ir"><input type="number" id="p_Pv" value="0.15" step="0.01" oninput="calcPump()"><span class="unit">bar(a)</span></div>
+      </div>
+    </div>
+
+    <div class="stitle pump">/// hydraulic parameters</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Flow rate Q</label>
+        <div class="ir"><input type="number" id="p_Q" value="100" step="1" oninput="calcPump()"><span class="unit">m3/hr</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Total head H</label>
+        <div class="ir"><input type="number" id="p_H" value="80" step="1" oninput="calcPump()"><span class="unit">m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pump efficiency η_pump</label>
+        <div class="ir"><input type="number" id="p_eta" value="75" step="0.5" oninput="calcPump()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Motor efficiency η_motor</label>
+        <div class="ir"><input type="number" id="p_eta_m" value="95" step="0.5" oninput="calcPump()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Service factor</label>
+        <div class="ir"><input type="number" id="p_sf" value="1.15" step="0.05" oninput="calcPump()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Speed (RPM)</label>
+        <div class="ir"><input type="number" id="p_N" value="2950" step="50" oninput="calcPump()"><span class="unit">RPM</span></div>
+      </div>
+    </div>
+
+    <div class="stitle pump">/// NPSH check</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Atmospheric pressure</label>
+        <div class="ir"><input type="number" id="p_Patm" value="1.013" step="0.01" oninput="calcPump()"><span class="unit">bar(a)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Suction head (positive = above)</label>
+        <div class="ir"><input type="number" id="p_Hs" value="2" step="0.1" oninput="calcPump()"><span class="unit">m</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Suction friction loss</label>
+        <div class="ir"><input type="number" id="p_Hfs" value="0.5" step="0.1" oninput="calcPump()"><span class="unit">m</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">NPSHr (pump datasheet)</label>
+      <div class="ir"><input type="number" id="p_NPSHr" value="4" step="0.1" oninput="calcPump()"><span class="unit">m</span></div>
+    </div>
+
+    <div id="r3"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 4: PERFORMANCE MAP ===== -->
+<div class="panel" id="p4">
+  <div class="card comp-accent">
+    <div class="stitle comp">/// compressor performance map</div>
+    <div class="ibox">
+      <strong>Performance map:</strong> Shows discharge temperature, power, and efficiency as functions of compression ratio and inlet conditions. Used for operating envelope definition and surge margin calculation.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Inlet pressure P1</label>
+        <div class="ir"><input type="number" id="pm_P1" value="5" step="0.1" oninput="calcMap()"><span class="unit">bar(a)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Inlet temperature T1</label>
+        <div class="ir"><input type="number" id="pm_T1" value="35" step="0.5" oninput="calcMap()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Mass flow rate</label>
+        <div class="ir"><input type="number" id="pm_mdot" value="10" step="0.1" oninput="calcMap()"><span class="unit">kg/s</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">γ (Cp/Cv)</label>
+        <div class="ir"><input type="number" id="pm_gamma" value="1.307" step="0.001" oninput="calcMap()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">MW</label>
+        <div class="ir"><input type="number" id="pm_MW" value="16.04" step="0.01" oninput="calcMap()"><span class="unit">g/mol</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Isentropic efficiency</label>
+        <div class="ir"><input type="number" id="pm_eta" value="78" step="0.5" oninput="calcMap()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Discharge temperature vs compression ratio (at various inlet T)</div>
+      <canvas id="mapChart1" height="180"></canvas>
+    </div>
+    <div class="chart-wrap" style="margin-top:10px;">
+      <div class="chart-title">Shaft power vs compression ratio</div>
+      <canvas id="mapChart2" height="180"></canvas>
+    </div>
+    <div id="r4"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 5: INTERCOOLING ===== -->
+<div class="panel" id="p5">
+  <div class="card comp-accent">
+    <div class="stitle comp">/// intercooling analysis - power savings</div>
+    <div class="ibox">
+      <strong>Intercooling benefit:</strong> Cooling gas between stages reduces volumetric flow entering the next stage, reducing compression work. Perfect intercooling (back to T1) minimizes work. Each stage of intercooling saves typically 10-25% of compression power vs single-stage at the same total ratio.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Inlet pressure P1</label>
+        <div class="ir"><input type="number" id="ic_P1" value="1.013" step="0.01" oninput="calcIC()"><span class="unit">bar(a)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Final pressure Pn</label>
+        <div class="ir"><input type="number" id="ic_Pn" value="100" step="1" oninput="calcIC()"><span class="unit">bar(a)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Inlet temperature T1</label>
+        <div class="ir"><input type="number" id="ic_T1" value="35" step="0.5" oninput="calcIC()"><span class="unit">°C</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">γ</label>
+        <div class="ir"><input type="number" id="ic_gamma" value="1.307" step="0.001" oninput="calcIC()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">MW</label>
+        <div class="ir"><input type="number" id="ic_MW" value="16.04" step="0.01" oninput="calcIC()"><span class="unit">g/mol</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Mass flow</label>
+        <div class="ir"><input type="number" id="ic_mdot" value="10" step="0.1" oninput="calcIC()"><span class="unit">kg/s</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Isentropic efficiency per stage</label>
+        <div class="ir"><input type="number" id="ic_eta" value="78" step="0.5" oninput="calcIC()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Intercooler outlet T (all stages)</label>
+        <div class="ir"><input type="number" id="ic_Tic" value="40" step="0.5" oninput="calcIC()"><span class="unit">°C</span></div>
+      </div>
+    </div>
+    <div id="r5"></div>
+    <div class="chart-wrap" style="margin-top:14px;">
+      <div class="chart-title">Total shaft power vs number of stages (same total ratio)</div>
+      <canvas id="icChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 6: REFERENCE ===== -->
+<div class="panel" id="p6">
+  <div class="card">
+    <div class="stitle comp">/// key formulas - compressor</div>
+    <div class="fbox">
+      <strong>Compression ratio (per stage):</strong> r = P2/P1<br>
+      <strong>Isentropic discharge T:</strong> T2s = T1 x (P2/P1)^((γ-1)/γ) [K]<br>
+      <strong>Actual discharge T (isentropic):</strong> T2 = T1 + (T2s - T1) / η_is [K]<br>
+      <strong>Isentropic head:</strong> H_is = Z1 x R x T1 / MW x (γ/(γ-1)) x ((P2/P1)^((γ-1)/γ) - 1) [J/kg]<br>
+      <strong>Isentropic power:</strong> W_is = m_dot x H_is [W]<br>
+      <strong>Shaft power:</strong> W_shaft = W_is / η_is [W]<br>
+      <strong>Installed motor power:</strong> W_motor = W_shaft / (η_mech x η_driver) [W]<br>
+      <strong>Polytropic exponent n:</strong> n/(n-1) = γ/(γ-1) x η_p (for compressors)<br>
+      <strong>Polytropic head:</strong> H_p = Z1 x R x T1 / MW x (n/(n-1)) x ((P2/P1)^((n-1)/n) - 1)<br>
+      <strong>Discharge T (polytropic):</strong> T2_p = T1 x (P2/P1)^((n-1)/n) [K]<br>
+      <strong>Isothermal power:</strong> W_iso = m_dot x Z x R x T1 / MW x ln(P2/P1)<br>
+      <strong>Optimal stage ratio:</strong> r_stage = (Pn/P1)^(1/N) for N stages<br>
+      <strong>Intercooling saving:</strong> W_N_stages / W_1_stage (at equal total ratio)
+    </div>
+    <div class="sep"></div>
+    <div class="stitle pump">/// key formulas - pump</div>
+    <div class="fbox" style="border-left-color:var(--pump);">
+      <strong>Hydraulic power:</strong> W_hyd = rho x g x Q x H [W] (Q in m3/s)<br>
+      <strong>Shaft power:</strong> W_shaft = W_hyd / η_pump<br>
+      <strong>Motor input power:</strong> W_motor = W_shaft / η_motor<br>
+      <strong>Motor selected (IEC):</strong> P_motor ≥ W_shaft x service_factor<br>
+      <strong>Specific speed Ns:</strong> Ns = N(RPM) x sqrt(Q(m3/s)) / H(m)^0.75<br>
+      <strong>Ns < 500:</strong> Radial centrifugal | <strong>500-3000:</strong> Mixed flow | <strong>>3000:</strong> Axial<br>
+      <strong>NPSHa:</strong> P_atm/(rho x g) - P_vapor/(rho x g) ± Z_s - H_f_suction [m]<br>
+      <strong>NPSHa must exceed NPSHr by ≥ 0.5m minimum</strong> (ISO 9906)<br>
+      <strong>Affinity laws:</strong> Q ~ N | H ~ N^2 | P ~ N^3 (speed change)<br>
+      <strong>VFD savings:</strong> P_new/P_old = (N_new/N_old)^3<br>
+      <strong>Torque:</strong> T = W_shaft / omega = W_shaft x 60 / (2 x pi x N_RPM) [N.m]
+    </div>
+    <div class="sep"></div>
+    <div class="stitle comp">/// typical compressor parameters</div>
+    <table class="tbl">
+      <thead><tr><th>Type</th><th>Compression ratio/stage</th><th>η_is typical</th><th>η_p typical</th><th>Typical application</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Reciprocating (low speed)</td><td>2-8</td><td>80-88%</td><td>82-90%</td><td>Gas injection, CNG, HPHT</td></tr>
+        <tr><td class="tw">Reciprocating (high speed)</td><td>2-6</td><td>75-85%</td><td>78-87%</td><td>Gas gathering, pipelines</td></tr>
+        <tr><td class="tw">Centrifugal (single stage)</td><td>1.2-3.5</td><td>72-82%</td><td>76-85%</td><td>Refrigeration, pipeline boost</td></tr>
+        <tr><td class="tw">Centrifugal (multi-stage)</td><td>1.2-3.5/stage</td><td>74-84%</td><td>78-87%</td><td>Gas reinjection, LNG, refinery</td></tr>
+        <tr><td class="tw">Axial compressor</td><td>1.1-1.4</td><td>85-92%</td><td>87-93%</td><td>Air separation, large gas turbines</td></tr>
+        <tr><td class="tw">Screw (dry)</td><td>2-5</td><td>65-75%</td><td>68-78%</td><td>Instrument air, small gas</td></tr>
+        <tr><td class="tw">Screw (oil-flooded)</td><td>2-8</td><td>70-80%</td><td>73-82%</td><td>Industrial air, refrigerants</td></tr>
+      </tbody>
+    </table>
+    <div class="sep"></div>
+    <div class="stitle comp">/// common gas properties</div>
+    <table class="tbl">
+      <thead><tr><th>Gas</th><th>MW (g/mol)</th><th>γ (Cp/Cv)</th><th>R (J/kg.K)</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Methane CH4</td><td>16.04</td><td>1.307</td><td>518.3</td><td>Main component natural gas</td></tr>
+        <tr><td class="tw">Natural gas (typical)</td><td>17-20</td><td>1.25-1.30</td><td>415-490</td><td>Varies by composition</td></tr>
+        <tr><td class="tw">Air (dry)</td><td>28.97</td><td>1.400</td><td>287.1</td><td>N2/O2 mixture</td></tr>
+        <tr><td class="tw">Hydrogen H2</td><td>2.016</td><td>1.405</td><td>4124</td><td>Very high R, low MW</td></tr>
+        <tr><td class="tw">Nitrogen N2</td><td>28.01</td><td>1.400</td><td>296.8</td><td>Inert, similar to air</td></tr>
+        <tr><td class="tw">CO2</td><td>44.01</td><td>1.289</td><td>188.9</td><td>Near-critical at 73 bar, 31°C</td></tr>
+        <tr><td class="tw">Ethane C2H6</td><td>30.07</td><td>1.188</td><td>276.5</td><td>LNG / NGL component</td></tr>
+        <tr><td class="tw">Propane C3H8</td><td>44.10</td><td>1.131</td><td>188.6</td><td>LPG, refrigerant R290</td></tr>
+        <tr><td class="tw">H2S</td><td>34.08</td><td>1.320</td><td>243.9</td><td>Sour gas - NACE MR0175</td></tr>
+        <tr><td class="tw">Ammonia NH3</td><td>17.03</td><td>1.310</td><td>488.2</td><td>Refrigerant, fertilizer</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">
+  <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
+  · API 617 centrifugal compressors / ASME PTC 10 / ISO 9906 pumps · Educational tool only
+</div>
+</div>
+
+<script>
+var pvChart=null,msChart=null,mapChart1=null,mapChart2=null,icChart=null;
+var R_univ=8314; // J/(kmol.K)
+
+/* ====== UTILS ====== */
+function sw(n){
+  for(var i=1;i<=6;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    var tab=document.getElementById('t'+i);
+    tab.className='tab';
+    if(i===n){
+      if(n<=2||n===4||n===5||n===6) tab.classList.add('on-comp');
+      else if(n===3) tab.classList.add('on-pump');
+    }
+  }
+  if(n===4)setTimeout(calcMap,80);
+  if(n===5)setTimeout(calcIC,80);
+}
+function rc(cls,lbl,val,unit,sub){
+  return '<div class="rc '+(cls||'')+'">'
+    +'<div class="rl">'+lbl+'</div>'
+    +'<div class="rv">'+val+(unit?' <span>'+unit+'</span>':'')+'</div>'
+    +(sub?'<div class="rsub">'+sub+'</div>':'')+'</div>';
+}
+function ar(type,title,body,sugg){
+  var d={ok:'d-ok',wn:'d-wn',er:'d-er',comp:'d-comp',pump:'d-pump'}[type]||'d-comp';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+}
+function motorSel(P_kW){
+  var ms=[0.37,0.55,0.75,1.1,1.5,2.2,3,4,5.5,7.5,11,15,18.5,22,30,37,45,55,75,90,110,132,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3150,4000,5000];
+  return ms.find(function(m){return m>=P_kW;})||ms[ms.length-1];
+}
+
+/* ====== GAS PRESETS ====== */
+function setGas(id,MW,gamma){
+  document.querySelectorAll('.gbtn').forEach(function(b){b.classList.remove('on');});
+  event.target.classList.add('on');
+  if(MW>0){
+    document.getElementById('MW').value=MW;
+    document.getElementById('gamma').value=gamma;
+    document.getElementById('ms_MW').value=MW;
+    document.getElementById('ms_gamma').value=gamma;
+    document.getElementById('pm_MW').value=MW;
+    document.getElementById('pm_gamma').value=gamma;
+    document.getElementById('ic_MW').value=MW;
+    document.getElementById('ic_gamma').value=gamma;
+  }
+  calcComp();
+}
+
+/* ====== PANEL 1: SINGLE STAGE ====== */
+function calcComp(){
+  var MW=parseFloat(document.getElementById('MW').value)||16.04;
+  var gamma=parseFloat(document.getElementById('gamma').value)||1.307;
+  var Z1=parseFloat(document.getElementById('Z1').value)||0.98;
+  var P1=parseFloat(document.getElementById('P1').value)||5;
+  var P2=parseFloat(document.getElementById('P2').value)||25;
+  var T1_c=parseFloat(document.getElementById('T1_c').value)||35;
+  var mdot=parseFloat(document.getElementById('mdot').value)||10;
+  var eta_is=parseFloat(document.getElementById('eta_is').value)||78;
+  var eta_mech=parseFloat(document.getElementById('eta_mech').value)||98;
+  var eta_p=parseFloat(document.getElementById('eta_p').value)||82;
+  var eta_driver=parseFloat(document.getElementById('eta_driver').value)||95;
+
+  var T1=T1_c+273.15;
+  var r=P2/P1; // compression ratio
+  var R=R_univ/MW; // specific gas constant J/kg.K
+
+  // Isentropic discharge temperature
+  var T2s=T1*Math.pow(r,(gamma-1)/gamma);
+  var T2s_C=T2s-273.15;
+
+  // Actual discharge T (isentropic)
+  var T2_is=T1+(T2s-T1)/(eta_is/100);
+  var T2_is_C=T2_is-273.15;
+
+  // Polytropic exponent n
+  var n_over_n1=gamma/(gamma-1)*(eta_p/100);
+  var n=n_over_n1/(n_over_n1-1);
+  // Polytropic discharge T
+  var T2_p=T1*Math.pow(r,(n-1)/n);
+  var T2_p_C=T2_p-273.15;
+
+  // Isentropic head
+  var H_is=Z1*R*T1*(gamma/(gamma-1))*(Math.pow(r,(gamma-1)/gamma)-1);
+
+  // Isentropic power
+  var W_is=mdot*H_is; // W
+  var W_shaft=W_is/(eta_is/100); // W
+  var W_brake=W_shaft/(eta_mech/100);
+  var W_motor=W_brake/(eta_driver/100);
+  var W_installed=motorSel(W_motor/1000); // kW
+
+  // Polytropic power
+  var H_p=Z1*R*T1*(n/(n-1))*(Math.pow(r,(n-1)/n)-1);
+  var W_p=mdot*H_p;
+  var W_shaft_p=W_p; // polytropic power IS shaft power when using polytropic head and mdot
+
+  // Isothermal (minimum theoretical)
+  var W_iso=mdot*Z1*R*T1*Math.log(r);
+  var eta_overall=W_iso/W_shaft*100;
+
+  // Volumetric flow (actual inlet)
+  var Qin=mdot/((P1*1e5)/(Z1*R*T1)); // m3/s (from P=rho*R*T/Z → rho=P*MW/(Z*R_univ*T))
+  var rho1=(P1*1e5)*MW/(Z1*R_univ*T1)/1000; // kg/m3 (using kg units)
+  var Qin_m3s=mdot/rho1;
+  var Qin_m3h=Qin_m3s*3600;
+
+  // Mach / temp check
+  var T_limit=180; // typical centrifugal limit
+  var T2_ok=T2_is_C<=T_limit;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Compression ratio r',r.toFixed(3),'-','P2/P1 = '+P2+'/'+P1+' bar(a)');
+  html+=rc('hl','Isentropic shaft power',( W_shaft/1000).toFixed(2),'kW','= '+(W_shaft/1e6).toFixed(3)+' MW');
+  html+=rc('hot','Discharge T (isentropic)',T2_is_C.toFixed(1),'°C',T2_ok?'Within limit':'EXCEEDS '+T_limit+'°C limit!');
+  html+=rc('','Isentropic T (T2s)',T2s_C.toFixed(1),'°C','If η_is = 100%');
+  html+=rc('','Polytropic shaft power',(W_shaft_p/1000).toFixed(2),'kW','Using n = '+n.toFixed(4));
+  html+=rc('','Polytropic discharge T',T2_p_C.toFixed(1),'°C','T2 = T1 x r^((n-1)/n)');
+  html+=rc('','Isothermal power (min)',(W_iso/1000).toFixed(2),'kW','Theoretical minimum');
+  html+=rc('','Installed motor',W_installed,'kW IEC','= '+(W_motor/1000).toFixed(2)+' kW required');
+  html+=rc('','Isentropic head',( H_is/1000).toFixed(2),'kJ/kg','Specific compression work');
+  html+=rc('','Overall efficiency',eta_overall.toFixed(1),'%','W_isothermal / W_shaft');
+  html+=rc('','Actual inlet flow',Qin_m3h.toFixed(1),'m3/hr (actual)','= '+(Qin_m3s*1000).toFixed(1)+' L/s');
+  html+=rc('','Gas density (inlet)',rho1.toFixed(3),'kg/m3','At P1='+P1+' bar, T1='+T1_c+'°C, Z='+Z1);
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>r</strong> = P2/P1 = '+P2+'/'+P1+' = <span class="hi">'+r.toFixed(3)+'</span> | R = R_univ/MW = 8314/'+MW+' = <span class="hi">'+R.toFixed(2)+' J/kg.K</span><br>'
+    +'<strong>T2s</strong> = T1 x r^((γ-1)/γ) = '+T1.toFixed(1)+' x '+r.toFixed(3)+'^('+((gamma-1)/gamma).toFixed(4)+') = <span class="hi">'+T2s_C.toFixed(1)+'°C</span><br>'
+    +'<strong>T2_actual</strong> = T1 + (T2s-T1)/η_is = '+T1_c+' + ('+T2s_C.toFixed(1)+'-'+T1_c+')/'+eta_is+'% = <span class="hi">'+T2_is_C.toFixed(1)+'°C</span><br>'
+    +'<strong>H_is</strong> = Z1 x R x T1 x (γ/(γ-1)) x (r^((γ-1)/γ)-1) = <span class="hi">'+(H_is/1000).toFixed(2)+' kJ/kg</span><br>'
+    +'<strong>W_shaft</strong> = m_dot x H_is / η_is = '+mdot+' x '+(H_is/1000).toFixed(2)+' / '+(eta_is/100)+' = <span class="hi">'+(W_shaft/1000).toFixed(2)+' kW</span><br>'
+    +'<strong>n</strong> = polytropic exponent = γ/(γ-1) x η_p / (γ/(γ-1) x η_p - 1) = <span class="hi">'+n.toFixed(4)+'</span>'
+    +'</div>';
+
+  var rows='';
+  if(!T2_ok){
+    rows+=ar('er','Discharge temperature exceeds limit ('+T2_is_C.toFixed(0)+'°C > '+T_limit+'°C)','For centrifugal compressors, discharge temperature above 180°C degrades seal oil, labyrinth seal materials, and internal clearances. For reciprocating compressors, above 150°C risks cylinder lubricant breakdown and valve damage.','Add intercooling (split into multiple stages). Each additional stage reduces discharge T significantly. For r = '+r.toFixed(1)+', two stages would give T2 ≈ '+( T1*(Math.pow(r,0.5)*(gamma-1)/gamma + 1/eta_is*(Math.pow(Math.pow(r,0.5),(gamma-1)/gamma)-1) + 0) - 273.15).toFixed(0) +'°C per stage. Target: T_discharge ≤ 150°C (reciprocating) or 180°C (centrifugal).');
+  } else if(T2_is_C>150){
+    rows+=ar('wn','High discharge temperature ('+T2_is_C.toFixed(0)+'°C)','Discharge temperature is within centrifugal limits but exceeds recommended reciprocating limit of 150°C. Evaluate compressor type carefully. Higher T accelerates seal wear and requires higher-grade lubricants.','For reciprocating service at this temperature: use synthetic lubricants rated to 180°C+. Verify cylinder material (ductile iron vs steel). Consider 2-stage design if reciprocating: '+(T1*(Math.pow(Math.pow(r,0.5),(gamma-1)/gamma)-1)/(eta_is/100)+T1-273.15).toFixed(0)+'°C per stage estimate.');
+  } else {
+    rows+=ar('ok','Discharge temperature acceptable ('+T2_is_C.toFixed(0)+'°C)','Discharge temperature is within normal operating limits for both centrifugal and reciprocating compressors. No intercooling required for temperature reasons. Verify lube oil system is rated for '+Math.ceil(T2_is_C/10)*10+'°C minimum.','');
+  }
+
+  if(r>10){
+    rows+=ar('wn','High compression ratio (r = '+r.toFixed(1)+')','Compression ratio above 10 is unusually high for a single stage. Centrifugal compressors are typically limited to r < 3.5 per stage (impeller tip speed and surge limits). Reciprocating compressors can handle r = 5-8 per stage.','Multi-stage compression is strongly recommended: '+Math.ceil(Math.log(r)/Math.log(4))+' stages at r = '+( Math.pow(r,1/Math.ceil(Math.log(r)/Math.log(4)))).toFixed(2)+'/stage each would cover this duty. Use Tab 2 for multi-stage calculation.');
+  } else if(r<1.05){
+    rows+=ar('wn','Very low compression ratio (r = '+r.toFixed(3)+')','Near-unity compression ratio means minimal work is being done. Verify that P1 and P2 inputs are correct. Check if a booster or fan (very low dP applications) is more appropriate than a compressor.');
+  }
+  rows+=ar('comp','Power summary','Isentropic shaft power: '+(W_shaft/1000).toFixed(2)+' kW | Polytropic: '+(W_shaft_p/1000).toFixed(2)+' kW | Isothermal (min): '+(W_iso/1000).toFixed(2)+' kW | Motor installed: '+W_installed+' kW IEC | Discharge T: '+T2_is_C.toFixed(1)+'°C.','');
+
+  html+='<div class="analysis"><div class="atitle">/// COMPRESSOR ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r1').innerHTML=html;
+
+  // PV diagram
+  drawPV(P1,P2,T1,gamma,Z1,R,eta_is);
+}
+
+function drawPV(P1,P2,T1,gamma,Z1,R,eta_is_pct){
+  var ctx=document.getElementById('pvChart').getContext('2d');
+  if(pvChart){pvChart.destroy();}
+  var nPts=50;
+  var rho1=(P1*1e5)/(Z1*R*T1);
+  var v1=1/rho1;
+  // Isentropic: P*v^gamma = const
+  var C_is=P1*1e5*Math.pow(v1,gamma);
+  // Isothermal: P*v = const
+  var C_iso=P1*1e5*v1;
+  // Polytropic: use n for actual
+  var eta_is=eta_is_pct/100;
+  var n=(gamma/(gamma-1)*eta_is)/(gamma/(gamma-1)*eta_is-1);
+  var C_poly=P1*1e5*Math.pow(v1,n);
+
+  var P2_Pa=P2*1e5;
+  var v2_is=Math.pow(C_is/P2_Pa,1/gamma);
+  var v2_iso=C_iso/P2_Pa;
+  var v2_poly=Math.pow(C_poly/P2_Pa,1/n);
+
+  var vMax=Math.max(v1,v2_iso)*1.1;
+  var vs=Array.from({length:nPts},function(_,i){return v2_is+(vMax-v2_is)*i/(nPts-1);});
+
+  pvChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'Isentropic (adiabatic)',data:vs.map(function(v){return{x:v*1000,y:C_is/Math.pow(v,gamma)/1e5};}),
+          borderColor:'#7744EE',backgroundColor:'rgba(119,68,238,0.05)',fill:true,borderWidth:2,pointRadius:0,tension:0.4},
+        {label:'Polytropic (actual)',data:vs.map(function(v){return{x:v*1000,y:C_poly/Math.pow(v,n)/1e5};}),
+          borderColor:'#EE5533',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4},
+        {label:'Isothermal (minimum)',data:vs.map(function(v){return{x:v*1000,y:C_iso/v/1e5};}),
+          borderColor:'#00BB55',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,borderDash:[4,3],tension:0.4},
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}},
+        tooltip:{backgroundColor:'#111',titleColor:'#fff',bodyColor:'#aaa'}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Specific volume v (L/kg)',color:'#666'},
+          ticks:{color:'#888',font:{size:10}},grid:{color:'#0C0C1C'}},
+        y:{title:{display:true,text:'Pressure P (bar)',color:'#666'},
+          ticks:{color:'#888',font:{size:10}},grid:{color:'#0C0C1C'}}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 2: MULTI-STAGE ====== */
+function calcMulti(){
+  var P1=parseFloat(document.getElementById('ms_P1').value)||1.013;
+  var Pn=parseFloat(document.getElementById('ms_Pn').value)||200;
+  var T1_c=parseFloat(document.getElementById('ms_T1').value)||35;
+  var N=parseInt(document.getElementById('ms_N').value)||3;
+  var MW=parseFloat(document.getElementById('ms_MW').value)||16.04;
+  var gamma=parseFloat(document.getElementById('ms_gamma').value)||1.307;
+  var mdot=parseFloat(document.getElementById('ms_mdot').value)||10;
+  var eta=parseFloat(document.getElementById('ms_eta').value)||78;
+  var Tic_c=parseFloat(document.getElementById('ms_Tic').value)||40;
+
+  var R=R_univ/MW;
+  var r_total=Pn/P1;
+  var r_stage=Math.pow(r_total,1/N);
+  var T1=T1_c+273.15;
+  var Tic=Tic_c+273.15;
+
+  var stages=[];
+  var P_in=P1,T_in=T1;
+  var total_power=0;
+  var W_iso=mdot*R*T1*Math.log(r_total); // isothermal for all stages (T1 ref)
+
+  for(var i=0;i<N;i++){
+    var P_out=P_in*r_stage;
+    var T_is=T_in*Math.pow(r_stage,(gamma-1)/gamma);
+    var T_out=T_in+(T_is-T_in)/(eta/100);
+    var H_is=R*T_in*(gamma/(gamma-1))*(Math.pow(r_stage,(gamma-1)/gamma)-1);
+    var W_stage=mdot*H_is/(eta/100);
+    total_power+=W_stage;
+    stages.push({
+      n:i+1,Pin:P_in.toFixed(3),Pout:P_out.toFixed(3),
+      Tin_c:(T_in-273.15).toFixed(1),Tout_c:(T_out-273.15).toFixed(1),
+      W_kW:(W_stage/1000).toFixed(1),r:r_stage.toFixed(3)
+    });
+    P_in=P_out;
+    T_in=(i<N-1)?Tic:T_out; // intercool between stages
+  }
+
+  var T_final=stages[N-1].Tout_c;
+  var eta_overall=W_iso/total_power*100;
+  var W_motor=motorSel(total_power/1000*1.1);
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Total compression ratio',r_total.toFixed(2),'-',N+' stages x r='+r_stage.toFixed(3)+'each');
+  html+=rc('hl','Total shaft power',(total_power/1000).toFixed(2),'kW','All '+N+' stages combined');
+  html+=rc('hot','Final discharge T',T_final,'°C','Last stage outlet');
+  html+=rc('','Ratio per stage',r_stage.toFixed(3),'-','Optimal equal distribution');
+  html+=rc('ok','Overall efficiency',eta_overall.toFixed(1),'%','W_iso / W_shaft_total');
+  html+=rc('','Installed motor',W_motor,'kW IEC','Total compressor train');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Total ratio:</strong> r_total = '+Pn+'/'+P1+' = <span class="hi">'+r_total.toFixed(2)+'</span><br>'
+    +'<strong>Optimal r_stage:</strong> ('+r_total.toFixed(2)+')^(1/'+N+') = <span class="hi">'+r_stage.toFixed(4)+' per stage</span><br>'
+    +'<strong>Total W_shaft:</strong> SUM of '+(total_power/1000).toFixed(2)+' kW = <span class="hi">'+(total_power/1e6).toFixed(3)+' MW</span><br>'
+    +'<strong>Isothermal ref:</strong> '+(W_iso/1000).toFixed(2)+' kW | Overall eta = <span class="hiok">'+eta_overall.toFixed(1)+'%</span>'
+    +'</div>';
+
+  // Stage cards
+  var stageHtml='<div class="stages-grid">';
+  stages.forEach(function(s){
+    stageHtml+='<div class="stage-card">'
+      +'<div class="stage-num">Stage '+s.n+'</div>'
+      +'<div style="font-size:10px;color:#666;font-family:var(--mono);margin-bottom:4px;">'+s.Pin+' → '+s.Pout+' bar</div>'
+      +'<div class="stage-val">'+s.Tout_c+'°C</div>'
+      +'<div class="stage-lbl">Discharge T</div>'
+      +'<div class="stage-val" style="font-size:14px;margin-top:6px;">'+s.W_kW+' kW</div>'
+      +'<div class="stage-lbl">Shaft power</div>'
+      +'</div>';
+  });
+  stageHtml+='</div>';
+
+  var rows='';
+  if(parseFloat(T_final)>180){
+    rows+=ar('er','Final stage discharge T too high ('+T_final+'°C)','Increase number of stages or reduce intercooler outlet temperature. Each additional stage with perfect intercooling reduces T_discharge significantly.','');
+  } else {
+    rows+=ar('ok','Multi-stage design acceptable',''+N+'-stage compression from '+P1+' to '+Pn+' bar. Total power: '+(total_power/1000).toFixed(2)+' kW. T_final: '+T_final+'°C.','');
+  }
+  rows+=ar('comp','Intercooler duty','Each intercooler removes heat Q_ic = m_dot x Cp x (T_discharge_prev - T_intercooler). With T_ic = '+Tic_c+'°C and Cp ≈ '+(R*gamma/(gamma-1)/1000).toFixed(2)+' kJ/kg.K: Q_ic per stage ≈ '+(mdot*R*gamma/(gamma-1)*(stages[0]?parseFloat(stages[0].Tout_c)-Tic_c:50)).toFixed(0)+' kW (approx stage 1).','');
+
+  html+='<div class="analysis"><div class="atitle">/// MULTI-STAGE ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r2').innerHTML=html;
+  document.getElementById('stages-display').innerHTML=stageHtml;
+
+  // MS Chart
+  var labels=['Inlet'].concat(stages.reduce(function(acc,s,i){acc.push('S'+s.n+' out');if(i<stages.length-1)acc.push('IC '+(i+1)+' out');return acc;},[]) );
+  var Pdata=[P1].concat(stages.reduce(function(acc,s,i){acc.push(parseFloat(s.Pout));if(i<stages.length-1)acc.push(parseFloat(s.Pout));return acc;},[]) );
+  var Tdata=[T1_c].concat(stages.reduce(function(acc,s,i){acc.push(parseFloat(s.Tout_c));if(i<stages.length-1)acc.push(parseFloat(document.getElementById('ms_Tic').value));return acc;},[]) );
+
+  var ctx=document.getElementById('msChart').getContext('2d');
+  if(msChart){msChart.destroy();}
+  msChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:labels,
+      datasets:[
+        {label:'Pressure (bar)',data:Pdata,borderColor:'#7744EE',backgroundColor:'rgba(119,68,238,0.05)',fill:true,borderWidth:2.5,pointRadius:4,tension:0.1,yAxisID:'y'},
+        {label:'Temperature (°C)',data:Tdata,borderColor:'#EE5533',backgroundColor:'transparent',borderWidth:2,pointRadius:4,tension:0.2,yAxisID:'y2'}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{ticks:{color:'#888',font:{size:9}},grid:{color:'#0C0C1C'}},
+        y:{title:{display:true,text:'Pressure (bar)',color:'#7744EE'},ticks:{color:'#7744EE'},grid:{color:'#0C0C1C'},position:'left'},
+        y2:{title:{display:true,text:'Temperature (°C)',color:'#EE5533'},ticks:{color:'#EE5533'},grid:{display:false},position:'right'}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 3: PUMP ====== */
+function calcPump(){
+  var rho=parseFloat(document.getElementById('p_rho').value)||850;
+  var visc=parseFloat(document.getElementById('p_visc').value)||3.5; // cP
+  var Pv=parseFloat(document.getElementById('p_Pv').value)||0.15; // bar(a)
+  var Q_m3h=parseFloat(document.getElementById('p_Q').value)||100;
+  var H=parseFloat(document.getElementById('p_H').value)||80;
+  var eta_p=parseFloat(document.getElementById('p_eta').value)||75;
+  var eta_m=parseFloat(document.getElementById('p_eta_m').value)||95;
+  var sf=parseFloat(document.getElementById('p_sf').value)||1.15;
+  var N_rpm=parseFloat(document.getElementById('p_N').value)||2950;
+  var Patm=parseFloat(document.getElementById('p_Patm').value)||1.013;
+  var Hs=parseFloat(document.getElementById('p_Hs').value)||2;
+  var Hfs=parseFloat(document.getElementById('p_Hfs').value)||0.5;
+  var NPSHr=parseFloat(document.getElementById('p_NPSHr').value)||4;
+
+  var Q_m3s=Q_m3h/3600;
+  var g=9.81;
+  var W_hyd=rho*g*Q_m3s*H; // W
+  var W_shaft=W_hyd/(eta_p/100);
+  var W_motor_in=W_shaft/(eta_m/100);
+  var P_nom=W_shaft/1000*sf;
+  var P_sel=motorSel(P_nom);
+  var eta_overall=W_hyd/W_motor_in*100;
+
+  // NPSHa
+  var Patm_m=Patm*1e5/(rho*g);
+  var Pv_m=Pv*1e5/(rho*g);
+  var NPSHa=Patm_m-Pv_m-Hs-Hfs;
+  // Note: Hs positive = suction above pump = negative to NPSHa
+  // Correct: NPSHa = (Patm - Pv)/(rho*g) + Hs - Hfs
+  NPSHa=Patm_m-Pv_m+Hs-Hfs; // Hs positive=flooded suction (benefit)
+  var npsh_margin=NPSHa-NPSHr;
+  var npsh_ok=npsh_margin>=0.5;
+
+  // Specific speed
+  var Ns=N_rpm*Math.sqrt(Q_m3s)/Math.pow(H,0.75);
+  var pump_type=Ns<500?'Radial centrifugal':Ns<3000?'Mixed flow centrifugal':'Axial flow';
+
+  // Viscosity correction (Hydraulic Institute method, simplified)
+  // For visc > 10 cP, apply correction factor
+  var Cq=1.0,Ch=1.0,Ce=1.0;
+  if(visc>10){
+    Cq=1-0.01*Math.log10(visc/10)*Math.sqrt(Q_m3h);
+    Ch=Math.max(0.7,1-0.002*visc);
+    Ce=Math.max(0.5,Ce*Cq*Ch/(Math.max(0.01,eta_p/100)));
+    Cq=Math.min(1,Math.max(0.5,Cq));
+    Ch=Math.min(1,Math.max(0.5,Ch));
+  }
+
+  // Torque
+  var omega=2*Math.PI*N_rpm/60;
+  var torque=W_shaft/omega;
+
+  // VFD savings at 80% speed
+  var P_80=W_shaft*Math.pow(0.8,3)/1000;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl-p','Hydraulic power',(W_hyd/1000).toFixed(2),'kW','rho x g x Q x H');
+  html+=rc('hl-p','Shaft power',(W_shaft/1000).toFixed(2),'kW','P_hyd / eta_pump');
+  html+=rc('ok','IEC motor selected',P_sel,'kW','Nom. req: '+P_nom.toFixed(1)+' kW (x SF '+sf+')');
+  html+=rc('','Motor input power',(W_motor_in/1000).toFixed(2),'kW','Electrical consumption');
+  html+=rc('','Overall efficiency',eta_overall.toFixed(1),'%','eta_pump x eta_motor');
+  html+=rc(npsh_ok?'ok':'er','NPSHa',NPSHa.toFixed(2),'m',npsh_ok?'Margin: +'+npsh_margin.toFixed(2)+'m':'CAVITATION RISK! Margin: '+npsh_margin.toFixed(2)+'m');
+  html+=rc('','Specific speed Ns',Ns.toFixed(0),'-',pump_type);
+  html+=rc('','Shaft torque',torque.toFixed(1),'N.m','At '+N_rpm+' RPM');
+  html+=rc('','VFD at 80% speed',(P_80).toFixed(1),'kW','Saving: '+(W_shaft/1000-P_80).toFixed(1)+' kW (P~N³)');
+  html+=rc('','Annual energy cost (est.)','$'+(W_motor_in/1000*8760*0.1/1000).toFixed(0)+'k','/yr','At $0.10/kWh, 8760h/yr');
+  html+='</div>';
+
+  html+='<div class="fbox" style="border-left-color:var(--pump);">'
+    +'<strong>W_hyd</strong> = rho x g x Q x H = '+rho+' x 9.81 x '+(Q_m3s).toFixed(5)+' x '+H+' = <span class="hib">'+(W_hyd/1000).toFixed(2)+' kW</span><br>'
+    +'<strong>W_shaft</strong> = '+( W_hyd/1000).toFixed(2)+' / '+(eta_p/100)+' = <span class="hib">'+(W_shaft/1000).toFixed(2)+' kW</span><br>'
+    +'<strong>NPSHa</strong> = P_atm/(rho.g) - Pv/(rho.g) + Hs - Hfs = '+Patm_m.toFixed(2)+' - '+Pv_m.toFixed(2)+' + '+Hs+' - '+Hfs+' = <span class="hib">'+NPSHa.toFixed(2)+' m</span><br>'
+    +'<strong>Ns</strong> = '+N_rpm+' x sqrt('+(Q_m3s).toFixed(4)+') / '+H+'^0.75 = <span class="hib">'+Ns.toFixed(0)+'</span> → '+pump_type+'<br>'
+    +'<strong>VFD (80% speed):</strong> P_new = P_old x 0.8³ = '+(W_shaft/1000).toFixed(2)+' x 0.512 = <span class="hiok">'+P_80.toFixed(1)+' kW</span>'
+    +'</div>';
+
+  var rows='';
+  if(!npsh_ok){
+    rows+=ar('er','CAVITATION RISK - NPSHa < NPSHr + 0.5m','NPSHa ('+NPSHa.toFixed(2)+'m) provides only '+(npsh_margin).toFixed(2)+'m margin above NPSHr ('+NPSHr+'m). Cavitation will cause noise, vibration, erosion of impeller and loss of performance. Pump damage can occur within hours.','Immediate actions: (1) Lower pump installation to increase Hs. (2) Increase suction pipe diameter to reduce H_fs. (3) Install a larger suction vessel to pressurize suction. (4) Select pump with lower NPSHr. Target: NPSHa ≥ NPSHr + 0.5m per ISO 9906.');
+  }
+  if(visc>50){
+    rows+=ar('wn','High viscosity ('+visc+' cP) - centrifugal efficiency may be reduced','At '+visc+' cP, centrifugal pump efficiency is significantly reduced vs water curve. Hydraulic Institute viscosity correction is required. Effective pump efficiency may be '+((eta_p/100*Ch)*100).toFixed(0)+'% vs rated '+eta_p+'%.','Consider positive displacement pump (gear pump, progressive cavity, twin screw) for viscosities above 100 cP. PD pumps maintain efficiency regardless of viscosity. Apply Hydraulic Institute SP-113 viscosity correction charts for centrifugal pump derating.');
+  }
+  rows+=ar('pump','Pump power summary','Hydraulic: '+(W_hyd/1000).toFixed(2)+' kW | Shaft: '+(W_shaft/1000).toFixed(2)+' kW | Motor: '+(W_motor_in/1000).toFixed(2)+' kW | IEC motor: '+P_sel+' kW. NPSHa margin: '+(npsh_margin>=0?'+':'')+npsh_margin.toFixed(2)+'m. Ns = '+Ns.toFixed(0)+' ('+pump_type+').','VFD installation at this power level ('+P_sel+' kW) is recommended: at 80% speed, power drops to '+(W_shaft/1000*0.8**3).toFixed(1)+' kW saving '+(W_shaft/1000*(1-0.8**3)).toFixed(1)+' kW = $'+(W_shaft/1000*(1-0.8**3)*8760*0.1*0.2/1000).toFixed(0)+'k/yr (at 20% part-load operation).');
+
+  html+='<div class="analysis"><div class="atitle pump">/// PUMP POWER ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r3').innerHTML=html;
+}
+
+/* ====== PANEL 4: PERFORMANCE MAP ====== */
+function calcMap(){
+  var P1=parseFloat(document.getElementById('pm_P1').value)||5;
+  var T1_c=parseFloat(document.getElementById('pm_T1').value)||35;
+  var mdot=parseFloat(document.getElementById('pm_mdot').value)||10;
+  var gamma=parseFloat(document.getElementById('pm_gamma').value)||1.307;
+  var MW=parseFloat(document.getElementById('pm_MW').value)||16.04;
+  var eta=parseFloat(document.getElementById('pm_eta').value)||78;
+  var R=R_univ/MW;
+
+  var ratios=Array.from({length:20},function(_,i){return 1.5+i*0.75;});
+  var T1_vals=[15,35,55,75]; // different inlet temperatures
+  var colors=['#2266EE','#7744EE','#FF8800','#EE5533'];
+
+  // T2 datasets
+  var T2_datasets=T1_vals.map(function(T1c,j){
+    return {
+      label:'T1='+T1c+'°C',
+      data:ratios.map(function(r){
+        var T1=T1c+273.15;
+        var T2s=T1*Math.pow(r,(gamma-1)/gamma);
+        var T2=(T2s-T1)/(eta/100)+T1;
+        return {x:r,y:(T2-273.15).toFixed(1)};
+      }),
+      borderColor:colors[j],backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4
+    };
+  });
+  // Add 180°C limit line
+  T2_datasets.push({
+    label:'T_max = 180°C',
+    data:ratios.map(function(r){return {x:r,y:180};}),
+    borderColor:'#FF3333',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,borderDash:[5,3]
+  });
+
+  var ctx1=document.getElementById('mapChart1').getContext('2d');
+  if(mapChart1){mapChart1.destroy();}
+  mapChart1=new Chart(ctx1,{
+    type:'line',data:{datasets:T2_datasets},
+    options:{responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Compression ratio r',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C1C'}},
+        y:{title:{display:true,text:'Discharge temperature (°C)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C1C'}}
+      }
+    }
+  });
+
+  // Power datasets
+  var T1=T1_c+273.15;
+  var W_datasets=T1_vals.map(function(T1c,j){
+    return {
+      label:'T1='+T1c+'°C',
+      data:ratios.map(function(r){
+        var T1=T1c+273.15;
+        var H_is=R*T1*(gamma/(gamma-1))*(Math.pow(r,(gamma-1)/gamma)-1);
+        var W=mdot*H_is/(eta/100)/1000;
+        return {x:r,y:W.toFixed(1)};
+      }),
+      borderColor:colors[j],backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4
+    };
+  });
+
+  var ctx2=document.getElementById('mapChart2').getContext('2d');
+  if(mapChart2){mapChart2.destroy();}
+  mapChart2=new Chart(ctx2,{
+    type:'line',data:{datasets:W_datasets},
+    options:{responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Compression ratio r',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C1C'}},
+        y:{title:{display:true,text:'Shaft power (kW)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C1C'}}
+      }
+    }
+  });
+
+  // Key takeaways
+  var T1_ref=T1_c+273.15;
+  var W_ref=mdot*R*T1_ref*(gamma/(gamma-1))*(Math.pow(5,(gamma-1)/gamma)-1)/(eta/100)/1000;
+  document.getElementById('r4').innerHTML='<div class="alert a-comp" style="margin-top:12px;">'
+    +'<strong>Performance map insight:</strong> Lower inlet temperature significantly reduces both discharge T and shaft power. For example at r=5: '
+    +'T1=15°C gives T_discharge='+(  (T1_vals[0]+273.15)*Math.pow(5,(gamma-1)/gamma)/(eta/100)+( T1_vals[0]+273.15)*(1-1/(eta/100))-273.15).toFixed(0)+'°C; '
+    +'T1=75°C gives T_discharge='+(  (T1_vals[3]+273.15)*Math.pow(5,(gamma-1)/gamma)/(eta/100)+( T1_vals[3]+273.15)*(1-1/(eta/100))-273.15).toFixed(0)+'°C. '
+    +'Each 20°C increase in T1 adds approximately '+(20*(gamma-1)/gamma*Math.pow(5,(gamma-1)/gamma)/(eta/100)).toFixed(0)+'°C to T2 and increases shaft power by ~'+(20/300*100).toFixed(0)+'%.</div>';
+}
+
+/* ====== PANEL 5: INTERCOOLING ====== */
+function calcIC(){
+  var P1=parseFloat(document.getElementById('ic_P1').value)||1.013;
+  var Pn=parseFloat(document.getElementById('ic_Pn').value)||100;
+  var T1_c=parseFloat(document.getElementById('ic_T1').value)||35;
+  var gamma=parseFloat(document.getElementById('ic_gamma').value)||1.307;
+  var MW=parseFloat(document.getElementById('ic_MW').value)||16.04;
+  var mdot=parseFloat(document.getElementById('ic_mdot').value)||10;
+  var eta=parseFloat(document.getElementById('ic_eta').value)||78;
+  var Tic_c=parseFloat(document.getElementById('ic_Tic').value)||40;
+
+  var R=R_univ/MW;
+  var T1=T1_c+273.15;
+  var Tic=Tic_c+273.15;
+  var r_total=Pn/P1;
+
+  var stageResults=[];
+  for(var N=1;N<=6;N++){
+    var r_s=Math.pow(r_total,1/N);
+    var W_total=0;
+    var T_in=T1;
+    for(var i=0;i<N;i++){
+      var H_is=R*T_in*(gamma/(gamma-1))*(Math.pow(r_s,(gamma-1)/gamma)-1);
+      W_total+=mdot*H_is/(eta/100);
+      T_in=(i<N-1)?Tic:T1; // use Tic for intercooled stages
+    }
+    var T_fin_K=T1*(Math.pow(r_s,(gamma-1)/gamma)-1)/(eta/100)+T1;
+    stageResults.push({N:N,W:W_total/1000,r:r_s,T_fin:T_fin_K-273.15});
+  }
+
+  var W_single=stageResults[0].W;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Single stage power',stageResults[0].W.toFixed(1),'kW','r_total='+r_total.toFixed(1));
+  html+=rc('','2-stage power',stageResults[1].W.toFixed(1),'kW','Saving: '+((stageResults[0].W-stageResults[1].W)/stageResults[0].W*100).toFixed(1)+'%');
+  html+=rc('','3-stage power',stageResults[2].W.toFixed(1),'kW','Saving: '+((stageResults[0].W-stageResults[2].W)/stageResults[0].W*100).toFixed(1)+'%');
+  html+=rc('','4-stage power',stageResults[3].W.toFixed(1),'kW','Saving: '+((stageResults[0].W-stageResults[3].W)/stageResults[0].W*100).toFixed(1)+'%');
+  html+=rc('ok','Optimal 3-stage T_final',stageResults[2].T_fin.toFixed(1),'°C','With T_ic='+Tic_c+'°C');
+  html+=rc('','Diminishing returns','3→4 stages saves '+(( stageResults[2].W-stageResults[3].W)/stageResults[0].W*100).toFixed(1),'%','vs 2→3: '+((stageResults[1].W-stageResults[2].W)/stageResults[0].W*100).toFixed(1)+'%');
+  html+='</div>';
+
+  html+='<div class="analysis"><div class="atitle">/// INTERCOOLING ANALYSIS</div>';
+  html+=ar('comp','Power savings vs number of stages',''+stageResults.slice(0,4).map(function(s){return 'N='+s.N+': '+ s.W.toFixed(0)+' kW ('+((W_single-s.W)/W_single*100).toFixed(0)+'% saved)';}).join(' | ')+'. Diminishing returns above N=3 typically make additional stages uneconomical.','Rule of thumb: 3 stages is optimal for total r = 10-200. For r = 200-5000 (e.g. CNG compression 1→250 bar), 4-5 stages are justified. Above 5 stages, isothermal limit is closely approached and capital cost dominates over energy savings.');
+  html+=ar('ok','Intercooler sizing','Each intercooler duty Q_ic = m_dot x Cp x (T_out_stage - T_ic). At T_ic = '+Tic_c+'°C: Q_per_cooler ≈ '+(mdot*R*gamma/(gamma-1)*(stageResults[0].T_fin-Tic_c)).toFixed(0)+' kW per cooler (estimate). Water-cooled shell and tube intercoolers are standard.','Design intercoolers for fouling (process gas side Rf = 0.00018 m2.K/W, cooling water Rf = 0.000176 m2.K/W per TEMA). Include condensate knockout drum after each intercooler to remove condensed water or hydrocarbons.');
+  html+='</div>';
+
+  document.getElementById('r5').innerHTML=html;
+
+  // Chart
+  var ctx=document.getElementById('icChart').getContext('2d');
+  if(icChart){icChart.destroy();}
+  icChart=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:stageResults.map(function(s){return s.N+' stage'+(s.N>1?'s':'');}),
+      datasets:[
+        {label:'Shaft power (kW)',data:stageResults.map(function(s){return s.W.toFixed(1);}),
+          backgroundColor:stageResults.map(function(s,i){return i===0?'rgba(238,85,51,0.6)':i===2?'rgba(0,187,85,0.6)':'rgba(119,68,238,0.5)';}),
+          borderColor:stageResults.map(function(s,i){return i===0?'#EE5533':i===2?'#00BB55':'#7744EE';}),
+          borderWidth:1}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false},
+        tooltip:{backgroundColor:'#111',titleColor:'#fff',bodyColor:'#aaa',
+          callbacks:{label:function(c){return 'Power: '+c.parsed.y+' kW | Saving: '+((W_single-c.parsed.y)/W_single*100).toFixed(1)+'%';}}}},
+      scales:{
+        x:{ticks:{color:'#888',font:{size:10}},grid:{color:'#0C0C1C'}},
+        y:{title:{display:true,text:'Shaft power (kW)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C1C'}}
+      }
+    }
+  });
+}
+
+/* ====== INIT ====== */
+calcComp();
+calcPump();
+setTimeout(function(){calcMulti();calcMap();calcIC();},300);
+</script>
+</body>
+</html>
