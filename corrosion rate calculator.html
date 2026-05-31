@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corrosion Rate Calculator - Petrosmart Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --red:#CC0000;--red-dim:rgba(204,0,0,0.12);
+  --bg:#040408;--surf:#0A0A10;--card:#0E0E16;
+  --border:#181828;--text:#DDDDF0;--muted:#404060;
+  --ok:#00BB55;--warn:#FF8800;--err:#FF3333;--info:#2266EE;
+  --rust:#CC6633;--rust-dim:rgba(204,102,51,0.12);
+  --teal:#00AAAA;--teal-dim:rgba(0,170,170,0.10);
+  --mono:'JetBrains Mono',monospace;--sans:'Manrope',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 50% 40% at 25% 25%,rgba(204,102,51,0.04),transparent),
+    radial-gradient(ellipse 40% 50% at 75% 65%,rgba(0,170,170,0.03),transparent),
+    radial-gradient(ellipse 30% 30% at 50% 50%,rgba(204,0,0,0.02),transparent);
+  pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:16px;}
+
+/* HEADER */
+.hdr{
+  background:linear-gradient(135deg,#080810,#140A06,#080810);
+  border:1px solid rgba(204,102,51,0.25);border-radius:18px;
+  padding:18px 22px;margin-bottom:18px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 0 60px rgba(204,102,51,0.06);
+  position:relative;overflow:hidden;}
+.hdr::before{content:'⚗️';position:absolute;right:16px;top:50%;
+  transform:translateY(-50%);font-size:80px;opacity:0.04;pointer-events:none;}
+.hdr-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  background:linear-gradient(135deg,var(--rust),#883311);
+  box-shadow:0 4px 20px rgba(204,102,51,0.35);}
+.hdr h1{font-size:19px;font-weight:800;color:#fff;}
+.hdr p{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+.hdr-tags{margin-left:auto;display:flex;gap:7px;flex-shrink:0;}
+.htag{padding:5px 11px;border-radius:8px;border:1px solid;
+  font-size:10px;font-weight:600;font-family:var(--mono);}
+.ht-co2{background:rgba(204,102,51,0.12);border-color:rgba(204,102,51,0.3);color:#EE8855;}
+.ht-h2s{background:rgba(255,200,0,0.10);border-color:rgba(255,200,0,0.3);color:#FFCC44;}
+.ht-norsok{background:rgba(0,170,170,0.10);border-color:rgba(0,170,170,0.25);color:#44CCCC;}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--surf);border:1px solid var(--border);
+  border-radius:12px;padding:4px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{flex:1;min-width:80px;padding:9px 4px;background:transparent;border:none;
+  border-radius:9px;color:var(--muted);font-size:10px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);text-transform:uppercase;letter-spacing:0.07em;transition:all 0.2s;}
+.tab:hover{color:#bbb;}
+.tab.on{background:var(--rust);color:#fff;box-shadow:0 0 16px rgba(204,102,51,0.4);}
+.panel{display:none;}.panel.on{display:block;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+.card.rust-accent{border-color:rgba(204,102,51,0.2);}
+.card.teal-accent{border-color:rgba(0,170,170,0.2);}
+.stitle{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  border-bottom:1px solid #10101C;padding-bottom:7px;margin-bottom:14px;font-family:var(--mono);}
+.stitle.rust{color:var(--rust);}
+.stitle.teal{color:var(--teal);}
+.stitle.neu{color:var(--muted);}
+.stitle.warn{color:var(--warn);}
+
+/* FORM */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+.field{margin-bottom:12px;}
+.lbl{font-size:10px;color:var(--muted);margin-bottom:5px;display:block;
+  text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.ir{display:flex;gap:6px;align-items:center;}
+input[type=number],select{width:100%;background:#07070F;border:1px solid #14142A;
+  border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;
+  font-family:var(--mono);transition:border-color 0.2s;}
+input:focus,select:focus{border-color:var(--rust);}
+select option{background:#0A0A14;}
+.unit{font-size:10px;color:#222;min-width:52px;text-align:right;
+  white-space:nowrap;font-family:var(--mono);}
+
+/* RESULTS */
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.rgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.rc{background:#07070E;border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px;position:relative;overflow:hidden;}
+.rc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.rc.hl::after{background:var(--rust);}
+.rc.ok::after{background:var(--ok);}
+.rc.wn::after{background:var(--warn);}
+.rc.er::after{background:var(--err);}
+.rc.teal::after{background:var(--teal);}
+.rc.hl{border-color:rgba(204,102,51,0.3);}
+.rc.ok{border-color:rgba(0,187,85,0.25);}
+.rc.wn{border-color:rgba(255,136,0,0.25);}
+.rc.er{border-color:rgba(255,51,51,0.25);}
+.rc.teal{border-color:rgba(0,170,170,0.25);}
+.rl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;font-family:var(--mono);}
+.rv{font-size:19px;font-weight:700;color:#fff;font-family:var(--mono);}
+.rv span{font-size:10px;color:#222;font-weight:400;}
+.rsub{font-size:10px;color:#222;margin-top:3px;font-family:var(--mono);}
+
+/* FORMULA */
+.fbox{background:#05050C;border-left:3px solid var(--rust);border-radius:0 10px 10px 0;
+  padding:12px 16px;margin-top:14px;font-size:11px;color:#444;line-height:2.0;font-family:var(--mono);}
+.fbox strong{color:#999;}
+.fbox .hi{color:var(--rust);font-weight:600;}
+.fbox .hit{color:var(--teal);font-weight:600;}
+.fbox .hiok{color:var(--ok);font-weight:600;}
+.fbox .hiwn{color:var(--warn);font-weight:600;}
+
+/* ANALYSIS */
+.analysis{background:#06060E;border:1px solid #0E0E1E;border-radius:12px;padding:16px;margin-top:14px;}
+.atitle{font-size:10px;font-weight:700;color:var(--rust);margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:0.09em;font-family:var(--mono);}
+.atitle.teal{color:var(--teal);}
+.arow{display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #0C0C1A;}
+.arow:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.d-ok{background:var(--ok);box-shadow:0 0 8px var(--ok);}
+.d-wn{background:var(--warn);box-shadow:0 0 8px var(--warn);}
+.d-er{background:var(--err);box-shadow:0 0 8px var(--err);}
+.d-rust{background:var(--rust);box-shadow:0 0 8px var(--rust);}
+.d-teal{background:var(--teal);box-shadow:0 0 8px var(--teal);}
+.atxt strong{color:#eee;font-size:12px;display:block;margin-bottom:3px;}
+.atxt p{font-size:11px;color:#444;line-height:1.7;margin:0;}
+.asugg{font-size:11px;color:#FFAA00;margin-top:4px;line-height:1.6;}
+
+/* ALERTS */
+.alert{border-radius:10px;padding:10px 14px;margin-top:10px;font-size:11px;line-height:1.7;font-weight:500;}
+.a-ok{background:rgba(0,187,85,0.07);border:1px solid rgba(0,187,85,0.2);color:#00CC66;}
+.a-er{background:rgba(255,51,51,0.07);border:1px solid rgba(255,51,51,0.2);color:#FF5555;}
+.a-wn{background:rgba(255,136,0,0.07);border:1px solid rgba(255,136,0,0.2);color:#FFA500;}
+.a-rust{background:rgba(204,102,51,0.07);border:1px solid rgba(204,102,51,0.2);color:#EE8855;}
+.a-teal{background:rgba(0,170,170,0.07);border:1px solid rgba(0,170,170,0.2);color:#44CCCC;}
+
+/* CHART */
+.chart-wrap{background:#05050C;border:1px solid var(--border);border-radius:12px;
+  padding:14px;margin-top:14px;}
+.chart-title{font-size:11px;color:var(--rust);font-weight:600;text-transform:uppercase;
+  letter-spacing:0.05em;margin-bottom:10px;font-family:var(--mono);}
+.chart-title.teal{color:var(--teal);}
+
+/* SEVERITY BADGE */
+.sev-badge{display:inline-flex;align-items:center;gap:6px;
+  padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;
+  font-family:var(--mono);margin-top:8px;letter-spacing:0.05em;}
+.sev-low{background:rgba(0,187,85,0.15);color:#00CC66;border:1px solid rgba(0,187,85,0.3);}
+.sev-mod{background:rgba(255,200,0,0.12);color:#FFCC00;border:1px solid rgba(255,200,0,0.3);}
+.sev-high{background:rgba(255,136,0,0.12);color:#FF9900;border:1px solid rgba(255,136,0,0.3);}
+.sev-sev{background:rgba(255,51,51,0.12);color:#FF4444;border:1px solid rgba(255,51,51,0.3);}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.tbl th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;
+  letter-spacing:0.07em;font-family:var(--mono);}
+.tbl td{padding:7px 10px;color:#888;border-bottom:1px solid #0C0C18;font-family:var(--mono);}
+.tbl tr:hover td{background:#0A0A14;}
+.tw{color:#fff!important;font-weight:600;}
+.ibox{background:var(--surf);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);
+  line-height:1.7;font-family:var(--mono);}
+.ibox strong{color:#bbb;}
+.sep{height:1px;background:var(--border);margin:14px 0;}
+
+/* MATERIAL BTNS */
+.mat-btns{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.mbtn{padding:5px 11px;background:#0A0A14;border:1px solid var(--border);
+  border-radius:7px;color:var(--muted);font-size:10px;cursor:pointer;
+  font-family:var(--mono);transition:all 0.15s;}
+.mbtn:hover,.mbtn.on{background:var(--rust-dim);border-color:var(--rust);color:#EE9966;}
+
+/* WALL THICKNESS BAR */
+.wt-bar{background:#07070E;border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;margin-top:14px;}
+.wt-title{font-size:10px;color:var(--rust);font-family:var(--mono);
+  text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;}
+.wt-track{height:20px;background:#0A0A14;border-radius:10px;
+  overflow:hidden;position:relative;margin:6px 0;}
+.wt-fill{height:100%;border-radius:10px;transition:width 0.6s;}
+.wt-label{display:flex;justify-content:space-between;
+  font-size:9px;color:var(--muted);font-family:var(--mono);}
+
+.foot{background:var(--surf);border-top:1px solid var(--border);margin-top:18px;
+  padding:10px 20px;font-size:10px;color:#111;text-align:center;
+  font-family:var(--mono);border-radius:12px;}
+.foot a{color:var(--rust);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-icon">🦠</div>
+  <div>
+    <h1>Corrosion Rate Calculator</h1>
+    <p>CO2 / H2S - de Waard-Milliams / NORSOK M-506 / NACE SP0775 - Material selection</p>
+  </div>
+  <div class="hdr-tags">
+    <div class="htag ht-co2">CO2 Sweet</div>
+    <div class="htag ht-h2s">H2S Sour</div>
+    <div class="htag ht-norsok">NORSOK M-506</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" id="t1" onclick="sw(1)">🌡️ CO2 Corrosion</button>
+  <button class="tab" id="t2" onclick="sw(2)">☠️ H2S Sour Service</button>
+  <button class="tab" id="t3" onclick="sw(3)">📏 Pipe Life Calc.</button>
+  <button class="tab" id="t4" onclick="sw(4)">🧪 Material Selection</button>
+  <button class="tab" id="t5" onclick="sw(5)">💉 Inhibitor Design</button>
+  <button class="tab" id="t6" onclick="sw(6)">📚 Reference</button>
+</div>
+
+<!-- ===== PANEL 1: CO2 CORROSION ===== -->
+<div class="panel on" id="p1">
+  <div class="card rust-accent">
+    <div class="stitle rust">/// CO2 corrosion - de Waard-Milliams model + NORSOK M-506</div>
+    <div class="ibox">
+      <strong>CO2 sweet corrosion:</strong> CO2 dissolves in water to form carbonic acid (H2CO3), causing uniform corrosion of carbon steel. Rate governed by CO2 partial pressure, temperature, pH, and flow velocity. NORSOK M-506 (2005) is the industry standard model for design.
+    </div>
+
+    <div class="stitle rust">/// system conditions</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Total system pressure</label>
+        <div class="ir"><input type="number" id="P_sys" value="100" step="1" oninput="calcCO2()"><span class="unit">bar(a)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">CO2 content in gas</label>
+        <div class="ir"><input type="number" id="CO2_pct" value="3" step="0.1" oninput="calcCO2()"><span class="unit">mol%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Temperature</label>
+        <div class="ir"><input type="number" id="T_co2" value="60" step="1" oninput="calcCO2()"><span class="unit">°C</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Water pH (in-situ)</label>
+        <div class="ir"><input type="number" id="pH" value="5.5" step="0.1" min="3" max="8" oninput="calcCO2()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Flow velocity</label>
+        <div class="ir"><input type="number" id="vel" value="2" step="0.1" oninput="calcCO2()"><span class="unit">m/s</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Water cut</label>
+        <div class="ir"><input type="number" id="wc_pct" value="30" step="1" oninput="calcCO2()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Oil API gravity</label>
+        <div class="ir"><input type="number" id="api_co2" value="35" step="0.5" oninput="calcCO2()"><span class="unit">°API</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Glycol / MEA inhibitor</label>
+        <select id="glycol" onchange="calcCO2()">
+          <option value="0">No glycol / MEG</option>
+          <option value="20">20% MEG</option>
+          <option value="50">50% MEG</option>
+          <option value="80">80% MEG (high protection)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Corrosion inhibitor efficiency</label>
+        <div class="ir"><input type="number" id="inh_eff" value="0" step="5" min="0" max="99" oninput="calcCO2()"><span class="unit">%</span></div>
+      </div>
+    </div>
+
+    <div id="r1"></div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">CO2 corrosion rate vs temperature (at current PCO2)</div>
+      <canvas id="co2Chart" height="190"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 2: H2S SOUR SERVICE ===== -->
+<div class="panel" id="p2">
+  <div class="card rust-accent">
+    <div class="stitle warn">/// H2S sour service - NACE MR0175 / ISO 15156</div>
+    <div class="ibox">
+      <strong>Sour service:</strong> H2S causes Sulfide Stress Cracking (SSC), Hydrogen Induced Cracking (HIC), and Stress-Oriented HIC (SOHIC). NACE MR0175/ISO 15156 defines sour service threshold: H2S partial pressure &gt; 0.0003 MPa (0.05 psia) AND pH &lt; calculated value. CO2 corrosion continues simultaneously.
+    </div>
+
+    <div class="stitle warn">/// sour service conditions</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Total pressure</label>
+        <div class="ir"><input type="number" id="s_P" value="100" step="1" oninput="calcH2S()"><span class="unit">bar(a)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">H2S content</label>
+        <div class="ir"><input type="number" id="s_H2S" value="0.5" step="0.01" oninput="calcH2S()"><span class="unit">mol%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">CO2 content</label>
+        <div class="ir"><input type="number" id="s_CO2" value="2" step="0.1" oninput="calcH2S()"><span class="unit">mol%</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Temperature</label>
+        <div class="ir"><input type="number" id="s_T" value="80" step="1" oninput="calcH2S()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">In-situ pH</label>
+        <div class="ir"><input type="number" id="s_pH" value="5.0" step="0.1" min="3" max="8" oninput="calcH2S()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Chloride content</label>
+        <div class="ir"><input type="number" id="s_Cl" value="50000" step="1000" oninput="calcH2S()"><span class="unit">mg/L (ppm)</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Material yield strength (SMYS)</label>
+        <div class="ir"><input type="number" id="s_smys" value="414" step="10" oninput="calcH2S()"><span class="unit">MPa</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Material hardness</label>
+        <div class="ir"><input type="number" id="s_hard" value="22" step="0.5" oninput="calcH2S()"><span class="unit">HRC</span></div>
+      </div>
+    </div>
+
+    <div id="r2"></div>
+
+    <div class="chart-wrap">
+      <div class="chart-title teal">NACE region diagram: pH vs H2S partial pressure</div>
+      <canvas id="naceChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 3: PIPE LIFE ===== -->
+<div class="panel" id="p3">
+  <div class="card teal-accent">
+    <div class="stitle teal">/// remaining life and corrosion allowance</div>
+    <div class="ibox">
+      <strong>Corrosion allowance:</strong> Additional wall thickness added at design to allow for corrosion over the design life. Remaining useful life (RUL) calculation per API 570 (piping) and API 579 (pressure vessels - Fitness For Service assessment).
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Nominal wall thickness</label>
+        <div class="ir"><input type="number" id="t_nom" value="9.5" step="0.1" oninput="calcLife()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Current measured thickness</label>
+        <div class="ir"><input type="number" id="t_meas" value="8.2" step="0.1" oninput="calcLife()"><span class="unit">mm</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Minimum required thickness (t_min)</label>
+        <div class="ir"><input type="number" id="t_min" value="5.5" step="0.1" oninput="calcLife()"><span class="unit">mm</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Corrosion rate (measured or calc.)</label>
+        <div class="ir"><input type="number" id="cr_pipe" value="0.3" step="0.01" oninput="calcLife()"><span class="unit">mm/yr</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Date of last measurement</label>
+        <div class="ir"><input type="number" id="yrs_since" value="2" step="0.5" oninput="calcLife()"><span class="unit">years ago</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Design pressure</label>
+        <div class="ir"><input type="number" id="P_pipe" value="50" step="1" oninput="calcLife()"><span class="unit">bar(g)</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">SMYS material</label>
+        <div class="ir"><input type="number" id="smys_pipe" value="241" step="10" oninput="calcLife()"><span class="unit">MPa</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pipe OD</label>
+        <div class="ir"><input type="number" id="OD_pipe" value="168.3" step="0.1" oninput="calcLife()"><span class="unit">mm</span></div>
+      </div>
+    </div>
+    <div id="r3"></div>
+
+    <!-- Wall thickness bar -->
+    <div class="wt-bar" id="wt-bar">
+      <div class="wt-title">WALL THICKNESS STATUS</div>
+      <div id="wt-bars"></div>
+    </div>
+
+    <div class="chart-wrap" style="margin-top:14px;">
+      <div class="chart-title teal">Wall thickness projection vs time</div>
+      <canvas id="lifeChart" height="180"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 4: MATERIAL SELECTION ===== -->
+<div class="panel" id="p4">
+  <div class="card rust-accent">
+    <div class="stitle rust">/// material selection guide - corrosive service</div>
+    <div class="ibox">
+      <strong>Material selection:</strong> Based on CO2 partial pressure, H2S partial pressure, temperature, chloride content, and pH. Enter conditions to get a recommendation aligned with NACE MR0175/ISO 15156 and NORSOK M-001.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">CO2 partial pressure</label>
+        <div class="ir"><input type="number" id="ms_pco2" value="3" step="0.1" oninput="calcMatSel()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">H2S partial pressure</label>
+        <div class="ir"><input type="number" id="ms_ph2s" value="0.05" step="0.01" oninput="calcMatSel()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Temperature</label>
+        <div class="ir"><input type="number" id="ms_T" value="80" step="1" oninput="calcMatSel()"><span class="unit">°C</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Chloride concentration</label>
+        <div class="ir"><input type="number" id="ms_Cl" value="50000" step="1000" oninput="calcMatSel()"><span class="unit">mg/L</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">pH</label>
+        <div class="ir"><input type="number" id="ms_pH" value="5.0" step="0.1" min="3" max="9" oninput="calcMatSel()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Corrosion inhibitor used?</label>
+        <select id="ms_inh" onchange="calcMatSel()">
+          <option value="no">No inhibitor</option>
+          <option value="yes">Yes - continuous injection</option>
+          <option value="batch">Batch treatment only</option>
+        </select>
+      </div>
+    </div>
+    <div id="r4"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 5: INHIBITOR DESIGN ===== -->
+<div class="panel" id="p5">
+  <div class="card teal-accent">
+    <div class="stitle teal">/// corrosion inhibitor design and chemical injection</div>
+    <div class="ibox">
+      <strong>Inhibitor injection:</strong> Film-forming corrosion inhibitors (imidazolines, quaternary ammonium compounds) adsorb on metal surface, blocking corrosive species. Dosage typically 10-50 ppm in produced water. Efficiency 70-95% when properly applied.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Uninhibited corrosion rate</label>
+        <div class="ir"><input type="number" id="inh_cr_unin" value="1.2" step="0.05" oninput="calcInhibitor()"><span class="unit">mm/yr</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Target corrosion rate</label>
+        <div class="ir"><input type="number" id="inh_cr_target" value="0.1" step="0.01" oninput="calcInhibitor()"><span class="unit">mm/yr</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Water production rate</label>
+        <div class="ir"><input type="number" id="inh_Qw" value="500" step="10" oninput="calcInhibitor()"><span class="unit">m3/d</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Inhibitor concentration target</label>
+        <div class="ir"><input type="number" id="inh_conc" value="25" step="1" oninput="calcInhibitor()"><span class="unit">ppm (mg/L)</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Inhibitor active content</label>
+        <div class="ir"><input type="number" id="inh_active" value="40" step="1" oninput="calcInhibitor()"><span class="unit">% by weight</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Inhibitor fluid density</label>
+        <div class="ir"><input type="number" id="inh_rho" value="0.95" step="0.01" oninput="calcInhibitor()"><span class="unit">kg/L</span></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Chemical unit cost</label>
+        <div class="ir"><input type="number" id="inh_cost" value="3.5" step="0.1" oninput="calcInhibitor()"><span class="unit">USD/L</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Pipeline length</label>
+        <div class="ir"><input type="number" id="inh_L" value="50" step="1" oninput="calcInhibitor()"><span class="unit">km</span></div>
+      </div>
+    </div>
+    <div id="r5"></div>
+  </div>
+</div>
+
+<!-- ===== PANEL 6: REFERENCE ===== -->
+<div class="panel" id="p6">
+  <div class="card">
+    <div class="stitle rust">/// corrosion rate severity classification</div>
+    <table class="tbl">
+      <thead><tr><th>Corrosion rate</th><th>Classification</th><th>Action required</th><th>Typical material</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">&lt; 0.1 mm/yr</td><td>Negligible</td><td>Standard inspection schedule</td><td>Carbon steel acceptable</td></tr>
+        <tr><td class="tw">0.1 - 0.25 mm/yr</td><td>Low</td><td>Annual UT thickness survey</td><td>Carbon steel + inhibitor</td></tr>
+        <tr><td class="tw">0.25 - 0.5 mm/yr</td><td>Moderate</td><td>6-monthly inspection</td><td>CS with corrosion allowance</td></tr>
+        <tr><td class="tw">0.5 - 1.0 mm/yr</td><td>High</td><td>Quarterly inspection, CRA lining</td><td>13Cr, duplex, or CRA lined</td></tr>
+        <tr><td class="tw">1.0 - 5.0 mm/yr</td><td>Severe</td><td>Monthly, inhibitor mandatory</td><td>25Cr superduplex, alloy 625</td></tr>
+        <tr><td class="tw">&gt; 5.0 mm/yr</td><td>Extreme</td><td>Immediate action, shutdown risk</td><td>Hastelloy, titanium, GRE</td></tr>
+      </tbody>
+    </table>
+    <div class="sep"></div>
+    <div class="stitle rust">/// CRA material selection matrix - partial pressure limits</div>
+    <table class="tbl">
+      <thead><tr><th>Material</th><th>Max PCO2</th><th>H2S service</th><th>Max Cl- (mg/L)</th><th>Max T (°C)</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Carbon steel (API 5L X52-X70)</td><td>Any*</td><td>No sour</td><td>Any*</td><td>120</td><td>*With inhibitor/CA. HRC ≤ 22</td></tr>
+        <tr><td class="tw">13Cr (L80 13Cr)</td><td>Any</td><td>&lt; 0.01 bar H2S</td><td>50,000</td><td>150</td><td>NACE MR0175 Sect. 2</td></tr>
+        <tr><td class="tw">Super 13Cr (S13Cr)</td><td>Any</td><td>&lt; 0.02 bar H2S</td><td>100,000</td><td>175</td><td>Better SSC resist than 13Cr</td></tr>
+        <tr><td class="tw">22Cr Duplex (SAF 2205)</td><td>Any</td><td>&lt; 0.1 bar H2S</td><td>200,000</td><td>200</td><td>Good for moderate sour</td></tr>
+        <tr><td class="tw">25Cr Superduplex (SAF 2507)</td><td>Any</td><td>&lt; 0.3 bar H2S</td><td>Seawater OK</td><td>220</td><td>High strength + corrosion resist</td></tr>
+        <tr><td class="tw">Alloy 825 (N08825)</td><td>Any</td><td>&lt; 1.0 bar H2S</td><td>No limit</td><td>230</td><td>Nickel alloy, cost ~8x CS</td></tr>
+        <tr><td class="tw">Alloy 625 (N06625)</td><td>Any</td><td>Full range</td><td>No limit</td><td>300</td><td>Extreme corrosion, cost ~15x CS</td></tr>
+        <tr><td class="tw">Titanium Grade 2</td><td>Any</td><td>Low H2S</td><td>No limit</td><td>260</td><td>Excellent seawater, light weight</td></tr>
+        <tr><td class="tw">Hastelloy C276</td><td>Any</td><td>Full range</td><td>No limit</td><td>350</td><td>Most corrosion resistant, high cost</td></tr>
+        <tr><td class="tw">GRE (Glass Reinforced Epoxy)</td><td>Any</td><td>No SSC risk</td><td>No limit</td><td>80</td><td>Non-metallic, for non-pressure</td></tr>
+      </tbody>
+    </table>
+    <div class="sep"></div>
+    <div class="stitle rust">/// key formulas</div>
+    <div class="fbox">
+      <strong>CO2 partial pressure:</strong> PCO2 = P_total x yCO2/100 [bar]<br>
+      <strong>H2S partial pressure:</strong> PH2S = P_total x yH2S/100 [bar]<br>
+      <strong>de Waard-Milliams (1993 updated):</strong><br>
+      log(V_CO2) = 5.8 - 1710/(T+273) + 0.67 x log(PCO2) [mm/yr, T in °C]<br>
+      <strong>NORSOK M-506 pH correction factor:</strong><br>
+      f_pH = 10^(0.46 x (pH - 3.8)) for pH 3.8-6.5 (reduces rate at higher pH)<br>
+      <strong>Temperature correction:</strong><br>
+      For T &lt; 60°C: use base rate; T > 60°C: protective FeCO3 scale forms → scale factor &lt; 1<br>
+      Scale factor K_scale ≈ exp(-2500 x (1/(T+273) - 1/333)) for T &gt; 60°C [approximate]<br>
+      <strong>Velocity correction (turbulent/erosion):</strong><br>
+      f_v = (v/v_ref)^0.8 [proportional to wall shear stress]<br>
+      <strong>Remaining life:</strong> RUL = (t_meas - t_min) / CR_actual [years]<br>
+      <strong>NACE sour threshold:</strong> PH2S &gt; 0.0003 MPa AND fluid pH &lt; calculated value<br>
+      <strong>CO2/H2S ratio:</strong> If PCO2/PH2S &lt; 20: sour corrosion dominates (FeS protective layer)<br>
+      If PCO2/PH2S &gt; 500: sweet CO2 corrosion dominates<br>
+      <strong>Inhibitor dose (mass):</strong> m_dot_inh = Q_water x C_target / (active_pct x 10000) [L/d]<br>
+      <strong>Erosion velocity limit:</strong> V_e = C / sqrt(rho_mix) [m/s], C = 100-150 (API RP 14E)
+    </div>
+    <div class="sep"></div>
+    <div class="stitle rust">/// inspection methods for corrosion monitoring</div>
+    <table class="tbl">
+      <thead><tr><th>Method</th><th>What it measures</th><th>Sensitivity</th><th>Online/Offline</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">UT (Ultrasonic Thickness)</td><td>Wall thickness</td><td>±0.1 mm</td><td>Offline (spot)</td><td>Most common, point measurement</td></tr>
+        <tr><td class="tw">Long-range UT / GWT</td><td>Wall thickness over long section</td><td>±0.5 mm</td><td>Offline</td><td>Covers 50-200m per test position</td></tr>
+        <tr><td class="tw">ER probes (Electrical Resistance)</td><td>Metal loss rate</td><td>0.001 mm/yr</td><td>Online (continuous)</td><td>Instantaneous corrosion rate</td></tr>
+        <tr><td class="tw">LPR probes (Linear Polarization)</td><td>Instantaneous corrosion rate</td><td>0.001 mm/yr</td><td>Online (continuous)</td><td>Electrochemical, water phase only</td></tr>
+        <tr><td class="tw">Corrosion coupons</td><td>Average metal loss over period</td><td>±0.01 mm/yr</td><td>Offline (periodic)</td><td>Low tech, reliable, inexpensive</td></tr>
+        <tr><td class="tw">Iron count (Fe2+/Fe3+)</td><td>Corrosion product in water</td><td>0.1 mg/L</td><td>Online / Lab</td><td>Indirect indicator, easy to apply</td></tr>
+        <tr><td class="tw">ILI (In-Line Inspection)</td><td>Wall thickness along full pipeline</td><td>±0.2 mm</td><td>Offline (pigging)</td><td>MFL or UT pigs, full pipeline scan</td></tr>
+        <tr><td class="tw">FSM (Field Signature Method)</td><td>Average wall thickness in spool</td><td>0.1% of wall</td><td>Online (continuous)</td><td>No access required, permanent sensor</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">
+  <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
+  · NORSOK M-506 / NACE MR0175 / ISO 15156 / API 570 / API 579 · Educational use only - not a substitute for engineering assessment
+</div>
+</div>
+
+<script>
+var co2Chart=null,naceChart=null,lifeChart=null;
+
+/* ====== UTILS ====== */
+function sw(n){
+  for(var i=1;i<=6;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    document.getElementById('t'+i).className='tab'+(i===n?' on':'');
+  }
+  if(n===2)setTimeout(calcH2S,80);
+  if(n===3)setTimeout(calcLife,80);
+  if(n===4)setTimeout(calcMatSel,80);
+  if(n===5)setTimeout(calcInhibitor,80);
+}
+function rc(cls,lbl,val,unit,sub){
+  return '<div class="rc '+(cls||'')+'">'
+    +'<div class="rl">'+lbl+'</div>'
+    +'<div class="rv">'+val+(unit?' <span>'+unit+'</span>':'')+'</div>'
+    +(sub?'<div class="rsub">'+sub+'</div>':'')+'</div>';
+}
+function ar(type,title,body,sugg){
+  var d={ok:'d-ok',wn:'d-wn',er:'d-er',rust:'d-rust',teal:'d-teal'}[type]||'d-rust';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+}
+function sevBadge(cr){
+  if(cr<0.1) return '<div class="sev-badge sev-low">✅ NEGLIGIBLE (&lt; 0.1 mm/yr)</div>';
+  if(cr<0.25) return '<div class="sev-badge sev-low">🟢 LOW (0.1-0.25 mm/yr)</div>';
+  if(cr<0.5) return '<div class="sev-badge sev-mod">🟡 MODERATE (0.25-0.5 mm/yr)</div>';
+  if(cr<1.0) return '<div class="sev-badge sev-high">🟠 HIGH (0.5-1.0 mm/yr)</div>';
+  if(cr<5.0) return '<div class="sev-badge sev-sev">🔴 SEVERE (1.0-5.0 mm/yr)</div>';
+  return '<div class="sev-badge sev-sev">🚨 EXTREME (&gt; 5.0 mm/yr)</div>';
+}
+
+/* ====== PANEL 1: CO2 ====== */
+function calcCO2(){
+  var P=parseFloat(document.getElementById('P_sys').value)||100;
+  var CO2=parseFloat(document.getElementById('CO2_pct').value)||3;
+  var T=parseFloat(document.getElementById('T_co2').value)||60;
+  var pH=parseFloat(document.getElementById('pH').value)||5.5;
+  var vel=parseFloat(document.getElementById('vel').value)||2;
+  var wc=parseFloat(document.getElementById('wc_pct').value)||30;
+  var api=parseFloat(document.getElementById('api_co2').value)||35;
+  var glycol=parseInt(document.getElementById('glycol').value)||0;
+  var inh=parseFloat(document.getElementById('inh_eff').value)||0;
+
+  // CO2 partial pressure
+  var PCO2=P*(CO2/100); // bar
+
+  // de Waard-Milliams (1993) base rate
+  var CR_base=Math.pow(10, 5.8 - 1710/(T+273) + 0.67*Math.log10(PCO2));
+
+  // pH correction (NORSOK M-506 approach)
+  // Reference pH for de Waard is ~3.8 at saturation
+  var pH_ref=3.8+0.46*Math.log10(PCO2); // saturation pH approximation
+  var f_pH=Math.pow(10, 0.46*(pH-3.8));
+  if(f_pH>1) f_pH=1; // can't increase rate above base
+  f_pH=Math.max(f_pH, 0.01);
+
+  // Temperature scaling (FeCO3 protective scale above 60°C)
+  var f_T=1.0;
+  if(T>60){
+    f_T=Math.exp(-2500*(1/(T+273)-1/333));
+    f_T=Math.max(0.05,Math.min(1.0,f_T)); // bounded
+  }
+
+  // Velocity factor (erosion/mass transfer)
+  var vel_ref=1.0; // reference m/s
+  var f_v=Math.pow(vel/vel_ref, 0.8);
+  if(vel<0.5) f_v=0.5; // stagnant zones, under-deposit
+  f_v=Math.min(f_v,5.0);
+
+  // Glycol factor (MEG inhibits corrosion by diluting water activity)
+  var f_gly=[1.0,0.6,0.2,0.05][[0,20,50,80].indexOf(glycol)];
+  if(f_gly===undefined) f_gly=1.0;
+
+  // Water cut (above inversion point ~30-40%, becomes water continuous)
+  var wc_inv=30; // typical inversion
+  var f_wc=wc>wc_inv?1.0:wc/wc_inv*0.5; // below inversion: oil continuous, lower rate
+
+  // Combined NORSOK rate
+  var CR_norsok=CR_base*f_pH*f_T*f_v*f_wc*f_gly;
+
+  // Inhibitor effect
+  var CR_inhib=CR_norsok*(1-inh/100);
+  var CR_final=Math.max(CR_inhib,0.001);
+
+  // de Waard-Milliams simple (for comparison)
+  var CR_dw=Math.pow(10, 5.8 - 1710/(T+273) + 0.67*Math.log10(PCO2));
+
+  // Erosion velocity check (API RP 14E)
+  var rho_oil=141.5/(api+131.5)*1000;
+  var rho_water=1050;
+  var rho_mix=(wc/100*rho_water+(1-wc/100)*rho_oil);
+  var V_erosion=100/Math.sqrt(rho_mix); // m/s (C=100 uninhibited)
+  var V_erosion_inh=150/Math.sqrt(rho_mix); // C=150 inhibited
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','CO2 partial pressure',PCO2.toFixed(2),'bar','= '+P+' bar x '+(CO2/100)+' mol CO2');
+  html+=rc('hl','NORSOK M-506 rate',CR_norsok.toFixed(3),'mm/yr','Before inhibitor');
+  html+=rc(inh>0?'ok':'','Final corrosion rate',CR_final.toFixed(3),'mm/yr',inh>0?'After '+inh+'% inhibitor':'No inhibitor applied');
+  html+=rc('','de Waard-Milliams (base)',CR_dw.toFixed(3),'mm/yr','Uncorrected base rate');
+  html+=rc('','pH correction factor',f_pH.toFixed(3),'-','At pH '+pH);
+  html+=rc('','Temperature scale factor',f_T.toFixed(3),'-',T>60?'FeCO3 scale forming':'No protective scale');
+  html+=rc('','Velocity factor',f_v.toFixed(3),'-','At '+vel+' m/s');
+  html+=rc(vel>V_erosion?'er':vel>V_erosion*0.8?'wn':'ok','Erosion velocity limit',V_erosion.toFixed(1),'m/s','API RP 14E C=100 | C=150 inhibited: '+V_erosion_inh.toFixed(1));
+  html+='</div>';
+  html+=sevBadge(CR_final);
+
+  html+='<div class="fbox">'
+    +'<strong>PCO2</strong> = '+P+' x '+CO2+'/100 = <span class="hi">'+PCO2.toFixed(3)+' bar</span><br>'
+    +'<strong>CR_base (de Waard-Milliams):</strong> 10^(5.8 - 1710/('+T+'+273) + 0.67 x log('+PCO2.toFixed(3)+')) = <span class="hi">'+CR_dw.toFixed(3)+' mm/yr</span><br>'
+    +'<strong>f_pH</strong> = 10^(0.46 x ('+pH+' - 3.8)) = <span class="hi">'+f_pH.toFixed(3)+'</span> (pH correction)<br>'
+    +'<strong>f_T</strong> = '+f_T.toFixed(3)+' ('+( T>60?'FeCO3 scale protection above 60°C':'no scale, T ≤ 60°C')+')<br>'
+    +'<strong>CR_NORSOK</strong> = '+CR_dw.toFixed(3)+' x '+f_pH.toFixed(3)+' x '+f_T.toFixed(3)+' x '+f_v.toFixed(3)+' x '+f_wc.toFixed(2)+' x '+f_gly+' = <span class="hi">'+CR_norsok.toFixed(3)+' mm/yr</span><br>'
+    +(inh>0?'<strong>CR_final</strong> = '+CR_norsok.toFixed(3)+' x (1-'+inh+'/100) = <span class="hiok">'+CR_final.toFixed(3)+' mm/yr</span>':'')
+    +'</div>';
+
+  var rows='';
+  if(PCO2>7){
+    rows+=ar('er','Very high CO2 partial pressure ('+PCO2.toFixed(1)+' bar)','PCO2 above 7 bar is extremely corrosive. Carbon steel with conventional inhibition is unlikely to be sufficient for long-term integrity. Even with 90% inhibitor efficiency, rate = '+( CR_norsok*0.1).toFixed(2)+' mm/yr.','Specify CRA (Corrosion Resistant Alloy): 13Cr or 22Cr Duplex for wells and flowlines. For pipelines: CS with CRA liner or internal epoxy coating + continuous inhibitor + comprehensive monitoring. Economic analysis: CRA premium vs inhibitor OPEX over field life.');
+  } else if(PCO2>2){
+    rows+=ar('wn','High CO2 partial pressure ('+PCO2.toFixed(1)+' bar) - corrosion likely significant','PCO2 > 2 bar is considered high-corrosivity for carbon steel. Without inhibition, corrosion rate of '+CR_norsok.toFixed(2)+' mm/yr requires significant corrosion allowance and frequent inspection.','Options: (1) Continuous corrosion inhibitor injection targeting efficiency > 85%. (2) Increase pipeline pH by MEG or bicarbonate injection. (3) Specify 13Cr CRA if inhibitor system reliability is uncertain. Install iron count monitoring and ER probes for continuous rate verification.');
+  } else if(PCO2>0.5){
+    rows+=ar('rust','Moderate CO2 corrosion risk ('+PCO2.toFixed(1)+' bar)','NORSOK classification: moderate. Carbon steel with appropriate corrosion allowance and periodic monitoring is viable. Inhibitor injection is beneficial but may not be mandatory depending on design life and inspection programme.','Design corrosion allowance = CR x design_life = '+CR_norsok.toFixed(3)+' x design_life mm. For 25-year design life: '+( CR_norsok*25).toFixed(1)+' mm CA required. Verify by UT thickness survey every 2-3 years and corrosion coupons at key locations.');
+  } else {
+    rows+=ar('ok','Low CO2 corrosion risk ('+PCO2.toFixed(2)+' bar)','PCO2 < 0.5 bar: low corrosion risk for carbon steel. Standard carbon steel pipeline design without special corrosion measures may be acceptable. Confirm with field data from similar service.','');
+  }
+
+  if(vel>V_erosion){
+    rows+=ar('er','FLOW VELOCITY EXCEEDS EROSION LIMIT ('+vel+' m/s > '+V_erosion.toFixed(1)+' m/s)','API RP 14E erosion velocity exceeded. At this velocity, mechanical erosion of the pipe wall and corrosion product film occurs, preventing formation of protective scales and accelerating metal loss dramatically. Risk of rapid failure at bends, reducers, and tees.','Reduce flow velocity by increasing pipe diameter. V_erosion = C/sqrt(rho_mix) = 100/sqrt('+rho_mix.toFixed(0)+') = '+V_erosion.toFixed(1)+' m/s. Specify erosion-resistant material (hard-facing, Inconel overlay) at high-velocity points. Add choke valves to reduce velocity upstream of bends. Use computational fluid dynamics (CFD) to identify erosion hot-spots.');
+  }
+
+  if(T>60&&T<100){
+    rows+=ar('ok','Temperature in protective scale formation zone ('+T+'°C)','Between 60-100°C, FeCO3 (siderite) and FeS protective scales form on carbon steel surface. NORSOK M-506 scale factor reduces corrosion rate significantly (f_T = '+f_T.toFixed(3)+'). This is accounted for in the NORSOK rate shown above.','Scales are brittle and can be disrupted by: slug flow, pigging, rapid depressurization, high wall shear stress (>50 Pa). Avoid velocity excursions that strip protective scales. After pigging, corrosion rate may spike for 24-48h until scale reforms.');
+  }
+
+  html+='<div class="analysis"><div class="atitle">/// CO2 CORROSION ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r1').innerHTML=html;
+
+  // CO2 rate vs T chart
+  var Temps=Array.from({length:25},function(_,i){return 20+i*6;});
+  var CR_vals_base=Temps.map(function(Tv){
+    return Math.pow(10, 5.8 - 1710/(Tv+273) + 0.67*Math.log10(PCO2));
+  });
+  var CR_vals_norsok=Temps.map(function(Tv){
+    var fT=Tv>60?Math.max(0.05,Math.min(1,Math.exp(-2500*(1/(Tv+273)-1/333)))):1.0;
+    return CR_vals_base[Temps.indexOf(Tv)]*f_pH*fT*f_v*f_wc*f_gly;
+  });
+
+  var ctx=document.getElementById('co2Chart').getContext('2d');
+  if(co2Chart){co2Chart.destroy();}
+  co2Chart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'de Waard-Milliams (base)',data:Temps.map(function(T,i){return{x:T,y:CR_vals_base[i].toFixed(3)};}),
+          borderColor:'#FF8800',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4},
+        {label:'NORSOK M-506 (corrected)',data:Temps.map(function(T,i){return{x:T,y:CR_vals_norsok[i].toFixed(3)};}),
+          borderColor:'#CC6633',backgroundColor:'rgba(204,102,51,0.07)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.4},
+        {label:'Current operating point',data:[{x:T,y:CR_norsok.toFixed(3)}],
+          borderColor:'#fff',backgroundColor:'#fff',pointRadius:8,showLine:false},
+        {label:'0.1 mm/yr limit',data:Temps.map(function(T){return{x:T,y:0.1};}),
+          borderColor:'#00BB55',backgroundColor:'transparent',borderWidth:1,pointRadius:0,borderDash:[4,3]},
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Temperature (°C)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}},
+        y:{title:{display:true,text:'Corrosion rate (mm/yr)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},type:'logarithmic'}
+      }
+    }
+  });
+  // pass PCO2 to other tabs
+  document.getElementById('ms_pco2').value=PCO2.toFixed(2);
+  document.getElementById('inh_cr_unin').value=CR_norsok.toFixed(3);
+}
+
+/* ====== PANEL 2: H2S ====== */
+function calcH2S(){
+  var P=parseFloat(document.getElementById('s_P').value)||100;
+  var H2S_pct=parseFloat(document.getElementById('s_H2S').value)||0.5;
+  var CO2_pct=parseFloat(document.getElementById('s_CO2').value)||2;
+  var T=parseFloat(document.getElementById('s_T').value)||80;
+  var pH=parseFloat(document.getElementById('s_pH').value)||5.0;
+  var Cl=parseFloat(document.getElementById('s_Cl').value)||50000;
+  var SMYS=parseFloat(document.getElementById('s_smys').value)||414;
+  var HRC=parseFloat(document.getElementById('s_hard').value)||22;
+
+  var PH2S=P*(H2S_pct/100); // bar
+  var PCO2=P*(CO2_pct/100); // bar
+  var PH2S_MPa=PH2S/10; // MPa
+
+  // NACE MR0175 sour threshold
+  var sour_threshold_MPa=0.0003; // MPa = 0.003 bar = 0.05 psia
+  var sour_psia=PH2S_MPa*145.04;
+  var is_sour=PH2S_MPa>sour_threshold_MPa;
+
+  // pH limit for sour service regions
+  // NACE Region 1 (no special requirements): pH > 4.5 AND PH2S < 0.3 psia
+  // NACE Region 2 (SSC precautions): intermediate
+  // NACE Region 3 (severe sour): low pH and/or high PH2S
+  var nace_region;
+  var nace_color;
+  if(!is_sour){
+    nace_region='NON-SOUR SERVICE';nace_color='ok';
+  } else if(sour_psia<1.0&&pH>4.5){
+    nace_region='NACE REGION 1 (mild sour)';nace_color='wn';
+  } else if(sour_psia<1.5&&pH>3.5){
+    nace_region='NACE REGION 2 (moderate sour)';nace_color='wn';
+  } else {
+    nace_region='NACE REGION 3 (severe sour)';nace_color='er';
+  }
+
+  // CO2/H2S ratio
+  var ratio=PCO2/Math.max(PH2S,0.0001);
+  var corr_type=ratio>500?'Sweet CO2 dominates':ratio<20?'H2S sour dominates':'Mixed CO2/H2S';
+
+  // SSC risk assessment
+  var ssc_ok=HRC<=22&&SMYS<=690;
+  var hic_risk=Cl>10000&&PH2S_MPa>0.003;
+
+  // Hardness check NACE MR0175
+  var HRC_limit=22;
+  var HV_equiv=HRC<=0?0:HRC*9.81/0.31; // rough conversion
+
+  // CO2 corrosion rate (still active in sour service)
+  var CR_co2=Math.pow(10, 5.8 - 1710/(T+273) + 0.67*Math.log10(Math.max(PCO2,0.001)));
+  // In sour service, FeS scale forms, reducing CO2 rate
+  var fes_factor=ratio<20?0.1:ratio<200?0.5:1.0;
+  var CR_sour=CR_co2*fes_factor;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','H2S partial pressure',PH2S.toFixed(4),'bar','= '+PH2S_MPa.toFixed(5)+' MPa = '+sour_psia.toFixed(4)+' psia');
+  html+=rc('hl','CO2 partial pressure',PCO2.toFixed(2),'bar','');
+  html+=rc(is_sour?'wn':'ok','NACE sour service',is_sour?'YES - SOUR':'NO - SWEET','-','Threshold: 0.0003 MPa H2S');
+  html+=rc(nace_color,is_sour?'NACE region':' ',nace_region,'-','');
+  html+=rc('','CO2/H2S ratio',ratio.toFixed(1),'-',corr_type);
+  html+=rc(ssc_ok?'ok':'er','SSC hardness',HRC+' HRC',ssc_ok?'≤ 22 HRC - PASS':'> 22 HRC - NACE LIMIT EXCEEDED');
+  html+=rc(hic_risk?'wn':'ok','HIC risk',hic_risk?'ELEVATED':'LOW','',Cl.toLocaleString()+' mg/L Cl, PH2S='+PH2S.toFixed(3)+' bar');
+  html+=rc('','Est. corrosion rate',CR_sour.toFixed(3),'mm/yr','CO2 rate x FeS scale factor '+fes_factor);
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>PH2S</strong> = '+P+' x '+H2S_pct+'/100 = <span class="hi">'+PH2S.toFixed(4)+' bar = '+PH2S_MPa.toFixed(5)+' MPa</span><br>'
+    +'<strong>Sour threshold</strong> (NACE MR0175): PH2S &gt; 0.0003 MPa → <span class="hi">'+( is_sour?'SOUR SERVICE':'Not sour')+'</span><br>'
+    +'<strong>PCO2/PH2S</strong> = '+PCO2.toFixed(2)+'/'+PH2S.toFixed(4)+' = <span class="hi">'+ratio.toFixed(1)+'</span> → '+corr_type+'<br>'
+    +'<strong>Hardness limit</strong>: NACE MR0175 = 22 HRC max for CS → '+( HRC<=22?'<span class="hiok">PASS</span>':'<span style="color:var(--err)">FAIL - Exceeds 22 HRC</span>')+'<br>'
+    +'<strong>FeS scale factor</strong>: '+fes_factor+' (CO2 rate reduced by H2S-derived FeS scale) → <span class="hit">CR_sour = '+CR_sour.toFixed(3)+' mm/yr</span>'
+    +'</div>';
+
+  var rows='';
+  if(!is_sour){
+    rows+=ar('ok','Non-sour service - standard carbon steel acceptable','H2S partial pressure ('+PH2S.toFixed(5)+' MPa) is below NACE MR0175/ISO 15156 sour threshold (0.0003 MPa). Standard carbon steel materials per API 5L and ASTM A106 are acceptable without special sour-service requirements.','Monitor CO2 corrosion using Tab 1 of this calculator. Even in non-sour service, CO2 can be significantly corrosive. Implement NORSOK M-506 based corrosion assessment for system design.');
+  } else if(nace_color==='wn'){
+    rows+=ar('wn','SOUR SERVICE - Mild to moderate ('+nace_region+')','H2S partial pressure ('+PH2S_MPa.toFixed(5)+' MPa) exceeds NACE sour threshold. Sulfide Stress Cracking (SSC) risk for susceptible materials. Standard low-alloy carbon steel must comply with NACE MR0175/ISO 15156 Part 2 hardness limits (22 HRC max).','Specify materials per NACE MR0175/ISO 15156: CS with max 22 HRC hardness, PWHT all welds. No cold-working. Restrict yield strength to SMYS ≤ 552 MPa for Region 1-2. Hydrogen permeation testing may be required for HIC-sensitive areas.');
+  } else {
+    rows+=ar('er','SEVERE SOUR SERVICE ('+nace_region+') - CRA materials required','Operating in NACE Region 3 (severe sour). High risk of SSC, HIC, and SOHIC cracking. Carbon steel, even with NACE compliance, has significantly elevated cracking risk in Region 3.','Materials: Duplex 22Cr or 25Cr (NACE MR0175 Part 3), Alloy 825, or Alloy 625 for pressure-containing components. Conduct H2S cracking testing (NACE TM0177 Method A/B) at actual service conditions. Engineering Critical Assessment (ECA) per API 579 / BS 7910 for any defects found in service.');
+  }
+  if(HRC>22){
+    rows+=ar('er','HARDNESS EXCEEDS NACE MR0175 LIMIT ('+HRC+' HRC > 22 HRC)','Any carbon or low-alloy steel above 22 HRC (equiv. ~240 HV, ~250 HBW) in sour service is highly susceptible to SSC. Brittle fracture can occur within hours of exposure to wet H2S.','Mandatory action: (1) Heat treatment (PWHT/annealing) to achieve ≤ 22 HRC. (2) Replace with NACE MR0175-compliant material. (3) Restrict operating stress to < 60% SMYS and add corrosion inhibitor as temporary measure. Report as potential integrity concern to asset owner.');
+  }
+  if(hic_risk){
+    rows+=ar('wn','HIC risk elevated (Cl = '+Cl.toLocaleString()+' mg/L, PH2S = '+PH2S.toFixed(3)+' bar)','High chloride + H2S combination significantly increases risk of Hydrogen Induced Cracking (HIC). HIC occurs in CS without applied stress, driven by atomic hydrogen absorption at inclusions. Particularly severe in high-strength (API 5L X65+) or pipe with elongated MnS inclusions.','Specify HIC-resistant steel (NACE TM0284): S content < 0.002%, low Ca treatment, high Ca/S ratio (> 1.5). Mill certification with HIC test results (CLR < 15%, CTR < 1.5%, CSR < 0.5%). Ultrasonic inspection of pipe body for initial laminations before installation.');
+  }
+
+  html+='<div class="analysis"><div class="atitle">/// SOUR SERVICE ASSESSMENT</div>'+rows+'</div>';
+  document.getElementById('r2').innerHTML=html;
+
+  // NACE diagram
+  var ctx=document.getElementById('naceChart').getContext('2d');
+  if(naceChart){naceChart.destroy();}
+  var pH_range=Array.from({length:10},function(_,i){return 3.0+i*0.5});
+  naceChart=new Chart(ctx,{
+    type:'scatter',
+    data:{
+      datasets:[
+        {label:'Region 1 boundary',data:pH_range.map(function(ph){return{x:ph,y:0.0034};}),
+          borderColor:'#FFCC00',backgroundColor:'transparent',showLine:true,borderDash:[5,3],pointRadius:0,borderWidth:1.5},
+        {label:'Sour threshold (0.0003 MPa)',data:pH_range.map(function(ph){return{x:ph,y:0.0003};}),
+          borderColor:'#FF8800',backgroundColor:'transparent',showLine:true,borderDash:[4,4],pointRadius:0,borderWidth:1.5},
+        {label:'Operating point',data:[{x:pH,y:PH2S_MPa}],
+          borderColor:'#fff',backgroundColor:is_sour?'#FF4444':'#00BB55',pointRadius:10,showLine:false}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}},
+        annotation:{annotations:{}}},
+      scales:{
+        x:{title:{display:true,text:'In-situ pH',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:3,max:8},
+        y:{title:{display:true,text:'H2S partial pressure (MPa)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},type:'logarithmic',min:0.00001,max:1}
+      }
+    }
+  });
+  document.getElementById('ms_ph2s').value=PH2S.toFixed(4);
+  document.getElementById('ms_T').value=T;
+  document.getElementById('ms_pH').value=pH;
+  document.getElementById('ms_Cl').value=Cl;
+}
+
+/* ====== PANEL 3: PIPE LIFE ====== */
+function calcLife(){
+  var t_nom=parseFloat(document.getElementById('t_nom').value)||9.5;
+  var t_meas=parseFloat(document.getElementById('t_meas').value)||8.2;
+  var t_min=parseFloat(document.getElementById('t_min').value)||5.5;
+  var CR=parseFloat(document.getElementById('cr_pipe').value)||0.3;
+  var yrs=parseFloat(document.getElementById('yrs_since').value)||2;
+  var P_d=parseFloat(document.getElementById('P_pipe').value)||50;
+  var SMYS=parseFloat(document.getElementById('smys_pipe').value)||241;
+  var OD=parseFloat(document.getElementById('OD_pipe').value)||168.3;
+
+  // Current estimated thickness (extrapolated to now)
+  var t_now=t_meas-CR*yrs;
+  var metal_loss=t_nom-t_now;
+
+  // Remaining useful life
+  var RUL=(t_now-t_min)/CR;
+  var RUL_from_nominal=(t_nom-t_min)/CR;
+  var life_consumed=(t_nom-t_now)/(t_nom-t_min)*100;
+
+  // MAOP with current thickness
+  var t_eff_now=t_now*(1-0.125); // with mill tolerance
+  var MAOP_now=2*SMYS*t_eff_now/(OD-2*0.4*t_eff_now)/10; // bar
+  var pressure_safety=MAOP_now/P_d;
+
+  // Next inspection date
+  var insp_interval=RUL<5?0.5*RUL:Math.min(RUL*0.4,5);
+  insp_interval=Math.max(0.5,insp_interval);
+
+  var status=RUL<2?'CRITICAL':RUL<5?'MONITOR':RUL<10?'ACCEPTABLE':'GOOD';
+  var statusCls=RUL<2?'er':RUL<5?'wn':RUL<10?'':'ok';
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Estimated current thickness',t_now.toFixed(2),'mm','t_meas - CR x '+yrs+' yr');
+  html+=rc(statusCls||'ok','Remaining useful life',RUL.toFixed(1),'years','Until t_min = '+t_min+' mm');
+  html+=rc('','Life consumed',life_consumed.toFixed(0),'%',( t_nom-t_now).toFixed(2)+' mm lost of '+(t_nom-t_min).toFixed(2)+' mm allowable');
+  html+=rc('','MAOP with current t',MAOP_now.toFixed(0),'bar','Safety factor: x'+pressure_safety.toFixed(2)+' vs design '+P_d+' bar');
+  html+=rc('','Metal loss to date',(t_nom-t_now).toFixed(2),'mm','Since installation');
+  html+=rc('','Next inspection in',insp_interval.toFixed(1),'years','API 570 interval');
+  html+=rc('','Original design life',RUL_from_nominal.toFixed(0),'years','At current CR from nominal');
+  html+=rc(statusCls||'ok','Status',status,'-','RUL = '+RUL.toFixed(1)+' years');
+  html+='</div>';
+
+  html+='<div class="fbox" style="border-left-color:var(--teal);">'
+    +'<strong>t_now</strong> = t_meas - CR x yrs_since = '+t_meas+' - '+CR+' x '+yrs+' = <span class="hit">'+t_now.toFixed(2)+' mm</span><br>'
+    +'<strong>RUL</strong> = (t_now - t_min) / CR = ('+t_now.toFixed(2)+' - '+t_min+') / '+CR+' = <span class="hit">'+RUL.toFixed(1)+' years</span><br>'
+    +'<strong>Life consumed</strong> = ('+t_nom+' - '+t_now.toFixed(2)+') / ('+t_nom+' - '+t_min+') = <span class="hit">'+life_consumed.toFixed(0)+'%</span><br>'
+    +'<strong>MAOP (current t):</strong> 2 x '+SMYS+' x '+t_eff_now.toFixed(2)+' / ('+OD+' - 2x0.4x'+t_eff_now.toFixed(2)+') / 10 = <span class="hit">'+MAOP_now.toFixed(0)+' bar</span>'
+    +'</div>';
+
+  var rows='';
+  if(RUL<2){
+    rows+=ar('er','CRITICAL - Less than 2 years remaining life ('+RUL.toFixed(1)+' yr)','Pipe has only '+RUL.toFixed(1)+' years before reaching minimum required thickness. Immediate action required. Current MAOP with actual wall thickness is '+MAOP_now.toFixed(0)+' bar vs design '+P_d+' bar.','Immediate actions: (1) Increase inspection frequency to 3-6 months. (2) Consider pressure deration if MAOP < design x 1.1. (3) Initiate pipe replacement planning (lead time 12-18 months typical). (4) Apply aggressive corrosion inhibition to extend life. (5) Commission API 579 Fitness-For-Service assessment.');
+  } else if(RUL<5){
+    rows+=ar('wn','Moderate concern - RUL = '+RUL.toFixed(1)+' years','Remaining life is limited. Plan inspection and replacement within the next '+Math.ceil(RUL)+' years. Corrosion rate should be verified by multiple measurement points to confirm '+CR+' mm/yr is representative.','Actions: Annual UT survey minimum. Implement ER probe monitoring for real-time rate. Evaluate inhibitor upgrade to reduce CR. Schedule replacement planning. Apply API 570 retirement criteria - check t_min compliance at all inspected locations.');
+  } else {
+    rows+=ar('ok','Acceptable remaining life ('+RUL.toFixed(1)+' years)','Pipe has adequate remaining life based on current corrosion rate of '+CR+' mm/yr. Next inspection in '+insp_interval.toFixed(1)+' years per API 570.','');
+  }
+  rows+=ar('teal','Inspection programme recommendation','Based on RUL = '+RUL.toFixed(1)+' years: inspect every '+insp_interval.toFixed(1)+' years. Use UT thickness measurement at minimum 3 points per spool. Record and trend all measurements. Per API 570, reduce interval if CR increases by > 20% between inspections.','');
+
+  html+='<div class="analysis"><div class="atitle teal">/// REMAINING LIFE ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r3').innerHTML=html;
+
+  // Wall thickness bars
+  var pct_nom=100;
+  var pct_now=t_now/t_nom*100;
+  var pct_min=t_min/t_nom*100;
+  document.getElementById('wt-bars').innerHTML=
+    '<div class="wt-label"><span>0</span><span>t_min='+t_min+'mm ('+(pct_min).toFixed(0)+'%)</span><span>t_nom='+t_nom+'mm</span></div>'
+    +'<div class="wt-track"><div class="wt-fill" style="width:'+Math.min(100,pct_now).toFixed(0)+'%;background:linear-gradient(90deg,'+( pct_now<pct_min+10?'#FF3333':'#CC6633')+','+( pct_now<50?'#FF8800':'#00BB55')+');"></div></div>'
+    +'<div class="wt-label"><span>t_now = '+t_now.toFixed(2)+'mm</span><span style="color:'+(pct_now>pct_min+10?'var(--ok)':'var(--err)')+';">'+pct_now.toFixed(0)+'% of nominal</span><span>100%</span></div>';
+
+  // Life projection chart
+  var yearPts=Array.from({length:Math.ceil(RUL*2)+2},function(_,i){return i*0.5;});
+  var tPts=yearPts.map(function(y){return Math.max(0,t_now-CR*y);});
+  var ctx=document.getElementById('lifeChart').getContext('2d');
+  if(lifeChart){lifeChart.destroy();}
+  lifeChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'Wall thickness',data:yearPts.map(function(y,i){return{x:y,y:tPts[i].toFixed(3)};}),
+          borderColor:'#00AAAA',backgroundColor:'rgba(0,170,170,0.07)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.1},
+        {label:'Minimum required ('+t_min+' mm)',data:yearPts.map(function(y){return{x:y,y:t_min};}),
+          borderColor:'#FF3333',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,borderDash:[5,3]},
+        {label:'Alert threshold ('+(t_min+CR*2).toFixed(1)+' mm, 2yr warning)',data:yearPts.map(function(y){return{x:y,y:t_min+CR*2};}),
+          borderColor:'#FF8800',backgroundColor:'transparent',borderWidth:1,pointRadius:0,borderDash:[3,3]},
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Years from now',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}},
+        y:{title:{display:true,text:'Wall thickness (mm)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 4: MATERIAL SELECTION ====== */
+function calcMatSel(){
+  var PCO2=parseFloat(document.getElementById('ms_pco2').value)||3;
+  var PH2S=parseFloat(document.getElementById('ms_ph2s').value)||0.05;
+  var T=parseFloat(document.getElementById('ms_T').value)||80;
+  var Cl=parseFloat(document.getElementById('ms_Cl').value)||50000;
+  var pH=parseFloat(document.getElementById('ms_pH').value)||5.0;
+  var inh=document.getElementById('ms_inh').value;
+
+  var PH2S_MPa=PH2S/10;
+  var is_sour=PH2S_MPa>0.0003;
+  var inh_factor=inh==='yes'?0.15:inh==='batch'?0.5:1.0;
+
+  // Determine material recommendation
+  var rec_mat,rec_color,rec_reason,rec_alt;
+  var CR_base=Math.pow(10,5.8-1710/(T+273)+0.67*Math.log10(Math.max(PCO2,0.01)));
+  var fT=T>60?Math.max(0.05,Math.min(1,Math.exp(-2500*(1/(T+273)-1/333)))):1.0;
+  var CR_est=CR_base*fT*inh_factor;
+
+  var html='<div class="rgrid3" style="margin-top:0;">';
+
+  // Condition-based material selection
+  if(!is_sour&&PCO2<0.5&&Cl<50000&&T<80){
+    rec_mat='Carbon Steel (API 5L Gr.B or X52)';rec_color='ok';
+    rec_reason='Low PCO2, non-sour, moderate T and Cl. Standard carbon steel acceptable with standard corrosion allowance (3mm for 25yr at '+CR_est.toFixed(2)+' mm/yr).';
+    rec_alt='Alternative: CS with fusion-bonded epoxy (FBE) internal coating for no corrosion allowance solution.';
+  } else if(!is_sour&&PCO2<3&&Cl<100000&&T<120&&(inh==='yes'||CR_est<0.25)){
+    rec_mat='Carbon Steel + Continuous Inhibitor';rec_color='ok';
+    rec_reason='Moderate CO2 service. Inhibited carbon steel cost-effective. Verified CR with inhibitor = '+CR_est.toFixed(3)+' mm/yr - acceptable.';
+    rec_alt='Upgrade to 13Cr if inhibitor reliability/access is a concern (e.g. remote unmanned installation).';
+  } else if(!is_sour&&(PCO2>3||T>100||CR_est>0.3)){
+    rec_mat='13Cr Martensitic Stainless (API 5CT L80-13Cr)';rec_color='wn';
+    rec_reason='High CO2 partial pressure or high temperature makes carbon steel uneconomical long-term. 13Cr provides excellent CO2 corrosion resistance.';
+    rec_alt='For wellbore: specify L80 13Cr (NACE MR0175 compliant for non-sour). For surface piping: UNS S41000 or S42000 13Cr weld-overlaid pipe.';
+  } else if(is_sour&&PH2S_MPa<0.01&&pH>4&&T<150&&Cl<100000){
+    rec_mat='Super 13Cr (S13Cr, UNS S41426)';rec_color='wn';
+    rec_reason='Mild sour service. Super 13Cr extends the application range of 13Cr to slightly higher H2S. Better SSC resistance than standard 13Cr.';
+    rec_alt='Alternative: 22Cr Duplex for improved mechanical properties and wider sour service range.';
+  } else if(is_sour&&PH2S_MPa<0.1&&Cl<200000&&T<200){
+    rec_mat='22Cr Duplex (UNS S31803/S32205)';rec_color='wn';
+    rec_reason='Moderate sour service with elevated CO2 and/or chlorides. Duplex provides excellent combination of corrosion resistance and mechanical strength (SMYS ~450 MPa).';
+    rec_alt='If Cl > 100,000 mg/L at T > 80°C: consider 25Cr Superduplex. Budget: ~3-4x carbon steel cost.';
+  } else if(is_sour&&PH2S_MPa<0.3&&T<220){
+    rec_mat='25Cr Superduplex (UNS S32750/S32760)';rec_color='wn';
+    rec_reason='Severe conditions with high H2S, high chlorides, and/or high temperature. Superduplex offers superior pitting and SSC resistance.';
+    rec_alt='For subsea/offshore: SAF 2507 (F55, F60). Welding requires skilled procedures and PWHT. Cost ~5-6x carbon steel.';
+  } else if(PH2S_MPa<1.0||T<230){
+    rec_mat='Alloy 825 (UNS N08825) or Alloy 625 clad/liner';rec_color='er';
+    rec_reason='Extreme corrosion service. Nickel alloys required. Solid Alloy 825 or 625-clad CS pipe for full-bore integrity.';
+    rec_alt='Consider CRA-lined carbon steel pipe (825 or 625 liner, HIP bonded) for large-diameter pipelines at 30-40% cost of solid CRA. Hastelloy C276 for highest resistance.';
+  } else {
+    rec_mat='Hastelloy C276 (UNS N10276) or Titanium Gr.2';rec_color='er';
+    rec_reason='Most extreme service conditions. Only the highest-alloy CRAs can provide adequate performance.';
+    rec_alt='Evaluate GRE (Glass Reinforced Epoxy) for non-pressure-bearing lines. Very high-temperature sour service: Hastelloy C276 or alloy 625 + HRSG assessment.';
+  }
+
+  html+=rc(rec_color,'Recommended material',rec_mat,'-','Based on PCO2='+PCO2.toFixed(1)+', PH2S='+PH2S.toFixed(3)+', T='+T+'°C, Cl='+Cl.toLocaleString());
+  html+=rc(is_sour?'wn':'ok','Sour service classification',is_sour?'SOUR (NACE MR0175)':'SWEET','',is_sour?'Special material requirements apply':'Standard materials acceptable');
+  html+=rc('','CO2 corrosion rate est.',CR_est.toFixed(3),'mm/yr','For selected material scenario');
+  html+='</div>';
+
+  // Generate compatibility table
+  var mats=[
+    {name:'CS API 5L X52',ok:!is_sour&&PCO2<3&&CR_est<0.5,sour:false,co2:'With CA/inhibitor',notes:'Baseline'},
+    {name:'13Cr L80',ok:!is_sour&&PCO2>0,sour:'PH2S < 0.001 bar',co2:'Excellent',notes:'Wellbore tubing'},
+    {name:'22Cr Duplex',ok:true,sour:PH2S_MPa<0.1,co2:'Excellent',notes:'Good all-round'},
+    {name:'25Cr Superduplex',ok:true,sour:PH2S_MPa<0.3,co2:'Excellent',notes:'High cost'},
+    {name:'Alloy 825',ok:true,sour:PH2S_MPa<1.0,co2:'Excellent',notes:'For extreme service'},
+    {name:'Hastelloy C276',ok:true,sour:true,co2:'Excellent',notes:'Most resistant, highest cost'},
+  ];
+
+  html+='<div style="margin-top:14px;"><table class="tbl"><thead><tr><th>Material</th><th>CO2 resistance</th><th>H2S limit (MPa)</th><th>Compatible?</th><th>Notes</th></tr></thead><tbody>';
+  mats.forEach(function(m){
+    var compat=m.ok&&(m.sour===true||(typeof m.sour==='boolean'&&!is_sour)||( typeof m.sour==='number'&&PH2S_MPa<=m.sour));
+    html+='<tr><td class="tw">'+m.name+'</td><td>'+m.co2+'</td><td>'+(m.sour===true?'Full range':m.sour===false?'Non-sour only':(m.sour*10).toFixed(3)+' bar')+'</td>'
+      +'<td style="color:'+(compat?'var(--ok)':'var(--err)')+';">'+(compat?'✅ YES':'❌ NO')+'</td><td>'+m.notes+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+
+  html+='<div class="analysis"><div class="atitle">/// MATERIAL SELECTION ASSESSMENT</div>';
+  html+=ar(rec_color==='ok'?'ok':rec_color==='wn'?'wn':'er','Recommendation: '+rec_mat,rec_reason,rec_alt);
+  if(T>150&&Cl>100000&&is_sour){
+    html+=ar('er','Triple threat: high T + high Cl + sour - extreme conditions','The combination of T='+T+'°C, Cl='+Cl.toLocaleString()+' mg/L, and sour service is extremely challenging. All three factors act synergistically to accelerate pitting, SSC, and chloride-induced SCC.','Conduct formal material selection workshop with corrosion specialist. Review case histories from similar fields (HPHT North Sea, Gulf of Mexico). Laboratory corrosion testing at actual service conditions strongly recommended before final material specification.');
+  }
+  html+='</div>';
+  document.getElementById('r4').innerHTML=html;
+}
+
+/* ====== PANEL 5: INHIBITOR ====== */
+function calcInhibitor(){
+  var CR_unin=parseFloat(document.getElementById('inh_cr_unin').value)||1.2;
+  var CR_target=parseFloat(document.getElementById('inh_cr_target').value)||0.1;
+  var Qw=parseFloat(document.getElementById('inh_Qw').value)||500; // m3/d
+  var conc=parseFloat(document.getElementById('inh_conc').value)||25; // ppm
+  var active=parseFloat(document.getElementById('inh_active').value)||40; // %
+  var rho_inh=parseFloat(document.getElementById('inh_rho').value)||0.95; // kg/L
+  var cost_L=parseFloat(document.getElementById('inh_cost').value)||3.5; // USD/L
+  var L_pipe=parseFloat(document.getElementById('inh_L').value)||50; // km
+
+  var eff_required=(1-CR_target/CR_unin)*100;
+  // Dose calculation
+  var conc_active=conc*(active/100); // ppm active
+  // Volume of product per day: Qw x C_target / active_fraction (L/d)
+  var V_product_d=Qw*1000*conc/(active/100*rho_inh*1000); // L/d → careful with units
+  // Simpler: mass per day = Qw(L/d) x conc(mg/L) / 1e6 x 1e6 g/t → kg/d of active
+  var mass_active_kg_d=Qw*1000*conc/1e6; // kg/d of active ingredient
+  var mass_product_kg_d=mass_active_kg_d/(active/100); // kg/d product
+  var vol_product_L_d=mass_product_kg_d/rho_inh; // L/d
+  var vol_per_m3_water=vol_product_L_d/Qw; // L product per m3 water
+  var cost_d=vol_product_L_d*cost_L;
+  var cost_y=cost_d*365;
+
+  // Injection rate (pump sizing)
+  var rate_ml_min=vol_product_L_d*1000/1440; // mL/min
+  var treat_ratio_ppm_product=conc/(active/100); // ppm of product for target
+
+  // Batch treatment alternative
+  var batch_dose_Lkm=vol_product_L_d*1000/L_pipe; // mL/km/day if batch
+  var batch_interval_d=30; // monthly
+  var batch_vol_L=vol_product_L_d*batch_interval_d; // L per treatment
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Required inhibitor efficiency',eff_required.toFixed(1),'%','To achieve '+CR_target+' mm/yr from '+CR_unin);
+  html+=rc('hl','Product dose rate',vol_product_L_d.toFixed(2),'L/d','= '+rate_ml_min.toFixed(1)+' mL/min');
+  html+=rc('','Active ingredient dose',conc,'ppm','In produced water phase');
+  html+=rc('','Product concentration',treat_ratio_ppm_product.toFixed(0),'ppm product','At '+active+'% active content');
+  html+=rc('','Daily chemical cost','$'+cost_d.toFixed(0),'/day','= $'+Math.round(cost_y/1000)+'k/year');
+  html+=rc('','Product per unit water',( vol_product_L_d/Qw*1000).toFixed(1),'mL/m3 water','Treat ratio for dosing verification');
+  html+=rc('','Batch treatment (monthly)',batch_vol_L.toFixed(0),'L per treatment','Alt. to continuous injection');
+  html+=rc('','Injection pump required',rate_ml_min.toFixed(1),'mL/min','Chemical metering pump');
+  html+='</div>';
+
+  html+='<div class="fbox" style="border-left-color:var(--teal);">'
+    +'<strong>Required efficiency:</strong> (1 - '+CR_target+'/'+CR_unin+') x 100 = <span class="hit">'+eff_required.toFixed(1)+'%</span><br>'
+    +'<strong>Active mass:</strong> '+Qw+' m3/d x 1000 L/m3 x '+conc+' mg/L / 1e6 = <span class="hit">'+mass_active_kg_d.toFixed(2)+' kg/d active</span><br>'
+    +'<strong>Product volume:</strong> '+mass_active_kg_d.toFixed(2)+' kg/d / '+(active/100)+' active / '+rho_inh+' kg/L = <span class="hit">'+vol_product_L_d.toFixed(2)+' L/d</span><br>'
+    +'<strong>Injection rate:</strong> '+vol_product_L_d.toFixed(2)+' L/d x 1000 / 1440 min/d = <span class="hit">'+rate_ml_min.toFixed(1)+' mL/min</span><br>'
+    +'<strong>Annual OPEX:</strong> '+vol_product_L_d.toFixed(2)+' x 365 x $'+cost_L+'/L = <span class="hit">$'+Math.round(cost_y/1000)+'k/yr</span>'
+    +'</div>';
+
+  var rows='';
+  if(eff_required>90){
+    rows+=ar('wn','Very high inhibitor efficiency required ('+eff_required.toFixed(0)+'%)','Film-forming inhibitors typically achieve 70-90% efficiency in continuous service. Achieving '+eff_required.toFixed(0)+'% is at the extreme end of the performance range and may not be reliably maintained.','For > 90% required efficiency: (1) Evaluate CRA material instead of inhibitor - may be more cost-effective long-term. (2) Use combination of inhibitor + pH stabilization (bicarbonate injection). (3) Specify redundant injection systems + continuous monitoring (ER probes) with automatic shutdown on inhibitor failure. (4) Increase inhibitor dose concentration as primary strategy.');
+  }
+  if(cost_y>500000){
+    rows+=ar('wn','High inhibitor OPEX ($'+Math.round(cost_y/1000)+'k/yr)','Annual inhibitor cost exceeds $500k. For long-duration fields, compare NPV of inhibitor OPEX vs capital cost of CRA materials.','NPV comparison: CRA premium for '+L_pipe+'km pipeline ≈ $'+(L_pipe*0.5).toFixed(0)+'M additional capital (rough estimate). Inhibitor OPEX NPV at 25yr / 10% discount ≈ $'+Math.round(cost_y*9.077/1000)+'k. Consider CRA if within 2-3x of inhibitor NPV.');
+  }
+  rows+=ar('teal','Inhibitor management programme','Dose: '+conc+' ppm active ('+treat_ratio_ppm_product.toFixed(0)+' ppm product) at '+rate_ml_min.toFixed(1)+' mL/min continuous injection. Cost: $'+Math.round(cost_y/1000)+'k/yr. Verify performance monthly by: (1) Iron count in produced water (target < 2 mg/L Fe). (2) ER probe trend. (3) Corrosion coupon weight loss at 90-day intervals.','Inhibitor performance can be disrupted by: slug flow (high velocity), pigging (strips film), scale inhibitor interactions (THPS, biocides), high water cut changes. Maintain emergency inhibitor stockpile of 30 days production on-site. Conduct annual product evaluation to ensure field performance matches lab data.');
+
+  html+='<div class="analysis"><div class="atitle teal">/// INHIBITOR PROGRAMME ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r5').innerHTML=html;
+}
+
+/* ====== INIT ====== */
+calcCO2();
+setTimeout(function(){calcH2S();calcLife();calcMatSel();calcInhibitor();},400);
+</script>
+</body>
+</html>
