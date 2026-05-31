@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reservoir Fluid PVT Calculator - Petrosmart Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --red:#CC0000;
+  --bg:#040408;--surf:#0A0A12;--card:#0E0E18;
+  --border:#181828;--text:#DDDDF0;--muted:#404060;
+  --ok:#00BB55;--warn:#FF8800;--err:#FF3333;--info:#2266EE;
+  --pvt:#8844CC;--pvt-dim:rgba(136,68,204,0.12);
+  --oil:#AA7700;--gas:#2266EE;
+  --mono:'Space Mono',monospace;--sans:'Rajdhani',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 50% 40% at 30% 30%,rgba(136,68,204,0.04),transparent),
+    radial-gradient(ellipse 40% 50% at 70% 70%,rgba(170,119,0,0.03),transparent);
+  pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:16px;}
+
+.hdr{background:linear-gradient(135deg,#080810,#100808,#080810);
+  border:1px solid rgba(136,68,204,0.25);border-radius:18px;
+  padding:18px 22px;margin-bottom:18px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 0 60px rgba(136,68,204,0.06);position:relative;overflow:hidden;}
+.hdr::before{content:'Φ';position:absolute;right:16px;top:50%;
+  transform:translateY(-50%);font-size:100px;opacity:0.04;pointer-events:none;color:#8844CC;}
+.hdr-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  background:linear-gradient(135deg,var(--pvt),#441188);
+  box-shadow:0 4px 20px rgba(136,68,204,0.35);}
+.hdr h1{font-size:19px;font-weight:700;color:#fff;}
+.hdr p{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+.hdr-tags{margin-left:auto;display:flex;gap:7px;flex-shrink:0;}
+.htag{padding:5px 11px;border-radius:8px;border:1px solid;font-size:10px;font-weight:700;font-family:var(--mono);}
+.ht-pvt{background:var(--pvt-dim);border-color:rgba(136,68,204,0.3);color:#CC88FF;}
+.ht-bo{background:rgba(170,119,0,0.10);border-color:rgba(170,119,0,0.3);color:#FFBB44;}
+.ht-bg{background:rgba(34,102,238,0.10);border-color:rgba(34,102,238,0.3);color:#5599FF;}
+
+.tabs{display:flex;gap:3px;background:var(--surf);border:1px solid var(--border);
+  border-radius:12px;padding:4px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{flex:1;min-width:70px;padding:9px 4px;background:transparent;border:none;
+  border-radius:9px;color:var(--muted);font-size:10px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);text-transform:uppercase;letter-spacing:0.07em;transition:all 0.2s;}
+.tab:hover{color:#bbb;}
+.tab.on{background:var(--pvt);color:#fff;box-shadow:0 0 16px rgba(136,68,204,0.4);}
+.panel{display:none;}.panel.on{display:block;}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+.card.pvt-accent{border-color:rgba(136,68,204,0.2);}
+.stitle{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  border-bottom:1px solid #10101C;padding-bottom:7px;margin-bottom:14px;font-family:var(--mono);}
+.stitle.pvt{color:var(--pvt);}
+.stitle.oil{color:var(--oil);}
+.stitle.gas{color:var(--gas);}
+.stitle.neu{color:var(--muted);}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+.field{margin-bottom:12px;}
+.lbl{font-size:10px;color:var(--muted);margin-bottom:5px;display:block;
+  text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.ir{display:flex;gap:6px;align-items:center;}
+input[type=number],select{width:100%;background:#07070F;border:1px solid #14142A;
+  border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;
+  font-family:var(--mono);transition:border-color 0.2s;}
+input:focus,select:focus{border-color:var(--pvt);}
+select option{background:#0A0A14;}
+.unit{font-size:10px;color:#222;min-width:52px;text-align:right;white-space:nowrap;font-family:var(--mono);}
+
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.rgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.rc{background:#07070E;border:1px solid var(--border);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden;}
+.rc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.rc.hl::after{background:var(--pvt);}
+.rc.ok::after{background:var(--ok);}
+.rc.wn::after{background:var(--warn);}
+.rc.er::after{background:var(--err);}
+.rc.oil::after{background:var(--oil);}
+.rc.gas::after{background:var(--gas);}
+.rc.hl{border-color:rgba(136,68,204,0.3);}
+.rc.ok{border-color:rgba(0,187,85,0.25);}
+.rc.wn{border-color:rgba(255,136,0,0.25);}
+.rc.er{border-color:rgba(255,51,51,0.25);}
+.rc.oil{border-color:rgba(170,119,0,0.3);}
+.rc.gas{border-color:rgba(34,102,238,0.25);}
+.rl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;font-family:var(--mono);}
+.rv{font-size:19px;font-weight:700;color:#fff;font-family:var(--mono);}
+.rv span{font-size:10px;color:#222;font-weight:400;}
+.rsub{font-size:10px;color:#222;margin-top:3px;font-family:var(--mono);}
+
+.fbox{background:#05050C;border-left:3px solid var(--pvt);border-radius:0 10px 10px 0;
+  padding:12px 16px;margin-top:14px;font-size:11px;color:#444;line-height:2.0;font-family:var(--mono);}
+.fbox strong{color:#999;}
+.fbox .hi{color:var(--pvt);font-weight:600;}
+.fbox .hio{color:var(--oil);font-weight:600;}
+.fbox .hig{color:var(--gas);font-weight:600;}
+.fbox .hiok{color:var(--ok);font-weight:600;}
+
+.analysis{background:#06060E;border:1px solid #0E0E1E;border-radius:12px;padding:16px;margin-top:14px;}
+.atitle{font-size:10px;font-weight:700;color:var(--pvt);margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:0.09em;font-family:var(--mono);}
+.arow{display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #0C0C1A;}
+.arow:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.d-ok{background:var(--ok);box-shadow:0 0 8px var(--ok);}
+.d-wn{background:var(--warn);box-shadow:0 0 8px var(--warn);}
+.d-er{background:var(--err);box-shadow:0 0 8px var(--err);}
+.d-pvt{background:var(--pvt);box-shadow:0 0 8px var(--pvt);}
+.d-oil{background:var(--oil);box-shadow:0 0 8px var(--oil);}
+.atxt strong{color:#eee;font-size:12px;display:block;margin-bottom:3px;}
+.atxt p{font-size:11px;color:#444;line-height:1.7;margin:0;}
+.asugg{font-size:11px;color:#FFAA00;margin-top:4px;line-height:1.6;}
+
+.chart-wrap{background:#05050C;border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px;}
+.chart-title{font-size:11px;color:var(--pvt);font-weight:600;text-transform:uppercase;
+  letter-spacing:0.05em;margin-bottom:10px;font-family:var(--mono);}
+
+.pvt-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:14px;}
+.pvt-table th{text-align:right;padding:7px 10px;color:var(--pvt);font-weight:600;
+  border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;
+  letter-spacing:0.07em;font-family:var(--mono);background:#07070E;}
+.pvt-table th:first-child{text-align:left;}
+.pvt-table td{padding:6px 10px;color:#aaa;border-bottom:1px solid #0C0C18;
+  font-family:var(--mono);text-align:right;}
+.pvt-table td:first-child{text-align:left;color:#ccc;font-weight:600;}
+.pvt-table tr:hover td{background:#0A0A14;}
+.pvt-table tr.pb-row td{color:#FFAA00;font-weight:700;}
+
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.tbl th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;
+  letter-spacing:0.07em;font-family:var(--mono);}
+.tbl td{padding:7px 10px;color:#888;border-bottom:1px solid #0C0C18;font-family:var(--mono);}
+.tbl tr:hover td{background:#0A0A14;}
+.tw{color:#fff!important;font-weight:600;}
+.ibox{background:var(--surf);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);line-height:1.7;font-family:var(--mono);}
+.ibox strong{color:#bbb;}
+.sep{height:1px;background:var(--border);margin:14px 0;}
+
+.fluid-btns{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.fbtn{padding:6px 13px;background:var(--card);border:1px solid var(--border);
+  border-radius:9px;color:var(--muted);font-size:11px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);transition:all 0.2s;}
+.fbtn:hover{color:#ccc;}
+.fbtn.on{background:var(--pvt-dim);border-color:var(--pvt);color:#CC88FF;}
+
+.foot{background:var(--surf);border-top:1px solid var(--border);margin-top:18px;
+  padding:10px 20px;font-size:10px;color:#111;text-align:center;font-family:var(--mono);border-radius:12px;}
+.foot a{color:var(--pvt);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+  <div class="hdr-icon">🔬</div>
+  <div>
+    <h1>Reservoir Fluid PVT Calculator</h1>
+    <p>Bo / Rs / Bg / co / μo - Standing / Vasquez-Beggs / Al-Marhoun / Lee-Kesler</p>
+  </div>
+  <div class="hdr-tags">
+    <div class="htag ht-pvt">PVT</div>
+    <div class="htag ht-bo">Bo / Rs</div>
+    <div class="htag ht-bg">Bg / Z</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" id="t1" onclick="sw(1)">🛢️ Oil PVT (Bo, Rs)</button>
+  <button class="tab" id="t2" onclick="sw(2)">⛽ Gas PVT (Bg, Z)</button>
+  <button class="tab" id="t3" onclick="sw(3)">📊 PVT Table</button>
+  <button class="tab" id="t4" onclick="sw(4)">💧 Fluid Properties</button>
+  <button class="tab" id="t5" onclick="sw(5)">📈 Phase Diagram</button>
+  <button class="tab" id="t6" onclick="sw(6)">📚 Reference</button>
+</div>
+
+<!-- PANEL 1: OIL PVT -->
+<div class="panel on" id="p1">
+  <div class="card pvt-accent">
+    <div class="stitle pvt">/// oil fluid type and correlations</div>
+    <div class="fluid-btns">
+      <button class="fbtn on" id="fl-standing" onclick="setCorr('standing')">Standing (1947)</button>
+      <button class="fbtn" id="fl-vasquez" onclick="setCorr('vasquez')">Vasquez-Beggs (1980)</button>
+      <button class="fbtn" id="fl-almarhoun" onclick="setCorr('almarhoun')">Al-Marhoun (1988)</button>
+      <button class="fbtn" id="fl-glaso" onclick="setCorr('glaso')">Glaso (1980)</button>
+    </div>
+
+    <div class="stitle oil">/// reservoir and fluid parameters</div>
+    <div class="row4">
+      <div class="field">
+        <label class="lbl">Reservoir pressure Pr</label>
+        <div class="ir"><input type="number" id="o_Pr" value="300" step="5" oninput="calcOil()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Reservoir temperature Tr</label>
+        <div class="ir"><input type="number" id="o_Tr" value="120" step="1" oninput="calcOil()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Bubble point Pb</label>
+        <div class="ir"><input type="number" id="o_Pb" value="200" step="5" oninput="calcOil()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Oil API gravity</label>
+        <div class="ir"><input type="number" id="o_API" value="35" step="0.5" oninput="calcOil()"><span class="unit">°API</span></div>
+      </div>
+    </div>
+    <div class="row4">
+      <div class="field">
+        <label class="lbl">Gas specific gravity γg</label>
+        <div class="ir"><input type="number" id="o_gamma" value="0.70" step="0.01" oninput="calcOil()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Solution GOR at Pb (Rs_b)</label>
+        <div class="ir"><input type="number" id="o_Rs" value="150" step="5" oninput="calcOil()"><span class="unit">scf/STB</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Evaluation pressure P</label>
+        <div class="ir"><input type="number" id="o_P" value="150" step="5" oninput="calcOil()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Water salinity</label>
+        <div class="ir"><input type="number" id="o_sal" value="50000" step="1000" oninput="calcOil()"><span class="unit">ppm</span></div>
+      </div>
+    </div>
+
+    <div id="r1"></div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Bo and Rs vs pressure (bubble point highlighted)</div>
+      <canvas id="boChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 2: GAS PVT -->
+<div class="panel" id="p2">
+  <div class="card pvt-accent">
+    <div class="stitle gas">/// gas PVT properties</div>
+    <div class="ibox">
+      <strong>Gas compressibility factor Z:</strong> Hall-Yarborough, Papay, or Pitzer correlations. Z corrects ideal gas law for real gas behavior. Bg = (P_sc × Z × T) / (T_sc × P) [dimensionless or res bbl/scf]. Gas viscosity from Lee-Kesler (1966) correlation.
+    </div>
+    <div class="row4">
+      <div class="field">
+        <label class="lbl">Gas specific gravity γg</label>
+        <div class="ir"><input type="number" id="g_gamma" value="0.65" step="0.01" oninput="calcGas()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">CO2 content</label>
+        <div class="ir"><input type="number" id="g_CO2" value="2" step="0.1" oninput="calcGas()"><span class="unit">mol%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">H2S content</label>
+        <div class="ir"><input type="number" id="g_H2S" value="0.5" step="0.1" oninput="calcGas()"><span class="unit">mol%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">N2 content</label>
+        <div class="ir"><input type="number" id="g_N2" value="1" step="0.1" oninput="calcGas()"><span class="unit">mol%</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Evaluation pressure P</label>
+        <div class="ir"><input type="number" id="g_P" value="200" step="5" oninput="calcGas()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Evaluation temperature T</label>
+        <div class="ir"><input type="number" id="g_T" value="120" step="1" oninput="calcGas()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Z-factor method</label>
+        <select id="g_method" onchange="calcGas()">
+          <option value="hy">Hall-Yarborough</option>
+          <option value="papay">Papay (explicit)</option>
+          <option value="bk">Beggs-Brill approx</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="r2"></div>
+
+    <div class="chart-wrap">
+      <div class="chart-title gas">Z-factor and Bg vs pressure (at reservoir temperature)</div>
+      <canvas id="bgChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 3: PVT TABLE -->
+<div class="panel" id="p3">
+  <div class="card pvt-accent">
+    <div class="stitle pvt">/// full PVT table - Bo, Rs, Bg, μo, co vs pressure</div>
+    <div class="ibox">
+      <strong>PVT table:</strong> Complete pressure-volume-temperature properties from initial reservoir pressure down to abandonment. Above Pb: undersaturated oil (single-phase, Bo and co only). Below Pb: two-phase (oil + gas, decreasing Bo and Rs).
+    </div>
+    <div class="row4">
+      <div class="field">
+        <label class="lbl">Initial pressure Pi</label>
+        <div class="ir"><input type="number" id="t_Pi" value="300" step="5" oninput="calcTable()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Bubble point Pb</label>
+        <div class="ir"><input type="number" id="t_Pb" value="200" step="5" oninput="calcTable()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Reservoir temperature Tr</label>
+        <div class="ir"><input type="number" id="t_Tr" value="120" step="1" oninput="calcTable()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Oil API gravity</label>
+        <div class="ir"><input type="number" id="t_API" value="35" step="0.5" oninput="calcTable()"><span class="unit">°API</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Gas gravity γg</label>
+        <div class="ir"><input type="number" id="t_gamma" value="0.70" step="0.01" oninput="calcTable()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Rs at Pb (solution GOR)</label>
+        <div class="ir"><input type="number" id="t_Rs_pb" value="150" step="5" oninput="calcTable()"><span class="unit">scf/STB</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Abandonment pressure</label>
+        <div class="ir"><input type="number" id="t_Pab" value="50" step="5" oninput="calcTable()"><span class="unit">bar</span></div>
+      </div>
+    </div>
+    <div id="pvt-table-wrap"></div>
+
+    <div class="chart-wrap" style="margin-top:14px;">
+      <div class="chart-title">Bo and Rs vs pressure - full PVT table</div>
+      <canvas id="pvtChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 4: FLUID PROPERTIES -->
+<div class="panel" id="p4">
+  <div class="card pvt-accent">
+    <div class="stitle pvt">/// oil viscosity, compressibility and water PVT</div>
+    <div class="row4">
+      <div class="field">
+        <label class="lbl">Pressure P</label>
+        <div class="ir"><input type="number" id="fp_P" value="200" step="5" oninput="calcFluid()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Temperature T</label>
+        <div class="ir"><input type="number" id="fp_T" value="120" step="1" oninput="calcFluid()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Oil API gravity</label>
+        <div class="ir"><input type="number" id="fp_API" value="35" step="0.5" oninput="calcFluid()"><span class="unit">°API</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Solution Rs</label>
+        <div class="ir"><input type="number" id="fp_Rs" value="150" step="5" oninput="calcFluid()"><span class="unit">scf/STB</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Bubble point Pb</label>
+        <div class="ir"><input type="number" id="fp_Pb" value="200" step="5" oninput="calcFluid()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas gravity γg</label>
+        <div class="ir"><input type="number" id="fp_gamma" value="0.70" step="0.01" oninput="calcFluid()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Water salinity</label>
+        <div class="ir"><input type="number" id="fp_sal" value="50000" step="1000" oninput="calcFluid()"><span class="unit">ppm TDS</span></div>
+      </div>
+    </div>
+    <div id="r4"></div>
+  </div>
+</div>
+
+<!-- PANEL 5: PHASE DIAGRAM -->
+<div class="panel" id="p5">
+  <div class="card pvt-accent">
+    <div class="stitle pvt">/// P-T phase envelope (conceptual) and fluid classification</div>
+    <div class="ibox">
+      <strong>Fluid classification:</strong> Based on initial reservoir conditions relative to phase envelope. Oil: Pr > Pb (undersaturated) or Pr ≈ Pb (saturated). Gas condensate: Pr between Pd (dew point) and Tc. Dry/wet gas: above critical point.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Initial pressure Pr</label>
+        <div class="ir"><input type="number" id="ph_Pr" value="300" step="5" oninput="calcPhase()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Initial temperature Tr</label>
+        <div class="ir"><input type="number" id="ph_Tr" value="120" step="1" oninput="calcPhase()"><span class="unit">°C</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">GOR (producing)</label>
+        <div class="ir"><input type="number" id="ph_GOR" value="500" step="50" oninput="calcPhase()"><span class="unit">scf/STB</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">API gravity</label>
+        <div class="ir"><input type="number" id="ph_API" value="35" step="0.5" oninput="calcPhase()"><span class="unit">°API</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Bubble point Pb (if oil)</label>
+        <div class="ir"><input type="number" id="ph_Pb" value="200" step="5" oninput="calcPhase()"><span class="unit">bar</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Gas gravity γg</label>
+        <div class="ir"><input type="number" id="ph_gamma" value="0.70" step="0.01" oninput="calcPhase()"><span class="unit">-</span></div>
+      </div>
+    </div>
+    <div id="r5"></div>
+    <div class="chart-wrap">
+      <div class="chart-title">P-T phase diagram (schematic)</div>
+      <canvas id="phaseChart" height="240"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 6: REFERENCE -->
+<div class="panel" id="p6">
+  <div class="card">
+    <div class="stitle pvt">/// key PVT correlations - formulas</div>
+    <div class="fbox">
+      <strong>Standing (1947) - Bo [RB/STB]:</strong><br>
+      Bo = 0.9759 + 0.000120 × [Rs × (γg/γo)^0.5 + 1.25×T_F]^1.2<br>
+      where γo = 141.5/(API+131.5), T_F = temperature in °F<br><br>
+      <strong>Standing (1947) - Rs [scf/STB]:</strong><br>
+      Rs = γg × (P/18.2 + 1.4)^1.205 × 10^(0.0125×API - 0.00091×T_F)<br><br>
+      <strong>Vasquez-Beggs (1980) - Rs:</strong><br>
+      Rs = C1 × γgs × P^C2 × 10^(C3×API/T_R)<br>
+      C1,C2,C3 depend on API (above/below 30°API)<br><br>
+      <strong>Al-Marhoun (1988) - Bo:</strong><br>
+      Bo = -1.001621 + (0.000005 × a) where a = Rs^0.742390 × γg^0.323294 × γo^(-1.202040) × T_R^0.0<br><br>
+      <strong>Undersaturated oil compressibility co [psi-1]:</strong><br>
+      co = (Rs + 17.2×T_F - 1180×γg + 12.61×API - 1433) / (10^5 × P)<br>
+      or Vasquez-Beggs: co = 1433 + 5Rs + 17.2×T_F - 1180×γg + 12.61×API) / (10^5 × P)<br><br>
+      <strong>Dead oil viscosity (Beal, 1946):</strong><br>
+      μod = (0.32 + 1.8×10^7/API^4.53) × (360/(T_F+200))^a, a = 10^(0.43+8.33/API)<br><br>
+      <strong>Live oil viscosity (Chew-Connally, 1959):</strong><br>
+      μo = A × μod^B, A and B functions of Rs<br><br>
+      <strong>Gas Z-factor (Hall-Yarborough):</strong><br>
+      Ppr = P/Ppc, Tpr = T/Tpc | Solve: -APpr + [y+y²+y³-y⁴]/(1-y)³ - (14.76/Tpr - 9.76/Tpr² + 4.58/Tpr³)y + (90.7/Tpr - 242.2/Tpr² + 42.4/Tpr³)y^(2.18+2.82/Tpr) = 0<br>
+      Z = APpr / y<br><br>
+      <strong>Gas formation volume factor Bg [res bbl/scf]:</strong><br>
+      Bg = 0.00504 × Z × T_R / P [T in °R = (T_F+460), P in psia]<br><br>
+      <strong>Gas viscosity (Lee-Kesler, 1966):</strong><br>
+      μg = 10^-4 × K × exp(X × (ρg/62.4)^Y) where K = (9.4 + 0.02×MW)×T_R^1.5 / (209+19×MW+T_R)<br>
+      X = 3.5 + 986/T_R + 0.01×MW | Y = 2.4 - 0.2×X
+    </div>
+    <div class="sep"></div>
+    <div class="stitle pvt">/// reservoir fluid classification</div>
+    <table class="tbl">
+      <thead><tr><th>Fluid type</th><th>GOR (scf/STB)</th><th>API (°API)</th><th>Bo at Pb</th><th>Characteristics</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Black oil</td><td>&lt; 200</td><td>15-35</td><td>1.05-1.3</td><td>High shrinkage, heavy crude</td></tr>
+        <tr><td class="tw">Low-shrinkage oil</td><td>200-500</td><td>30-40</td><td>1.1-1.5</td><td>Moderate Bo</td></tr>
+        <tr><td class="tw">Volatile oil</td><td>500-3300</td><td>40-50</td><td>1.5-2.0</td><td>High shrinkage, near-critical</td></tr>
+        <tr><td class="tw">Gas condensate (rich)</td><td>3300-100k</td><td>&gt; 50</td><td>-</td><td>Retrograde condensation</td></tr>
+        <tr><td class="tw">Wet gas</td><td>100k-300k</td><td>&gt; 60</td><td>-</td><td>Liquids at surface only</td></tr>
+        <tr><td class="tw">Dry gas</td><td>&gt; 300k</td><td>-</td><td>-</td><td>No liquids at surface</td></tr>
+      </tbody>
+    </table>
+    <div class="sep"></div>
+    <div class="stitle pvt">/// PVT correlations accuracy guide</div>
+    <table class="tbl">
+      <thead><tr><th>Correlation</th><th>Region developed</th><th>API range</th><th>Accuracy Bo</th><th>Best use</th></tr></thead>
+      <tbody>
+        <tr><td class="tw">Standing (1947)</td><td>California (US)</td><td>16-63°API</td><td>±4%</td><td>General, light-medium crude</td></tr>
+        <tr><td class="tw">Vasquez-Beggs (1980)</td><td>Worldwide</td><td>15-59°API</td><td>±3%</td><td>Most widely used globally</td></tr>
+        <tr><td class="tw">Al-Marhoun (1988)</td><td>Middle East</td><td>19-44°API</td><td>±3%</td><td>Middle East crude oils</td></tr>
+        <tr><td class="tw">Glaso (1980)</td><td>North Sea</td><td>22-48°API</td><td>±4%</td><td>North Sea crude oils</td></tr>
+        <tr><td class="tw">Petrosky-Farshad (1993)</td><td>Gulf of Mexico</td><td>25-46°API</td><td>±3%</td><td>GOM offshore</td></tr>
+        <tr><td class="tw">De Ghetto (1994)</td><td>Mediterranean</td><td>6-56°API</td><td>±4%</td><td>Heavy oils, extra-heavy</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">
+  <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
+  · Standing 1947 / Vasquez-Beggs 1980 / Al-Marhoun 1988 / Hall-Yarborough / Lee-Kesler · Educational tool only
+</div>
+</div>
+
+<script>
+var boChart=null,bgChart=null,pvtChart=null,phaseChart=null;
+var corrMethod='standing';
+
+function sw(n){
+  for(var i=1;i<=6;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    document.getElementById('t'+i).className='tab'+(i===n?' on':'');
+  }
+  if(n===2)setTimeout(calcGas,80);
+  if(n===3)setTimeout(calcTable,80);
+  if(n===4)setTimeout(calcFluid,80);
+  if(n===5)setTimeout(calcPhase,80);
+}
+function rc(cls,lbl,val,unit,sub){
+  return '<div class="rc '+(cls||'')+'">'
+    +'<div class="rl">'+lbl+'</div>'
+    +'<div class="rv">'+val+(unit?' <span>'+unit+'</span>':'')+'</div>'
+    +(sub?'<div class="rsub">'+sub+'</div>':'')+'</div>';
+}
+function ar(type,title,body,sugg){
+  var d={ok:'d-ok',wn:'d-wn',er:'d-er',pvt:'d-pvt',oil:'d-oil'}[type]||'d-pvt';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+}
+
+function setCorr(c){
+  corrMethod=c;
+  ['standing','vasquez','almarhoun','glaso'].forEach(function(x){
+    document.getElementById('fl-'+x).classList.toggle('on',x===c);
+  });
+  calcOil();
+}
+
+/* ====== PVT CORRELATIONS ====== */
+
+/* Convert units */
+function barToPsi(b){return b*14.5038;}
+function cToF(c){return c*9/5+32;}
+function cToR(c){return (c+273.15)*1.8;}
+
+/* Standing Rs [scf/STB] */
+function Rs_standing(P_bar,T_C,API,gamma_g){
+  var P=barToPsi(P_bar);
+  var T=cToF(T_C);
+  var x=0.0125*API-0.00091*T;
+  return gamma_g*Math.pow(P/18.2+1.4,1.205)*Math.pow(10,x);
+}
+
+/* Standing Bo [RB/STB] */
+function Bo_standing(Rs,T_C,API,gamma_g){
+  var T=cToF(T_C);
+  var gamma_o=141.5/(API+131.5);
+  var F=Rs*Math.pow(gamma_g/gamma_o,0.5)+1.25*T;
+  return 0.9759+0.000120*Math.pow(F,1.2);
+}
+
+/* Vasquez-Beggs Rs */
+function Rs_vasquez(P_bar,T_C,API,gamma_g){
+  var P=barToPsi(P_bar);
+  var T=cToR(T_C);
+  var C1,C2,C3;
+  if(API<=30){C1=0.0362;C2=1.0937;C3=25.7240;}
+  else{C1=0.0178;C2=1.1870;C3=23.9310;}
+  var gamma_gs=gamma_g*(1+5.912e-5*API*(cToF(T_C)-60)*Math.log10(P/114.7));
+  return C1*gamma_gs*Math.pow(P,C2)*Math.pow(10,C3*API/(T));
+}
+
+/* Vasquez-Beggs Bo */
+function Bo_vasquez(Rs,T_C,API,gamma_g){
+  var T=cToF(T_C);
+  var C1,C2,C3;
+  if(API<=30){C1=4.677e-4;C2=1.751e-5;C3=-1.811e-8;}
+  else{C1=4.670e-4;C2=1.100e-5;C3=1.337e-9;}
+  return 1+C1*Rs+C2*(T-60)*(API/gamma_g)+C3*Rs*(T-60)*(API/gamma_g);
+}
+
+/* Al-Marhoun Rs (inverted from Bo, use Standing Rs for now) */
+function Rs_almarhoun(P_bar,T_C,API,gamma_g){
+  var P=barToPsi(P_bar);
+  var T=cToF(T_C)+460; // Rankine
+  var gamma_o=141.5/(API+131.5);
+  return Math.pow(P/(5.38088e-3*Math.pow(gamma_g,0.715082)*Math.pow(gamma_o,-1.87784)*Math.pow(T,3.1437)),1/1.326976);
+}
+
+/* Al-Marhoun Bo */
+function Bo_almarhoun(Rs,T_C,API,gamma_g){
+  var T=cToF(T_C)+460;
+  var gamma_o=141.5/(API+131.5);
+  var a=Rs*Math.pow(gamma_g,0.742390)*Math.pow(gamma_o,-1.202040)*Math.pow(T,0.323294);
+  return 0.497069+0.862963e-3*T+0.182594e-2*a+0.318099e-5*a*a;
+}
+
+/* Glaso Rs */
+function Rs_glaso(P_bar,T_C,API,gamma_g){
+  var P=barToPsi(P_bar);
+  var T=cToF(T_C);
+  var Pb_star=Math.pow(10,1.7669+1.7447*Math.log10(P/gamma_g)-0.30218*Math.pow(Math.log10(P/gamma_g),2));
+  return gamma_g*Math.pow(Pb_star/Math.pow(10,0.00164*T-1.769/API),1.2255);
+}
+
+/* Glaso Bo */
+function Bo_glaso(Rs,T_C,API,gamma_g){
+  var T=cToF(T_C);
+  var gamma_o=141.5/(API+131.5);
+  var F=Rs*Math.pow(gamma_g/gamma_o,0.526)+0.968*T;
+  var lnBo=-6.58511+2.91329*Math.log(F)-0.27683*Math.pow(Math.log(F),2);
+  return Math.exp(lnBo);
+}
+
+/* Generic Rs and Bo by method */
+function calcRs(P,T,API,gamma_g){
+  if(corrMethod==='vasquez') return Rs_vasquez(P,T,API,gamma_g);
+  if(corrMethod==='almarhoun') return Rs_almarhoun(P,T,API,gamma_g);
+  if(corrMethod==='glaso') return Rs_glaso(P,T,API,gamma_g);
+  return Rs_standing(P,T,API,gamma_g);
+}
+function calcBo(Rs,T,API,gamma_g){
+  if(corrMethod==='vasquez') return Bo_vasquez(Rs,T,API,gamma_g);
+  if(corrMethod==='almarhoun') return Bo_almarhoun(Rs,T,API,gamma_g);
+  if(corrMethod==='glaso') return Bo_glaso(Rs,T,API,gamma_g);
+  return Bo_standing(Rs,T,API,gamma_g);
+}
+
+/* Undersaturated oil compressibility co [psi-1] */
+function co_vasquez(Rs_b,T_C,API,gamma_g,P_bar){
+  var P=barToPsi(P_bar);
+  var T=cToF(T_C);
+  return (1433+5*Rs_b+17.2*T-1180*gamma_g+12.61*API)/(1e5*P);
+}
+
+/* Dead oil viscosity (Beal) */
+function mu_od(API,T_C){
+  var T=cToF(T_C);
+  var a=Math.pow(10,0.43+8.33/API);
+  return (0.32+1.8e7/Math.pow(API,4.53))*Math.pow(360/(T+200),a);
+}
+
+/* Live oil viscosity (Chew-Connally) */
+function mu_o_live(mu_od_val,Rs){
+  var A=Math.pow(10,Rs*(2.2e-7*Rs-7.4e-4));
+  var b=0.68/Math.pow(10,8.62e-5*Rs)+0.25/Math.pow(10,5.79e-4*Rs)+0.062/Math.pow(10,1.1e-5*Rs*Rs);
+  return A*Math.pow(mu_od_val,b);
+}
+
+/* Z-factor correlations */
+function calcZ(P_bar,T_C,gamma_g,CO2_pct,H2S_pct,N2_pct,method){
+  var P=barToPsi(P_bar);
+  var T=cToR(T_C);
+  // Pseudo-critical properties (Kay's rule with impurity corrections)
+  var Ppc=677+15*gamma_g-37.5*gamma_g*gamma_g;
+  var Tpc=168+325*gamma_g-12.5*gamma_g*gamma_g;
+  // Wichert-Aziz correction for CO2 and H2S
+  var A=(CO2_pct+H2S_pct)/100;
+  var B=H2S_pct/100;
+  if(A>0){
+    var eps=120*(Math.pow(A,0.9)-Math.pow(A,1.6))+15*(Math.pow(B,0.5)-Math.pow(B,4));
+    Tpc=Tpc-eps;
+    Ppc=Ppc*Tpc/(Tpc+B*(1-B)*eps);
+  }
+  var Ppr=P/Ppc;
+  var Tpr=T/Tpc;
+
+  if(method==='papay'){
+    return 1-3.52*Ppr/(10.73*Tpr)+0.274*Ppr*Ppr/(10.73*Tpr*Tpr);
+  }
+  if(method==='bk'){
+    // Beggs-Brill
+    var A_=1.39*(Tpr-0.92)^0.5-0.36*Tpr-0.101;
+    var E=9*(Tpr-1);
+    var B2=0.62-0.23*Tpr;
+    var C=0.132-0.32*Math.log10(Tpr);
+    var F=0.3106-0.49*Tpr+0.1824*Tpr*Tpr;
+    var Z=A_+(1-A_)/Math.exp(E)+C*Math.pow(Ppr,F)+Math.pow(Ppr,B2)*Math.pow(10,-9*(Tpr-1));
+    return Math.max(0.2,Math.min(1.2,Z||0.88));
+  }
+  // Hall-Yarborough (default)
+  var t=1/Tpr;
+  var A_HY=-0.06125*t*Math.exp(-1.2*(1-t)*(1-t));
+  var y=0.001;
+  for(var i=0;i<50;i++){
+    var F_y=A_HY*Ppr+(y+y*y+y*y*y-y*y*y*y)/Math.pow(1-y,3)
+      -(14.76*t-9.76*t*t+4.58*t*t*t)*y*y
+      +(90.7*t-242.2*t*t+42.4*t*t*t)*Math.pow(y,2.18+2.82*t);
+    var dF=( (1+4*y+4*y*y-4*y*y*y+y*y*y*y)/Math.pow(1-y,4)
+      -2*(14.76*t-9.76*t*t+4.58*t*t*t)*y
+      +(2.18+2.82*t)*(90.7*t-242.2*t*t+42.4*t*t*t)*Math.pow(y,1.18+2.82*t));
+    var dy=-F_y/dF;
+    y+=dy;
+    if(Math.abs(dy)<1e-8) break;
+    y=Math.max(0.001,Math.min(0.99,y));
+  }
+  return -A_HY*Ppr/y;
+}
+
+/* Gas viscosity (Lee-Kesler) */
+function mu_g(P_bar,T_C,gamma_g){
+  var T_R=cToR(T_C);
+  var MW=gamma_g*28.97;
+  var rho_g=barToPsi(P_bar)/(10.7316*T_R)*MW/1; // lbm/ft3 approx
+  var K=(9.4+0.02*MW)*Math.pow(T_R,1.5)/(209+19*MW+T_R);
+  var X=3.5+986/T_R+0.01*MW;
+  var Y=2.4-0.2*X;
+  return 1e-4*K*Math.exp(X*Math.pow(rho_g/62.4,Y));
+}
+
+/* ====== PANEL 1: OIL PVT ====== */
+function calcOil(){
+  var Pr=parseFloat(document.getElementById('o_Pr').value)||300;
+  var Tr=parseFloat(document.getElementById('o_Tr').value)||120;
+  var Pb=parseFloat(document.getElementById('o_Pb').value)||200;
+  var API=parseFloat(document.getElementById('o_API').value)||35;
+  var gamma=parseFloat(document.getElementById('o_gamma').value)||0.70;
+  var Rs_b=parseFloat(document.getElementById('o_Rs').value)||150;
+  var P=parseFloat(document.getElementById('o_P').value)||150;
+  var sal=parseFloat(document.getElementById('o_sal').value)||50000;
+
+  var corr=corrMethod.charAt(0).toUpperCase()+corrMethod.slice(1);
+  var gamma_o=141.5/(API+131.5);
+  var rho_o=gamma_o*1000;
+
+  // At bubble point
+  var Bo_pb=calcBo(Rs_b,Tr,API,gamma);
+  // Below Pb: Rs and Bo at pressure P
+  var P_eval=Math.min(P,Pb);
+  var Rs_P=P<=Pb?calcRs(P,Tr,API,gamma):Rs_b;
+  var Bo_P;
+  if(P>=Pb){
+    // Undersaturated: Bo shrinks from Bo_pb with co
+    var co=co_vasquez(Rs_b,Tr,API,gamma,Pb);
+    Bo_P=Bo_pb*Math.exp(-co*(barToPsi(P)-barToPsi(Pb)));
+  } else {
+    Bo_P=calcBo(Rs_P,Tr,API,gamma);
+  }
+
+  // Oil compressibility (above Pb)
+  var co_val=co_vasquez(Rs_b,Tr,API,gamma,P>=Pb?P:Pb);
+
+  // Oil viscosity
+  var mu_od_val=mu_od(API,Tr);
+  var mu_o_val=mu_o_live(mu_od_val,Rs_P);
+
+  // FVF shrinkage
+  var shrinkage=(1-1/Bo_pb)*100;
+
+  // Oil density at reservoir conditions
+  var rho_res=rho_o/(Bo_P*(1+Rs_P/5.615));
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Bo at eval. pressure P='+P+' bar',Bo_P.toFixed(4),'RB/STB','Correlation: '+corr);
+  html+=rc('hl','Rs at P='+P+' bar',Rs_P.toFixed(1),'scf/STB',P>=Pb?'Above Pb (Rs_b fixed)':'Below Pb');
+  html+=rc('oil','Bo at bubble point Pb',Bo_pb.toFixed(4),'RB/STB','At Pb = '+Pb+' bar');
+  html+=rc('oil','Rs at bubble point',Rs_b,'scf/STB','User input or Pb correlation');
+  html+=rc('','Oil viscosity μo',mu_o_val.toFixed(3),'cP','Chew-Connally live oil');
+  html+=rc('','Dead oil viscosity μod',mu_od_val.toFixed(2),'cP','Beal correlation at '+Tr+'°C');
+  html+=rc('','Oil compressibility co',co_val.toExponential(3),'psi-1','Vasquez-Beggs');
+  html+=rc('','Shrinkage (ΔBo at Pb)',shrinkage.toFixed(1),'%','1 - 1/Bo_pb');
+  html+=rc('','Oil stock-tank density',rho_o.toFixed(1),'kg/m3 (STC)','At '+API+'°API');
+  html+=rc('','Fluid type',API<20?'Heavy oil':API<35?'Medium crude':API<45?'Light crude':'Very light/condensate','-',API+'°API');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>γo</strong> = 141.5/('+API+'+131.5) = <span class="hio">'+gamma_o.toFixed(4)+'</span><br>'
+    +'<strong>Rs ('+corr+')</strong> at P='+P+' bar: <span class="hio">'+Rs_P.toFixed(1)+' scf/STB</span><br>'
+    +'<strong>Bo ('+corr+')</strong> at Pb: F = Rs×(γg/γo)^0.5 + 1.25×T_F → <span class="hio">'+Bo_pb.toFixed(4)+' RB/STB</span><br>'
+    +(P>Pb?'<strong>Bo (undersaturated):</strong> Bo_pb × exp(-co × (P-Pb)) = '+Bo_pb.toFixed(4)+' × exp(-'+co_val.toExponential(2)+'×'+(barToPsi(P)-barToPsi(Pb)).toFixed(0)+') = <span class="hi">'+Bo_P.toFixed(4)+'</span><br>':'')
+    +'<strong>μo (live):</strong> Chew-Connally = <span class="hio">'+mu_o_val.toFixed(3)+' cP</span>'
+    +'</div>';
+
+  var rows='';
+  var fluidType=API<20?'Heavy oil':API<30?'Medium crude':API<45?'Light crude':'Volatile/condensate';
+  rows+=ar('pvt','Fluid classification: '+fluidType,'API = '+API+'°. '+
+    (API<20?'Heavy oil: low Bo (<1.1), high viscosity (>100 cP). EOR (thermal: SAGD, CSS) typically required. Low solution GOR.':
+     API<30?'Medium crude: moderate Bo (1.1-1.3). Conventional primary and secondary recovery applicable.':
+     API<45?'Light crude: good Bo (1.2-1.5), low viscosity (<5 cP). Excellent primary recovery potential. Full range of EOR applicable.':
+     'Volatile/very light crude: high Bo (>1.5), near-critical fluid. High shrinkage below Pb. Retrograde condensation risk near wellbore.'),'');
+  if(mu_o_val>10){
+    rows+=ar('wn','High oil viscosity ('+mu_o_val.toFixed(1)+' cP at reservoir conditions)','At reservoir T = '+Tr+'°C, oil viscosity '+mu_o_val.toFixed(1)+' cP. High-viscosity oil may require: artificial lift optimization, viscosity-reducing additives, or thermal stimulation. Surface facilities must be designed for '+Math.min(mu_o_val*3,1000).toFixed(0)+' cP+ at wellhead temperature.','Viscosity at surface (20°C, dead oil): approximately '+mu_od(API,20).toFixed(0)+' cP. Heat tracing or insulation of flowlines required if μ_surface > 200 cP. Consider pipeline viscosity break.');
+  }
+  if(shrinkage>30){
+    rows+=ar('oil','High shrinkage ('+(shrinkage).toFixed(1)+'%) - volatile oil behavior','Bo of '+Bo_pb.toFixed(3)+' at Pb indicates significant gas in solution. High shrinkage means large difference between reservoir barrels and stock-tank barrels. GOR will be high.','Monitor GOR production carefully: increasing GOR below Pb indicates gas cap formation or coning. Consider gas injection to maintain pressure above Pb and preserve Bo.');
+  }
+
+  html+='<div class="analysis"><div class="atitle">/// OIL PVT ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r1').innerHTML=html;
+
+  // Bo and Rs chart
+  var P_range=Array.from({length:50},function(_,i){return 10+i*(Pr-10)/49;});
+  var ctx=document.getElementById('boChart').getContext('2d');
+  if(boChart){boChart.destroy();}
+  boChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'Bo (RB/STB)',data:P_range.map(function(p){
+          var Rs_p=p<=Pb?calcRs(p,Tr,API,gamma):Rs_b;
+          var Bo_p=p>=Pb?Bo_pb*Math.exp(-co_val*(barToPsi(p)-barToPsi(Pb))):calcBo(Rs_p,Tr,API,gamma);
+          return {x:p,y:Bo_p.toFixed(4)};
+        }),borderColor:'#AA7700',backgroundColor:'rgba(170,119,0,0.07)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.4,yAxisID:'y'},
+        {label:'Rs (scf/STB)',data:P_range.map(function(p){
+          return {x:p,y:p<=Pb?calcRs(p,Tr,API,gamma).toFixed(1):Rs_b};
+        }),borderColor:'#2266EE',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4,yAxisID:'y2'},
+        {label:'Bubble point Pb='+Pb+' bar',data:[{x:Pb,y:Bo_pb}],
+          borderColor:'#FF8800',backgroundColor:'#FF8800',pointRadius:8,showLine:false,yAxisID:'y'}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Pressure (bar)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}},
+        y:{title:{display:true,text:'Bo (RB/STB)',color:'#AA7700'},ticks:{color:'#AA7700'},grid:{color:'#0C0C18'},position:'left'},
+        y2:{title:{display:true,text:'Rs (scf/STB)',color:'#2266EE'},ticks:{color:'#2266EE'},grid:{display:false},position:'right',min:0}
+      }
+    }
+  });
+
+  // Sync to other tabs
+  document.getElementById('t_API').value=API;
+  document.getElementById('t_gamma').value=gamma;
+  document.getElementById('t_Tr').value=Tr;
+  document.getElementById('fp_API').value=API;
+  document.getElementById('fp_gamma').value=gamma;
+  document.getElementById('fp_T').value=Tr;
+}
+
+/* ====== PANEL 2: GAS PVT ====== */
+function calcGas(){
+  var gamma=parseFloat(document.getElementById('g_gamma').value)||0.65;
+  var CO2=parseFloat(document.getElementById('g_CO2').value)||2;
+  var H2S=parseFloat(document.getElementById('g_H2S').value)||0.5;
+  var N2=parseFloat(document.getElementById('g_N2').value)||1;
+  var P=parseFloat(document.getElementById('g_P').value)||200;
+  var T=parseFloat(document.getElementById('g_T').value)||120;
+  var method=document.getElementById('g_method').value;
+
+  var MW=gamma*28.97;
+  var Tsc=288.15,Psc=1.01325;
+  var T_R=cToR(T);
+
+  var Z=calcZ(P,T,gamma,CO2,H2S,N2,method);
+  Z=Math.max(0.4,Math.min(1.2,Z));
+
+  // Bg [res bbl/scf]
+  var Bg_bbl=0.00504*Z*T_R/barToPsi(P);
+  // Bg [m3/Sm3]
+  var Bg_m3=Z*(T+273.15)/T_R*14.504/barToPsi(P)*Psc/1.01325;
+  Bg_m3=Z*Psc*(T+273.15)/(P*Tsc);
+
+  // Gas expansion factor Eg = 1/Bg [scf/res bbl]
+  var Eg=1/Bg_bbl;
+
+  // Gas viscosity
+  var mu_g_val=mu_g(P,T,gamma);
+  var mu_g_cP=mu_g_val*1000;
+
+  // Gas density at op. conditions
+  var rho_g=P*1e5*MW/(Z*8314*(T+273.15));
+
+  // Pseudo-critical properties
+  var Ppc=677+15*gamma-37.5*gamma*gamma;
+  var Tpc=168+325*gamma-12.5*gamma*gamma;
+  var Ppr=barToPsi(P)/Ppc;
+  var Tpr=T_R/Tpc;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Z-factor',Z.toFixed(4),'-',method==='hy'?'Hall-Yarborough':method==='papay'?'Papay':'Beggs-Brill');
+  html+=rc('hl','Bg',Bg_bbl.toExponential(4),'res bbl/scf','= '+(Bg_m3).toFixed(5)+' m3/Sm3');
+  html+=rc('gas','Gas expansion factor Eg',Eg.toFixed(1),'scf/res bbl','= '+( 1/Bg_m3).toFixed(0)+' Sm3/m3');
+  html+=rc('','Gas density at op. cond.',rho_g.toFixed(2),'kg/m3','At P='+P+' bar, T='+T+'°C');
+  html+=rc('','Gas viscosity μg',mu_g_cP.toFixed(4),'cP','Lee-Kesler (1966)');
+  html+=rc('','Reduced pressure Ppr',Ppr.toFixed(3),'-','P/Ppc');
+  html+=rc('','Reduced temperature Tpr',Tpr.toFixed(3),'-','T/Tpc');
+  html+=rc('','MW gas',MW.toFixed(2),'g/mol','γg × 28.97');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Pseudo-critical:</strong> Ppc = '+Ppc.toFixed(0)+' psia | Tpc = '+Tpc.toFixed(0)+' °R<br>'
+    +'<strong>Reduced:</strong> Ppr = '+barToPsi(P).toFixed(0)+'/'+Ppc.toFixed(0)+' = '+Ppr.toFixed(3)+' | Tpr = '+T_R.toFixed(0)+'/'+Tpc.toFixed(0)+' = '+Tpr.toFixed(3)+'<br>'
+    +'<strong>Z ('+method+')</strong> = <span class="hig">'+Z.toFixed(4)+'</span><br>'
+    +'<strong>Bg</strong> = 0.00504 × Z × T_R / P_psia = 0.00504 × '+Z.toFixed(4)+' × '+T_R.toFixed(0)+' / '+barToPsi(P).toFixed(0)+' = <span class="hig">'+Bg_bbl.toExponential(4)+' res bbl/scf</span><br>'
+    +'<strong>ρg</strong> = P × MW / (Z × R × T) = '+P+'e5 × '+MW.toFixed(2)+' / ('+Z.toFixed(4)+' × 8314 × '+(T+273.15).toFixed(1)+') = <span class="hig">'+rho_g.toFixed(2)+' kg/m3</span>'
+    +'</div>';
+
+  var rows='';
+  if(Ppr>6||Tpr<1.1){
+    rows+=ar('wn','Near critical region (Ppr='+Ppr.toFixed(2)+', Tpr='+Tpr.toFixed(2)+')','Near critical conditions (Ppr > 6 or Tpr < 1.1) are challenging for Z-factor correlations. Hall-Yarborough may lose accuracy. Consider EOS (equation of state) simulation for P > 700 bar or reservoir near critical temperature.','For HPHT (>150°C, >700 bar): use PR-EOS or SRK-EOS in reservoir simulator. Correlation accuracy ±5-10% in this region vs ±2-3% at normal conditions. Critical point: Pc ≈ '+( Ppc/14.5).toFixed(0)+' bar, Tc ≈ '+(Tpc/1.8-273.15).toFixed(0)+'°C.');
+  }
+  rows+=ar('pvt','Gas PVT summary','Z = '+Z.toFixed(4)+' | Bg = '+Bg_bbl.toExponential(3)+' res bbl/scf | ρg = '+rho_g.toFixed(2)+' kg/m3 | μg = '+mu_g_cP.toFixed(4)+' cP | Eg = '+Eg.toFixed(0)+' scf/res bbl.','Bg is critical for material balance (OGIP calculation): OGIP = Gp × Bg / (Bgi - Bg) where Bgi = Bg at Pi. For gas condensate: use two-phase Z factor for accurate below-dew-point calculations.');
+
+  html+='<div class="analysis"><div class="atitle gas">/// GAS PVT ANALYSIS</div>'+rows+'</div>';
+  document.getElementById('r2').innerHTML=html;
+
+  // Bg and Z chart
+  var P_range=Array.from({length:40},function(_,i){return 10+i*(400-10)/39;});
+  var ctx=document.getElementById('bgChart').getContext('2d');
+  if(bgChart){bgChart.destroy();}
+  bgChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'Z-factor',data:P_range.map(function(p){
+          var z=Math.max(0.4,Math.min(1.2,calcZ(p,T,gamma,CO2,H2S,N2,method)));
+          return {x:p,y:z.toFixed(4)};
+        }),borderColor:'#8844CC',backgroundColor:'transparent',borderWidth:2.5,pointRadius:0,tension:0.4,yAxisID:'y'},
+        {label:'Bg (×1000 res bbl/scf)',data:P_range.map(function(p){
+          var z=Math.max(0.4,Math.min(1.2,calcZ(p,T,gamma,CO2,H2S,N2,method)));
+          var bg=0.00504*z*T_R/barToPsi(p);
+          return {x:p,y:(bg*1000).toFixed(4)};
+        }),borderColor:'#2266EE',backgroundColor:'rgba(34,102,238,0.06)',fill:true,borderWidth:2,pointRadius:0,tension:0.4,yAxisID:'y2'},
+        {label:'Operating point',data:[{x:P,y:Z}],
+          borderColor:'#fff',backgroundColor:'#8844CC',pointRadius:8,showLine:false,yAxisID:'y'}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Pressure (bar)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}},
+        y:{title:{display:true,text:'Z-factor',color:'#8844CC'},ticks:{color:'#8844CC'},grid:{color:'#0C0C18'},position:'left',min:0,max:1.2},
+        y2:{title:{display:true,text:'Bg ×1000 (res bbl/scf)',color:'#2266EE'},ticks:{color:'#2266EE'},grid:{display:false},position:'right'}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 3: PVT TABLE ====== */
+function calcTable(){
+  var Pi=parseFloat(document.getElementById('t_Pi').value)||300;
+  var Pb=parseFloat(document.getElementById('t_Pb').value)||200;
+  var Tr=parseFloat(document.getElementById('t_Tr').value)||120;
+  var API=parseFloat(document.getElementById('t_API').value)||35;
+  var gamma=parseFloat(document.getElementById('t_gamma').value)||0.70;
+  var Rs_pb=parseFloat(document.getElementById('t_Rs_pb').value)||150;
+  var Pab=parseFloat(document.getElementById('t_Pab').value)||50;
+
+  // Generate pressure points
+  var P_pts=[];
+  var nAbove=8,nBelow=12;
+  if(Pi>Pb){
+    for(var i=0;i<=nAbove;i++) P_pts.push(Pi-(Pi-Pb)*i/nAbove);
+  }
+  for(var j=1;j<=nBelow;j++) P_pts.push(Pb-(Pb-Pab)*j/nBelow);
+
+  var Bo_pb=calcBo(Rs_pb,Tr,API,gamma);
+  var co_val=co_vasquez(Rs_pb,Tr,API,gamma,Pb);
+
+  // Build PVT rows
+  var rows=P_pts.map(function(P){
+    var isPb=Math.abs(P-Pb)<1;
+    var Rs_P,Bo_P,co_P,muo_P,Bg_P,Z_P;
+    if(P>=Pb){
+      Rs_P=Rs_pb;
+      Bo_P=Bo_pb*Math.exp(-co_val*(barToPsi(P)-barToPsi(Pb)));
+      co_P=co_vasquez(Rs_pb,Tr,API,gamma,P);
+    } else {
+      Rs_P=Math.max(0,calcRs(P,Tr,API,gamma));
+      Rs_P=Math.min(Rs_P,Rs_pb);
+      Bo_P=Math.max(1,calcBo(Rs_P,Tr,API,gamma));
+      co_P=null;
+    }
+    var mu_od_v=mu_od(API,Tr);
+    muo_P=mu_o_live(mu_od_v,Rs_P);
+    // Gas FVF
+    var Z=calcZ(P,Tr,gamma,0,0,0,'hy');
+    Bg_P=P<Pb?0.00504*Z*cToR(Tr)/barToPsi(P):null;
+    return {P:P,isPb:isPb,Rs:Rs_P,Bo:Bo_P,co:co_P,muo:muo_P,Bg:Bg_P,Z:P<Pb?Z:null};
+  });
+
+  // HTML table
+  var tableHtml='<table class="pvt-table"><thead><tr>'
+    +'<th>P (bar)</th><th>Rs (scf/STB)</th><th>Bo (RB/STB)</th><th>co (psi-1)</th><th>μo (cP)</th>'
+    +'<th>Bg (rb/scf)</th><th>Z</th>'
+    +'</tr></thead><tbody>';
+  rows.forEach(function(r){
+    tableHtml+='<tr'+(r.isPb?' class="pb-row"':'')+' title="'+(r.isPb?'★ Bubble point':'')+'">'
+      +'<td>'+(r.isPb?'★ ':'')+r.P.toFixed(1)+'</td>'
+      +'<td>'+r.Rs.toFixed(1)+'</td>'
+      +'<td>'+r.Bo.toFixed(4)+'</td>'
+      +'<td>'+(r.co!=null?r.co.toExponential(3):'-')+'</td>'
+      +'<td>'+r.muo.toFixed(3)+'</td>'
+      +'<td>'+(r.Bg!=null?r.Bg.toExponential(4):'-')+'</td>'
+      +'<td>'+(r.Z!=null?r.Z.toFixed(4):'-')+'</td>'
+      +'</tr>';
+  });
+  tableHtml+='</tbody></table>';
+  document.getElementById('pvt-table-wrap').innerHTML=tableHtml;
+
+  // Chart
+  var ctx=document.getElementById('pvtChart').getContext('2d');
+  if(pvtChart){pvtChart.destroy();}
+  pvtChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'Bo (RB/STB)',data:rows.map(function(r){return{x:r.P,y:r.Bo.toFixed(4)};}),
+          borderColor:'#AA7700',backgroundColor:'rgba(170,119,0,0.07)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.3,yAxisID:'y'},
+        {label:'Rs (scf/STB)',data:rows.map(function(r){return{x:r.P,y:r.Rs.toFixed(1)};}),
+          borderColor:'#2266EE',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.3,yAxisID:'y2'},
+        {label:'Bubble point',data:[{x:Pb,y:Bo_pb}],
+          borderColor:'#FF8800',backgroundColor:'#FF8800',pointRadius:8,showLine:false,yAxisID:'y'}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Pressure (bar)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}},
+        y:{title:{display:true,text:'Bo (RB/STB)',color:'#AA7700'},ticks:{color:'#AA7700'},grid:{color:'#0C0C18'},position:'left'},
+        y2:{title:{display:true,text:'Rs (scf/STB)',color:'#2266EE'},ticks:{color:'#2266EE'},grid:{display:false},position:'right',min:0}
+      }
+    }
+  });
+}
+
+/* ====== PANEL 4: FLUID PROPERTIES ====== */
+function calcFluid(){
+  var P=parseFloat(document.getElementById('fp_P').value)||200;
+  var T=parseFloat(document.getElementById('fp_T').value)||120;
+  var API=parseFloat(document.getElementById('fp_API').value)||35;
+  var Rs=parseFloat(document.getElementById('fp_Rs').value)||150;
+  var Pb=parseFloat(document.getElementById('fp_Pb').value)||200;
+  var gamma=parseFloat(document.getElementById('fp_gamma').value)||0.70;
+  var sal=parseFloat(document.getElementById('fp_sal').value)||50000;
+
+  var gamma_o=141.5/(API+131.5);
+  var mu_od_v=mu_od(API,T);
+  var mu_o_v=mu_o_live(mu_od_v,Rs);
+  var co=co_vasquez(Rs,T,API,gamma,Pb);
+  var mu_g_v=mu_g(P,T,gamma)*1000; // cP
+
+  // Water PVT (Dodson-Standing for Bw, Collins for μw)
+  var Bw=1+3.17e-5*(T-60/1.8)+8.5e-7*barToPsi(P)*barToPsi(P)*(T-60/1.8)-1.47e-6*(barToPsi(P)-14.7);
+  var Bw_sal=Bw-sal*7e-8; // salinity correction (approximate)
+  var mu_w=Math.exp(1.003-1.479e-2*cToF(T)+1.982e-5*cToF(T)*cToF(T)); // cP dead water
+  var mu_w_pres=mu_w*Math.pow(1+3.5e-12*barToPsi(P)*barToPsi(P)*(cToF(T)-40),1); // rough pressure correction
+
+  // Interfacial tension (Firoozabadi-Ramey)
+  var IFT=Math.max(0,(52.5-1.847*T+0.0149*T*T)*Math.exp(-0.0001*barToPsi(P))); // mN/m rough
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Oil viscosity μo (live)',mu_o_v.toFixed(3),'cP','Chew-Connally at Rs='+Rs);
+  html+=rc('hl','Oil viscosity μod (dead)',mu_od_v.toFixed(2),'cP','Beal at '+T+'°C');
+  html+=rc('oil','Oil compressibility co',co.toExponential(3),'psi-1','Vasquez-Beggs');
+  html+=rc('oil','Oil density (stock tank)',(gamma_o*1000).toFixed(1),'kg/m3',''+API+'°API');
+  html+=rc('gas','Gas viscosity μg',mu_g_v.toFixed(4),'cP','Lee-Kesler at '+P+' bar, '+T+'°C');
+  html+=rc('','Water Bw (Dodson-Standing)',Bw_sal.toFixed(4),'RB/STB','At '+sal.toLocaleString()+' ppm TDS');
+  html+=rc('','Water viscosity μw',mu_w_pres.toFixed(3),'cP','At '+T+'°C, '+P+' bar');
+  html+=rc('','Oil-gas IFT (approx)',IFT.toFixed(1),'mN/m','At P='+P+' bar, T='+T+'°C');
+  html+=rc('','Gas/oil viscosity ratio',(mu_g_v/mu_o_v).toFixed(4),'-','μg/μo - mobility ratio impact');
+  html+=rc('','Oil/water viscosity ratio',(mu_o_v/mu_w_pres).toFixed(1),'-','μo/μw - water flooding sweep');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>μod (Beal):</strong> a = 10^(0.43+8.33/'+API+') = '+Math.pow(10,0.43+8.33/API).toFixed(2)+'<br>'
+    +'μod = (0.32+1.8×10^7/'+API+'^4.53)×(360/('+cToF(T).toFixed(0)+'+200))^a = <span class="hio">'+mu_od_v.toFixed(2)+' cP</span><br>'
+    +'<strong>μo (Chew-Connally):</strong> A = 10^(Rs×(2.2×10^-7×Rs - 7.4×10^-4)) → μo = A×μod^b = <span class="hio">'+mu_o_v.toFixed(3)+' cP</span><br>'
+    +'<strong>Bw (Dodson-Standing):</strong> ≈ <span class="hi">'+Bw_sal.toFixed(4)+' RB/STB</span> at '+sal.toLocaleString()+' ppm TDS'
+    +'</div>';
+
+  document.getElementById('r4').innerHTML=html;
+}
+
+/* ====== PANEL 5: PHASE DIAGRAM ====== */
+function calcPhase(){
+  var Pr=parseFloat(document.getElementById('ph_Pr').value)||300;
+  var Tr_C=parseFloat(document.getElementById('ph_Tr').value)||120;
+  var GOR=parseFloat(document.getElementById('ph_GOR').value)||500;
+  var API=parseFloat(document.getElementById('ph_API').value)||35;
+  var Pb=parseFloat(document.getElementById('ph_Pb').value)||200;
+  var gamma=parseFloat(document.getElementById('ph_gamma').value)||0.70;
+
+  // Fluid classification
+  var fluidType,fluidColor,fluidDesc;
+  if(GOR<200){fluidType='Black Oil';fluidColor='#AA3300';}
+  else if(GOR<500){fluidType='Low-Shrinkage Oil';fluidColor='#CC6600';}
+  else if(GOR<3300){fluidType='Volatile Oil';fluidColor='#CC8800';}
+  else if(GOR<100000){fluidType='Gas Condensate';fluidColor='#2266EE';}
+  else if(GOR<300000){fluidType='Wet Gas';fluidColor='#5599FF';}
+  else{fluidType='Dry Gas';fluidColor='#88BBFF';}
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Fluid type',fluidType,'-','Based on GOR = '+GOR.toLocaleString()+' scf/STB');
+  html+=rc('hl','Initial pressure',Pr,'bar','Reservoir conditions');
+  html+=rc('pvt','Initial temperature',Tr_C,'°C','Reservoir temperature');
+  html+=rc('','GOR (producing)',GOR.toLocaleString(),'scf/STB','Fluid characterization parameter');
+  html+=rc('oil','Bubble point (oil)',Pb,'bar',Pr>=Pb?'Undersaturated (Pr > Pb)':'Saturated (Pr ≈ Pb)');
+  html+=rc('','API gravity',API,'°API',API<30?'Medium-heavy crude':API<40?'Light crude':'Volatile/very light');
+  html+='</div>';
+
+  document.getElementById('r5').innerHTML=html;
+
+  // Phase diagram (schematic)
+  var ctx=document.getElementById('phaseChart').getContext('2d');
+  if(phaseChart){phaseChart.destroy();}
+  // Build schematic phase envelope
+  var Pc_est=Pb*1.3; // rough critical pressure
+  var Tc_est=Tr_C*0.7; // rough critical temperature (°C)
+  var bubblePts=[],dewPts=[];
+  for(var t=-50;t<=Tc_est;t+=5){
+    var frac=(t+50)/(Tc_est+50);
+    var P_bub=Pb*Math.pow(1-frac,1.5)*1.2;
+    var P_dew=Pb*Math.pow(1-frac,0.8)*0.8;
+    if(t<Tc_est){
+      bubblePts.push({x:t,y:P_bub});
+      dewPts.push({x:t,y:P_dew});
+    }
+  }
+  bubblePts.push({x:Tc_est,y:Pc_est});
+  dewPts.push({x:Tc_est,y:Pc_est});
+
+  phaseChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      datasets:[
+        {label:'Bubble point curve',data:bubblePts,borderColor:'#CC7700',backgroundColor:'rgba(170,119,0,0.06)',fill:'+1',borderWidth:2.5,pointRadius:0,tension:0.5},
+        {label:'Dew point curve',data:dewPts,borderColor:'#2266EE',backgroundColor:'transparent',borderWidth:2.5,pointRadius:0,tension:0.5},
+        {label:'Critical point',data:[{x:Tc_est,y:Pc_est}],
+          borderColor:'#FF8800',backgroundColor:'#FF8800',pointRadius:8,showLine:false},
+        {label:'Reservoir conditions',data:[{x:Tr_C,y:Pr}],
+          borderColor:'#fff',backgroundColor:fluidColor,pointRadius:10,showLine:false},
+        {label:'Bubble point (Pb)',data:[{x:Tr_C,y:Pb}],
+          borderColor:'#AA7700',backgroundColor:'#AA7700',pointRadius:6,showLine:false}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Temperature (°C)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}},
+        y:{title:{display:true,text:'Pressure (bar)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0}
+      }
+    }
+  });
+}
+
+/* INIT */
+calcOil();
+setTimeout(function(){calcGas();calcTable();calcFluid();calcPhase();},400);
+</script>
+</body>
+</html>
