@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Petroleum Project Economics Calculator - Petrosmart Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#040408;--surf:#0A0A12;--card:#0E0E18;
+  --border:#181828;--text:#DDDDF0;--muted:#404060;
+  --ok:#00BB55;--warn:#FF8800;--err:#FF3333;--info:#2266EE;
+  --gold:#DDAA00;--gold-dim:rgba(221,170,0,0.12);
+  --green:#00AA44;--green-dim:rgba(0,170,68,0.10);
+  --red:#CC0000;--red-dim:rgba(204,0,0,0.10);
+  --mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 50% 40% at 20% 20%,rgba(221,170,0,0.04),transparent),
+    radial-gradient(ellipse 40% 50% at 80% 70%,rgba(0,170,68,0.03),transparent);
+  pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:16px;}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#080810,#0C0C06,#080810);
+  border:1px solid rgba(221,170,0,0.25);border-radius:18px;
+  padding:18px 24px;margin-bottom:18px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 0 60px rgba(221,170,0,0.06);
+  position:relative;overflow:hidden;}
+.hdr::before{content:'$';position:absolute;right:20px;top:50%;
+  transform:translateY(-50%);font-size:120px;font-weight:800;
+  color:rgba(221,170,0,0.04);pointer-events:none;}
+.hdr-icon{width:54px;height:54px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+  background:linear-gradient(135deg,var(--gold),#886600);
+  box-shadow:0 4px 20px rgba(221,170,0,0.35);}
+.hdr h1{font-size:19px;font-weight:800;color:#fff;}
+.hdr p{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+.hdr-kpis{margin-left:auto;display:flex;gap:8px;flex-shrink:0;}
+.kpi-pill{background:rgba(221,170,0,0.1);border:1px solid rgba(221,170,0,0.25);
+  border-radius:8px;padding:6px 12px;text-align:center;}
+.kpi-val{font-size:15px;font-weight:700;color:var(--gold);font-family:var(--mono);}
+.kpi-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--surf);border:1px solid var(--border);
+  border-radius:12px;padding:4px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{flex:1;min-width:80px;padding:9px 5px;background:transparent;border:none;
+  border-radius:9px;color:var(--muted);font-size:10px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);text-transform:uppercase;letter-spacing:0.07em;transition:all 0.2s;}
+.tab:hover{color:#bbb;}
+.tab.on{background:var(--gold);color:#000;font-weight:700;box-shadow:0 0 16px rgba(221,170,0,0.4);}
+.panel{display:none;}.panel.on{display:block;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+.card.gold-accent{border-color:rgba(221,170,0,0.2);}
+.stitle{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  border-bottom:1px solid #10101C;padding-bottom:7px;margin-bottom:14px;font-family:var(--mono);}
+.stitle.gold{color:var(--gold);}
+.stitle.green{color:var(--green);}
+.stitle.red{color:var(--red);}
+.stitle.neu{color:var(--muted);}
+
+/* FORM */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+.field{margin-bottom:12px;}
+.lbl{font-size:10px;color:var(--muted);margin-bottom:5px;display:block;
+  text-transform:uppercase;letter-spacing:0.07em;font-family:var(--mono);}
+.ir{display:flex;gap:6px;align-items:center;}
+input[type=number],input[type=text],select,textarea{
+  width:100%;background:#07070F;border:1px solid #14142A;
+  border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;
+  font-family:var(--mono);transition:border-color 0.2s;}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);}
+select option{background:#0A0A14;}
+.unit{font-size:10px;color:#222;min-width:52px;text-align:right;white-space:nowrap;font-family:var(--mono);}
+
+/* PROJECT CARDS GRID */
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:16px;}
+.proj-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s;}
+.proj-card:hover{border-color:rgba(221,170,0,0.3);}
+.proj-card-hdr{background:linear-gradient(90deg,rgba(221,170,0,0.15),transparent);
+  padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);}
+.proj-num{width:26px;height:26px;background:var(--gold);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;color:#000;flex-shrink:0;}
+.proj-name-input{flex:1;background:transparent;border:none;color:#fff;
+  font-size:12px;font-weight:600;outline:none;font-family:var(--sans);}
+.proj-name-input::placeholder{color:var(--muted);}
+.proj-body{padding:12px 14px;}
+.proj-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;}
+.proj-field{}
+.proj-lbl{font-size:9px;color:var(--muted);margin-bottom:3px;display:block;
+  text-transform:uppercase;letter-spacing:0.06em;font-family:var(--mono);}
+.proj-input{width:100%;background:#07070F;border:1px solid #14142A;
+  border-radius:6px;color:#fff;font-size:12px;padding:6px 8px;outline:none;
+  font-family:var(--mono);transition:border-color 0.15s;}
+.proj-input:focus{border-color:var(--gold);}
+
+/* RESULTS */
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.rgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.rgrid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;}
+.rc{background:#07070E;border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px;position:relative;overflow:hidden;}
+.rc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.rc.hl::after{background:var(--gold);}
+.rc.ok::after{background:var(--ok);}
+.rc.wn::after{background:var(--warn);}
+.rc.er::after{background:var(--err);}
+.rc.green::after{background:var(--green);}
+.rc.hl{border-color:rgba(221,170,0,0.3);}
+.rc.ok{border-color:rgba(0,187,85,0.25);}
+.rc.wn{border-color:rgba(255,136,0,0.25);}
+.rc.er{border-color:rgba(255,51,51,0.25);}
+.rc.green{border-color:rgba(0,170,68,0.25);}
+.rl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;font-family:var(--mono);}
+.rv{font-size:19px;font-weight:700;color:#fff;font-family:var(--mono);}
+.rv span{font-size:10px;color:#222;font-weight:400;}
+.rsub{font-size:10px;color:#222;margin-top:3px;font-family:var(--mono);}
+
+/* FORMULA */
+.fbox{background:#05050C;border-left:3px solid var(--gold);border-radius:0 10px 10px 0;
+  padding:12px 16px;margin-top:14px;font-size:11px;color:#444;line-height:2.0;font-family:var(--mono);}
+.fbox strong{color:#999;}
+.fbox .hi{color:var(--gold);font-weight:600;}
+.fbox .hig{color:var(--green);font-weight:600;}
+.fbox .hir{color:var(--err);font-weight:600;}
+
+/* ANALYSIS */
+.analysis{background:#06060E;border:1px solid #0E0E1E;border-radius:12px;padding:16px;margin-top:14px;}
+.atitle{font-size:10px;font-weight:700;color:var(--gold);margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:0.09em;font-family:var(--mono);}
+.arow{display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #0C0C1A;}
+.arow:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.d-ok{background:var(--ok);box-shadow:0 0 8px var(--ok);}
+.d-wn{background:var(--warn);box-shadow:0 0 8px var(--warn);}
+.d-er{background:var(--err);box-shadow:0 0 8px var(--err);}
+.d-gold{background:var(--gold);box-shadow:0 0 8px var(--gold);}
+.d-green{background:var(--green);box-shadow:0 0 8px var(--green);}
+.atxt strong{color:#eee;font-size:12px;display:block;margin-bottom:3px;}
+.atxt p{font-size:11px;color:#444;line-height:1.7;margin:0;}
+.asugg{font-size:11px;color:#FFAA00;margin-top:4px;line-height:1.6;}
+
+/* CHART */
+.chart-wrap{background:#05050C;border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px;}
+.chart-title{font-size:11px;color:var(--gold);font-weight:600;text-transform:uppercase;
+  letter-spacing:0.05em;margin-bottom:10px;font-family:var(--mono);}
+
+/* RANKING TABLE */
+.rank-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:11px;}
+.rank-table th{text-align:left;padding:9px 12px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;
+  letter-spacing:0.07em;font-family:var(--mono);background:var(--surf);}
+.rank-table td{padding:9px 12px;border-bottom:1px solid #0C0C18;font-family:var(--mono);}
+.rank-table tr:hover td{background:#0A0A12;}
+.rank-table tr.rank-1 td{background:rgba(221,170,0,0.08);}
+.rank-table tr.rank-2 td{background:rgba(0,170,68,0.06);}
+.rank-table tr.rank-3 td{background:rgba(34,102,238,0.05);}
+.tw{color:#fff!important;font-weight:700;}
+.tpos{color:var(--gold)!important;font-weight:800;font-size:13px;}
+.tneg{color:var(--err)!important;}
+
+.ibox{background:var(--surf);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);
+  line-height:1.7;font-family:var(--mono);}
+.ibox strong{color:#bbb;}
+.sep{height:1px;background:var(--border);margin:14px 0;}
+
+/* CASHFLOW INPUT TABLE */
+.cf-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.cf-table th{text-align:center;padding:7px 8px;color:var(--muted);font-weight:600;
+  border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;
+  letter-spacing:0.06em;font-family:var(--mono);background:var(--surf);}
+.cf-table td{padding:4px 6px;border-bottom:1px solid #0C0C18;}
+.cf-table input{background:#07070F;border:1px solid #14142A;border-radius:5px;
+  color:#fff;font-size:11px;padding:5px 7px;width:100%;outline:none;font-family:var(--mono);}
+.cf-table input:focus{border-color:var(--gold);}
+.cf-year{color:var(--gold);font-weight:600;font-family:var(--mono);font-size:11px;text-align:center;}
+
+/* DECISION BADGE */
+.dec-badge{display:inline-flex;align-items:center;gap:8px;
+  padding:8px 18px;border-radius:20px;font-size:13px;font-weight:700;
+  font-family:var(--mono);margin-top:10px;letter-spacing:0.05em;}
+.dec-go{background:rgba(0,187,85,0.15);color:#00CC66;border:1px solid rgba(0,187,85,0.3);}
+.dec-caution{background:rgba(255,136,0,0.12);color:#FFAA00;border:1px solid rgba(255,136,0,0.3);}
+.dec-no{background:rgba(204,0,0,0.12);color:#FF5555;border:1px solid rgba(204,0,0,0.3);}
+
+/* WATERFALL CHART */
+.wf-bar{height:32px;border-radius:4px;display:flex;align-items:center;padding:0 10px;
+  font-size:10px;font-weight:600;color:#fff;font-family:var(--mono);
+  margin-bottom:4px;transition:width 0.5s;}
+
+.foot{background:var(--surf);border-top:1px solid var(--border);margin-top:18px;
+  padding:10px 20px;font-size:10px;color:#111;text-align:center;font-family:var(--mono);border-radius:12px;}
+.foot a{color:var(--gold);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-icon">💰</div>
+  <div>
+    <h1>Petroleum Project Economics Calculator</h1>
+    <p>NPV · IRR · Payback · WACC · Decline Curve · Capital Allocation · Portfolio Ranking</p>
+  </div>
+  <div class="hdr-kpis">
+    <div class="kpi-pill"><div class="kpi-val" id="hdr-npv">—</div><div class="kpi-lbl">Portfolio NPV</div></div>
+    <div class="kpi-pill"><div class="kpi-val" id="hdr-irr">—</div><div class="kpi-lbl">Best IRR</div></div>
+    <div class="kpi-pill"><div class="kpi-val" id="hdr-n">0</div><div class="kpi-lbl">Projects</div></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" id="t1" onclick="sw(1)">📋 Projects Input</button>
+  <button class="tab" id="t2" onclick="sw(2)">📈 NPV and IRR</button>
+  <button class="tab" id="t3" onclick="sw(3)">📉 Decline Curve</button>
+  <button class="tab" id="t4" onclick="sw(4)">⚖️ WACC</button>
+  <button class="tab" id="t5" onclick="sw(5)">🏆 Portfolio Ranking</button>
+  <button class="tab" id="t6" onclick="sw(6)">💵 Capital Allocation</button>
+  <button class="tab" id="t7" onclick="sw(7)">📚 Reference</button>
+</div>
+
+<!-- ===== PANEL 1: PROJECTS INPUT ===== -->
+<div class="panel on" id="p1">
+  <div class="card gold-accent">
+    <div class="stitle gold">/// portfolio configuration</div>
+    <div class="row3" style="margin-bottom:14px;">
+      <div class="field">
+        <label class="lbl">Number of projects</label>
+        <select id="n_projects" onchange="buildProjectCards()">
+          <option value="2">2 projects</option>
+          <option value="3" selected>3 projects</option>
+          <option value="4">4 projects</option>
+          <option value="5">5 projects</option>
+          <option value="6">6 projects</option>
+          <option value="8">8 projects</option>
+          <option value="10">10 projects</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Discount rate (WACC default)</label>
+        <div class="ir"><input type="number" id="wacc_default" value="12" step="0.5" oninput="calcAll()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Oil price assumption</label>
+        <div class="ir"><input type="number" id="oil_price" value="75" step="1" oninput="calcAll()"><span class="unit">USD/bbl</span></div>
+      </div>
+    </div>
+
+    <div class="stitle gold">/// project data entry</div>
+    <div id="projects-grid" class="projects-grid"></div>
+
+    <div style="text-align:center;margin-top:8px;">
+      <button onclick="calcAll()" style="background:var(--gold);color:#000;border:none;border-radius:10px;
+        padding:10px 32px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);">
+        ⚡ CALCULATE ALL PROJECTS
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 2: NPV AND IRR ===== -->
+<div class="panel" id="p2">
+  <div class="card gold-accent">
+    <div class="stitle gold">/// cash flow model - single project deep dive</div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Select project</label>
+        <select id="npv_proj_sel" onchange="calcNPVDetail()"></select>
+      </div>
+      <div class="field">
+        <label class="lbl">Discount rate</label>
+        <div class="ir"><input type="number" id="npv_rate" value="12" step="0.5" oninput="calcNPVDetail()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Project life</label>
+        <div class="ir"><input type="number" id="npv_life" value="15" step="1" oninput="calcNPVDetail()"><span class="unit">years</span></div>
+      </div>
+    </div>
+
+    <div class="stitle gold">/// annual cash flows (Year 0 = CAPEX outflow, negative)</div>
+    <div id="cf-table-container"></div>
+
+    <div id="r2"></div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Cumulative NPV profile and annual cash flows</div>
+      <canvas id="npvChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 3: DECLINE CURVE ===== -->
+<div class="panel" id="p3">
+  <div class="card gold-accent">
+    <div class="stitle gold">/// decline curve analysis - Arps equation</div>
+    <div class="ibox">
+      <strong>Arps (1945):</strong> q(t) = qi / (1 + b×Di×t)^(1/b) — Exponential (b=0), Hyperbolic (0&lt;b&lt;1), Harmonic (b=1). Used to forecast production and calculate EUR (Estimated Ultimate Recovery) for economic limit analysis.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Initial rate qi</label>
+        <div class="ir"><input type="number" id="dc_qi" value="5000" step="100" oninput="calcDecline()"><span class="unit">bbl/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Initial decline rate Di</label>
+        <div class="ir"><input type="number" id="dc_Di" value="25" step="1" oninput="calcDecline()"><span class="unit">%/yr</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Arps exponent b</label>
+        <div class="ir"><input type="number" id="dc_b" value="0.5" step="0.05" min="0" max="1" oninput="calcDecline()"><span class="unit">0=exp, 1=harm</span></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Economic limit q_min</label>
+        <div class="ir"><input type="number" id="dc_qmin" value="50" step="10" oninput="calcDecline()"><span class="unit">bbl/d</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Oil price</label>
+        <div class="ir"><input type="number" id="dc_price" value="75" step="1" oninput="calcDecline()"><span class="unit">USD/bbl</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">OPEX per bbl</label>
+        <div class="ir"><input type="number" id="dc_opex" value="18" step="1" oninput="calcDecline()"><span class="unit">USD/bbl</span></div>
+      </div>
+    </div>
+    <div id="r3"></div>
+    <div class="chart-wrap">
+      <div class="chart-title">Production decline and cumulative EUR (Arps)</div>
+      <canvas id="declineChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 4: WACC ===== -->
+<div class="panel" id="p4">
+  <div class="card gold-accent">
+    <div class="stitle gold">/// WACC - Weighted Average Cost of Capital</div>
+    <div class="ibox">
+      <strong>WACC</strong> = (E/V) × Re + (D/V) × Rd × (1 − Tax) where E = equity, D = debt, V = E+D, Re = cost of equity (CAPM), Rd = cost of debt. WACC is the minimum return required to create value. NPV > 0 at WACC means the project generates value above the cost of capital.
+    </div>
+    <div class="stitle gold">/// capital structure</div>
+    <div class="row4">
+      <div class="field">
+        <label class="lbl">Equity proportion E/V</label>
+        <div class="ir"><input type="number" id="w_E" value="60" step="1" oninput="calcWACC()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Debt proportion D/V</label>
+        <div class="ir"><input type="number" id="w_D" value="40" step="1" oninput="calcWACC()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Cost of debt Rd</label>
+        <div class="ir"><input type="number" id="w_Rd" value="7" step="0.25" oninput="calcWACC()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Corporate tax rate</label>
+        <div class="ir"><input type="number" id="w_tax" value="30" step="1" oninput="calcWACC()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div class="stitle gold">/// CAPM - cost of equity</div>
+    <div class="row4">
+      <div class="field">
+        <label class="lbl">Risk-free rate Rf</label>
+        <div class="ir"><input type="number" id="w_Rf" value="4.5" step="0.25" oninput="calcWACC()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Market premium ERP</label>
+        <div class="ir"><input type="number" id="w_ERP" value="5.5" step="0.25" oninput="calcWACC()"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Beta (oil sector typical)</label>
+        <div class="ir"><input type="number" id="w_beta" value="1.15" step="0.05" oninput="calcWACC()"><span class="unit">-</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Country risk premium CRP</label>
+        <div class="ir"><input type="number" id="w_CRP" value="2.0" step="0.25" oninput="calcWACC()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div id="r4"></div>
+    <div class="chart-wrap">
+      <div class="chart-title">WACC sensitivity — NPV vs discount rate</div>
+      <canvas id="waccChart" height="190"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 5: PORTFOLIO RANKING ===== -->
+<div class="panel" id="p5">
+  <div class="card gold-accent">
+    <div class="stitle gold">/// portfolio ranking — all projects</div>
+    <div class="ibox">
+      Projects are ranked by <strong>NPV/Investment ratio</strong> (Profitability Index PI) — the preferred metric for capital-constrained ranking per <strong>SPE-PRMS</strong> and IOC portfolio standards. Secondary rank by IRR. Budget constraint applied to select optimal project mix.
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label class="lbl">Available capital budget</label>
+        <div class="ir"><input type="number" id="budget" value="500" step="10" oninput="calcRanking()"><span class="unit">M USD</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Hurdle rate (min acceptable IRR)</label>
+        <div class="ir"><input type="number" id="hurdle" value="15" step="1" oninput="calcRanking()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div id="r5"></div>
+    <div class="chart-wrap">
+      <div class="chart-title">Portfolio bubble chart: NPV vs IRR (bubble size = CAPEX)</div>
+      <canvas id="portfolioChart" height="240"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 6: CAPITAL ALLOCATION ===== -->
+<div class="panel" id="p6">
+  <div class="card gold-accent">
+    <div class="stitle gold">/// capital allocation — optimised portfolio selection</div>
+    <div class="ibox">
+      <strong>Capital allocation:</strong> Given a budget constraint, select the combination of projects that maximises total NPV (0/1 knapsack or fractional). Includes sensitivity analysis: how much additional NPV per additional M USD of budget.
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label class="lbl">Total budget</label>
+        <div class="ir"><input type="number" id="alloc_budget" value="500" step="10" oninput="calcAlloc()"><span class="unit">M USD</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Min project NPV threshold</label>
+        <div class="ir"><input type="number" id="alloc_npv_min" value="0" step="10" oninput="calcAlloc()"><span class="unit">M USD</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Min project IRR threshold</label>
+        <div class="ir"><input type="number" id="alloc_irr_min" value="12" step="1" oninput="calcAlloc()"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <div id="r6"></div>
+    <div class="chart-wrap">
+      <div class="chart-title">Capital allocation: NPV waterfall by selected projects</div>
+      <canvas id="allocChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL 7: REFERENCE ===== -->
+<div class="panel" id="p7">
+  <div class="card">
+    <div class="stitle gold">/// key economic formulas</div>
+    <div class="fbox">
+      <strong>NPV:</strong> NPV = Σ [CFt / (1+r)^t] for t = 0 to n [USD]<br>
+      <strong>IRR:</strong> Solve NPV = 0 → Σ [CFt / (1+IRR)^t] = 0 (iterative)<br>
+      <strong>Payback period:</strong> Year when cumulative undiscounted cash flow turns positive<br>
+      <strong>Discounted payback:</strong> Year when cumulative discounted cash flow turns positive<br>
+      <strong>Profitability Index PI:</strong> PI = (NPV + CAPEX) / CAPEX = 1 + NPV/CAPEX<br>
+      <strong>WACC:</strong> WACC = (E/V)×Re + (D/V)×Rd×(1−Tax)<br>
+      <strong>CAPM cost of equity Re:</strong> Re = Rf + β×ERP + CRP<br>
+      <strong>After-tax cost of debt:</strong> Rd_AT = Rd × (1 − Tax)<br>
+      <strong>Arps decline (hyperbolic):</strong> q(t) = qi / (1 + b×Di×t)^(1/b)<br>
+      <strong>Arps decline (exponential b=0):</strong> q(t) = qi × exp(−Di×t)<br>
+      <strong>EUR (exponential):</strong> EUR = qi / Di × (1 − exp(−Di×t_aban))<br>
+      <strong>EUR (hyperbolic):</strong> EUR = (qi^b / ((1−b)×Di)) × (qi^(1−b) − qmin^(1−b))<br>
+      <strong>Economic limit:</strong> q_EL = OPEX / (Price × (1 − Royalty − Tax))<br>
+      <strong>Revenue CF:</strong> CF = Q×Price×(1−Royalty) − OPEX − CapexMaintenance − Taxes<br>
+      <strong>Govt take:</strong> GovernmentTake = (Royalty + TaxOnProfit) × Gross Revenue<br>
+      <strong>EMV (Expected Monetary Value):</strong> EMV = Psucc×NPV_success − Pfail×|NPV_failure|<br>
+      <strong>Sensitivity:</strong> ΔNPV/ΔPrice = Σ [Q_t×(1−Royalty)×(1−Tax) / (1+r)^t]
+    </div>
+    <div class="sep"></div>
+    <div class="stitle gold">/// typical industry benchmarks (E&P sector)</div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+      <thead><tr>
+        <th style="text-align:left;padding:8px;color:var(--muted);font-size:9px;text-transform:uppercase;border-bottom:1px solid var(--border);font-family:var(--mono);">Metric</th>
+        <th style="text-align:left;padding:8px;color:var(--muted);font-size:9px;text-transform:uppercase;border-bottom:1px solid var(--border);font-family:var(--mono);">Threshold (Go)</th>
+        <th style="text-align:left;padding:8px;color:var(--muted);font-size:9px;text-transform:uppercase;border-bottom:1px solid var(--border);font-family:var(--mono);">Notes</th>
+      </tr></thead>
+      <tbody id="ref-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">
+  <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
+  · SPE-PRMS / Arps 1945 / CAPM Sharpe 1964 · For educational use — verify with qualified petroleum economist
+</div>
+</div>
+
+<script>
+// ─── GLOBAL STATE ──────────────────────────────────────────────────────────
+var N_PROJ = 3;
+var projects = [];  // computed results
+var cashflows = {}; // proj_id → array of annual CFs
+var npvChart=null, declineChart=null, waccChart=null, portfolioChart=null, allocChart=null;
+
+// Default project templates
+var DEFAULT_PROJS = [
+  {name:"Onshore Field A", capex:200, opex_annual:25, plateau_bopd:8000, plateau_yrs:4, royalty:12.5, tax:35, start_yr:2025, life:20},
+  {name:"Offshore Block B",capex:450, opex_annual:60, plateau_bopd:18000,plateau_yrs:5, royalty:15,   tax:35, start_yr:2026, life:18},
+  {name:"Tight Gas C",     capex:120, opex_annual:18, plateau_bopd:3500, plateau_yrs:3, royalty:10,   tax:30, start_yr:2025, life:15},
+  {name:"Deep Water D",    capex:800, opex_annual:95, plateau_bopd:30000,plateau_yrs:6, royalty:16,   tax:40, start_yr:2027, life:20},
+  {name:"EOR Project E",   capex:90,  opex_annual:22, plateau_bopd:2800, plateau_yrs:8, royalty:10,   tax:30, start_yr:2025, life:12},
+  {name:"LNG Terminal F",  capex:1200,opex_annual:80, plateau_bopd:0,    plateau_yrs:0, royalty:12,   tax:35, start_yr:2028, life:25},
+  {name:"CBM Project G",   capex:65,  opex_annual:12, plateau_bopd:1500, plateau_yrs:5, royalty:8,    tax:28, start_yr:2025, life:10},
+  {name:"Shale Oil H",     capex:350, opex_annual:40, plateau_bopd:12000,plateau_yrs:2, royalty:18,   tax:38, start_yr:2026, life:15},
+  {name:"CO2 EOR I",       capex:180, opex_annual:28, plateau_bopd:4500, plateau_yrs:6, royalty:10,   tax:32, start_yr:2025, life:14},
+  {name:"Arctic Field J",  capex:600, opex_annual:70, plateau_bopd:22000,plateau_yrs:5, royalty:14,   tax:40, start_yr:2029, life:22},
+];
+
+// ─── UTILS ──────────────────────────────────────────────────────────────────
+function sw(n){
+  for(var i=1;i<=7;i++){
+    document.getElementById('p'+i).className='panel'+(i===n?' on':'');
+    document.getElementById('t'+i).className='tab'+(i===n?' on':'');
+  }
+  if(n===2) setTimeout(buildNPVDetail,80);
+  if(n===3) setTimeout(calcDecline,80);
+  if(n===4) setTimeout(calcWACC,80);
+  if(n===5) setTimeout(calcRanking,80);
+  if(n===6) setTimeout(calcAlloc,80);
+}
+function rc(cls,lbl,val,unit,sub){
+  return '<div class="rc '+(cls||'')+'">'
+    +'<div class="rl">'+lbl+'</div>'
+    +'<div class="rv">'+val+(unit?' <span>'+unit+'</span>':'')+'</div>'
+    +(sub?'<div class="rsub">'+sub+'</div>':'')+'</div>';
+}
+function ar(type,title,body,sugg){
+  var d={ok:'d-ok',wn:'d-wn',er:'d-er',gold:'d-gold',green:'d-green'}[type]||'d-gold';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+}
+function fmt(v,dec){
+  dec=dec===undefined?1:dec;
+  if(Math.abs(v)>=1000) return (v/1000).toFixed(dec)+'B';
+  if(Math.abs(v)>=1)    return v.toFixed(dec)+'M';
+  return v.toFixed(dec+1)+'M';
+}
+function fmtM(v){ return '$'+(v>=0?'':'-')+(Math.abs(v)).toFixed(1)+'M'; }
+
+// ─── IRR SOLVER ─────────────────────────────────────────────────────────────
+function calcIRR(cashflows){
+  var npv=function(r){ return cashflows.reduce(function(s,cf,t){return s+cf/Math.pow(1+r,t);},0); };
+  var lo=0, hi=10, mid;
+  if(npv(0)<=0) return null; // no positive IRR
+  for(var i=0;i<100;i++){
+    mid=(lo+hi)/2;
+    if(npv(mid)>0) lo=mid; else hi=mid;
+    if(hi-lo<0.00001) break;
+  }
+  return mid*100; // %
+}
+
+// ─── GENERATE CASH FLOWS FROM PROJECT PARAMS ────────────────────────────────
+function genCashflows(p, oil_price, life){
+  life = life || 15;
+  var cfs = [];
+  // Year 0: CAPEX (negative)
+  var capex_split = p.capex * 0.6; // 60% year 0
+  cfs.push(-capex_split);
+  var capex_yr1 = p.capex * 0.4;
+  // Years 1..life
+  var b=0.5, Di=0.20; // default decline params
+  for(var t=1;t<=life;t++){
+    var q_annual_bbl;
+    if(t===1){
+      // Ramp-up year
+      q_annual_bbl = p.plateau_bopd * 0.5 * 365;
+      var capex_this = capex_yr1; // remaining capex in year 1
+    } else if(t<=p.plateau_yrs+1){
+      q_annual_bbl = p.plateau_bopd * 365;
+      var capex_this = 0;
+    } else {
+      var t_dec = t - p.plateau_yrs - 1;
+      if(b===0){
+        q_annual_bbl = p.plateau_bopd * Math.exp(-Di*t_dec) * 365;
+      } else {
+        q_annual_bbl = p.plateau_bopd / Math.pow(1+b*Di*t_dec, 1/b) * 365;
+      }
+      var capex_this = 0;
+    }
+    if(t===1) var capex_this2 = capex_yr1; else var capex_this2 = 0;
+    var revenue = q_annual_bbl * oil_price;
+    var royalty_cost = revenue * (p.royalty/100);
+    var net_revenue = revenue - royalty_cost;
+    var opex = p.opex_annual * 1e6; // M USD → USD
+    var ebitda = net_revenue - opex - capex_this2*1e6;
+    var tax = Math.max(0, ebitda * (p.tax/100));
+    var cf_net = (ebitda - tax) / 1e6; // M USD
+    cfs.push(cf_net);
+  }
+  return cfs;
+}
+
+// ─── BUILD PROJECT CARDS ────────────────────────────────────────────────────
+function buildProjectCards(){
+  N_PROJ = parseInt(document.getElementById('n_projects').value)||3;
+  var container = document.getElementById('projects-grid');
+  var html = '';
+  for(var i=0;i<N_PROJ;i++){
+    var d = DEFAULT_PROJS[i]||DEFAULT_PROJS[0];
+    html += `
+    <div class="proj-card" id="pcard-${i}">
+      <div class="proj-card-hdr">
+        <div class="proj-num">${i+1}</div>
+        <input class="proj-name-input" id="p${i}_name" value="${d.name}" placeholder="Project name" oninput="calcAll()">
+      </div>
+      <div class="proj-body">
+        <div class="proj-row">
+          <div class="proj-field"><label class="proj-lbl">CAPEX (M USD)</label>
+            <input class="proj-input" id="p${i}_capex" type="number" value="${d.capex}" oninput="calcAll()"></div>
+          <div class="proj-field"><label class="proj-lbl">OPEX/yr (M USD)</label>
+            <input class="proj-input" id="p${i}_opex" type="number" value="${d.opex_annual}" oninput="calcAll()"></div>
+        </div>
+        <div class="proj-row">
+          <div class="proj-field"><label class="proj-lbl">Plateau (bopd)</label>
+            <input class="proj-input" id="p${i}_rate" type="number" value="${d.plateau_bopd}" oninput="calcAll()"></div>
+          <div class="proj-field"><label class="proj-lbl">Plateau years</label>
+            <input class="proj-input" id="p${i}_plateau" type="number" value="${d.plateau_yrs}" oninput="calcAll()"></div>
+        </div>
+        <div class="proj-row">
+          <div class="proj-field"><label class="proj-lbl">Royalty (%)</label>
+            <input class="proj-input" id="p${i}_royalty" type="number" value="${d.royalty}" oninput="calcAll()"></div>
+          <div class="proj-field"><label class="proj-lbl">Tax rate (%)</label>
+            <input class="proj-input" id="p${i}_tax" type="number" value="${d.tax}" oninput="calcAll()"></div>
+        </div>
+        <div style="margin-top:8px;background:#07070E;border-radius:8px;padding:8px 10px;">
+          <div id="pcard-result-${i}" style="font-size:10px;color:var(--muted);font-family:var(--mono);">Calculate to see results</div>
+        </div>
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html;
+  calcAll();
+}
+
+// ─── CALC ALL PROJECTS ──────────────────────────────────────────────────────
+function calcAll(){
+  var rate = (parseFloat(document.getElementById('wacc_default').value)||12)/100;
+  var oil_price = parseFloat(document.getElementById('oil_price').value)||75;
+  var life = 15;
+  projects = [];
+
+  for(var i=0;i<N_PROJ;i++){
+    var name  = (document.getElementById('p'+i+'_name')||{value:'Project '+(i+1)}).value;
+    var capex = parseFloat((document.getElementById('p'+i+'_capex')||{value:200}).value)||200;
+    var opex  = parseFloat((document.getElementById('p'+i+'_opex')||{value:25}).value)||25;
+    var rate_bopd = parseFloat((document.getElementById('p'+i+'_rate')||{value:5000}).value)||5000;
+    var plateau = parseFloat((document.getElementById('p'+i+'_plateau')||{value:4}).value)||4;
+    var royalty = parseFloat((document.getElementById('p'+i+'_royalty')||{value:12}).value)||12;
+    var tax = parseFloat((document.getElementById('p'+i+'_tax')||{value:35}).value)||35;
+
+    var p = {name,capex,opex_annual:opex,plateau_bopd:rate_bopd,plateau_yrs:plateau,royalty,tax};
+    var cfs = genCashflows(p, oil_price, life);
+    cashflows[i] = cfs;
+
+    var npv = cfs.reduce(function(s,cf,t){return s+cf/Math.pow(1+rate,t);},0);
+    var irr = calcIRR(cfs);
+    var pi = (npv + capex)/capex;
+    // Payback
+    var cum=0, pb=-1;
+    for(var t=0;t<cfs.length;t++){cum+=cfs[t]; if(cum>=0&&pb<0) pb=t;}
+
+    projects.push({i,name,capex,npv,irr,pi,pb,cfs,p});
+
+    // Update card result
+    var rd = document.getElementById('pcard-result-'+i);
+    if(rd){
+      var col = npv>0?'#00BB55':'#FF3333';
+      rd.innerHTML = `<span style="color:${col};font-weight:700;">NPV ${fmtM(npv)}</span> &nbsp;|&nbsp; IRR ${irr?irr.toFixed(1)+'%':'N/A'} &nbsp;|&nbsp; PI ${pi.toFixed(2)} &nbsp;|&nbsp; PB ${pb>0?pb+'yr':'N/A'}`;
+    }
+  }
+
+  // Update header KPIs
+  var total_npv = projects.reduce(function(s,p){return s+p.npv;},0);
+  var best_irr = Math.max.apply(null, projects.filter(function(p){return p.irr;}).map(function(p){return p.irr;}));
+  document.getElementById('hdr-npv').textContent = fmtM(total_npv);
+  document.getElementById('hdr-irr').textContent = best_irr>0?best_irr.toFixed(1)+'%':'—';
+  document.getElementById('hdr-n').textContent = N_PROJ;
+
+  // Refresh NPV selector
+  var sel = document.getElementById('npv_proj_sel');
+  if(sel){
+    sel.innerHTML = projects.map(function(p){return '<option value="'+p.i+'">'+p.name+'</option>';}).join('');
+    calcNPVDetail();
+  }
+}
+
+// ─── PANEL 2: NPV DETAIL ───────────────────────────────────────────────────
+function buildNPVDetail(){
+  var sel = document.getElementById('npv_proj_sel');
+  if(!sel){return;}
+  sel.innerHTML = projects.map(function(p){return '<option value="'+p.i+'">'+p.name+'</option>';}).join('');
+  calcNPVDetail();
+}
+
+function calcNPVDetail(){
+  var idx = parseInt(document.getElementById('npv_proj_sel').value)||0;
+  var rate = (parseFloat(document.getElementById('npv_rate').value)||12)/100;
+  var life = parseInt(document.getElementById('npv_life').value)||15;
+  var proj = projects[idx];
+  if(!proj){return;}
+
+  var oil_price = parseFloat(document.getElementById('oil_price').value)||75;
+  var cfs = genCashflows(proj.p, oil_price, life);
+  cashflows[idx] = cfs;
+
+  var npv = cfs.reduce(function(s,cf,t){return s+cf/Math.pow(1+rate,t);},0);
+  var irr = calcIRR(cfs);
+  var pi = (npv+proj.capex)/proj.capex;
+  var cum=0, pb=-1, dpb=-1, cum_d=0;
+  for(var t=0;t<cfs.length;t++){
+    cum+=cfs[t]; if(cum>=0&&pb<0) pb=t;
+    cum_d+=cfs[t]/Math.pow(1+rate,t); if(cum_d>=0&&dpb<0) dpb=t;
+  }
+  var total_revenue = cfs.slice(1).filter(function(c){return c>0;}).reduce(function(s,c){return s+c;},0);
+
+  // Build CF table
+  var tbl='<table class="cf-table"><thead><tr><th>Year</th><th>Cash Flow (M$)</th><th>PV Factor</th><th>DCF (M$)</th><th>Cum. DCF (M$)</th></tr></thead><tbody>';
+  var cumDCF=0;
+  cfs.forEach(function(cf,t){
+    var pv=1/Math.pow(1+rate,t);
+    var dcf=cf*pv;
+    cumDCF+=dcf;
+    var rowColor = cf>=0?'rgba(0,187,85,0.05)':'rgba(255,51,51,0.05)';
+    tbl+=`<tr style="background:${rowColor}">
+      <td class="cf-year">Y${t}</td>
+      <td style="text-align:right;color:${cf>=0?'#00CC66':'#FF5555'};font-family:var(--mono);">${cf.toFixed(2)}</td>
+      <td style="text-align:center;color:var(--muted);font-family:var(--mono);">${pv.toFixed(4)}</td>
+      <td style="text-align:right;color:${dcf>=0?'#00CC66':'#FF5555'};font-family:var(--mono);">${dcf.toFixed(2)}</td>
+      <td style="text-align:right;color:${cumDCF>=0?'var(--gold)':'var(--err)'};font-weight:600;font-family:var(--mono);">${cumDCF.toFixed(2)}</td>
+    </tr>`;
+  });
+  tbl+='</tbody></table>';
+  document.getElementById('cf-table-container').innerHTML=tbl;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','NPV',fmtM(npv),'','At '+(rate*100).toFixed(1)+'% discount rate');
+  html+=rc(irr&&irr>rate*100?'ok':'wn','IRR',irr?irr.toFixed(2)+'%':'N/A','',irr?irr>rate*100?'> WACC - value creating':'< WACC - value destroying':'IRR not found');
+  html+=rc(pi>1.2?'ok':pi>1?'wn':'er','Profitability Index PI',pi.toFixed(3),'',pi>1?'PI > 1 - acceptable':'PI < 1 - reject');
+  html+=rc('','Payback period',pb>0?pb+' yr':'N/A','',pb>0?'Undiscounted':'No payback');
+  html+=rc('','Discounted payback',dpb>0?dpb+' yr':'N/A','','At '+( rate*100).toFixed(1)+'% discount rate');
+  html+=rc('','Total undiscounted CF',fmtM(total_revenue),'','Sum of positive cash flows');
+  html+=rc('','CAPEX',fmtM(-proj.capex),'','Initial investment');
+  html+=rc('','Multiple of investment',(total_revenue/proj.capex).toFixed(2)+'x','','Undiscounted cash-on-cash');
+  html+='</div>';
+
+  // Decision badge
+  var dec_class = npv>50&&irr&&irr>15?'dec-go':npv>0&&irr&&irr>10?'dec-caution':'dec-no';
+  var dec_text = npv>50&&irr&&irr>15?'✅ GO — Economically attractive':npv>0?'⚠️ BORDERLINE — Review assumptions':'❌ NO-GO — Value destroying at these parameters';
+  html+=`<div class="dec-badge ${dec_class}">${dec_text}</div>`;
+
+  html+='<div class="fbox">'
+    +'<strong>NPV</strong> = Σ [CFt / (1+r)^t] = '+cfs.map(function(cf,t){return cf.toFixed(1)+'/1.'+((rate*100).toFixed(0))+(t>0?'^'+t:'');}).slice(0,4).join(' + ')+'... = <span class="hi">'+fmtM(npv)+'</span><br>'
+    +'<strong>IRR</strong> = rate where NPV = 0 → solved iteratively = <span class="hi">'+(irr?irr.toFixed(2)+'%':'N/A')+'</span><br>'
+    +'<strong>PI</strong> = (NPV + CAPEX) / CAPEX = ('+npv.toFixed(1)+' + '+proj.capex.toFixed(0)+') / '+proj.capex.toFixed(0)+' = <span class="hi">'+pi.toFixed(3)+'</span>'
+    +'</div>';
+
+  var rows='';
+  if(npv<0){
+    rows+=ar('er','Negative NPV ('+fmtM(npv)+') — project destroys value at '+( rate*100).toFixed(0)+'% WACC',
+      'At the current discount rate, the project does not recover its cost of capital. Present value of cash inflows is less than CAPEX.',
+      'Levers to improve NPV: (1) Reduce CAPEX by 10-15% through value engineering. (2) Increase initial rate qi via hydraulic fracturing or ESP optimization. (3) Negotiate lower royalty rate. (4) Apply for tax incentives / fiscal stabilization. (5) Find a lower-cost-of-capital partner (farm-out).');
+  } else if(irr && irr < rate*100){
+    rows+=ar('wn','IRR ('+irr.toFixed(1)+'%) below WACC ('+(rate*100).toFixed(0)+'%) — thin margin',
+      'Project has positive NPV at the selected rate but IRR is below WACC. This is only possible if the rate used for NPV < IRR. Check consistency.',
+      '');
+  }
+  if(pb>0&&pb>10){
+    rows+=ar('wn','Long payback period ('+pb+' years)',
+      'Payback beyond 10 years exposes the project to significant oil price and political risk. Investors may require higher return to compensate.',
+      'Strategies to accelerate payback: (1) Phased development — smaller first phase recovers early cash. (2) Optimize plateau rate upward (more wells). (3) Pre-sell production (offtake agreement) to improve early cash flow certainty.');
+  }
+  if(!rows) rows=ar('ok','Project economics acceptable','NPV '+fmtM(npv)+' | IRR '+(irr?irr.toFixed(1)+'%':'N/A')+' | PI '+pi.toFixed(2)+' | Payback '+pb+' years. All key metrics indicate value creation at '+(rate*100).toFixed(0)+'% discount rate.','');
+
+  html+='<div class="analysis"><div class="atitle">/// NPV AND IRR ANALYSIS — '+proj.name.toUpperCase()+'</div>'+rows+'</div>';
+  document.getElementById('r2').innerHTML=html;
+
+  // NPV chart
+  var cumDCF_pts=[], cum_pts=[], years=cfs.map(function(_,t){return 'Y'+t;});
+  var cd=0,cu=0;
+  cfs.forEach(function(cf,t){cd+=cf/Math.pow(1+rate,t);cu+=cf;cumDCF_pts.push(cd);cum_pts.push(cu);});
+  var ctx=document.getElementById('npvChart').getContext('2d');
+  if(npvChart){npvChart.destroy();}
+  npvChart=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:years,
+      datasets:[
+        {label:'Annual CF (M$)',data:cfs,backgroundColor:cfs.map(function(c){return c>=0?'rgba(0,187,85,0.5)':'rgba(255,51,51,0.5)';}),borderWidth:0,order:2},
+        {label:'Cum. DCF (M$)',data:cumDCF_pts,type:'line',borderColor:'#DDAA00',backgroundColor:'transparent',borderWidth:2.5,pointRadius:0,tension:0.4,order:1},
+      ]
+    },
+    options:{responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{ticks:{color:'#888',font:{size:9}},grid:{color:'#0C0C18'}},
+        y:{title:{display:true,text:'M USD',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}}
+      }
+    }
+  });
+}
+
+// ─── PANEL 3: DECLINE CURVE ─────────────────────────────────────────────────
+function calcDecline(){
+  var qi = parseFloat(document.getElementById('dc_qi').value)||5000;
+  var Di = parseFloat(document.getElementById('dc_Di').value)/100||0.25;
+  var b  = parseFloat(document.getElementById('dc_b').value)||0.5;
+  var qmin = parseFloat(document.getElementById('dc_qmin').value)||50;
+  var price = parseFloat(document.getElementById('dc_price').value)||75;
+  var opex_bbl = parseFloat(document.getElementById('dc_opex').value)||18;
+
+  var years=[], q_pts=[], cum_pts=[], rev_pts=[];
+  var cum=0, t_aban=-1, EUR=0;
+  for(var t=0;t<=40;t++){
+    var q;
+    if(b<0.01) q=qi*Math.exp(-Di*t);
+    else q=qi/Math.pow(1+b*Di*t,1/b);
+    q=Math.max(0,q);
+    if(q<qmin&&t_aban<0) t_aban=t;
+    if(t_aban>0&&t>t_aban) q=0;
+    cum+=q*365/1000; // Mbbl
+    var rev_annual=(price-opex_bbl)*q*365/1e6; // M$/yr
+    years.push('Y'+t);
+    q_pts.push(q.toFixed(0));
+    cum_pts.push(cum.toFixed(0));
+    rev_pts.push(rev_annual.toFixed(2));
+  }
+  EUR=cum;
+  var t_50=(t_aban>0?t_aban:30)*0.5;
+  var q_50=b<0.01?qi*Math.exp(-Di*t_50):qi/Math.pow(1+b*Di*t_50,1/b);
+  var total_rev=(price-opex_bbl)*EUR*1000*365/1e9; // rough $B
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Initial rate qi',qi.toLocaleString(),'bbl/d','Input');
+  html+=rc('hl','EUR (to economic limit)',(EUR).toFixed(0),'Mbbl','= '+(EUR/1000).toFixed(2)+' MMbbl');
+  html+=rc('','Decline type',b<0.01?'Exponential':b>=0.99?'Harmonic':'Hyperbolic (b='+b.toFixed(2)+')','','Arps exponent');
+  html+=rc('','Initial decline Di',(Di*100).toFixed(0),'%/yr','Nominal decline rate');
+  html+=rc('','Economic life',t_aban>0?t_aban+' years':'> 40 yr','','At q_min = '+qmin+' bbl/d');
+  html+=rc('','Rate at year 10',(b<0.01?qi*Math.exp(-Di*10):qi/Math.pow(1+b*Di*10,1/b)).toFixed(0),'bbl/d','Forecast');
+  html+=rc('','Revenue (undiscounted)',(total_rev).toFixed(0),'M USD','Net: price - OPEX/bbl');
+  html+=rc('','EUR per initial bopd',(EUR*1000/qi).toFixed(1),'bbl/bopd','Productivity metric');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Arps hyperbolic:</strong> q(t) = qi / (1 + b×Di×t)^(1/b)<br>'
+    +'q(10) = '+qi+' / (1 + '+b+'×'+Di.toFixed(3)+'×10)^(1/'+b+') = <span class="hi">'+(b<0.01?qi*Math.exp(-Di*10):qi/Math.pow(1+b*Di*10,1/b)).toFixed(0)+' bbl/d</span><br>'
+    +'<strong>EUR (hyperbolic):</strong> = qi^b / ((1-b)×Di) × (qi^(1-b) − qmin^(1-b))<br>'
+    +'= <span class="hi">'+EUR.toFixed(0)+' Mbbl = '+(EUR/1000).toFixed(3)+' MMbbl</span>'
+    +'</div>';
+
+  document.getElementById('r3').innerHTML=html;
+
+  var ctx=document.getElementById('declineChart').getContext('2d');
+  if(declineChart){declineChart.destroy();}
+  declineChart=new Chart(ctx,{
+    type:'line',
+    data:{labels:years,
+      datasets:[
+        {label:'Production (bbl/d)',data:q_pts,borderColor:'#CC7700',backgroundColor:'rgba(204,119,0,0.08)',fill:true,borderWidth:2,pointRadius:0,tension:0.4,yAxisID:'y'},
+        {label:'Cum. EUR (Mbbl)',data:cum_pts,borderColor:'#DDAA00',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4,yAxisID:'y2'},
+      ]
+    },
+    options:{responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{ticks:{color:'#888',font:{size:9}},grid:{color:'#0C0C18'}},
+        y:{title:{display:true,text:'Rate (bbl/d)',color:'#CC7700'},ticks:{color:'#CC7700'},grid:{color:'#0C0C18'},position:'left'},
+        y2:{title:{display:true,text:'Cum EUR (Mbbl)',color:'#DDAA00'},ticks:{color:'#DDAA00'},grid:{display:false},position:'right'}
+      }
+    }
+  });
+}
+
+// ─── PANEL 4: WACC ──────────────────────────────────────────────────────────
+function calcWACC(){
+  var E = parseFloat(document.getElementById('w_E').value)||60;
+  var D = parseFloat(document.getElementById('w_D').value)||40;
+  var Rd = parseFloat(document.getElementById('w_Rd').value)||7;
+  var tax = parseFloat(document.getElementById('w_tax').value)||30;
+  var Rf = parseFloat(document.getElementById('w_Rf').value)||4.5;
+  var ERP = parseFloat(document.getElementById('w_ERP').value)||5.5;
+  var beta = parseFloat(document.getElementById('w_beta').value)||1.15;
+  var CRP = parseFloat(document.getElementById('w_CRP').value)||2.0;
+
+  var Re = Rf + beta*ERP + CRP;
+  var Rd_AT = Rd*(1-tax/100);
+  var WACC = (E/100)*Re + (D/100)*Rd_AT;
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','WACC',WACC.toFixed(2),'%','Weighted Average Cost of Capital');
+  html+=rc('hl','Cost of equity Re (CAPM)',Re.toFixed(2),'%','Rf + β×ERP + CRP');
+  html+=rc('','After-tax cost of debt',Rd_AT.toFixed(2),'%','Rd × (1−Tax) = '+Rd+'% × '+(1-tax/100).toFixed(2));
+  html+=rc('','Beta β',beta,'','Levered, oil sector');
+  html+=rc('','Risk-free rate Rf',Rf,'%','10yr Treasury / benchmark');
+  html+=rc('','Equity risk premium ERP',ERP,'%','Historical / Damodaran');
+  html+=rc('','Country risk premium CRP',CRP,'%','EMBI spread / Damodaran');
+  html+=rc('','Capital structure','E: '+E+'% / D: '+D+'%','','Debt-to-equity targeting');
+  html+='</div>';
+
+  html+='<div class="fbox">'
+    +'<strong>Re (CAPM)</strong> = Rf + β×ERP + CRP = '+Rf+' + '+beta+'×'+ERP+' + '+CRP+' = <span class="hi">'+Re.toFixed(2)+'%</span><br>'
+    +'<strong>Rd (after-tax)</strong> = Rd×(1−Tax) = '+Rd+'×(1−'+tax+'/100) = <span class="hi">'+Rd_AT.toFixed(2)+'%</span><br>'
+    +'<strong>WACC</strong> = (E/V)×Re + (D/V)×Rd_AT = '+(E/100).toFixed(2)+'×'+Re.toFixed(2)+' + '+(D/100).toFixed(2)+'×'+Rd_AT.toFixed(2)+' = <span class="hi">'+WACC.toFixed(2)+'%</span>'
+    +'</div>';
+
+  document.getElementById('r4').innerHTML=html;
+
+  // Sync WACC to other tabs
+  document.getElementById('wacc_default').value=WACC.toFixed(1);
+  document.getElementById('npv_rate').value=WACC.toFixed(1);
+  calcAll();
+
+  // WACC sensitivity chart: NPV of first project vs discount rate
+  if(projects.length>0){
+    var rates_range=Array.from({length:20},function(_,i){return 5+i*2});
+    var npvs=rates_range.map(function(r){
+      return projects[0].cfs.reduce(function(s,cf,t){return s+cf/Math.pow(1+r/100,t);},0);
+    });
+    var ctx=document.getElementById('waccChart').getContext('2d');
+    if(waccChart){waccChart.destroy();}
+    waccChart=new Chart(ctx,{
+      type:'line',
+      data:{
+        datasets:[
+          {label:'NPV of '+projects[0].name+' (M$)',data:rates_range.map(function(r,i){return{x:r,y:npvs[i].toFixed(1)};}),
+            borderColor:'#DDAA00',backgroundColor:'rgba(221,170,0,0.07)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.4},
+          {label:'WACC = '+WACC.toFixed(1)+'%',data:[{x:WACC,y:projects[0].cfs.reduce(function(s,cf,t){return s+cf/Math.pow(1+WACC/100,t);},0)}],
+            borderColor:'#fff',backgroundColor:'#FF8800',pointRadius:9,showLine:false},
+          {label:'NPV = 0',data:rates_range.map(function(r){return{x:r,y:0};}),
+            borderColor:'#FF3333',backgroundColor:'transparent',borderWidth:1,pointRadius:0,borderDash:[4,3]}
+        ]
+      },
+      options:{responsive:true,
+        plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+        scales:{
+          x:{type:'linear',title:{display:true,text:'Discount rate (%)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}},
+          y:{title:{display:true,text:'NPV (M USD)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}}
+        }
+      }
+    });
+  }
+}
+
+// ─── PANEL 5: PORTFOLIO RANKING ──────────────────────────────────────────────
+function calcRanking(){
+  var budget = parseFloat(document.getElementById('budget').value)||500;
+  var hurdle = parseFloat(document.getElementById('hurdle').value)||15;
+
+  if(projects.length===0){document.getElementById('r5').innerHTML='<div class="ibox">Calculate projects first (Tab 1).</div>';return;}
+
+  var sorted = projects.slice().sort(function(a,b){return b.pi-a.pi;});
+
+  var tbl='<table class="rank-table"><thead><tr>'
+    +'<th>Rank</th><th>Project</th><th>CAPEX (M$)</th>'
+    +'<th>NPV (M$)</th><th>IRR (%)</th><th>PI</th>'
+    +'<th>Payback (yr)</th><th>Hurdle</th><th>Status</th>'
+    +'</tr></thead><tbody>';
+
+  var ranks=['🥇','🥈','🥉'];
+  sorted.forEach(function(p,idx){
+    var go = p.npv>0 && p.irr && p.irr>hurdle;
+    var rankClass = idx<3?'rank-'+(idx+1):'';
+    tbl+=`<tr class="${rankClass}">
+      <td class="tpos">${ranks[idx]||('#'+(idx+1))}</td>
+      <td class="tw">${p.name}</td>
+      <td style="font-family:var(--mono);">${p.capex.toFixed(0)}</td>
+      <td class="${p.npv>0?'tpos tw':'tneg'}">${p.npv.toFixed(1)}</td>
+      <td class="${p.irr&&p.irr>hurdle?'tpos':'tneg'}">${p.irr?p.irr.toFixed(1)+'%':'N/A'}</td>
+      <td class="${p.pi>1.2?'tpos':p.pi>1?'':'tneg'}">${p.pi.toFixed(3)}</td>
+      <td style="font-family:var(--mono);">${p.pb>0?p.pb:'N/A'}</td>
+      <td style="color:${go?'var(--ok)':'var(--err)'};font-weight:700;">${go?'✅ Pass':'❌ Fail'}</td>
+      <td style="color:${go?'var(--ok)':'var(--warn)'};font-weight:700;">${go?'GO':'REVIEW'}</td>
+    </tr>`;
+  });
+  tbl+='</tbody></table>';
+
+  // Within-budget selection
+  var selected=[], used=0;
+  sorted.forEach(function(p){if(p.npv>0&&p.irr&&p.irr>hurdle&&used+p.capex<=budget){selected.push(p);used+=p.capex;}});
+  var sel_npv=selected.reduce(function(s,p){return s+p.npv;},0);
+
+  document.getElementById('r5').innerHTML=tbl
+    +'<div class="ibox" style="margin-top:14px;">'
+    +'<strong>Budget utilisation:</strong> $'+used.toFixed(0)+'M of $'+budget+'M budget deployed | '
+    +'<strong>Selected projects:</strong> '+selected.map(function(p){return p.name;}).join(', ')+' | '
+    +'<strong>Combined NPV:</strong> $'+sel_npv.toFixed(1)+'M'
+    +'</div>';
+
+  // Bubble chart
+  var colors=['#DDAA00','#00BB55','#2266EE','#CC0000','#9944CC','#00AAAA','#FF8800','#FF3366','#88CC00','#4488CC'];
+  var ctx=document.getElementById('portfolioChart').getContext('2d');
+  if(portfolioChart){portfolioChart.destroy();}
+  portfolioChart=new Chart(ctx,{
+    type:'bubble',
+    data:{datasets:projects.map(function(p,i){return{
+      label:p.name,
+      data:[{x:p.irr||0,y:p.npv,r:Math.min(30,Math.max(8,p.capex/30))}],
+      backgroundColor:colors[i%colors.length]+'88',
+      borderColor:colors[i%colors.length],borderWidth:2
+    };})},
+    options:{responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}},
+        tooltip:{callbacks:{label:function(c){return c.dataset.label+': NPV=$'+c.parsed.y.toFixed(1)+'M, IRR='+c.parsed.x.toFixed(1)+'%, CAPEX=bubble';}}},
+      },
+      scales:{
+        x:{title:{display:true,text:'IRR (%)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}},
+        y:{title:{display:true,text:'NPV (M USD)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}}
+      }
+    }
+  });
+}
+
+// ─── PANEL 6: CAPITAL ALLOCATION ────────────────────────────────────────────
+function calcAlloc(){
+  var budget = parseFloat(document.getElementById('alloc_budget').value)||500;
+  var npv_min = parseFloat(document.getElementById('alloc_npv_min').value)||0;
+  var irr_min = parseFloat(document.getElementById('alloc_irr_min').value)||12;
+
+  if(projects.length===0){document.getElementById('r6').innerHTML='<div class="ibox">Calculate projects first (Tab 1).</div>';return;}
+
+  // Filter eligible
+  var eligible = projects.filter(function(p){return p.npv>=npv_min&&p.irr&&p.irr>=irr_min;});
+  // Sort by PI for greedy knapsack
+  eligible.sort(function(a,b){return b.pi-a.pi;});
+
+  // 0/1 Knapsack (exact, small N)
+  var N=eligible.length;
+  var caps=eligible.map(function(p){return Math.round(p.capex);}); // M USD
+  var B=Math.round(budget);
+  // DP table
+  var dp=Array.from({length:N+1},function(){return new Array(B+1).fill(0);});
+  for(var i=1;i<=N;i++){
+    for(var j=0;j<=B;j++){
+      dp[i][j]=dp[i-1][j];
+      if(caps[i-1]<=j&&dp[i-1][j-caps[i-1]]+eligible[i-1].npv>dp[i][j]){
+        dp[i][j]=dp[i-1][j-caps[i-1]]+eligible[i-1].npv;
+      }
+    }
+  }
+  // Backtrack
+  var selected_alloc=[], j=B;
+  for(var i=N;i>0;i--){
+    if(dp[i][j]!==dp[i-1][j]){selected_alloc.push(eligible[i-1]);j-=caps[i-1];}
+  }
+  var used_cap=selected_alloc.reduce(function(s,p){return s+p.capex;},0);
+  var total_npv_sel=selected_alloc.reduce(function(s,p){return s+p.npv;},0);
+  var not_selected=projects.filter(function(p){return !selected_alloc.includes(p);});
+
+  var html='<div class="rgrid">';
+  html+=rc('hl','Optimal portfolio NPV',fmtM(total_npv_sel),'','Max NPV within budget');
+  html+=rc('hl','Capital deployed',fmtM(used_cap),'','of $'+budget+'M budget');
+  html+=rc('ok','Projects selected',selected_alloc.length,'',selected_alloc.map(function(p){return p.name;}).join(', '));
+  html+=rc('','Remaining budget',fmtM(budget-used_cap),'','Undeployed capital');
+  html+=rc('','NPV per M$ invested',(total_npv_sel/used_cap).toFixed(3),'x','Portfolio PI');
+  html+=rc('','Projects deferred/rejected',not_selected.length,'',not_selected.map(function(p){return p.name;}).join(', ')||'None');
+  html+='</div>';
+
+  html+='<div class="analysis"><div class="atitle">/// CAPITAL ALLOCATION — OPTIMAL PORTFOLIO</div>';
+  html+=ar('gold','Optimal selection via 0/1 Knapsack algorithm',
+    'Selected: '+selected_alloc.map(function(p){return p.name+' (CAPEX $'+p.capex+'M, NPV $'+p.npv.toFixed(0)+'M, PI '+p.pi.toFixed(2)+')'}).join(' | ')+'.',
+    'Budget remaining: $'+(budget-used_cap).toFixed(0)+'M. Consider: (1) Partial investment (farm-down) in next-ranked project. (2) Phased development to fit within budget. (3) Project finance / reserve-based lending (RBL) to increase effective budget.');
+  if(not_selected.length>0){
+    html+=ar('wn','Deferred projects',
+      'Not selected within budget: '+not_selected.map(function(p){return p.name+'(PI:'+p.pi.toFixed(2)+')'}).join(', ')+'. These projects pass hurdle rates but capital is insufficient.',
+      'Options for deferred projects: (1) Farm-out (sell working interest to reduce CAPEX). Typical farm-out: sell 40-60% WI for carried CAPEX. (2) Staged development: reduce phase-1 scope. (3) Project bond / sukuk financing for CEMAC region assets.');
+  }
+  html+='</div>';
+
+  document.getElementById('r6').innerHTML=html;
+
+  // Waterfall chart
+  var alloc_labels=['Budget'];
+  var alloc_values=[budget];
+  var alloc_colors=['rgba(221,170,0,0.5)'];
+  var running=budget;
+  selected_alloc.forEach(function(p){
+    alloc_labels.push(p.name.substring(0,12));
+    alloc_values.push(-p.capex);
+    alloc_colors.push('rgba(204,0,0,0.5)');
+  });
+  alloc_labels.push('Remaining');
+  alloc_values.push(budget-used_cap);
+  alloc_colors.push('rgba(0,170,68,0.5)');
+
+  var ctx=document.getElementById('allocChart').getContext('2d');
+  if(allocChart){allocChart.destroy();}
+  allocChart=new Chart(ctx,{
+    type:'bar',
+    data:{labels:alloc_labels,
+      datasets:[{label:'Capital (M USD)',data:alloc_values,backgroundColor:alloc_colors,borderWidth:0}]},
+    options:{responsive:true,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#111',titleColor:'#fff',bodyColor:'#aaa'}},
+      scales:{x:{ticks:{color:'#888',font:{size:9}},grid:{color:'#0C0C18'}},
+        y:{title:{display:true,text:'M USD',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}}}
+    }
+  });
+}
+
+// ─── REFERENCE TABLE ─────────────────────────────────────────────────────────
+var benchmarks=[
+  ['NPV','> $0','Positive NPV required. Higher is better. Compare absolute NPV vs peer projects.'],
+  ['IRR','> WACC (typically 12-20%)','E&P sector hurdle rates: IOC 15-20%, NOC 10-15%, smaller operators 12-18%.'],
+  ['Profitability Index PI','> 1.2','PI = 1.0 means just recovering cost. PI > 1.5 is excellent. Used for ranking capital-constrained projects.'],
+  ['Payback period','< 5-7 years','Undiscounted payback. Offshore projects often 8-12 years; onshore 3-7 years. Short payback reduces political/price risk.'],
+  ['WACC (Oil sector)','8-15%','Developed nations: 8-12%. Emerging markets: 12-20%. Adds country risk premium (CRP). Damodaran dataset.'],
+  ['Beta (E&P)','0.9-1.4','Integrated majors β ≈ 0.9-1.1. Pure E&P independents β ≈ 1.2-1.5. Higher leverage → higher β.'],
+  ['EUR/well (onshore shale)','200-800 Mbbl','Permian Basin: 400-800 Mbbl. Conventional onshore: 1-20 MMbbl per field depending on size.'],
+  ['Decline rate Di','10-80%/yr','Shale: 60-80%/yr (b=0.7-0.9). Conventional: 10-25%/yr (b=0.3-0.6). Exponential: tight/mature fields.'],
+  ['Government take','50-90%','PSC regimes (Africa, SE Asia): 70-85% govt take. Royalty+Tax (US): 40-60% govt take. Competitive PSC: < 70%.'],
+  ['EMV positive probability','> 25-30%','Below 20% probability of success typically needs EMV > 3x dry hole cost to justify drilling.'],
+];
+document.getElementById('ref-table').innerHTML=benchmarks.map(function(r){
+  return '<tr><td class="tw">'+r[0]+'</td>'
+    +'<td style="color:var(--gold);font-family:var(--mono);">'+r[1]+'</td>'
+    +'<td style="color:#888;">'+r[2]+'</td></tr>';
+}).join('');
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+buildProjectCards();
+setTimeout(function(){calcDecline();calcWACC();},400);
+</script>
+</body>
+</html>
