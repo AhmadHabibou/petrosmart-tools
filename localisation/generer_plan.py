@@ -9,7 +9,6 @@ c.setTitle("Plan de localisation - M. Boubakari Oumarou")
 ROAD=HexColor("#d9d9d9"); EDGE=HexColor("#555555"); BLD=HexColor("#f2e6c9"); RED=HexColor("#c0392b"); GREEN=HexColor("#9fc89a")
 c.setFont("Helvetica-Bold",20); c.drawCentredString(W/2,H-52,"PLAN DE LOCALISATION")
 c.setFont("Helvetica-Bold",13); c.drawCentredString(W/2,H-74,"M. BOUBAKARI OUMAROU")
-c.setFont("Helvetica",10); c.drawCentredString(W/2,H-90,"Yaoundé, secteur Omnisport / Lycée Bilingue / Nkolmesseng")
 fx,fy,fw,fh=40,175,W-80,H-285
 c.setLineWidth(1.2); c.rect(fx,fy,fw,fh)
 c.saveState(); p=c.beginPath(); p.rect(fx,fy,fw,fh); c.clipPath(p,stroke=0,fill=0)
