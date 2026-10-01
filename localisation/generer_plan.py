@@ -36,11 +36,6 @@ for fn,w in roads: stroke(fn,w,ROAD)
 for (x,y),r in ((A,46),(B,42)):
     c.setFillColor(ROAD); c.circle(x,y,r,fill=1,stroke=0)
     c.setFillColor(GREEN); c.setStrokeColor(EDGE); c.setLineWidth(1); c.circle(x,y,15,fill=1,stroke=1)
-# Ralentisseurs
-c.setStrokeColor(HexColor("#f1c40f")); c.setLineWidth(3)
-def bz(t,p0,p1,p2,p3): return tuple((1-t)**3*a+3*(1-t)**2*t*b+3*(1-t)*t*t*cc+t**3*d for a,b,cc,d in zip(p0,p1,p2,p3))
-for t in (0.70,0.74,0.78):
-    px,py=bz(t,A,(215,600-18),(240,540),(240,450)); c.line(px-15,py,px+15,py)
 # Lycée (îlot entre route principale, voie latérale et route de Nkolmesseng)
 sl=(375-B[1])/(fx+fw+30-B[0])
 yb=lambda x: B[1]+sl*(x-B[0])+30
@@ -63,8 +58,7 @@ c.drawString(B[0]+48,B[1]-38,"CARREFOUR LYCÉE BILINGUE")
 lab(380,692,math.degrees(math.atan2(720-A[1],fx+fw+30-A[0])),"Vers NGOUSSO  →","Helvetica-Oblique")
 lab(236,430,90,"Vers OMNISPORT  →","Helvetica-Oblique")
 lab(440,330,math.degrees(math.atan(sl)),"Vers NKOLMESSENG  →","Helvetica-Oblique")
-c.setFont("Helvetica",8.5); px,py=bz(0.74,A,(215,582),(240,540),(240,450)); c.drawString(px+22,py-3,"Ralentisseurs")
-c.setFillColor(RED); c.setFont("Helvetica-Bold",10); c.drawRightString(sx-42,sy-4,"DOMICILE")
+c.setFont("Helvetica",8.5); c.setFillColor(RED); c.setFont("Helvetica-Bold",10); c.drawRightString(sx-42,sy-4,"DOMICILE")
 c.restoreState()
 c.setFont("Helvetica-Oblique",8); c.drawString(fx+6,fy+6,"Croquis non à l'échelle")
 # Légende
@@ -74,7 +68,7 @@ def sw(col,t,w=22):
     global x
     c.setFillColor(col); c.setStrokeColor(EDGE); c.rect(x,y-2,w,10,fill=1,stroke=1)
     c.setFillColor(black); c.drawString(x+w+6,y,t); x+=w+6+c.stringWidth(t,"Helvetica",9)+12
-sw(ROAD,"Voie"); sw(GREEN,"Carrefour"); sw(BLD,"Établissement scolaire"); sw(HexColor("#f1c40f"),"Ralentisseurs"); sw(RED,"Emplacement")
+sw(ROAD,"Voie"); sw(GREEN,"Carrefour"); sw(BLD,"Établissement scolaire"); sw(RED,"Emplacement")
 # Contacts
 cy=40; ch=95; c.setStrokeColor(black); c.setLineWidth(1); c.rect(fx,cy,fw,ch)
 c.setFont("Helvetica-Bold",11); c.drawString(fx+12,cy+ch-20,"CONTACTS")
