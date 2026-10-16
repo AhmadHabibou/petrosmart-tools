@@ -35,7 +35,7 @@ body::before{
   display:flex;align-items:center;gap:14px;
   box-shadow:0 0 60px rgba(204,119,0,0.06);
   position:relative;overflow:hidden;}
-.hdr::before{content:'🛢️';position:absolute;right:16px;top:50%;
+.hdr::before{content:'';position:absolute;right:16px;top:50%;
   transform:translateY(-50%);font-size:80px;opacity:0.05;pointer-events:none;}
 .hdr-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;font-size:26px;
@@ -182,7 +182,7 @@ select option{background:#0A0A14;}
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-icon">🛢️</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>Well Productivity Index Calculator</h1>
     <p>IPR Darcy / Vogel / Fetkovich / Klinkenberg - VLP - Operating point - AOF</p>
@@ -195,12 +195,12 @@ select option{background:#0A0A14;}
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab on" id="t1" onclick="sw(1)">📊 PI & IPR</button>
-  <button class="tab" id="t2" onclick="sw(2)">🌊 Vogel / Fetkovich</button>
-  <button class="tab" id="t3" onclick="sw(3)">⛽ Gas Well IPR</button>
-  <button class="tab" id="t4" onclick="sw(4)">🔄 IPR + VLP (Nodal)</button>
-  <button class="tab" id="t5" onclick="sw(5)">💉 Skin and Damage</button>
-  <button class="tab" id="t6" onclick="sw(6)">📚 Reference</button>
+  <button class="tab on" id="t1" onclick="sw(1)"> PI & IPR</button>
+  <button class="tab" id="t2" onclick="sw(2)"> Vogel / Fetkovich</button>
+  <button class="tab" id="t3" onclick="sw(3)"> Gas Well IPR</button>
+  <button class="tab" id="t4" onclick="sw(4)"> IPR + VLP (Nodal)</button>
+  <button class="tab" id="t5" onclick="sw(5)"> Skin and Damage</button>
+  <button class="tab" id="t6" onclick="sw(6)"> Reference</button>
 </div>
 
 <!-- ===== PANEL 1: PI & IPR (LINEAR) ===== -->
@@ -535,7 +535,7 @@ select option{background:#0A0A14;}
       <strong>Darcy IPR:</strong> Q = J × (Pr - Pwf) [linear, valid above Pb]<br>
       <strong>AOF (linear):</strong> Qmax = J × Pr [at Pwf = 0]<br>
       <strong>Darcy steady-state (radial flow):</strong><br>
-      J_Darcy = 0.00708 × k × h / (μ_o × Bo × (ln(re/rw) - 0.75 + S)) [bbl/d/psi with k in mD]<br>
+      J_Darcy = 0.00708 × k × h / (μ_o × Bo × (ln(re/rw) - 0.75 + S)) [bbl/d/psi with k in mD, h in ft, viscosity in cP; convert the input thickness from m to ft]<br>
       <strong>Vogel IPR (1968):</strong> Q/Qmax = 1 - 0.2×(Pwf/Pr) - 0.8×(Pwf/Pr)²<br>
       Qmax (Vogel AOF at Pwf=0) = Q_test / [1 - 0.2×(Pwf_t/Pr) - 0.8×(Pwf_t/Pr)²]<br>
       <strong>Composite IPR (Pr &gt; Pb):</strong><br>
@@ -610,7 +610,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',oil:'d-oil',well:'d-well'}[type]||'d-oil';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 
 function setMethod(m){
@@ -633,6 +633,7 @@ function calcPI(){
   var GOR=parseFloat(document.getElementById('GOR').value)||200;
   var k=parseFloat(document.getElementById('k_res').value)||50;
   var h=parseFloat(document.getElementById('h_res').value)||20;
+  var h_ft=h/0.3048; // UI metres to feet for the field-unit Darcy coefficient
   var mu_o=parseFloat(document.getElementById('mu_o').value)||2.5;
   var Bo=parseFloat(document.getElementById('Bo').value)||1.25;
   var re=parseFloat(document.getElementById('re').value)||500;
@@ -647,12 +648,12 @@ function calcPI(){
   var drawdown_des=Pr-Pwf_des;
 
   // Darcy-theoretical PI (no skin)
-  // SI version: J = (0.00708 × k × h) / (μ × Bo × (ln(re/rw) - 0.75 + S))
-  // In bbl/d/psi: J = 0.00708*k*h / (mu*Bo*(ln(re/rw)-0.75+S))
+  // Field units: h in feet, k in mD, mu in cP, J in STB/d/psi.
+  // Radius ratio is dimensionless; re and rw both remain in metres.
   // Convert bar to psi: 1 bar = 14.504 psi → J_bbl_psi = J_bbl_bar / 14.504
   var ln_term=Math.log(re/rw);
-  var J_darcy_noDmg=0.00708*k*h/(mu_o*Bo*(ln_term-0.75)); // bbl/d/psi
-  var J_darcy=0.00708*k*h/(mu_o*Bo*(ln_term-0.75+S)); // bbl/d/psi
+  var J_darcy_noDmg=0.00708*k*h_ft/(mu_o*Bo*(ln_term-0.75)); // bbl/d/psi
+  var J_darcy=0.00708*k*h_ft/(mu_o*Bo*(ln_term-0.75+S)); // bbl/d/psi
   var J_darcy_bar=J_darcy*14.504; // bbl/d/bar
   var J_darcy_noDmg_bar=J_darcy_noDmg*14.504;
 
@@ -693,7 +694,7 @@ function calcPI(){
   html+='<div class="fbox">'
     +'<strong>PI (test)</strong> = Q_test / (Pr - Pwf_t) = '+Q_test+' / ('+Pr+' - '+Pwf_t+') = <span class="hi">'+J_test.toFixed(3)+' bbl/d/bar</span><br>'
     +'<strong>Darcy J</strong> = 0.00708 × k × h / (μ × Bo × (ln(re/rw) - 0.75 + S))<br>'
-    +'= 0.00708 × '+k+' × '+h+' / ('+mu_o+' × '+Bo+' × ('+ln_term.toFixed(3)+' - 0.75 + '+S+')) = <span class="hi">'+J_darcy.toFixed(4)+' bbl/d/psi = '+J_darcy_bar.toFixed(3)+' bbl/d/bar</span><br>'
+    +'h = '+h+' m = '+h_ft.toFixed(4)+' ft<br>= 0.00708 × '+k+' × '+h_ft.toFixed(4)+' / ('+mu_o+' × '+Bo+' × ('+ln_term.toFixed(3)+' - 0.75 + '+S+')) = <span class="hi">'+J_darcy.toFixed(4)+' bbl/d/psi = '+J_darcy_bar.toFixed(3)+' bbl/d/bar</span><br>'
     +'<strong>AOF (composite)</strong> = Qb + J×Pb/1.8 = '+Qb.toFixed(0)+' + '+(J_test*Pb/1.8).toFixed(0)+' = <span class="hi">'+Qmax_composite.toFixed(0)+' bbl/d</span><br>'
     +'<strong>DR</strong> = '+J_darcy_bar.toFixed(3)+' / '+J_darcy_noDmg_bar.toFixed(3)+' = <span class="hi">'+(DR*100).toFixed(1)+'%</span>'
     +'</div>';
@@ -986,7 +987,7 @@ function calcNodal(){
   var flows=op_Q>0&&op_Pwf>THP;
 
   document.getElementById('op-point').innerHTML='<div class="op-badge">'
-    +'<div class="op-icon">'+(flows?'⚡':'❌')+'</div>'
+    +'<div class="op-icon">'+(flows?'':'')+'</div>'
     +'<div>'
     +'<div class="op-title">Natural flow operating point</div>'
     +'<div class="op-val">'+(flows?op_Q.toFixed(0):'No flow')+'</div>'
