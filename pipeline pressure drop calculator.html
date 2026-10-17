@@ -234,9 +234,8 @@ select option{background:#0A0A14;}
     <div class="ibox">
       <strong>Gas pipeline formulas:</strong><br>
       <strong>Weymouth</strong> (short, high-rate lines): f = C/D^(1/3), good for small-diameter pipelines.<br>
-      <strong>Panhandle A</strong> (intermediate efficiency): E factor 0.92 typical. Good for medium-pressure gas.<br>
-      <strong>Panhandle B</strong> (modified, high-pressure): More accurate at high Reynolds numbers.<br>
-      <strong>General Darcy-Weisbach</strong> with Colebrook-White friction factor is most accurate.
+      <strong>Panhandle A</strong>: empirical, with a pipeline efficiency E calibrated on operating data (E = 1 for a new, clean line).<br>
+      <strong>General flow equation</strong> with the Colebrook-White friction factor, Z at average pressure and elevation correction (Menon, 2005).
     </div>
     <div class="row3">
       <div class="field">
@@ -479,8 +478,8 @@ select option{background:#0A0A14;}
       <strong>Reynolds number:</strong> Re = ρ × v × D / μ [dimensionless]<br>
       <strong>Friction factor (Colebrook-White):</strong> 1/√f = -2 × log10(ε/(3.7D) + 2.51/(Re×√f))<br>
       <strong>Swamee-Jain (explicit):</strong> f = 0.25 / [log10(ε/(3.7D) + 5.74/Re^0.9)]²<br>
-      <strong>Weymouth (gas):</strong> Q = 3.7435×10⁻³ × D^(8/3) × √((P1²-P2²)/(γg×T×Z×L)) [Sm3/d]<br>
-      <strong>Panhandle A:</strong> Q = 435.87 × E × (T_sc/P_sc)^1.0788 × (P1²-P2²)^0.5394 / (γg^0.4606×T^0.5394×L^0.5394×D^1.0788)<br>
+      <strong>Weymouth (gas):</strong> Q = 433.5 E (Tb/Pb) [(P1²-P2²)/(γg T L Z)]^0.5 D^2.667 [scfd, psia, °R, mi, in]<br>
+      <strong>Panhandle A:</strong> Q = 435.87 E (Tb/Pb)^1.0788 [(P1²-P2²)/(γg^0.8539 T L Z)]^0.5394 D^2.6182<br>
       <strong>Hazen-Williams (water):</strong> Q = 0.2785 × C_HW × D^2.63 × S^0.54 [m3/s, S = slope = ΔP/(ρgL)]<br>
       <strong>Beggs-Brill Froude:</strong> Fr = vm/√(g×D) | NFr = vm²/(g×D)<br>
       <strong>Lockhart-Martinelli X:</strong> X_LM = (ΔP/L)_liquid/(ΔP/L)_gas)^0.5<br>
@@ -527,7 +526,7 @@ select option{background:#0A0A14;}
 
 <div class="foot">
   <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
-  · Darcy-Weisbach / Weymouth / Panhandle A&B / Beggs-Brill / API RP 14E · Educational tool only
+  · Darcy-Weisbach / Weymouth / Panhandle A / Beggs-Brill / API RP 14E · Educational tool only
 </div>
 </div>
 
@@ -664,165 +663,95 @@ function calcLiq(){
 }
 
 /* ====== PANEL 2: GAS ====== */
+/* PSA-CORE gas properties: Sutton pseudo-criticals, Dranchuk-Abou-Kassem Z, Lee-Gonzalez-Eakin viscosity */
+function psaPseudoCrit(g){return {Ppc:756.8-131.07*g-3.6*g*g, Tpc:169.2+349.5*g-74.0*g*g};}
+function psaZ(T_R,P_psia,g){
+  var pc=psaPseudoCrit(g),Tr=T_R/pc.Tpc,Pr=P_psia/pc.Ppc;
+  var A=[0,0.3265,-1.07,-0.5339,0.01569,-0.05165,0.5475,-0.7361,0.1844,0.1056,0.6134,0.721];
+  function f(Z){var r=0.27*Pr/(Z*Tr);
+    var z=1+(A[1]+A[2]/Tr+A[3]/Math.pow(Tr,3)+A[4]/Math.pow(Tr,4)+A[5]/Math.pow(Tr,5))*r
+      +(A[6]+A[7]/Tr+A[8]/(Tr*Tr))*r*r-A[9]*(A[7]/Tr+A[8]/(Tr*Tr))*Math.pow(r,5)
+      +A[10]*(1+A[11]*r*r)*(r*r/Math.pow(Tr,3))*Math.exp(-A[11]*r*r);
+    return Z-z;}
+  var lo=0.2,hi=3;for(var i=0;i<100;i++){var m=(lo+hi)/2;if(f(lo)*f(m)<=0)hi=m;else lo=m;}
+  return (lo+hi)/2;}
+function psaMuGas(T_R,P_psia,g,Z){
+  var M=28.97*g,rho=P_psia*M/(Z*10.7316*T_R)/62.428;
+  var K=(9.4+0.02*M)*Math.pow(T_R,1.5)/(209+19*M+T_R),X=3.5+986/T_R+0.01*M,Y=2.4-0.2*X;
+  return 1e-4*K*Math.exp(X*Math.pow(rho,Y));}
+
+/* Isothermal steady gas flow. Q in Sm3/d at 15 C and 1.01325 bar; P in bar(a); D in m; L in m; T in K.
+   gfe: general flow equation with Darcy f (Colebrook), P1^2 - e^s P2^2 = f Le Z R T G^2 / (D M), Le = L (e^s - 1)/s, s = 2 g M dz / (Z R T)
+   wey: Weymouth, Q[scfd] = 433.5 E (Tb/Pb) ((P1^2 - P2^2)/(G T L Z))^0.5 D^2.667 (psia, R, miles, in)
+   pa : Panhandle A, Q[scfd] = 435.87 E (Tb/Pb)^1.0788 ((P1^2 - P2^2)/(G^0.8539 T L Z))^0.5394 D^2.6182
+   (forms as given in Menon, Gas Pipeline Hydraulics, 2005). Z from DAK at the average pressure. */
+function psaGasLine(o,method){
+  var R=8314.46,M=28.97*o.g,Tsc=288.15,Psc=1.01325e5,P1=o.P1*1e5;
+  var A=Math.PI/4*o.D*o.D, rho_sc=Psc*M/(R*Tsc), mdot=o.Q/86400*rho_sc, G=mdot/A;
+  var P2=0.9*P1, Z=1, f=0.01, Re=0, mu=0.012, i;
+  for(i=0;i<30;i++){
+    var Pavg=2/3*(P1+P2-P1*P2/(P1+P2));
+    Z=psaZ(o.T*1.8,Pavg/6894.757,o.g); mu=psaMuGas(o.T*1.8,Pavg/6894.757,o.g,Z);
+    Re=G*o.D/(mu/1000); f=frictionFactor(Re,o.eps/o.D);
+    var s=2*9.80665*M*(o.dz||0)/(Z*R*o.T), Le=Math.abs(s)>1e-9?o.L*(Math.exp(s)-1)/s:o.L, P2sq;
+    if(method==='gfe'){P2sq=(P1*P1-f*Le*Z*R*o.T*G*G/(o.D*M))/Math.exp(s);}
+    else{
+      var Qs=o.Q*35.3147*(288.706/288.15)*(1.01325/1.01560); // scfd at 60 F, 14.73 psia (approx. 1.0016)
+      var p1=P1/6894.757,Tr=o.T*1.8,Lmi=o.L/1609.344,Din=o.D/0.0254,E=o.E||1,Tb=519.67,Pb=14.73;
+      var dq;
+      if(method==='wey'){dq=Math.pow(Qs/(433.5*E*(Tb/Pb)*Math.pow(Din,2.667)),2)*o.g*Tr*Lmi*Z;}
+      else {dq=Math.pow(Qs/(435.87*E*Math.pow(Tb/Pb,1.0788)*Math.pow(Din,2.6182)),1/0.5394)*Math.pow(o.g,0.8539)*Tr*Lmi*Z;}
+      P2sq=Math.pow((p1*p1-dq)*Math.pow(6894.757,2),1);
+    }
+    if(P2sq<=0) return {P2:0,Z:Z,f:f,Re:Re,mu:mu,feasible:false};
+    var P2n=Math.sqrt(P2sq); if(Math.abs(P2n-P2)<1) {P2=P2n;break;} P2=P2n;
+  }
+  return {P2:P2/1e5,Z:Z,f:f,Re:Re,mu:mu,feasible:true,rho_sc:rho_sc,M:M};
+}
 function calcGas(){
-  var D_mm=psaNum('g_D',500);
-  var L_km=psaNum('g_L',100);
-  var eps=psaNum('g_eps',0.046);
-  var Q_std=psaNum('g_Q',5000000); // Sm3/d
-  var gamma=psaNum('g_gamma',0.65);
-  var P1=psaNum('g_P1',70); // bar(a)
-  var T_C=psaNum('g_T',15);
-  var dz=psaNum('g_dz',0);
-  var E=psaNum('g_E',0.92);
-
-  var D=D_mm/1000;
-  var L=L_km*1000;
-  var T_K=T_C+273.15;
-  var Tsc=288.15, Psc=1.01325; // standard conditions
-
-  // Z factor approximation
-  var Pc=667+15*gamma-37.5*gamma*gamma; // psia
-  var Tc=168+325*gamma-12.5*gamma*gamma; // R
-  var P1_psia=P1*14.504;
-  var Ppr=P1_psia/Pc;
-  var Tpr=T_K*1.8/Tc;
-  var Z=1-3.52*Ppr/(10.73*Tpr)+0.274*Ppr*Ppr/(10.73*Tpr*Tpr);
-  Z=Math.max(0.6,Math.min(1.0,Z));
-
-  // Average gas density at line conditions
-  var MW_g=gamma*28.97;
-  var rho_avg=P1*1e5*MW_g/(Z*8314*T_K); // kg/m3
-
-  // Gas viscosity (Lee-Kesler approx)
-  var mu_g=0.0001*(( 9.4+0.02*MW_g)*Math.pow(T_K,1.5))/(209+19*MW_g+T_K);
-  mu_g=Math.max(0.008,Math.min(mu_g,0.025)); // clamp
-
-  // Actual volumetric flow at line conditions
-  var Q_act=Q_std/86400*(Z*T_K/Tsc)*(Psc/P1); // m3/s
-  var A=Math.PI/4*D*D;
-  var v=Q_act/A; // m/s
-
-  var Re=rho_avg*v*D/(mu_g/1000);
-  var f=frictionFactor(Re,eps/D_mm);
-
-  // Darcy-Weisbach ΔP² method (for gas)
-  // ΔP² = f × (L/D) × (ρ_avg × v²/2) × 2 × P1 (simplified pressure-squared)
-  var dP_DW=f*(L/D)*(rho_avg*v*v/2); // Pa average
-  var dP_DW_bar=dP_DW/1e5;
-  var P2_DW=P1-dP_DW_bar;
-
-  // Weymouth formula: Q = 3.7435e-3 × D^(8/3) × sqrt((P1²-P2²)/(γ×T×Z×L))
-  // Solve for P2: P2² = P1² - (Q/3.7435e-3/D^(8/3))² × γ×T×Z×L
-  var Q_Mscfd=Q_std/28317; // Mscf/d
-  var Wy_coeff=3.7435e-3*Math.pow(D_mm/1000*39.37,8/3); // ft units approx
-  // Using SI-friendly Weymouth: Q [Sm3/d] = 3.7435e-3 × D[m]^(8/3) × sqrt((P1²-P2²)/( γ×T×Z×L)) × 86400×Psc/(R_univ×Tsc)
-  // Simplified: P2_wy² = P1² - (Q_std × sqrt(γ×T×Z×L) / K_wy)²
-  var K_wy=3.7435e-3*Math.pow(D,8/3)*Math.sqrt(1/(gamma*T_K*Z*L))*86400;
-  // P2_wy: iterative
-  var P2_wy=P1*0.8;
-  for(var i=0;i<20;i++){
-    var Z_avg=Z; // simplified constant Z
-    var K=3.7435e-3*Math.pow(D,8/3)*Math.sqrt((P1*P1-P2_wy*P2_wy)/(gamma*T_K*Z_avg*L))*86400;
-    var err=K-Q_std/1e6; // in MSm3/d
-    if(Math.abs(err)<1e-4) break;
-    P2_wy-=err*(P1-P2_wy)*0.1;
-    P2_wy=Math.max(0.1,P2_wy);
-  }
-  // Panhandle A: Q = 435.87 × E × (Tsc/Psc)^1.0788 × (P1²-P2²)^0.5394 / (γg^0.4606 × T^0.5394 × L^0.5394 × D_in^1.0788)
-  // Using D in inches, P in psia, Q in Mscf/d, L in miles, T in R
-  var D_in=D*39.37;
-  var L_mi=L_km*0.6214;
-  var T_R=T_K*1.8;
-  var P1_pa=P1*14.504; // psia
-  var P2_pa=P1_pa*0.85; // initial
-  for(var j=0;j<20;j++){
-    var Q_calc_PA=435.87*E*Math.pow(Tsc*1.8/14.696,1.0788)*Math.pow(P1_pa*P1_pa-P2_pa*P2_pa,0.5394)/(Math.pow(gamma,0.4606)*Math.pow(T_R,0.5394)*Math.pow(L_mi,0.5394)*Math.pow(D_in,1.0788));
-    var err2=Q_calc_PA-Q_Mscfd;
-    if(Math.abs(err2)<0.01) break;
-    P2_pa-=err2*0.5;
-    P2_pa=Math.max(1,P2_pa);
-  }
-  var P2_PA=P2_pa/14.504;
-
+  var D_mm=psaNum('g_D',500), L_km=psaNum('g_L',100), eps=psaNum('g_eps',0.046), Q_std=psaNum('g_Q',5000000);
+  var gamma=psaNum('g_gamma',0.65), P1=psaNum('g_P1',70), T_C=psaNum('g_T',15), dz=psaNum('g_dz',0), E=psaNum('g_E',0.92);
+  var D=D_mm/1000, L=L_km*1000, T_K=T_C+273.15, Tsc=288.15, Psc=1.01325;
+  var o={Q:Q_std,P1:P1,D:D,L:L,T:T_K,g:gamma,eps:eps/1000,dz:dz,E:E};
+  var r=psaGasLine(o,'gfe'), rw=psaGasLine(o,'wey'), rp=psaGasLine(o,'pa');
+  var P2_DW=r.P2, P2_wy=rw.P2, P2_PA=rp.P2, dP_DW_bar=P1-P2_DW;
+  var MW_g=gamma*28.97, Z1=psaZ(T_K*1.8,P1*14.5038,gamma);
+  var rho_avg=P1*1e5*MW_g/(Z1*8314.46*T_K);
+  var Q_act=Q_std/86400*(Z1*T_K/Tsc)*(Psc/P1);
+  var A=Math.PI/4*D*D, v=Q_act/A, Re=r.Re, f=r.f, Z=r.Z;
   var html='<div class="rgrid">';
-  html+=rc('hl','ΔP (Darcy-Weisbach)',dP_DW_bar.toFixed(2),'bar','P2 = '+P2_DW.toFixed(1)+' bar(a)');
-  html+=rc('gas','P2 (Weymouth)',P2_wy.toFixed(2),'bar(a)','ΔP = '+(P1-P2_wy).toFixed(2)+' bar');
-  html+=rc('gas','P2 (Panhandle A)',P2_PA.toFixed(2),'bar(a)','E = '+E+', ΔP = '+(P1-P2_PA).toFixed(2)+' bar');
-  html+=rc('','Gas velocity (actual)',v.toFixed(2),'m/s','At P = '+P1+' bar, T = '+T_C+'°C');
-  html+=rc('','Reynolds number',Re.toFixed(0),'-',Re>1e6?'Fully turbulent':'Transitional/turbulent');
-  html+=rc('','Friction factor f',f.toFixed(5),'-','Colebrook-White');
-  html+=rc('','Z factor (estimated)',Z.toFixed(3),'-','Hall-Yarborough approx');
-  html+=rc('','Gas density (actual)',rho_avg.toFixed(2),'kg/m3','At P1, T conditions');
-  html+=rc('','Actual volumetric flow',(Q_act*3600).toFixed(0),'m3/hr actual','= '+(v).toFixed(2)+' m/s at '+(A*1e4).toFixed(0)+' cm2');
-  html+=rc('','Velocity / speed of sound',(v/(Math.sqrt(1.3*8314/MW_g*T_K))*100).toFixed(1),'% Mach','Mach < 50% recommended');
+  html+=rc('hl','P2 (general flow equation)',r.feasible?P2_DW.toFixed(2):'not feasible','bar(a)','ΔP = '+dP_DW_bar.toFixed(2)+' bar, Darcy f (Colebrook)');
+  html+=rc('gas','P2 (Weymouth)',rw.feasible?P2_wy.toFixed(2):'not feasible','bar(a)','E = '+E);
+  html+=rc('gas','P2 (Panhandle A)',rp.feasible?P2_PA.toFixed(2):'not feasible','bar(a)','E = '+E);
+  html+=rc('','Gas velocity at inlet',v.toFixed(2),'m/s','At P1 = '+P1+' bar, T = '+T_C+'°C');
+  html+=rc('','Reynolds number',Re.toExponential(3),'-','mass flux x D / viscosity');
+  html+=rc('','Friction factor f (Darcy)',f.toFixed(5),'-','Colebrook-White');
+  html+=rc('','Z at average pressure',Z.toFixed(3),'-','Dranchuk-Abou-Kassem');
+  html+=rc('','Gas density at inlet',rho_avg.toFixed(2),'kg/m3','At P1, T');
+  html+=rc('','Actual flow at inlet',(Q_act*3600).toFixed(0),'m3/h','');
   html+='</div>';
-
   html+='<div class="fbox">'
-    +'<strong>Darcy-Weisbach:</strong> ΔP = f×(L/D)×(ρ×v²/2) = '+f.toFixed(5)+'×'+(L/D).toFixed(0)+'×('+(rho_avg).toFixed(2)+'×'+v.toFixed(2)+'²/2) / 1e5 = <span class="hi">'+dP_DW_bar.toFixed(2)+' bar</span><br>'
-    +'<strong>Weymouth:</strong> P2 = sqrt(P1² - (Q/K_Wy)² × γ×T×Z×L) = <span class="hig">'+P2_wy.toFixed(2)+' bar(a)</span><br>'
-    +'<strong>Panhandle A:</strong> (iterative, E='+E+') = <span class="hig">'+P2_PA.toFixed(2)+' bar(a)</span><br>'
-    +'<strong>Z factor:</strong> '+Z.toFixed(3)+' | Re = '+Re.toFixed(0)+' | f = '+f.toFixed(5)+' | ρ_avg = '+rho_avg.toFixed(2)+' kg/m3'
+    +'<strong>General flow equation (isothermal):</strong> P1² - e^s P2² = f Le Z R T G² / (D M), G = mass flux<br>'
+    +'<strong>Weymouth:</strong> Q = 433.5 E (Tb/Pb) [(P1² - P2²)/(G T L Z)]^0.5 D^2.667 (scfd, psia, °R, mi, in)<br>'
+    +'<strong>Panhandle A:</strong> Q = 435.87 E (Tb/Pb)^1.0788 [(P1² - P2²)/(G^0.8539 T L Z)]^0.5394 D^2.6182<br>'
+    +'Source: Menon, <em>Gas Pipeline Hydraulics</em> (2005). Weymouth and Panhandle are empirical; their efficiency E must be calibrated on line data.'
     +'</div>';
-
   var rows='';
-  var v_sonic=Math.sqrt(1.3*8314/MW_g*T_K);
-  if(v>v_sonic*0.5){
-    rows+=ar('er','Gas velocity exceeds 50% of sonic speed (Mach '+(v/v_sonic).toFixed(2)+')','High gas velocities create noise, erosion and potential flow instability. At Mach > 0.3-0.5, compressibility effects become significant and pressure drop increases non-linearly.','Increase pipe diameter to reduce velocity. Mach number target < 0.3 for process piping, < 0.5 for export pipelines. Next larger diameter: '+(Math.ceil(D_mm/100+1)*100)+' mm reduces velocity to '+(v*D*D/Math.pow((Math.ceil(D_mm/100+1)*100)/1000,2)).toFixed(2)+' m/s (Mach '+(v*D*D/Math.pow((Math.ceil(D_mm/100+1)*100)/1000,2)/v_sonic).toFixed(2)+').');
-  }
-  if((P1-P2_wy)/P1>0.3){
-    rows+=ar('wn','High pressure ratio ('+(( P1-P2_wy)/P1*100).toFixed(0)+'% pressure loss)','Losing more than 30% of inlet pressure over the pipeline length. Gas density varies significantly along the line, making pressure-average calculations less accurate. Full isothermal compressible flow simulation recommended.','Consider: (1) Installing intermediate compressor station at approximately km '+(L_km/2).toFixed(0)+'. (2) Increasing pipe diameter. (3) Operating at higher inlet pressure to reduce pressure ratio. For ΔP/P1 > 40%, use AGA Equation 1 (full compressible flow) for accurate sizing.');
-  }
-  rows+=ar('pipe','Gas pipeline comparison','Darcy-Weisbach: P2 = '+P2_DW.toFixed(1)+' bar | Weymouth: P2 = '+P2_wy.toFixed(1)+' bar | Panhandle A: P2 = '+P2_PA.toFixed(1)+' bar. Differences reflect equation applicability: Weymouth is conservative (higher ΔP) for large diameter, Panhandle A more accurate for Re > 10M.','Use Darcy-Weisbach with Colebrook friction factor for most accurate results. Weymouth is conservative and good for design. Panhandle A/B: recommended for long-distance gas transmission at high Re (> 10 million).');
-
+  rows+=ar('pipe','Comparison','General flow equation: '+P2_DW.toFixed(1)+' bar | Weymouth: '+P2_wy.toFixed(1)+' bar | Panhandle A: '+P2_PA.toFixed(1)+' bar. Kinetic energy change is neglected; the temperature is held constant.','');
   html+='<div class="analysis"><div class="atitle gas">/// GAS PIPELINE ANALYSIS</div>'+rows+'</div>';
   document.getElementById('r2').innerHTML=html;
-
-  // Gas chart: P2 vs Q for 3 methods
   var Q_range=Array.from({length:20},function(_,i){return Q_std*(0.3+i*0.07);});
   var ctx=document.getElementById('gasChart').getContext('2d');
   if(gasChart){gasChart.destroy();}
-  gasChart=new Chart(ctx,{
-    type:'line',
-    data:{
-      datasets:[
-        {label:'Darcy-Weisbach',data:Q_range.map(function(q){
-          var qa=q/86400*(Z*T_K/Tsc)*(Psc/P1);
-          var v2=qa/A;
-          var Re2=rho_avg*v2*D/(mu_g/1000);
-          var f2=frictionFactor(Re2,eps/D_mm);
-          var dp=f2*(L/D)*(rho_avg*v2*v2/2)/1e5;
-          return {x:q/1e6,y:Math.max(0,P1-dp)};
-        }),borderColor:'#3366AA',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4},
-        {label:'Weymouth',data:Q_range.map(function(q){
-          var P2w=P1*0.8;
-          for(var ii=0;ii<15;ii++){
-            var K=3.7435e-3*Math.pow(D,8/3)*Math.sqrt(Math.max(0,P1*P1-P2w*P2w)/(gamma*T_K*Z*L))*86400;
-            P2w-=(K-q/1e6)*0.3; P2w=Math.max(0.1,P2w);
-          }
-          return {x:q/1e6,y:Math.max(0,P2w)};
-        }),borderColor:'#2266EE',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4,borderDash:[5,3]},
-        {label:'Panhandle A',data:Q_range.map(function(q){
-          var QM=q/28317;
-          var P2p=P1_pa*0.85;
-          for(var ii=0;ii<15;ii++){
-            var QC=435.87*E*Math.pow(Tsc*1.8/14.696,1.0788)*Math.pow(Math.max(0,P1_pa*P1_pa-P2p*P2p),0.5394)/(Math.pow(gamma,0.4606)*Math.pow(T_R,0.5394)*Math.pow(L_mi,0.5394)*Math.pow(D_in,1.0788));
-            P2p-=(QC-QM)*0.5; P2p=Math.max(1,P2p);
-          }
-          return {x:q/1e6,y:Math.max(0,P2p/14.504)};
-        }),borderColor:'#00AAAA',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4,borderDash:[3,3]},
-        {label:'Operating point',data:[{x:Q_std/1e6,y:P2_DW}],
-          borderColor:'#fff',backgroundColor:'#FF8800',pointRadius:8,showLine:false}
-      ]
-    },
-    options:{
-      responsive:true,
-      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
-      scales:{
-        x:{type:'linear',title:{display:true,text:'Gas flow rate (MSm3/d)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}},
-        y:{title:{display:true,text:'Outlet pressure P2 (bar)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0}
-      }
-    }
-  });
+  function line(m){return Q_range.map(function(q){var x=Object.assign({},o,{Q:q});return {x:q/1e6,y:Math.max(0,psaGasLine(x,m).P2)};});}
+  gasChart=new Chart(ctx,{type:'line',data:{datasets:[
+      {label:'General flow equation',data:line('gfe'),borderColor:'#2266EE',backgroundColor:'transparent',borderWidth:2,pointRadius:0},
+      {label:'Weymouth',data:line('wey'),borderColor:'#FF8800',backgroundColor:'transparent',borderWidth:2,pointRadius:0},
+      {label:'Panhandle A',data:line('pa'),borderColor:'#00BB55',backgroundColor:'transparent',borderWidth:2,pointRadius:0},
+      {label:'Operating point',data:[{x:Q_std/1e6,y:P2_DW}],borderColor:'#fff',backgroundColor:'#2266EE',pointRadius:8,showLine:false}]},
+    options:{responsive:true,plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{x:{type:'linear',title:{display:true,text:'Gas flow rate (million Sm3/d)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'}},
+        y:{title:{display:true,text:'Outlet pressure P2 (bar a)',color:'#666'},ticks:{color:'#888'},grid:{color:'#0C0C18'},min:0}}}});
 }
 
 /* ====== PANEL 3: MULTIPHASE ====== */
