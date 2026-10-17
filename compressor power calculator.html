@@ -556,8 +556,8 @@ select option{background:#0A0A16;}
       <strong>Shaft power:</strong> W_shaft = W_hyd / η_pump<br>
       <strong>Motor input power:</strong> W_motor = W_shaft / η_motor<br>
       <strong>Motor selected (IEC):</strong> P_motor ≥ W_shaft x service_factor<br>
-      <strong>Specific speed Ns:</strong> Ns = N(RPM) x sqrt(Q(m3/s)) / H(m)^0.75<br>
-      <strong>Ns < 500:</strong> Radial centrifugal | <strong>500-3000:</strong> Mixed flow | <strong>>3000:</strong> Axial<br>
+      <strong>Specific speed Ns (US units):</strong> Ns = N (rpm) x sqrt(Q (gpm)) / H (ft)^0.75<br>
+      <strong>Ns &lt; 4,000:</strong> radial | <strong>4,000 to 9,000:</strong> mixed flow | <strong>&gt; 9,000:</strong> axial (approximate boundaries)<br>
       <strong>NPSHa:</strong> P_atm/(rho x g) - P_vapor/(rho x g) ± Z_s - H_f_suction [m]<br>
       <strong>NPSHa must exceed NPSHr by ≥ 0.5m minimum</strong> (ISO 9906)<br>
       <strong>Affinity laws:</strong> Q ~ N | H ~ N^2 | P ~ N^3 (speed change)<br>
@@ -702,7 +702,7 @@ function calcComp(){
   // Polytropic power
   var H_p=Z1*R*T1*(n/(n-1))*(Math.pow(r,(n-1)/n)-1);
   var W_p=mdot*H_p;
-  var W_shaft_p=W_p; // polytropic power IS shaft power when using polytropic head and mdot
+  var W_shaft_p=W_p/(eta_p/100); // gas power = mass flow x polytropic head / polytropic efficiency
 
   // Isothermal (minimum theoretical)
   var W_iso=mdot*Z1*R*T1*Math.log(r);
@@ -710,12 +710,12 @@ function calcComp(){
 
   // Volumetric flow (actual inlet)
   var Qin=mdot/((P1*1e5)/(Z1*R*T1)); // m3/s (from P=rho*R*T/Z → rho=P*MW/(Z*R_univ*T))
-  var rho1=(P1*1e5)*MW/(Z1*R_univ*T1)/1000; // kg/m3 (using kg units)
+  var rho1=(P1*1e5)*MW/(Z1*R_univ*T1); // kg/m3
   var Qin_m3s=mdot/rho1;
   var Qin_m3h=Qin_m3s*3600;
 
   // Mach / temp check
-  var T_limit=180; // typical centrifugal limit
+  var T_limit=180; // screening value only; machine limits are set by the vendor
   var T2_ok=T2_is_C<=T_limit;
 
   var html='<div class="rgrid">';
@@ -744,7 +744,7 @@ function calcComp(){
 
   var rows='';
   if(!T2_ok){
-    rows+=ar('er','Discharge temperature exceeds limit ('+T2_is_C.toFixed(0)+'°C > '+T_limit+'°C)','For centrifugal compressors, discharge temperature above 180°C degrades seal oil, labyrinth seal materials, and internal clearances. For reciprocating compressors, above 150°C risks cylinder lubricant breakdown and valve damage.','Add intercooling (split into multiple stages). Each additional stage reduces discharge T significantly. For r = '+r.toFixed(1)+', two stages would give T2 ≈ '+( T1*(Math.pow(r,0.5)*(gamma-1)/gamma + 1/eta_is*(Math.pow(Math.pow(r,0.5),(gamma-1)/gamma)-1) + 0) - 273.15).toFixed(0) +'°C per stage. Target: T_discharge ≤ 150°C (reciprocating) or 180°C (centrifugal).');
+    rows+=ar('er','Discharge temperature above the '+T_limit+' °C screening value ('+T2_is_C.toFixed(0)+' °C)','The allowable discharge temperature depends on the machine, seals and lubricant and is set by the vendor; 180 °C is used here only as a screening value. Consider an additional stage with intercooling.','');
   } else if(T2_is_C>150){
     rows+=ar('wn','High discharge temperature ('+T2_is_C.toFixed(0)+'°C)','Discharge temperature is within centrifugal limits but exceeds recommended reciprocating limit of 150°C. Evaluate compressor type carefully. Higher T accelerates seal wear and requires higher-grade lubricants.','For reciprocating service at this temperature: use synthetic lubricants rated to 180°C+. Verify cylinder material (ductile iron vs steel). Consider 2-stage design if reciprocating: '+(T1*(Math.pow(Math.pow(r,0.5),(gamma-1)/gamma)-1)/(eta_is/100)+T1-273.15).toFixed(0)+'°C per stage estimate.');
   } else {
@@ -963,8 +963,9 @@ function calcPump(){
   var npsh_ok=npsh_margin>=0.5;
 
   // Specific speed
-  var Ns=N_rpm*Math.sqrt(Q_m3s)/Math.pow(H,0.75);
-  var pump_type=Ns<500?'Radial centrifugal':Ns<3000?'Mixed flow centrifugal':'Axial flow';
+  // Specific speed in US customary units (rpm, gpm, ft): radial below about 4,000, mixed flow 4,000 to 9,000, axial above (Karassik, Pump Handbook)
+  var Ns=N_rpm*Math.sqrt(Q_m3s*15850.3)/Math.pow(H*3.28084,0.75);
+  var pump_type=Ns<4000?'Radial centrifugal':Ns<9000?'Mixed flow':'Axial flow';
 
   // Viscosity correction (Hydraulic Institute method, simplified)
   // For visc > 10 cP, apply correction factor
@@ -991,7 +992,7 @@ function calcPump(){
   html+=rc('','Motor input power',(W_motor_in/1000).toFixed(2),'kW','Electrical consumption');
   html+=rc('','Overall efficiency',eta_overall.toFixed(1),'%','eta_pump x eta_motor');
   html+=rc(npsh_ok?'ok':'er','NPSHa',NPSHa.toFixed(2),'m',npsh_ok?'Margin: +'+npsh_margin.toFixed(2)+'m':'CAVITATION RISK! Margin: '+npsh_margin.toFixed(2)+'m');
-  html+=rc('','Specific speed Ns',Ns.toFixed(0),'-',pump_type);
+  html+=rc('','Specific speed Ns (US units)',Ns.toFixed(0),'rpm, gpm, ft',pump_type);
   html+=rc('','Shaft torque',torque.toFixed(1),'N.m','At '+N_rpm+' RPM');
   html+=rc('','VFD at 80% speed',(P_80).toFixed(1),'kW','Saving: '+(W_shaft/1000-P_80).toFixed(1)+' kW (P~N³)');
   html+=rc('','Annual energy cost (est.)','$'+(W_motor_in/1000*8760*0.1/1000).toFixed(0)+'k','/yr','At $0.10/kWh, 8760h/yr');
@@ -1001,7 +1002,7 @@ function calcPump(){
     +'<strong>W_hyd</strong> = rho x g x Q x H = '+rho+' x 9.81 x '+(Q_m3s).toFixed(5)+' x '+H+' = <span class="hib">'+(W_hyd/1000).toFixed(2)+' kW</span><br>'
     +'<strong>W_shaft</strong> = '+( W_hyd/1000).toFixed(2)+' / '+(eta_p/100)+' = <span class="hib">'+(W_shaft/1000).toFixed(2)+' kW</span><br>'
     +'<strong>NPSHa</strong> = P_atm/(rho.g) - Pv/(rho.g) + Hs - Hfs = '+Patm_m.toFixed(2)+' - '+Pv_m.toFixed(2)+' + '+Hs+' - '+Hfs+' = <span class="hib">'+NPSHa.toFixed(2)+' m</span><br>'
-    +'<strong>Ns</strong> = '+N_rpm+' x sqrt('+(Q_m3s).toFixed(4)+') / '+H+'^0.75 = <span class="hib">'+Ns.toFixed(0)+'</span> → '+pump_type+'<br>'
+    +'<strong>Ns</strong> = '+N_rpm+' x sqrt('+(Q_m3s*15850.3).toFixed(0)+' gpm) / ('+(H*3.28084).toFixed(1)+' ft)^0.75 = <span class="hib">'+Ns.toFixed(0)+'</span> → '+pump_type+'<br>'
     +'<strong>VFD (80% speed):</strong> P_new = P_old x 0.8³ = '+(W_shaft/1000).toFixed(2)+' x 0.512 = <span class="hiok">'+P_80.toFixed(1)+' kW</span>'
     +'</div>';
 
