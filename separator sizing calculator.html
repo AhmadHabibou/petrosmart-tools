@@ -200,26 +200,26 @@ select option{background:#0A0A12;}
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-icon">🫧</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>Separator Sizing Calculator</h1>
     <p>Two-phase and three-phase - horizontal and vertical - API 12J / GPSA Engineering Data Book</p>
   </div>
   <div class="hdr-phases">
-    <div class="phase-tag pt-gas"><span>⬆</span>GAS</div>
+    <div class="phase-tag pt-gas"><span></span>GAS</div>
     <div class="phase-tag pt-oil"><span>●</span>OIL</div>
-    <div class="phase-tag pt-water"><span>💧</span>WATER</div>
+    <div class="phase-tag pt-water"><span></span>WATER</div>
   </div>
 </div>
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab on" id="t1" onclick="sw(1)">📥 Inlet Conditions</button>
-  <button class="tab" id="t2" onclick="sw(2)">📐 Sizing - Horiz.</button>
-  <button class="tab" id="t3" onclick="sw(3)">📐 Sizing - Vert.</button>
-  <button class="tab" id="t4" onclick="sw(4)">💧 3-Phase Design</button>
-  <button class="tab" id="t5" onclick="sw(5)">🔍 Nozzle and Internals</button>
-  <button class="tab" id="t6" onclick="sw(6)">📚 GPSA Reference</button>
+  <button class="tab on" id="t1" onclick="sw(1)"> Inlet Conditions</button>
+  <button class="tab" id="t2" onclick="sw(2)"> Sizing - Horiz.</button>
+  <button class="tab" id="t3" onclick="sw(3)"> Sizing - Vert.</button>
+  <button class="tab" id="t4" onclick="sw(4)"> 3-Phase Design</button>
+  <button class="tab" id="t5" onclick="sw(5)"> Nozzle and Internals</button>
+  <button class="tab" id="t6" onclick="sw(6)"> GPSA Reference</button>
 </div>
 
 <!-- ===== PANEL 1: INLET CONDITIONS ===== -->
@@ -603,7 +603,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',st:'d-st',info:'d-info'}[type]||'d-st';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 
 function setPhase(n){

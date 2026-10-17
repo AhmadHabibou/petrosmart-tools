@@ -149,7 +149,7 @@ select option{background:#0A0A14;}
 <div class="wrap">
 
 <div class="hdr">
-  <div class="hdr-icon">🔴</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>Pipeline Pressure Drop Calculator</h1>
     <p>Darcy-Weisbach / Weymouth / Panhandle / Hazen-Williams - Liquid, Gas, Multiphase</p>
@@ -162,12 +162,12 @@ select option{background:#0A0A14;}
 </div>
 
 <div class="tabs">
-  <button class="tab on" id="t1" onclick="sw(1)">💧 Liquid Pipeline</button>
-  <button class="tab" id="t2" onclick="sw(2)">⛽ Gas Pipeline</button>
-  <button class="tab" id="t3" onclick="sw(3)">🌀 Multiphase</button>
-  <button class="tab" id="t4" onclick="sw(4)">📊 Pressure Profile</button>
-  <button class="tab" id="t5" onclick="sw(5)">⚡ Erosion and Slug</button>
-  <button class="tab" id="t6" onclick="sw(6)">📚 Reference</button>
+  <button class="tab on" id="t1" onclick="sw(1)"> Liquid Pipeline</button>
+  <button class="tab" id="t2" onclick="sw(2)"> Gas Pipeline</button>
+  <button class="tab" id="t3" onclick="sw(3)"> Multiphase</button>
+  <button class="tab" id="t4" onclick="sw(4)"> Pressure Profile</button>
+  <button class="tab" id="t5" onclick="sw(5)"> Erosion and Slug</button>
+  <button class="tab" id="t6" onclick="sw(6)"> Reference</button>
 </div>
 
 <!-- PANEL 1: LIQUID -->
@@ -553,7 +553,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',pipe:'d-pipe',gas:'d-gas'}[type]||'d-pipe';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 
 /* Colebrook-White friction factor (iterative) */
@@ -1022,7 +1022,7 @@ function calcErosion(){
 
   var html='<div class="rgrid">';
   html+=rc(erosion_ok?'ok':'er','Erosion velocity limit',V_e_ms.toFixed(2),'m/s (API RP 14E)','C='+C+', ρmix='+rho_m.toFixed(0)+' kg/m3');
-  html+=rc(erosion_ok?'ok':'er','Mixture velocity',vm.toFixed(2),'m/s',erosion_ok?'✅ Below Ve ('+erosion_ratio.toFixed(0)+'%)':'❌ EXCEEDS Ve ('+erosion_ratio.toFixed(0)+'%)');
+  html+=rc(erosion_ok?'ok':'er','Mixture velocity',vm.toFixed(2),'m/s',erosion_ok?' Below Ve ('+erosion_ratio.toFixed(0)+'%)':' EXCEEDS Ve ('+erosion_ratio.toFixed(0)+'%)');
   html+=rc('liq','Liquid superficial v',vsl.toFixed(3),'m/s','vsl / vm = '+(lamL*100).toFixed(0)+'%');
   html+=rc('gas','Gas superficial v',vsg.toFixed(3),'m/s','vsg / vm = '+((1-lamL)*100).toFixed(0)+'%');
   html+=rc('','Mixture density ρm',rho_m.toFixed(1),'kg/m3','No-slip homogeneous');

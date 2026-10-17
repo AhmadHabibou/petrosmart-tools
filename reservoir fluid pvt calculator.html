@@ -162,7 +162,7 @@ select option{background:#0A0A14;}
 <div class="wrap">
 
 <div class="hdr">
-  <div class="hdr-icon">🔬</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>Reservoir Fluid PVT Calculator</h1>
     <p>Bo / Rs / Bg / co / μo - Standing / Vasquez-Beggs / Al-Marhoun / Lee-Gonzalez-Eakin</p>
@@ -175,12 +175,12 @@ select option{background:#0A0A14;}
 </div>
 
 <div class="tabs">
-  <button class="tab on" id="t1" onclick="sw(1)">🛢️ Oil PVT (Bo, Rs)</button>
-  <button class="tab" id="t2" onclick="sw(2)">⛽ Gas PVT (Bg, Z)</button>
-  <button class="tab" id="t3" onclick="sw(3)">📊 PVT Table</button>
-  <button class="tab" id="t4" onclick="sw(4)">💧 Fluid Properties</button>
-  <button class="tab" id="t5" onclick="sw(5)">📈 Phase Diagram</button>
-  <button class="tab" id="t6" onclick="sw(6)">📚 Reference</button>
+  <button class="tab on" id="t1" onclick="sw(1)"> Oil PVT (Bo, Rs)</button>
+  <button class="tab" id="t2" onclick="sw(2)"> Gas PVT (Bg, Z)</button>
+  <button class="tab" id="t3" onclick="sw(3)"> PVT Table</button>
+  <button class="tab" id="t4" onclick="sw(4)"> Fluid Properties</button>
+  <button class="tab" id="t5" onclick="sw(5)"> Phase Diagram</button>
+  <button class="tab" id="t6" onclick="sw(6)"> Reference</button>
 </div>
 
 <!-- PANEL 1: OIL PVT -->
@@ -514,7 +514,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',pvt:'d-pvt',oil:'d-oil'}[type]||'d-pvt';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 
 function setCorr(c){
@@ -936,8 +936,8 @@ function calcTable(){
     +'<th>Bg (rb/scf)</th><th>Z</th>'
     +'</tr></thead><tbody>';
   rows.forEach(function(r){
-    tableHtml+='<tr'+(r.isPb?' class="pb-row"':'')+' title="'+(r.isPb?'★ Bubble point':'')+'">'
-      +'<td>'+(r.isPb?'★ ':'')+r.P.toFixed(1)+'</td>'
+    tableHtml+='<tr'+(r.isPb?' class="pb-row"':'')+' title="'+(r.isPb?' Bubble point':'')+'">'
+      +'<td>'+(r.isPb?' ':'')+r.P.toFixed(1)+'</td>'
       +'<td>'+r.Rs.toFixed(1)+'</td>'
       +'<td>'+r.Bo.toFixed(4)+'</td>'
       +'<td>'+(r.co!=null?r.co.toExponential(3):'-')+'</td>'

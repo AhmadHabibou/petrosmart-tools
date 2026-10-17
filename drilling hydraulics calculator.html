@@ -29,7 +29,7 @@ body::before{content:'';position:fixed;inset:0;
   padding:18px 22px;margin-bottom:18px;
   display:flex;align-items:center;gap:14px;
   box-shadow:0 0 60px rgba(68,136,68,0.06);position:relative;overflow:hidden;}
-.hdr::before{content:'⛏️';position:absolute;right:16px;top:50%;
+.hdr::before{content:'';position:absolute;right:16px;top:50%;
   transform:translateY(-50%);font-size:80px;opacity:0.05;pointer-events:none;}
 .hdr-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;font-size:26px;
@@ -155,7 +155,7 @@ select option{background:#0A0A14;}
 <div class="wrap">
 
 <div class="hdr">
-  <div class="hdr-icon">⛏️</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>Drilling Hydraulics Calculator</h1>
     <p>Pressure losses - ECD - Bit hydraulics - Pump optimization - API RP 13D</p>
@@ -168,12 +168,12 @@ select option{background:#0A0A14;}
 </div>
 
 <div class="tabs">
-  <button class="tab on" id="t1" onclick="sw(1)">🔩 Drillstring ΔP</button>
-  <button class="tab" id="t2" onclick="sw(2)">🌀 Annular ΔP</button>
-  <button class="tab" id="t3" onclick="sw(3)">⚡ ECD and Pressure</button>
-  <button class="tab" id="t4" onclick="sw(4)">💥 Bit Hydraulics</button>
-  <button class="tab" id="t5" onclick="sw(5)">⚙️ Pump Optimization</button>
-  <button class="tab" id="t6" onclick="sw(6)">📚 Reference</button>
+  <button class="tab on" id="t1" onclick="sw(1)"> Drillstring ΔP</button>
+  <button class="tab" id="t2" onclick="sw(2)"> Annular ΔP</button>
+  <button class="tab" id="t3" onclick="sw(3)"> ECD and Pressure</button>
+  <button class="tab" id="t4" onclick="sw(4)"> Bit Hydraulics</button>
+  <button class="tab" id="t5" onclick="sw(5)"> Pump Optimization</button>
+  <button class="tab" id="t6" onclick="sw(6)"> Reference</button>
 </div>
 
 <!-- PANEL 1: DRILLSTRING ΔP -->
@@ -575,7 +575,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',drill:'d-drill',mud:'d-mud'}[type]||'d-drill';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 
 /* Bingham Plastic pipe ΔP [psi] */

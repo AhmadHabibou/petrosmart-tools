@@ -177,7 +177,7 @@ select option{background:#0A0A12;}
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-icon">🔥</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>Heat Exchanger Calculator</h1>
     <p>LMTD method - NTU-effectiveness - Fouling - Shell and tube / Plate</p>
@@ -190,12 +190,12 @@ select option{background:#0A0A12;}
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab on" id="t1" onclick="sw(1)">🌡️ LMTD Method</button>
-  <button class="tab" id="t2" onclick="sw(2)">📊 NTU-Effectiveness</button>
-  <button class="tab" id="t3" onclick="sw(3)">⚗️ Fouling Analysis</button>
-  <button class="tab" id="t4" onclick="sw(4)">🔧 Shell and Tube</button>
-  <button class="tab" id="t5" onclick="sw(5)">📋 Plate HX</button>
-  <button class="tab" id="t6" onclick="sw(6)">📚 Reference</button>
+  <button class="tab on" id="t1" onclick="sw(1)"> LMTD Method</button>
+  <button class="tab" id="t2" onclick="sw(2)"> NTU-Effectiveness</button>
+  <button class="tab" id="t3" onclick="sw(3)"> Fouling Analysis</button>
+  <button class="tab" id="t4" onclick="sw(4)"> Shell and Tube</button>
+  <button class="tab" id="t5" onclick="sw(5)"> Plate HX</button>
+  <button class="tab" id="t6" onclick="sw(6)"> Reference</button>
 </div>
 
 <!-- ===== PANEL 1: LMTD METHOD ===== -->
@@ -204,7 +204,7 @@ select option{background:#0A0A12;}
     <div class="stitle hot">/// heat exchanger type</div>
     <div class="hx-types">
       <div class="hxbtn on" id="hx-counter" onclick="setHX('counter')">
-        <div class="hxbtn-icon">↔️</div>
+        <div class="hxbtn-icon">↔</div>
         <div class="hxbtn-name">Counter-flow</div>
         <div class="hxbtn-desc">Most efficient</div>
       </div>
@@ -214,12 +214,12 @@ select option{background:#0A0A12;}
         <div class="hxbtn-desc">Co-current</div>
       </div>
       <div class="hxbtn" id="hx-shell" onclick="setHX('shell')">
-        <div class="hxbtn-icon">🏭</div>
+        <div class="hxbtn-icon"></div>
         <div class="hxbtn-name">Shell & Tube</div>
         <div class="hxbtn-desc">1-2 pass</div>
       </div>
       <div class="hxbtn" id="hx-cross" onclick="setHX('cross')">
-        <div class="hxbtn-icon">✚</div>
+        <div class="hxbtn-icon"></div>
         <div class="hxbtn-name">Cross flow</div>
         <div class="hxbtn-desc">Unmixed</div>
       </div>
@@ -648,7 +648,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',hot:'d-hot',cold:'d-cold'}[type]||'d-hot';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 
 function setHX(type){

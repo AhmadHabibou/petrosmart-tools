@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Petrosmart — Premium Calculators</title>
+<title>Petrosmart - Premium Calculators</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -388,14 +388,14 @@
 </div>
 
 <!-- ============================================================ -->
-<!--  TAB 1 — KILL SHEET                                          -->
+<!--  TAB 1 - KILL SHEET                                          -->
 <!-- ============================================================ -->
 <div id="panel-killsheet" class="panel active">
 <div class="container">
 
   <div class="section-header">
     <div class="section-title">Well Control Kill Sheet</div>
-    <div class="section-sub">Driller's Method & Wait-and-Weight — ICP, FCP, KMW, MAASP calculation</div>
+    <div class="section-sub">Driller's Method & Wait-and-Weight - ICP, FCP, KMW, MAASP calculation</div>
   </div>
 
   <div class="grid2">
@@ -416,11 +416,11 @@
           <input type="number" id="ks_gain" value="12" placeholder="12">
         </div>
         <div class="field">
-          <label>SIDPP — shut-in drill pipe pressure <span class="unit">(psi)</span></label>
+          <label>SIDPP - shut-in drill pipe pressure <span class="unit">(psi)</span></label>
           <input type="number" id="ks_sidpp" value="350" placeholder="350">
         </div>
         <div class="field">
-          <label>SICP — shut-in casing pressure <span class="unit">(psi)</span></label>
+          <label>SICP - shut-in casing pressure <span class="unit">(psi)</span></label>
           <input type="number" id="ks_sicp" value="420" placeholder="420">
         </div>
       </div>
@@ -465,23 +465,23 @@
         <div class="card-title">Kill Sheet Results</div>
         <table class="kill-table" id="ks-results-table">
           <tbody>
-            <tr><td>Kill Mud Weight (KMW)</td><td class="val accent" id="r_kmw">—</td></tr>
-            <tr><td>Initial Circ. Pressure (ICP)</td><td class="val blue" id="r_icp">—</td></tr>
-            <tr><td>Final Circ. Pressure (FCP)</td><td class="val blue" id="r_fcp">—</td></tr>
-            <tr><td>MAASP</td><td class="val" id="r_maasp">—</td></tr>
-            <tr><td>Strokes to bit (kill mud)</td><td class="val" id="r_strokes_bit">—</td></tr>
-            <tr><td>Total strokes (full circ.)</td><td class="val" id="r_strokes_total">—</td></tr>
-            <tr><td>Influx type estimate</td><td class="val" id="r_influx">—</td></tr>
-            <tr><td>Pore pressure gradient</td><td class="val" id="r_pp_grad">—</td></tr>
-            <tr><td>KMW with 0.2 ppg margin</td><td class="val accent" id="r_kmw_margin">—</td></tr>
-            <tr><td>SICP vs MAASP</td><td class="val" id="r_sicp_vs_maasp">—</td></tr>
+            <tr><td>Kill Mud Weight (KMW)</td><td class="val accent" id="r_kmw">-</td></tr>
+            <tr><td>Initial Circ. Pressure (ICP)</td><td class="val blue" id="r_icp">-</td></tr>
+            <tr><td>Final Circ. Pressure (FCP)</td><td class="val blue" id="r_fcp">-</td></tr>
+            <tr><td>MAASP</td><td class="val" id="r_maasp">-</td></tr>
+            <tr><td>Strokes to bit (kill mud)</td><td class="val" id="r_strokes_bit">-</td></tr>
+            <tr><td>Total strokes (full circ.)</td><td class="val" id="r_strokes_total">-</td></tr>
+            <tr><td>Influx type estimate</td><td class="val" id="r_influx">-</td></tr>
+            <tr><td>Pore pressure gradient</td><td class="val" id="r_pp_grad">-</td></tr>
+            <tr><td>KMW with 0.2 ppg margin</td><td class="val accent" id="r_kmw_margin">-</td></tr>
+            <tr><td>SICP vs MAASP</td><td class="val" id="r_sicp_vs_maasp">-</td></tr>
           </tbody>
         </table>
         <div id="ks-status"></div>
       </div>
 
       <div class="card" style="margin-top:16px;">
-        <div class="card-title">Driller's Method — Pressure Schedule</div>
+        <div class="card-title">Driller's Method - Pressure Schedule</div>
         <table class="kill-table" id="ks-drill-method">
           <thead>
             <tr>
@@ -491,10 +491,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td>Cycle 1 start</td><td class="val" id="dm_c1_start">—</td><td style="color:var(--text3);font-size:11px;">Circulate with original MW</td></tr>
-            <tr><td>Cycle 1 end</td><td class="val" id="dm_c1_end">—</td><td style="color:var(--text3);font-size:11px;">Kick at surface</td></tr>
-            <tr><td>Cycle 2 start</td><td class="val blue" id="dm_c2_start">—</td><td style="color:var(--text3);font-size:11px;">Pump kill mud (ICP)</td></tr>
-            <tr><td>Cycle 2 end</td><td class="val blue" id="dm_c2_end">—</td><td style="color:var(--text3);font-size:11px;">Kill mud at bit (FCP)</td></tr>
+            <tr><td>Cycle 1 start</td><td class="val" id="dm_c1_start">-</td><td style="color:var(--text3);font-size:11px;">Circulate with original MW</td></tr>
+            <tr><td>Cycle 1 end</td><td class="val" id="dm_c1_end">-</td><td style="color:var(--text3);font-size:11px;">Kick at surface</td></tr>
+            <tr><td>Cycle 2 start</td><td class="val blue" id="dm_c2_start">-</td><td style="color:var(--text3);font-size:11px;">Pump kill mud (ICP)</td></tr>
+            <tr><td>Cycle 2 end</td><td class="val blue" id="dm_c2_end">-</td><td style="color:var(--text3);font-size:11px;">Kill mud at bit (FCP)</td></tr>
           </tbody>
         </table>
       </div>
@@ -515,13 +515,13 @@
 </div>
 
 <!-- ============================================================ -->
-<!--  TAB 2 — DLS + FATIGUE                                       -->
+<!--  TAB 2 - DLS + FATIGUE                                       -->
 <!-- ============================================================ -->
 <div id="panel-dls" class="panel">
 <div class="container">
 
   <div class="section-header">
-    <div class="section-title">DLS — Dogleg Severity & Drill Pipe Fatigue</div>
+    <div class="section-title">DLS - Dogleg Severity & Drill Pipe Fatigue</div>
     <div class="section-sub">Full DLS formula + bending stress + API RP 7G fatigue life estimation</div>
   </div>
 
@@ -532,19 +532,19 @@
         <div class="card-title">Survey Station Data</div>
         <div class="grid2">
           <div class="field">
-            <label>Inclination 1 — I₁ <span class="unit">(°)</span></label>
+            <label>Inclination 1 - I₁ <span class="unit">(°)</span></label>
             <input type="number" id="dls_i1" value="5.0" step="0.1">
           </div>
           <div class="field">
-            <label>Inclination 2 — I₂ <span class="unit">(°)</span></label>
+            <label>Inclination 2 - I₂ <span class="unit">(°)</span></label>
             <input type="number" id="dls_i2" value="10.0" step="0.1">
           </div>
           <div class="field">
-            <label>Azimuth 1 — Az₁ <span class="unit">(°)</span></label>
+            <label>Azimuth 1 - Az₁ <span class="unit">(°)</span></label>
             <input type="number" id="dls_az1" value="45.0" step="0.1">
           </div>
           <div class="field">
-            <label>Azimuth 2 — Az₂ <span class="unit">(°)</span></label>
+            <label>Azimuth 2 - Az₂ <span class="unit">(°)</span></label>
             <input type="number" id="dls_az2" value="60.0" step="0.1">
           </div>
         </div>
@@ -563,10 +563,10 @@
         <div class="field">
           <label>Pipe grade</label>
           <select id="dls_grade">
-            <option value="75000">Grade E — 75,000 psi</option>
-            <option value="105000">Grade X — 105,000 psi</option>
-            <option value="120000">Grade G — 120,000 psi</option>
-            <option value="135000">Grade S — 135,000 psi</option>
+            <option value="75000">Grade E - 75,000 psi</option>
+            <option value="105000">Grade X - 105,000 psi</option>
+            <option value="120000">Grade G - 120,000 psi</option>
+            <option value="135000">Grade S - 135,000 psi</option>
           </select>
         </div>
         <div class="field">
@@ -589,32 +589,32 @@
       <div class="results-grid" id="dls-results" style="margin-top:0;">
         <div class="result-card highlight">
           <div class="result-label">DLS</div>
-          <div class="result-value" id="r_dls">—</div>
+          <div class="result-value" id="r_dls">-</div>
           <div class="result-unit">°/100 ft</div>
         </div>
         <div class="result-card">
           <div class="result-label">Dogleg Angle</div>
-          <div class="result-value" id="r_dl">—</div>
+          <div class="result-value" id="r_dl">-</div>
           <div class="result-unit">degrees</div>
         </div>
         <div class="result-card">
           <div class="result-label">Bending Stress</div>
-          <div class="result-value" id="r_bend">—</div>
+          <div class="result-value" id="r_bend">-</div>
           <div class="result-unit">psi</div>
         </div>
         <div class="result-card">
           <div class="result-label">Cycles to failure</div>
-          <div class="result-value" id="r_nf">—</div>
+          <div class="result-value" id="r_nf">-</div>
           <div class="result-unit">API RP 7G</div>
         </div>
         <div class="result-card">
           <div class="result-label">Cycles accumulated</div>
-          <div class="result-value" id="r_nacc">—</div>
+          <div class="result-value" id="r_nacc">-</div>
           <div class="result-unit">at planned time</div>
         </div>
         <div class="result-card">
           <div class="result-label">Fatigue ratio</div>
-          <div class="result-value" id="r_ratio">—</div>
+          <div class="result-value" id="r_ratio">-</div>
           <div class="result-unit">Nacc / Nf</div>
         </div>
       </div>
@@ -623,12 +623,12 @@
         <div class="card-title">Fatigue Analysis</div>
         <table class="kill-table">
           <tbody>
-            <tr><td>Azimuth change ΔAz</td><td class="val" id="r_daz">—</td></tr>
-            <tr><td>DLS (inclination only)</td><td class="val" id="r_dls_simple">—</td></tr>
-            <tr><td>Azimuth contribution</td><td class="val accent" id="r_az_contrib">—</td></tr>
-            <tr><td>Side force (at 300k lbs tension)</td><td class="val" id="r_sideforce">—</td></tr>
-            <tr><td>Hours to fatigue failure</td><td class="val" id="r_hours_fail">—</td></tr>
-            <tr><td>DLS limit for current grade (API)</td><td class="val" id="r_dls_limit">—</td></tr>
+            <tr><td>Azimuth change ΔAz</td><td class="val" id="r_daz">-</td></tr>
+            <tr><td>DLS (inclination only)</td><td class="val" id="r_dls_simple">-</td></tr>
+            <tr><td>Azimuth contribution</td><td class="val accent" id="r_az_contrib">-</td></tr>
+            <tr><td>Side force (at 300k lbs tension)</td><td class="val" id="r_sideforce">-</td></tr>
+            <tr><td>Hours to fatigue failure</td><td class="val" id="r_hours_fail">-</td></tr>
+            <tr><td>DLS limit for current grade (API)</td><td class="val" id="r_dls_limit">-</td></tr>
           </tbody>
         </table>
         <div id="dls-status"></div>
@@ -641,9 +641,9 @@
             <tr><th>DLS Range</th><th>Classification</th><th>Drill Pipe Impact</th></tr>
           </thead>
           <tbody>
-            <tr><td style="color:var(--green);">0 – 2°/100ft</td><td style="color:var(--green);">Low</td><td style="color:var(--text3);font-size:11px;">Negligible fatigue</td></tr>
-            <tr><td style="color:var(--accent);">2 – 5°/100ft</td><td style="color:var(--accent);">Moderate</td><td style="color:var(--text3);font-size:11px;">Monitor — 300k–700k cycles</td></tr>
-            <tr><td style="color:#f97316;">5 – 10°/100ft</td><td style="color:#f97316;">High</td><td style="color:var(--text3);font-size:11px;">Failure risk &lt;100k cycles</td></tr>
+            <tr><td style="color:var(--green);">0 - 2°/100ft</td><td style="color:var(--green);">Low</td><td style="color:var(--text3);font-size:11px;">Negligible fatigue</td></tr>
+            <tr><td style="color:var(--accent);">2 - 5°/100ft</td><td style="color:var(--accent);">Moderate</td><td style="color:var(--text3);font-size:11px;">Monitor - 300k-700k cycles</td></tr>
+            <tr><td style="color:#f97316;">5 - 10°/100ft</td><td style="color:#f97316;">High</td><td style="color:var(--text3);font-size:11px;">Failure risk &lt;100k cycles</td></tr>
             <tr><td style="color:var(--red);">&gt; 10°/100ft</td><td style="color:var(--red);">Critical</td><td style="color:var(--text3);font-size:11px;">Immediate corrective action</td></tr>
           </tbody>
         </table>
@@ -652,7 +652,7 @@
   </div>
 
   <div class="chart-container">
-    <div class="chart-title">Bending stress vs DLS — 5" drill pipe fatigue envelope</div>
+    <div class="chart-title">Bending stress vs DLS - 5" drill pipe fatigue envelope</div>
     <canvas id="fatigueChart" height="220" role="img" aria-label="Graphique contrainte de flexion vs sévérité dogleg pour drill pipe 5 pouces">Courbe de fatigue drill pipe.</canvas>
   </div>
 
@@ -668,7 +668,7 @@
 </div>
 
 <!-- ============================================================ -->
-<!--  TAB 3 — MUD WEIGHT WINDOW                                   -->
+<!--  TAB 3 - MUD WEIGHT WINDOW                                   -->
 <!-- ============================================================ -->
 <div id="panel-mudwindow" class="panel">
 <div class="container">
@@ -714,32 +714,32 @@
       <div class="results-grid" style="margin-top:0; grid-template-columns: 1fr 1fr;">
         <div class="result-card">
           <div class="result-label">Pore Pressure</div>
-          <div class="result-value" id="mw_r_pp">—</div>
+          <div class="result-value" id="mw_r_pp">-</div>
           <div class="result-unit">psi</div>
         </div>
         <div class="result-card">
           <div class="result-label">Fracture Pressure</div>
-          <div class="result-value" id="mw_r_fp">—</div>
+          <div class="result-value" id="mw_r_fp">-</div>
           <div class="result-unit">psi</div>
         </div>
         <div class="result-card highlight">
           <div class="result-label">Min MW (drilling)</div>
-          <div class="result-value" id="mw_r_min">—</div>
+          <div class="result-value" id="mw_r_min">-</div>
           <div class="result-unit">ppg</div>
         </div>
         <div class="result-card highlight">
           <div class="result-label">Max MW (no losses)</div>
-          <div class="result-value" id="mw_r_max">—</div>
+          <div class="result-value" id="mw_r_max">-</div>
           <div class="result-unit">ppg</div>
         </div>
         <div class="result-card">
           <div class="result-label">MW Window</div>
-          <div class="result-value" id="mw_r_window">—</div>
+          <div class="result-value" id="mw_r_window">-</div>
           <div class="result-unit">ppg margin</div>
         </div>
         <div class="result-card">
           <div class="result-label">Max MW with ECD</div>
-          <div class="result-value" id="mw_r_ecd_max">—</div>
+          <div class="result-value" id="mw_r_ecd_max">-</div>
           <div class="result-unit">ppg (circulating)</div>
         </div>
       </div>
@@ -748,12 +748,12 @@
         <div class="card-title">Window Analysis</div>
         <table class="kill-table">
           <tbody>
-            <tr><td>Min MW — EMW</td><td class="val" id="mw_min_emw">—</td></tr>
-            <tr><td>Max MW — EMW</td><td class="val" id="mw_max_emw">—</td></tr>
-            <tr><td>Recommended drilling MW</td><td class="val accent" id="mw_rec">—</td></tr>
-            <tr><td>ECD at recommended MW</td><td class="val" id="mw_ecd_at_rec">—</td></tr>
-            <tr><td>Trip-in MW requirement</td><td class="val" id="mw_trip_in">—</td></tr>
-            <tr><td>Window classification</td><td class="val" id="mw_class">—</td></tr>
+            <tr><td>Min MW - EMW</td><td class="val" id="mw_min_emw">-</td></tr>
+            <tr><td>Max MW - EMW</td><td class="val" id="mw_max_emw">-</td></tr>
+            <tr><td>Recommended drilling MW</td><td class="val accent" id="mw_rec">-</td></tr>
+            <tr><td>ECD at recommended MW</td><td class="val" id="mw_ecd_at_rec">-</td></tr>
+            <tr><td>Trip-in MW requirement</td><td class="val" id="mw_trip_in">-</td></tr>
+            <tr><td>Window classification</td><td class="val" id="mw_class">-</td></tr>
           </tbody>
         </table>
         <div id="mw-status"></div>
@@ -762,7 +762,7 @@
   </div>
 
   <div class="chart-container">
-    <div class="chart-title">Mud weight window — pressure profile at TVD</div>
+    <div class="chart-title">Mud weight window - pressure profile at TVD</div>
     <canvas id="mudWindowChart" height="200" role="img" aria-label="Fenêtre de poids de boue avec pression de pore et gradient de fracturation">Fenêtre MW.</canvas>
   </div>
 
@@ -772,8 +772,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 const d2r = d => d * Math.PI / 180;
-const fmt = (v, dec=1) => isNaN(v) || !isFinite(v) ? '—' : v.toFixed(dec);
-const fmtInt = v => isNaN(v) || !isFinite(v) ? '—' : Math.round(v).toLocaleString();
+const fmt = (v, dec=1) => isNaN(v) || !isFinite(v) ? '-' : v.toFixed(dec);
+const fmtInt = v => isNaN(v) || !isFinite(v) ? '-' : Math.round(v).toLocaleString();
 
 function switchTab(id, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -831,11 +831,11 @@ function calcKillSheet() {
 
   const statusEl = document.getElementById('ks-status');
   if (sicp > maasp) {
-    statusEl.innerHTML = '<div class="status-banner danger"><div class="status-dot"></div>CRITICAL — SICP exceeds MAASP (' + fmtInt(maasp) + ' psi). Risk of shoe fracture and underground blowout. Bleed off with caution.</div>';
+    statusEl.innerHTML = '<div class="status-banner danger"><div class="status-dot"></div>CRITICAL - SICP exceeds MAASP (' + fmtInt(maasp) + ' psi). Risk of shoe fracture and underground blowout. Bleed off with caution.</div>';
   } else if (sicp > maasp * 0.8) {
-    statusEl.innerHTML = '<div class="status-banner warning"><div class="status-dot"></div>WARNING — SICP at ' + fmt(sicp/maasp*100,0) + '% of MAASP. Limited pressure margin during kill. Monitor shoe carefully.</div>';
+    statusEl.innerHTML = '<div class="status-banner warning"><div class="status-dot"></div>WARNING - SICP at ' + fmt(sicp/maasp*100,0) + '% of MAASP. Limited pressure margin during kill. Monitor shoe carefully.</div>';
   } else {
-    statusEl.innerHTML = '<div class="status-banner safe"><div class="status-dot"></div>SAFE — Pressure margins acceptable. Proceed with kill operation per planned method.</div>';
+    statusEl.innerHTML = '<div class="status-banner safe"><div class="status-dot"></div>SAFE - Pressure margins acceptable. Proceed with kill operation per planned method.</div>';
   }
 }
 
@@ -907,13 +907,13 @@ function calcDLS() {
 
   const statusEl = document.getElementById('dls-status');
   if (ratio > 1) {
-    statusEl.innerHTML = '<div class="status-banner danger"><div class="status-dot"></div>FAILURE PREDICTED — Accumulated cycles exceed fatigue life at planned hours. Reduce drilling time, reduce DLS, or replace pipe.</div>';
+    statusEl.innerHTML = '<div class="status-banner danger"><div class="status-dot"></div>FAILURE PREDICTED - Accumulated cycles exceed fatigue life at planned hours. Reduce drilling time, reduce DLS, or replace pipe.</div>';
   } else if (ratio > 0.5) {
-    statusEl.innerHTML = '<div class="status-banner warning"><div class="status-dot"></div>WARNING — ' + fmt(ratio*100, 0) + '% of fatigue life consumed. Inspect pipe at next trip. Consider reducing DLS or RPM.</div>';
+    statusEl.innerHTML = '<div class="status-banner warning"><div class="status-dot"></div>WARNING - ' + fmt(ratio*100, 0) + '% of fatigue life consumed. Inspect pipe at next trip. Consider reducing DLS or RPM.</div>';
   } else if (dls > dls_limit) {
     statusEl.innerHTML = '<div class="status-banner warning"><div class="status-dot"></div>DLS exceeds API limit for this grade (' + dls_limit + '°/100ft). Ream smooth or re-evaluate trajectory.</div>';
   } else {
-    statusEl.innerHTML = '<div class="status-banner safe"><div class="status-dot"></div>Within acceptable limits — DLS and fatigue ratio manageable at planned parameters.</div>';
+    statusEl.innerHTML = '<div class="status-banner safe"><div class="status-dot"></div>Within acceptable limits - DLS and fatigue ratio manageable at planned parameters.</div>';
   }
 
   buildFatigueChart(dls, bend_stress, od);
@@ -1010,7 +1010,7 @@ function calcMudWindow() {
   let classification = '';
   let classColor = '';
   if (window < 0.5) { classification = 'NARROW (<0.5 ppg)'; classColor = 'red'; }
-  else if (window < 1.0) { classification = 'TIGHT (0.5–1.0 ppg)'; classColor = 'accent'; }
+  else if (window < 1.0) { classification = 'TIGHT (0.5-1.0 ppg)'; classColor = 'accent'; }
   else { classification = 'ADEQUATE (>1.0 ppg)'; classColor = 'green'; }
 
   document.getElementById('mw_r_pp').textContent = fmtInt(pp);
@@ -1028,11 +1028,11 @@ function calcMudWindow() {
 
   const statusEl = document.getElementById('mw-status');
   if (window < 0.5) {
-    statusEl.innerHTML = '<div class="status-banner danger"><div class="status-dot"></div>NARROW WINDOW — Less than 0.5 ppg margin. ECD management critical. Consider MPD (managed pressure drilling).</div>';
+    statusEl.innerHTML = '<div class="status-banner danger"><div class="status-dot"></div>NARROW WINDOW - Less than 0.5 ppg margin. ECD management critical. Consider MPD (managed pressure drilling).</div>';
   } else if (window < 1.0) {
-    statusEl.innerHTML = '<div class="status-banner warning"><div class="status-dot"></div>TIGHT WINDOW — Pump rate, pipe speed, and losses must be carefully managed to stay within bounds.</div>';
+    statusEl.innerHTML = '<div class="status-banner warning"><div class="status-dot"></div>TIGHT WINDOW - Pump rate, pipe speed, and losses must be carefully managed to stay within bounds.</div>';
   } else {
-    statusEl.innerHTML = '<div class="status-banner safe"><div class="status-dot"></div>ADEQUATE WINDOW — Sufficient margin for standard drilling operations at this depth.</div>';
+    statusEl.innerHTML = '<div class="status-banner safe"><div class="status-dot"></div>ADEQUATE WINDOW - Sufficient margin for standard drilling operations at this depth.</div>';
   }
 
   buildMudChart(tvd, min_mw_drill, max_mw_drill, rec_mw, ecd_at_rec);

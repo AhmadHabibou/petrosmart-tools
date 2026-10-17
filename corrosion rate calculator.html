@@ -35,7 +35,7 @@ body::before{
   display:flex;align-items:center;gap:14px;
   box-shadow:0 0 60px rgba(204,102,51,0.06);
   position:relative;overflow:hidden;}
-.hdr::before{content:'⚗️';position:absolute;right:16px;top:50%;
+.hdr::before{content:'';position:absolute;right:16px;top:50%;
   transform:translateY(-50%);font-size:80px;opacity:0.04;pointer-events:none;}
 .hdr-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;font-size:26px;
@@ -201,7 +201,7 @@ select option{background:#0A0A14;}
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-icon">🦠</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>Corrosion Rate Calculator</h1>
     <p>CO2 / H2S - de Waard-Milliams screening / ISO 15156 / NACE SP0775 - Material selection</p>
@@ -215,12 +215,12 @@ select option{background:#0A0A14;}
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab on" id="t1" onclick="sw(1)">🌡️ CO2 Corrosion</button>
-  <button class="tab" id="t2" onclick="sw(2)">☠️ H2S Sour Service</button>
-  <button class="tab" id="t3" onclick="sw(3)">📏 Pipe Life Calc.</button>
-  <button class="tab" id="t4" onclick="sw(4)">🧪 Material Selection</button>
-  <button class="tab" id="t5" onclick="sw(5)">💉 Inhibitor Design</button>
-  <button class="tab" id="t6" onclick="sw(6)">📚 Reference</button>
+  <button class="tab on" id="t1" onclick="sw(1)"> CO2 Corrosion</button>
+  <button class="tab" id="t2" onclick="sw(2)"> H2S Sour Service</button>
+  <button class="tab" id="t3" onclick="sw(3)"> Pipe Life Calc.</button>
+  <button class="tab" id="t4" onclick="sw(4)"> Material Selection</button>
+  <button class="tab" id="t5" onclick="sw(5)"> Inhibitor Design</button>
+  <button class="tab" id="t6" onclick="sw(6)"> Reference</button>
 </div>
 
 <!-- ===== PANEL 1: CO2 CORROSION ===== -->
@@ -591,7 +591,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',rust:'d-rust',teal:'d-teal'}[type]||'d-rust';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 /* Severity categories for carbon steel general corrosion, NACE SP0775 */
 function sevBadge(cr){
@@ -963,7 +963,7 @@ function calcMatSel(){
   mats.forEach(function(m){
     var compat=m.ok&&(m.sour===true||(typeof m.sour==='boolean'&&!is_sour)||( typeof m.sour==='number'&&PH2S_MPa<=m.sour));
     html+='<tr><td class="tw">'+m.name+'</td><td>'+m.co2+'</td><td>'+(m.sour===true?'Full range':m.sour===false?'Non-sour only':(m.sour*10).toFixed(3)+' bar')+'</td>'
-      +'<td style="color:'+(compat?'var(--ok)':'var(--err)')+';">'+(compat?'✅ YES':'❌ NO')+'</td><td>'+m.notes+'</td></tr>';
+      +'<td style="color:'+(compat?'var(--ok)':'var(--err)')+';">'+(compat?' YES':' NO')+'</td><td>'+m.notes+'</td></tr>';
   });
   html+='</tbody></table></div>';
 

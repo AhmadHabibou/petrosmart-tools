@@ -176,7 +176,7 @@ select option{background:#111;}
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-icon">🔩</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>Pipe Wall Thickness Calculator</h1>
     <p>ASME B31.3 / B31.4 / B31.8 / API 5L - Petroleum Pipeline Design</p>
@@ -518,7 +518,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',info:'d-info'}[type]||'d-info';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 function barToMPa(b){return b/10;}
 

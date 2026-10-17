@@ -220,7 +220,7 @@ select option{background:#0A0A14;}
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-icon">⚛️</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>H2 Production Cost Calculator</h1>
     <p>Grey / Blue / Green hydrogen - Levelized Cost of Hydrogen (LCOH)</p>
@@ -234,12 +234,12 @@ select option{background:#0A0A14;}
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab on t-gray" id="t1" onclick="sw(1)">⚙️ Grey H2 (SMR)</button>
-  <button class="tab t-blue" id="t2" onclick="sw(2)">💧 Blue H2 (SMR+CCS)</button>
-  <button class="tab t-green" id="t3" onclick="sw(3)">⚡ Green H2 (PEM)</button>
-  <button class="tab t-red" id="t4" onclick="sw(4)">📊 Comparison</button>
-  <button class="tab t-gold" id="t5" onclick="sw(5)">🎯 Break-even</button>
-  <button class="tab t-purple" id="t6" onclick="sw(6)">📚 Reference</button>
+  <button class="tab on t-gray" id="t1" onclick="sw(1)"> Grey H2 (SMR)</button>
+  <button class="tab t-blue" id="t2" onclick="sw(2)"> Blue H2 (SMR+CCS)</button>
+  <button class="tab t-green" id="t3" onclick="sw(3)"> Green H2 (PEM)</button>
+  <button class="tab t-red" id="t4" onclick="sw(4)"> Comparison</button>
+  <button class="tab t-gold" id="t5" onclick="sw(5)"> Break-even</button>
+  <button class="tab t-purple" id="t6" onclick="sw(6)"> Reference</button>
 </div>
 
 <!-- ===== PANEL 1: GREY H2 (SMR) ===== -->
@@ -582,7 +582,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',blue:'d-blue',green:'d-green'}[type]||'d-blue';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 
 /* Capital annuity */

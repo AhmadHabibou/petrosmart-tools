@@ -213,7 +213,7 @@ select option{background:#111;}
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-icon">⛽</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>Cetane Index Calculator</h1>
     <p>Diesel fuel quality assessment - ASTM D976 / D4737 / EN 15195</p>
@@ -236,7 +236,7 @@ select option{background:#111;}
 <!-- ===== PANEL 1: CI CALCULATOR ===== -->
 <div class="panel on" id="p1">
   <div class="card">
-    <div class="stitle">⛽ Fuel type and reference presets</div>
+    <div class="stitle"> Fuel type and reference presets</div>
     <div class="fuel-btns" id="fuel-btns">
       <button class="fbtn on" onclick="setFuel('en590',840,250,295,'EN 590 Diesel')">EN 590 Diesel</button>
       <button class="fbtn" onclick="setFuel('astm',845,254,297,'ASTM No.2 Diesel')">ASTM No.2</button>
@@ -499,7 +499,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',info:'d-info',gold:'d-gold'}[type]||'d-info';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 
 /* ====== FUEL PRESETS ====== */

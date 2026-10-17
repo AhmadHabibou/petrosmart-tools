@@ -194,7 +194,7 @@ body::before{
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-icon">⚗️</div>
+  <div class="hdr-icon"></div>
   <div class="hdr-txt">
     <h1>Oilfield Units Converter</h1>
     <p>All petroleum engineering unit conversions in one place</p>
@@ -218,9 +218,9 @@ body::before{
 
   <!-- Search -->
   <div class="search-wrap">
-    <span class="search-icon">🔍</span>
+    <span class="search-icon"></span>
     <input class="search-input" type="text" id="search" placeholder="Search converter... e.g. 'pressure', 'barrel', 'density'" oninput="filterCards()">
-    <span class="search-clear" onclick="clearSearch()">✕</span>
+    <span class="search-clear" onclick="clearSearch()"></span>
   </div>
 
   <!-- Category pills -->
@@ -233,7 +233,7 @@ body::before{
 <!-- ===== PANEL 2: MULTI-CONVERT ===== -->
 <div class="panel" id="p2">
   <div class="full-conv">
-    <div class="full-title">🔄 Multi-unit pressure converter</div>
+    <div class="full-title"> Multi-unit pressure converter</div>
     <div class="inp-row">
       <input class="c-input" type="number" id="mc-p" value="100" oninput="multiConvert('p')">
       <select class="c-select" id="mc-p-unit" onchange="multiConvert('p')">
@@ -253,7 +253,7 @@ body::before{
   </div>
 
   <div class="full-conv">
-    <div class="full-title">🛢️ Multi-unit volume / flow converter</div>
+    <div class="full-title"> Multi-unit volume / flow converter</div>
     <div class="inp-row">
       <input class="c-input" type="number" id="mc-v" value="1000" oninput="multiConvert('v')">
       <select class="c-select" id="mc-v-unit" onchange="multiConvert('v')">
@@ -269,7 +269,7 @@ body::before{
   </div>
 
   <div class="full-conv">
-    <div class="full-title">⚖️ Multi-unit density / mud weight converter</div>
+    <div class="full-title"> Multi-unit density / mud weight converter</div>
     <div class="inp-row">
       <input class="c-input" type="number" id="mc-d" value="1.3" step="0.01" oninput="multiConvert('d')">
       <select class="c-select" id="mc-d-unit" onchange="multiConvert('d')">
@@ -286,7 +286,7 @@ body::before{
   </div>
 
   <div class="full-conv">
-    <div class="full-title">🌡️ Multi-unit temperature converter</div>
+    <div class="full-title"> Multi-unit temperature converter</div>
     <div class="inp-row">
       <input class="c-input" type="number" id="mc-t" value="100" oninput="multiConvert('t')">
       <select class="c-select" id="mc-t-unit" onchange="multiConvert('t')">
@@ -303,7 +303,7 @@ body::before{
 <!-- ===== PANEL 3: FIELD FORMULAS ===== -->
 <div class="panel" id="p3">
   <div class="full-conv">
-    <div class="full-title">🛢️ API Gravity ↔ Density</div>
+    <div class="full-title"> API Gravity ↔ Density</div>
     <div class="inp-row">
       <input class="c-input" type="number" id="api-in" value="33.4" step="0.1" oninput="calcAPI()">
       <select class="c-select" id="api-unit" onchange="calcAPI()">
@@ -317,7 +317,7 @@ body::before{
   </div>
 
   <div class="full-conv">
-    <div class="full-title">💧 Flow rate conversion + Darcy velocity</div>
+    <div class="full-title"> Flow rate conversion + Darcy velocity</div>
     <div class="row2" style="gap:10px;">
       <div>
         <label style="font-size:10px;color:var(--muted);font-family:var(--mono);display:block;margin-bottom:5px;">FLOW RATE</label>
@@ -349,7 +349,7 @@ body::before{
   </div>
 
   <div class="full-conv">
-    <div class="full-title">⛽ Gas volume at standard conditions (Boyle's Law)</div>
+    <div class="full-title"> Gas volume at standard conditions (Boyle's Law)</div>
     <div class="row2" style="gap:10px;">
       <div>
         <label style="font-size:10px;color:var(--muted);font-family:var(--mono);display:block;margin-bottom:5px;">RESERVOIR CONDITIONS</label>
@@ -379,7 +379,7 @@ body::before{
   </div>
 
   <div class="full-conv">
-    <div class="full-title">🔩 Torque and power conversion</div>
+    <div class="full-title"> Torque and power conversion</div>
     <div class="inp-row">
       <input class="c-input" type="number" id="pwr-in" value="132" oninput="calcPower()">
       <select class="c-select" id="pwr-unit" onchange="calcPower()">
@@ -398,7 +398,7 @@ body::before{
 <!-- ===== PANEL 4: REFERENCE TABLES ===== -->
 <div class="panel" id="p4">
   <div class="full-conv">
-    <div class="full-title">📊 Crude oil barrel contents</div>
+    <div class="full-title"> Crude oil barrel contents</div>
     <div class="ibox"><strong>1 barrel of crude oil (42 US gallons = 158.987 L) at 60°F</strong></div>
     <table class="tbl">
       <thead><tr><th>Product</th><th>Volume (bbl)</th><th>Volume (L)</th><th>% of barrel</th><th>Notes</th></tr></thead>
@@ -416,7 +416,7 @@ body::before{
   </div>
 
   <div class="full-conv">
-    <div class="full-title">⚡ Energy equivalents - Petroleum fuels</div>
+    <div class="full-title"> Energy equivalents - Petroleum fuels</div>
     <table class="tbl">
       <thead><tr><th>Fuel</th><th>Per unit</th><th>MJ/unit</th><th>kWh/unit</th><th>BOE equivalent</th></tr></thead>
       <tbody>
@@ -433,7 +433,7 @@ body::before{
   </div>
 
   <div class="full-conv">
-    <div class="full-title">🌍 Production rate conversions - Common oilfield rates</div>
+    <div class="full-title"> Production rate conversions - Common oilfield rates</div>
     <table class="tbl">
       <thead><tr><th>Rate (BOPD)</th><th>m3/day</th><th>m3/hr</th><th>L/s</th><th>Category</th></tr></thead>
       <tbody>
@@ -449,7 +449,7 @@ body::before{
   </div>
 
   <div class="full-conv">
-    <div class="full-title">📐 Key oilfield constants</div>
+    <div class="full-title"> Key oilfield constants</div>
     <table class="tbl">
       <thead><tr><th>Constant</th><th>Value</th><th>Unit</th><th>Notes</th></tr></thead>
       <tbody>
@@ -484,125 +484,125 @@ function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=par
    ============================ */
 var converters=[
   // PRESSURE
-  {id:'press',cat:'Pressure',icon:'🔴',title:'Pressure',keywords:'pressure bar psi kPa MPa atm',
+  {id:'press',cat:'Pressure',icon:'',title:'Pressure',keywords:'pressure bar psi kPa MPa atm',
    units:['bar','psi','kPa','MPa','atm','Pa','kgf/cm2','m H2O','ft H2O','mmHg','inHg'],
    base:'bar',// all to bar
    factors:{bar:1,psi:0.0689476,kPa:0.01,MPa:10,atm:1.01325,Pa:1e-5,'kgf/cm2':0.980665,'m H2O':0.0980665,'ft H2O':0.0298907,mmHg:0.00133322,inHg:0.0338639},
    formula:'P (bar) = P (psi) / 14.504 | P (psi) = P (bar) x 14.504'},
 
   // VOLUME
-  {id:'vol',cat:'Volume',icon:'🛢️',title:'Volume',keywords:'volume barrel bbl m3 litre gallon',
+  {id:'vol',cat:'Volume',icon:'',title:'Volume',keywords:'volume barrel bbl m3 litre gallon',
    units:['bbl','m3','L','ft3','US gal','UK gal','in3'],
    base:'bbl',
    factors:{bbl:1,m3:6.28981,'L':0.00628981,ft3:0.17811,'US gal':0.023810,'UK gal':0.021997,in3:0.0000036373},
    formula:'1 barrel = 0.158987 m3 = 42 US gallons'},
 
   // FLOW RATE
-  {id:'flow',cat:'Flow Rate',icon:'💧',title:'Flow Rate',keywords:'flow rate m3/hr bbl/day L/s gpm',
+  {id:'flow',cat:'Flow Rate',icon:'',title:'Flow Rate',keywords:'flow rate m3/hr bbl/day L/s gpm',
    units:['m3/hr','bbl/day','L/s','m3/s','gal/min(US)','gal/min(UK)','ft3/min','bbl/hr'],
    base:'m3/hr',
    factors:{'m3/hr':1,'bbl/day':0.158987/24,'L/s':3.6,'m3/s':3600,'gal/min(US)':0.22712,'gal/min(UK)':0.18927,'ft3/min':1.69901,'bbl/hr':0.158987},
    formula:'Q (m3/hr) = Q (bbl/day) x 0.006624'},
 
   // DENSITY
-  {id:'dens',cat:'Density',icon:'⚖️',title:'Density / Mud Weight',keywords:'density mud weight SG kg/m3 ppg',
+  {id:'dens',cat:'Density',icon:'',title:'Density / Mud Weight',keywords:'density mud weight SG kg/m3 ppg',
    units:['kg/m3','g/cm3','SG','ppg','lb/ft3','bar/m','psi/ft'],
    base:'kg/m3',
    factors:{'kg/m3':1,'g/cm3':1000,'SG':1000,'ppg':119.826,'lb/ft3':16.0185,'bar/m':10197.16,'psi/ft':2306.66},
    formula:'SG = rho (kg/m3) / 1000 | ppg = kg/m3 / 119.826'},
 
   // TEMPERATURE
-  {id:'temp',cat:'Temperature',icon:'🌡️',title:'Temperature',keywords:'temperature celsius fahrenheit kelvin',
+  {id:'temp',cat:'Temperature',icon:'',title:'Temperature',keywords:'temperature celsius fahrenheit kelvin',
    units:['°C','°F','K','°R'],
    base:'C',special:true,
    formula:'°F = °C × 9/5 + 32 | K = °C + 273.15'},
 
   // LENGTH / DEPTH
-  {id:'len',cat:'Length',icon:'📏',title:'Length / Depth',keywords:'length depth meter feet inch km mile',
+  {id:'len',cat:'Length',icon:'',title:'Length / Depth',keywords:'length depth meter feet inch km mile',
    units:['m','ft','km','mile','inch','cm','mm'],
    base:'m',
    factors:{m:1,ft:0.3048,km:1000,mile:1609.34,inch:0.0254,cm:0.01,mm:0.001},
    formula:'1 ft = 0.3048 m | 1 mile = 5280 ft = 1.609 km'},
 
   // MASS / WEIGHT
-  {id:'mass',cat:'Mass',icon:'🏋️',title:'Mass / Weight',keywords:'mass weight tonne kg lb pound',
+  {id:'mass',cat:'Mass',icon:'',title:'Mass / Weight',keywords:'mass weight tonne kg lb pound',
    units:['kg','tonne','lb','short ton','long ton','g'],
    base:'kg',
    factors:{kg:1,tonne:1000,lb:0.453592,'short ton':907.185,'long ton':1016.05,g:0.001},
    formula:'1 tonne = 1000 kg | 1 lb = 0.4536 kg'},
 
   // FORCE
-  {id:'force',cat:'Force',icon:'💪',title:'Force',keywords:'force newton kN kgf lbf',
+  {id:'force',cat:'Force',icon:'',title:'Force',keywords:'force newton kN kgf lbf',
    units:['N','kN','MN','kgf','lbf','tonf'],
    base:'N',
    factors:{N:1,kN:1000,MN:1e6,kgf:9.80665,lbf:4.44822,tonf:9806.65},
    formula:'1 kN = 1000 N | 1 lbf = 4.448 N'},
 
   // AREA
-  {id:'area',cat:'Area',icon:'⬜',title:'Area',keywords:'area m2 ft2 hectare acre',
+  {id:'area',cat:'Area',icon:'',title:'Area',keywords:'area m2 ft2 hectare acre',
    units:['m2','ft2','km2','hectare','acre','in2','cm2'],
    base:'m2',
    factors:{m2:1,ft2:0.092903,km2:1e6,hectare:10000,acre:4046.86,in2:0.00064516,cm2:0.0001},
    formula:'1 hectare = 10,000 m2 | 1 acre = 4,047 m2'},
 
   // POWER
-  {id:'power',cat:'Power',icon:'⚡',title:'Power',keywords:'power kW HP horsepower MW watt',
+  {id:'power',cat:'Power',icon:'',title:'Power',keywords:'power kW HP horsepower MW watt',
    units:['kW','HP(metric)','HP(US)','MW','W','BTU/hr','kcal/hr','ft.lbf/s'],
    base:'kW',
    factors:{kW:1,'HP(metric)':0.735499,'HP(US)':0.745700,MW:1000,W:0.001,'BTU/hr':0.000293071,'kcal/hr':0.001163,'ft.lbf/s':0.0013558},
    formula:'1 HP (US) = 0.7457 kW | 1 kW = 1.341 HP'},
 
   // TORQUE
-  {id:'torq',cat:'Torque',icon:'🔄',title:'Torque',keywords:'torque N.m ft.lbf kN.m',
+  {id:'torq',cat:'Torque',icon:'',title:'Torque',keywords:'torque N.m ft.lbf kN.m',
    units:['N.m','kN.m','ft.lbf','in.lbf','kgf.m'],
    base:'N.m',
    factors:{'N.m':1,'kN.m':1000,'ft.lbf':1.35582,'in.lbf':0.112985,'kgf.m':9.80665},
    formula:'1 ft.lbf = 1.356 N.m | 1 kN.m = 737.6 ft.lbf'},
 
   // ENERGY
-  {id:'energy',cat:'Energy',icon:'🔋',title:'Energy',keywords:'energy kJ MJ kWh BTU calorie joule',
+  {id:'energy',cat:'Energy',icon:'',title:'Energy',keywords:'energy kJ MJ kWh BTU calorie joule',
    units:['kJ','MJ','kWh','BTU','kcal','J','ft.lbf'],
    base:'kJ',
    factors:{kJ:1,MJ:1000,kWh:3600,BTU:1.05506,kcal:4.1868,J:0.001,'ft.lbf':0.00135582},
    formula:'1 kWh = 3600 kJ | 1 BTU = 1055 J | 1 BOE = 6117 MJ'},
 
   // VISCOSITY DYNAMIC
-  {id:'visc_d',cat:'Viscosity',icon:'🌊',title:'Dynamic Viscosity',keywords:'viscosity dynamic mPa cP poise',
+  {id:'visc_d',cat:'Viscosity',icon:'',title:'Dynamic Viscosity',keywords:'viscosity dynamic mPa cP poise',
    units:['mPa.s (cP)','Pa.s','cP','Poise','lbf.s/ft2','lbm/ft.s'],
    base:'mPa.s (cP)',
    factors:{'mPa.s (cP)':1,'Pa.s':1000,'cP':1,'Poise':100,'lbf.s/ft2':47880,'lbm/ft.s':1488.16},
    formula:'1 cP = 1 mPa.s | water at 20 °C ≈ 1.0 cP'},
 
   // VISCOSITY KINEMATIC
-  {id:'visc_k',cat:'Viscosity',icon:'💦',title:'Kinematic Viscosity',keywords:'viscosity kinematic cSt mm2/s',
+  {id:'visc_k',cat:'Viscosity',icon:'',title:'Kinematic Viscosity',keywords:'viscosity kinematic cSt mm2/s',
    units:['cSt (mm2/s)','m2/s','ft2/s'],
    base:'cSt (mm2/s)',
    factors:{'cSt (mm2/s)':1,'m2/s':1e6,'ft2/s':92903},
    formula:'1 cSt = 1 mm2/s | nu = mu/rho | SSU is not a linear unit: use the ASTM D2161 conversion table'},
 
   // GAS VOLUME
-  {id:'gasvol',cat:'Gas Volume',icon:'💨',title:'Gas Volume',keywords:'gas Mcf MMscf Sm3 standard cubic feet',
+  {id:'gasvol',cat:'Gas Volume',icon:'',title:'Gas Volume',keywords:'gas Mcf MMscf Sm3 standard cubic feet',
    units:['Sm3','Mcf','MMscf','scf'],
    base:'Sm3',
    factors:{Sm3:1,Mcf:28.317,MMscf:28317,scf:0.028317},
    formula:'1 Mcf = 28.317 Sm3 | 1 MMscfd = 28,317 Sm3/d | standard conditions differ (60 °F for scf, 15 °C for Sm3); the ratio used here, 28.317, ignores that difference (about 0.2%)'},
 
   // CONCENTRATION
-  {id:'conc',cat:'Concentration',icon:'🧪',title:'Concentration',keywords:'concentration ppm ppb mg/L percent',
+  {id:'conc',cat:'Concentration',icon:'',title:'Concentration',keywords:'concentration ppm ppb mg/L percent',
    units:['ppm (mg/L)','ppb','mg/kg','g/L','% wt','kg/m3'],
    base:'ppm (mg/L)',
    factors:{'ppm (mg/L)':1,'ppb':0.001,'mg/kg':1,'g/L':1000,'% wt':10000,'kg/m3':1000},
    formula:'1% wt = 10,000 ppm | 1 mg/L ≈ 1 ppm (for water)'},
 
   // PERMEABILITY
-  {id:'perm',cat:'Reservoir',icon:'🏔️',title:'Permeability',keywords:'permeability darcy millidarcy mD',
+  {id:'perm',cat:'Reservoir',icon:'',title:'Permeability',keywords:'permeability darcy millidarcy mD',
    units:['mD','D (Darcy)','m2','cm2','ft2'],
    base:'mD',
    factors:{mD:1,'D (Darcy)':1000,m2:1.01325e15,cm2:1.01325e11,ft2:9.41340e13},
    formula:'1 Darcy = 1000 mD = 9.869233 x 10-13 m2'},
 
   // ANGLE
-  {id:'angle',cat:'Other',icon:'📐',title:'Angle (for directional drilling)',keywords:'angle degree radian inclination',
+  {id:'angle',cat:'Other',icon:'',title:'Angle (for directional drilling)',keywords:'angle degree radian inclination',
    units:['degrees','radians','grad'],
    base:'degrees',
    factors:{degrees:1,radians:57.2958,grad:0.9},

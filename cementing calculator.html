@@ -32,7 +32,7 @@ body::before{
   display:flex;align-items:center;gap:14px;
   box-shadow:0 0 50px rgba(200,169,110,0.05);position:relative;overflow:hidden;
 }
-.hdr::before{content:'🏗';position:absolute;right:20px;top:50%;transform:translateY(-50%);
+.hdr::before{content:'';position:absolute;right:20px;top:50%;transform:translateY(-50%);
   font-size:80px;opacity:0.04;pointer-events:none;}
 .hdr-icon{width:52px;height:52px;background:linear-gradient(135deg,var(--cement),var(--cement2));
   border-radius:14px;display:flex;align-items:center;justify-content:center;
@@ -178,7 +178,7 @@ select option{background:#0A0A12;}
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-icon">🏗️</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>Well Cementing Calculator</h1>
     <p>Primary cementing - slurry design, volume, pressure, ECD - API Class G/H cement</p>
@@ -191,12 +191,12 @@ select option{background:#0A0A12;}
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab on" id="t1" onclick="sw(1)">🧮 Slurry Design</button>
-  <button class="tab" id="t2" onclick="sw(2)">📐 Volume Calc.</button>
-  <button class="tab" id="t3" onclick="sw(3)">⚡ ECD and Pressure</button>
-  <button class="tab" id="t4" onclick="sw(4)">⏱️ Thickening Time</button>
-  <button class="tab" id="t5" onclick="sw(5)">🔬 Lab Data</button>
-  <button class="tab" id="t6" onclick="sw(6)">📚 API Reference</button>
+  <button class="tab on" id="t1" onclick="sw(1)"> Slurry Design</button>
+  <button class="tab" id="t2" onclick="sw(2)"> Volume Calc.</button>
+  <button class="tab" id="t3" onclick="sw(3)"> ECD and Pressure</button>
+  <button class="tab" id="t4" onclick="sw(4)"> Thickening Time</button>
+  <button class="tab" id="t5" onclick="sw(5)"> Lab Data</button>
+  <button class="tab" id="t6" onclick="sw(6)"> API Reference</button>
 </div>
 
 <!-- ===== PANEL 1: SLURRY DESIGN ===== -->
@@ -605,7 +605,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',cem:'d-cem',info:'d-info'}[type]||'d-cem';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 
 /* ====== CEMENT CLASS PRESETS ====== */

@@ -236,7 +236,7 @@ select option{background:#1A1A1A;}
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-icon">🔬</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>Hydrostatic Pressure Calculator</h1>
     <p>Petrosmart Academy - Petroleum and Industrial Fluid Column Pressure Tool</p>
@@ -255,7 +255,7 @@ select option{background:#1A1A1A;}
 <!-- ===== PANEL 1: SINGLE COLUMN ===== -->
 <div class="panel on" id="p1">
   <div class="card">
-    <div class="stitle">🧪 Fluid selection</div>
+    <div class="stitle"> Fluid selection</div>
     <div class="fluid-btns">
       <button class="fbtn on" onclick="setFluid('water',1000,'Water (fresh)')">Water</button>
       <button class="fbtn" onclick="setFluid('seawater',1025,'Seawater')">Seawater</button>
@@ -267,7 +267,7 @@ select option{background:#1A1A1A;}
       <button class="fbtn" onclick="setFluid('custom',0,'Custom')">Custom</button>
     </div>
 
-    <div class="stitle">⚙️ Parameters</div>
+    <div class="stitle"> Parameters</div>
     <div class="row3">
       <div class="field">
         <label class="lbl">Fluid density</label>
@@ -306,7 +306,7 @@ select option{background:#1A1A1A;}
 <!-- ===== PANEL 2: MULTI-LAYER ===== -->
 <div class="panel" id="p2">
   <div class="card">
-    <div class="stitle">📐 Multi-layer fluid column (up to 5 layers)</div>
+    <div class="stitle"> Multi-layer fluid column (up to 5 layers)</div>
     <div style="font-size:11px;color:#888;margin-bottom:14px;">Enter each fluid layer from top to bottom. Common in wellbore annuli, storage tanks and pipelines with stratified fluids.</div>
 
     <div id="layers-form"></div>
@@ -326,7 +326,7 @@ select option{background:#1A1A1A;}
 <!-- ===== PANEL 3: WELLBORE ===== -->
 <div class="panel" id="p3">
   <div class="card">
-    <div class="stitle">🛢️ Wellbore pressure analysis - Petroleum engineering</div>
+    <div class="stitle"> Wellbore pressure analysis - Petroleum engineering</div>
     <div style="font-size:11px;color:#888;margin-bottom:14px;">Calculates bottom-hole pressure (BHP), formation pressure gradient, overbalance/underbalance, equivalent circulating density (ECD) and kill mud weight. Standard petroleum engineering calculations per API RP 13D.</div>
 
     <div class="row3">
@@ -375,7 +375,7 @@ select option{background:#1A1A1A;}
 <!-- ===== PANEL 4: UNIT CONVERTER ===== -->
 <div class="panel" id="p4">
   <div class="card">
-    <div class="stitle">🔄 Pressure unit converter</div>
+    <div class="stitle"> Pressure unit converter</div>
     <div class="field">
       <label class="lbl">Input pressure value</label>
       <div class="ir"><input type="number" id="pconv" value="100" step="0.01" oninput="calcConv()"><span class="unit">-</span></div>
@@ -399,7 +399,7 @@ select option{background:#1A1A1A;}
     <div id="conv-out"></div>
 
     <div class="sep"></div>
-    <div class="stitle">🔄 Density / pressure gradient converter</div>
+    <div class="stitle"> Density / pressure gradient converter</div>
     <div class="row3">
       <div class="field">
         <label class="lbl">Mud density</label>
@@ -426,7 +426,7 @@ select option{background:#1A1A1A;}
 <!-- ===== PANEL 5: FLUID REFERENCE ===== -->
 <div class="panel" id="p5">
   <div class="card">
-    <div class="stitle">📚 Petroleum and industrial fluid reference - Click to load</div>
+    <div class="stitle"> Petroleum and industrial fluid reference - Click to load</div>
     <table class="tbl">
       <thead>
         <tr>
@@ -436,7 +436,7 @@ select option{background:#1A1A1A;}
       <tbody id="fluid-tb"></tbody>
     </table>
     <div class="sep"></div>
-    <div class="stitle">📖 Key formulas reference</div>
+    <div class="stitle"> Key formulas reference</div>
     <div class="fbox">
       <strong>Hydrostatic pressure:</strong> P = P0 + rho x g x h (Pa)<br>
       <strong>In bar:</strong> P (bar) = P0 + rho (kg/m3) x 9.81 x h (m) / 100000<br>
@@ -451,7 +451,7 @@ select option{background:#1A1A1A;}
       <strong>EMW:</strong> EMW (kg/m3) = P (bar) x 100000 / (9.81 x TVD)
     </div>
     <div class="sep"></div>
-    <div class="stitle">🎓 Pressure conversion table</div>
+    <div class="stitle"> Pressure conversion table</div>
     <table class="tbl">
       <thead><tr><th>From</th><th>To bar</th><th>To psi</th><th>To kPa</th><th>To atm</th></tr></thead>
       <tbody>
@@ -522,7 +522,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',info:'d-info'}[type]||'d-info';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">💡 '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 
 /* ===================== FLUID PRESET ===================== */
