@@ -204,12 +204,12 @@ select option{background:#0A0A14;}
   <div class="hdr-icon">🦠</div>
   <div>
     <h1>Corrosion Rate Calculator</h1>
-    <p>CO2 / H2S - de Waard-Milliams / NORSOK M-506 / NACE SP0775 - Material selection</p>
+    <p>CO2 / H2S - de Waard-Milliams screening / ISO 15156 / NACE SP0775 - Material selection</p>
   </div>
   <div class="hdr-tags">
     <div class="htag ht-co2">CO2 Sweet</div>
     <div class="htag ht-h2s">H2S Sour</div>
-    <div class="htag ht-norsok">NORSOK M-506</div>
+    <div class="htag ht-norsok">de Waard-Milliams</div>
   </div>
 </div>
 
@@ -226,7 +226,7 @@ select option{background:#0A0A14;}
 <!-- ===== PANEL 1: CO2 CORROSION ===== -->
 <div class="panel on" id="p1">
   <div class="card rust-accent">
-    <div class="stitle rust">/// CO2 corrosion - de Waard-Milliams model + NORSOK M-506</div>
+    <div class="stitle rust">/// CO2 corrosion - de Waard, Lotz and Milliams (1991) screening model</div>
     <div class="ibox">
       <strong>CO2 sweet corrosion:</strong> CO2 dissolves in water to form carbonic acid (H2CO3), causing uniform corrosion of carbon steel. Rate governed by CO2 partial pressure, temperature, pH, and flow velocity. NORSOK M-506 (2005) is the industry standard model for design.
     </div>
@@ -535,21 +535,13 @@ select option{background:#0A0A14;}
     <div class="fbox">
       <strong>CO2 partial pressure:</strong> PCO2 = P_total x yCO2/100 [bar]<br>
       <strong>H2S partial pressure:</strong> PH2S = P_total x yH2S/100 [bar]<br>
-      <strong>de Waard-Milliams (1993 updated):</strong><br>
-      log(V_CO2) = 5.8 - 1710/(T+273) + 0.67 x log(PCO2) [mm/yr, T in °C]<br>
-      <strong>NORSOK M-506 pH correction factor:</strong><br>
-      f_pH = 10^(0.46 x (pH - 3.8)) for pH 3.8-6.5 (reduces rate at higher pH)<br>
-      <strong>Temperature correction:</strong><br>
-      For T &lt; 60°C: use base rate; T > 60°C: protective FeCO3 scale forms → scale factor &lt; 1<br>
-      Scale factor K_scale ≈ exp(-2500 x (1/(T+273) - 1/333)) for T &gt; 60°C [approximate]<br>
-      <strong>Velocity correction (turbulent/erosion):</strong><br>
-      f_v = (v/v_ref)^0.8 [proportional to wall shear stress]<br>
+      <strong>de Waard, Lotz and Milliams (1991):</strong> log V = 5.8 - 1710/T + 0.67 log fCO2 [mm/yr, T in K, fCO2 in bar]<br>
+      fCO2 = a x pCO2, log a = P (0.0031 - 1.4/T); scale factor log Fs = 2400/T - 0.6 log fCO2 - 6.7 (Fs &lt;= 1); glycol factor log Fg = 1.6 (log W - 2)<br>
       <strong>Remaining life:</strong> RUL = (t_meas - t_min) / CR_actual [years]<br>
-      <strong>NACE sour threshold:</strong> PH2S &gt; 0.0003 MPa AND fluid pH &lt; calculated value<br>
-      <strong>CO2/H2S ratio:</strong> If PCO2/PH2S &lt; 20: sour corrosion dominates (FeS protective layer)<br>
-      If PCO2/PH2S &gt; 500: sweet CO2 corrosion dominates<br>
+      <strong>Sour service threshold (ISO 15156-2 / NACE MR0175):</strong> pH2S &gt;= 0.3 kPa (0.05 psia); the SSC severity region then depends on pH2S and in-situ pH (ISO 15156-2, Figure 1)<br>
+      
       <strong>Inhibitor dose (mass):</strong> m_dot_inh = Q_water x C_target / (active_pct x 10000) [L/d]<br>
-      <strong>Erosion velocity limit:</strong> V_e = C / sqrt(rho_mix) [m/s], C = 100-150 (API RP 14E)
+      <strong>Erosional velocity (API RP 14E):</strong> V_e = C / sqrt(rho_m) in ft/s with rho_m in lb/ft3; in SI V_e (m/s) = 1.22 C / sqrt(rho_m kg/m3)
     </div>
     <div class="sep"></div>
     <div class="stitle rust">/// inspection methods for corrosion monitoring</div>
@@ -571,7 +563,7 @@ select option{background:#0A0A14;}
 
 <div class="foot">
   <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
-  · NORSOK M-506 / NACE MR0175 / ISO 15156 / API 570 / API 579 · Educational use only - not a substitute for engineering assessment
+  · de Waard-Milliams / NACE MR0175 / ISO 15156 / API 570 / API 579 · Educational use only - not a substitute for engineering assessment
 </div>
 </div>
 
@@ -601,15 +593,28 @@ function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',rust:'d-rust',teal:'d-teal'}[type]||'d-rust';
   return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
 }
+/* Severity categories for carbon steel general corrosion, NACE SP0775 */
 function sevBadge(cr){
-  if(cr<0.1) return '<div class="sev-badge sev-low">✅ NEGLIGIBLE (&lt; 0.1 mm/yr)</div>';
-  if(cr<0.25) return '<div class="sev-badge sev-low">🟢 LOW (0.1-0.25 mm/yr)</div>';
-  if(cr<0.5) return '<div class="sev-badge sev-mod">🟡 MODERATE (0.25-0.5 mm/yr)</div>';
-  if(cr<1.0) return '<div class="sev-badge sev-high">🟠 HIGH (0.5-1.0 mm/yr)</div>';
-  if(cr<5.0) return '<div class="sev-badge sev-sev">🔴 SEVERE (1.0-5.0 mm/yr)</div>';
-  return '<div class="sev-badge sev-sev">🚨 EXTREME (&gt; 5.0 mm/yr)</div>';
+  if(cr<0.025) return '<div class="sev-badge sev-low">LOW (&lt; 0.025 mm/yr, NACE SP0775)</div>';
+  if(cr<=0.12) return '<div class="sev-badge sev-mod">MODERATE (0.025 to 0.12 mm/yr, NACE SP0775)</div>';
+  if(cr<=0.25) return '<div class="sev-badge sev-high">HIGH (0.13 to 0.25 mm/yr, NACE SP0775)</div>';
+  return '<div class="sev-badge sev-sev">SEVERE (&gt; 0.25 mm/yr, NACE SP0775)</div>';
 }
-
+/* de Waard, Lotz and Milliams (1991), Corrosion 47(12): worst-case CO2 corrosion rate of carbon steel (mm/yr)
+   log V = 5.8 - 1710/T + 0.67 log fCO2 ; log a = P (0.0031 - 1.4/T) ; log Fscale = 2400/T - 0.6 log fCO2 - 6.7 (Fscale <= 1)
+   glycol: log Fglycol = 1.6 (log W - 2), W = water mass % in the water-glycol phase. T in K, P and pCO2 in bar. */
+function psaDWM(P_bar,pCO2,T_C,glycolPct){
+  var T=T_C+273.15, a=Math.pow(10,P_bar*(0.0031-1.4/T)), f=Math.max(a*pCO2,1e-6);
+  var V=Math.pow(10,5.8-1710/T+0.67*Math.log10(f));
+  var Fs=Math.min(1,Math.pow(10,2400/T-0.6*Math.log10(f)-6.7));
+  var W=Math.max(1,100-(glycolPct||0)), Fg=Math.min(1,Math.pow(10,1.6*(Math.log10(W)-2)));
+  return {fCO2:f,a:a,V:V,Fs:Fs,Fg:Fg,CR:V*Fs*Fg};
+}
+/* API RP 14E erosional velocity: Ve = C / sqrt(rho_m), ft/s with lb/ft3; in SI Ve (m/s) = 1.22 C / sqrt(rho_m kg/m3) */
+function psaVe(C,rho){return 1.2199*C/Math.sqrt(rho);}
+/* Approximate Rockwell C to Vickers conversion (ASTM E140, steels), linear interpolation */
+function psaHRCtoHV(h){var t=[[20,238],[22,248],[24,260],[26,272],[28,286],[30,302],[32,318],[35,345],[40,392]];
+  if(h<=t[0][0])return t[0][1];for(var i=1;i<t.length;i++){if(h<=t[i][0]){var a=t[i-1],b=t[i];return a[1]+(b[1]-a[1])*(h-a[0])/(b[0]-a[0]);}}return t[t.length-1][1];}
 /* ====== PANEL 1: CO2 ====== */
 function calcCO2(){
   var P=psaNum('P_sys',100);
@@ -625,107 +630,50 @@ function calcCO2(){
   // CO2 partial pressure
   var PCO2=P*(CO2/100); // bar
 
-  // de Waard-Milliams (1993) base rate
-  var CR_base=Math.pow(10, 5.8 - 1710/(T+273) + 0.67*Math.log10(PCO2));
-
-  // pH correction (NORSOK M-506 approach)
-  // Reference pH for de Waard is ~3.8 at saturation
-  var pH_ref=3.8+0.46*Math.log10(PCO2); // saturation pH approximation
-  var f_pH=Math.pow(10, 0.46*(pH-3.8));
-  if(f_pH>1) f_pH=1; // can't increase rate above base
-  f_pH=Math.max(f_pH, 0.01);
-
-  // Temperature scaling (FeCO3 protective scale above 60°C)
-  var f_T=1.0;
-  if(T>60){
-    f_T=Math.exp(-2500*(1/(T+273)-1/333));
-    f_T=Math.max(0.05,Math.min(1.0,f_T)); // bounded
-  }
-
-  // Velocity factor (erosion/mass transfer)
-  var vel_ref=1.0; // reference m/s
-  var f_v=Math.pow(vel/vel_ref, 0.8);
-  if(vel<0.5) f_v=0.5; // stagnant zones, under-deposit
-  f_v=Math.min(f_v,5.0);
-
-  // Glycol factor (MEG inhibits corrosion by diluting water activity)
-  var f_gly=[1.0,0.6,0.2,0.05][[0,20,50,80].indexOf(glycol)];
-  if(f_gly===undefined) f_gly=1.0;
-
-  // Water cut (above inversion point ~30-40%, becomes water continuous)
-  var wc_inv=30; // typical inversion
-  var f_wc=wc>wc_inv?1.0:wc/wc_inv*0.5; // below inversion: oil continuous, lower rate
-
-  // Combined NORSOK rate
-  var CR_norsok=CR_base*f_pH*f_T*f_v*f_wc*f_gly;
-
-  // Inhibitor effect
+  var dw=psaDWM(P,PCO2,T,glycol);
+  var CR_dw=dw.V, f_T=dw.Fs, f_gly=dw.Fg;
+  var CR_norsok=dw.CR; // de Waard-Lotz-Milliams with scale and glycol factors (not NORSOK M-506)
   var CR_inhib=CR_norsok*(1-inh/100);
-  var CR_final=Math.max(CR_inhib,0.001);
-
-  // de Waard-Milliams simple (for comparison)
-  var CR_dw=Math.pow(10, 5.8 - 1710/(T+273) + 0.67*Math.log10(PCO2));
-
-  // Erosion velocity check (API RP 14E)
-  var rho_oil=141.5/(api+131.5)*1000;
+  var CR_final=Math.max(CR_inhib,0);
+  // Erosional velocity (API RP 14E)
+  var rho_oil=141.5/(api+131.5)*999.0;
   var rho_water=1050;
   var rho_mix=(wc/100*rho_water+(1-wc/100)*rho_oil);
-  var V_erosion=100/Math.sqrt(rho_mix); // m/s (C=100 uninhibited)
-  var V_erosion_inh=150/Math.sqrt(rho_mix); // C=150 inhibited
-
+  var V_erosion=psaVe(100,rho_mix);
+  var V_erosion_inh=psaVe(150,rho_mix);
   var html='<div class="rgrid">';
   html+=rc('hl','CO2 partial pressure',PCO2.toFixed(2),'bar','= '+P+' bar x '+(CO2/100)+' mol CO2');
-  html+=rc('hl','NORSOK M-506 rate',CR_norsok.toFixed(3),'mm/yr','Before inhibitor');
-  html+=rc(inh>0?'ok':'','Final corrosion rate',CR_final.toFixed(3),'mm/yr',inh>0?'After '+inh+'% inhibitor':'No inhibitor applied');
-  html+=rc('','de Waard-Milliams (base)',CR_dw.toFixed(3),'mm/yr','Uncorrected base rate');
-  html+=rc('','pH correction factor',f_pH.toFixed(3),'-','At pH '+pH);
-  html+=rc('','Temperature scale factor',f_T.toFixed(3),'-',T>60?'FeCO3 scale forming':'No protective scale');
-  html+=rc('','Velocity factor',f_v.toFixed(3),'-','At '+vel+' m/s');
-  html+=rc(vel>V_erosion?'er':vel>V_erosion*0.8?'wn':'ok','Erosion velocity limit',V_erosion.toFixed(1),'m/s','API RP 14E C=100 | C=150 inhibited: '+V_erosion_inh.toFixed(1));
+  html+=rc('hl','CO2 rate (de Waard-Lotz-Milliams 1991)',CR_norsok.toFixed(3),'mm/yr','with scale and glycol factors, before inhibitor');
+  html+=rc(inh>0?'ok':'','Final corrosion rate',CR_final.toFixed(3),'mm/yr',inh>0?'After '+inh+'% inhibitor efficiency':'No inhibitor applied');
+  html+=rc('','Base rate (no correction)',CR_dw.toFixed(3),'mm/yr','de Waard-Milliams nomogram equation');
+  html+=rc('','CO2 fugacity',dw.fCO2.toFixed(3),'bar','fugacity coefficient '+dw.a.toFixed(3));
+  html+=rc('','Scale factor',f_T.toFixed(3),'-','log F = 2400/T - 0.6 log fCO2 - 6.7');
+  html+=rc('','Glycol factor',f_gly.toFixed(3),'-',glycol+' % glycol');
+  html+=rc(vel>V_erosion?'er':vel>V_erosion*0.8?'wn':'ok','Erosional velocity',V_erosion.toFixed(1),'m/s','API RP 14E, C = 100 | C = 150: '+V_erosion_inh.toFixed(1)+' m/s');
   html+='</div>';
   html+=sevBadge(CR_final);
 
   html+='<div class="fbox">'
     +'<strong>PCO2</strong> = '+P+' x '+CO2+'/100 = <span class="hi">'+PCO2.toFixed(3)+' bar</span><br>'
-    +'<strong>CR_base (de Waard-Milliams):</strong> 10^(5.8 - 1710/('+T+'+273) + 0.67 x log('+PCO2.toFixed(3)+')) = <span class="hi">'+CR_dw.toFixed(3)+' mm/yr</span><br>'
-    +'<strong>f_pH</strong> = 10^(0.46 x ('+pH+' - 3.8)) = <span class="hi">'+f_pH.toFixed(3)+'</span> (pH correction)<br>'
-    +'<strong>f_T</strong> = '+f_T.toFixed(3)+' ('+( T>60?'FeCO3 scale protection above 60°C':'no scale, T ≤ 60°C')+')<br>'
-    +'<strong>CR_NORSOK</strong> = '+CR_dw.toFixed(3)+' x '+f_pH.toFixed(3)+' x '+f_T.toFixed(3)+' x '+f_v.toFixed(3)+' x '+f_wc.toFixed(2)+' x '+f_gly+' = <span class="hi">'+CR_norsok.toFixed(3)+' mm/yr</span><br>'
+    +'<strong>fCO2</strong> = a x pCO2, log a = P (0.0031 - 1.4/T) = <span class="hi">'+dw.fCO2.toFixed(3)+' bar</span><br>'
+    +'<strong>V</strong> = 10^(5.8 - 1710/T + 0.67 log fCO2) = <span class="hi">'+CR_dw.toFixed(3)+' mm/yr</span> (T = '+(T+273.15).toFixed(2)+' K)<br>'
+    +'<strong>CR</strong> = V x Fscale x Fglycol = '+CR_dw.toFixed(3)+' x '+f_T.toFixed(3)+' x '+f_gly.toFixed(3)+' = <span class="hi">'+CR_norsok.toFixed(3)+' mm/yr</span><br>'
+    +'<em>Not modelled: in-situ pH, flow velocity, water wetting, oil type. The result is a conservative screening value, not a NORSOK M-506 calculation.</em><br>'
     +(inh>0?'<strong>CR_final</strong> = '+CR_norsok.toFixed(3)+' x (1-'+inh+'/100) = <span class="hiok">'+CR_final.toFixed(3)+' mm/yr</span>':'')
     +'</div>';
 
   var rows='';
-  if(PCO2>7){
-    rows+=ar('er','Very high CO2 partial pressure ('+PCO2.toFixed(1)+' bar)','PCO2 above 7 bar is extremely corrosive. Carbon steel with conventional inhibition is unlikely to be sufficient for long-term integrity. Even with 90% inhibitor efficiency, rate = '+( CR_norsok*0.1).toFixed(2)+' mm/yr.','Specify CRA (Corrosion Resistant Alloy): 13Cr or 22Cr Duplex for wells and flowlines. For pipelines: CS with CRA liner or internal epoxy coating + continuous inhibitor + comprehensive monitoring. Economic analysis: CRA premium vs inhibitor OPEX over field life.');
-  } else if(PCO2>2){
-    rows+=ar('wn','High CO2 partial pressure ('+PCO2.toFixed(1)+' bar) - corrosion likely significant','PCO2 > 2 bar is considered high-corrosivity for carbon steel. Without inhibition, corrosion rate of '+CR_norsok.toFixed(2)+' mm/yr requires significant corrosion allowance and frequent inspection.','Options: (1) Continuous corrosion inhibitor injection targeting efficiency > 85%. (2) Increase pipeline pH by MEG or bicarbonate injection. (3) Specify 13Cr CRA if inhibitor system reliability is uncertain. Install iron count monitoring and ER probes for continuous rate verification.');
-  } else if(PCO2>0.5){
-    rows+=ar('rust','Moderate CO2 corrosion risk ('+PCO2.toFixed(1)+' bar)','NORSOK classification: moderate. Carbon steel with appropriate corrosion allowance and periodic monitoring is viable. Inhibitor injection is beneficial but may not be mandatory depending on design life and inspection programme.','Design corrosion allowance = CR x design_life = '+CR_norsok.toFixed(3)+' x design_life mm. For 25-year design life: '+( CR_norsok*25).toFixed(1)+' mm CA required. Verify by UT thickness survey every 2-3 years and corrosion coupons at key locations.');
-  } else {
-    rows+=ar('ok','Low CO2 corrosion risk ('+PCO2.toFixed(2)+' bar)','PCO2 < 0.5 bar: low corrosion risk for carbon steel. Standard carbon steel pipeline design without special corrosion measures may be acceptable. Confirm with field data from similar service.','');
-  }
-
+  rows+=ar('rust','Corrosion allowance from this rate','For a design life of N years the allowance is CR x N: '+CR_final.toFixed(3)+' mm/yr x 25 years = '+(CR_final*25).toFixed(1)+' mm. The de Waard-Milliams family of equations is conservative for many conditions; confirm with a full model and field monitoring.','');
   if(vel>V_erosion){
-    rows+=ar('er','FLOW VELOCITY EXCEEDS EROSION LIMIT ('+vel+' m/s > '+V_erosion.toFixed(1)+' m/s)','API RP 14E erosion velocity exceeded. At this velocity, mechanical erosion of the pipe wall and corrosion product film occurs, preventing formation of protective scales and accelerating metal loss dramatically. Risk of rapid failure at bends, reducers, and tees.','Reduce flow velocity by increasing pipe diameter. V_erosion = C/sqrt(rho_mix) = 100/sqrt('+rho_mix.toFixed(0)+') = '+V_erosion.toFixed(1)+' m/s. Specify erosion-resistant material (hard-facing, Inconel overlay) at high-velocity points. Add choke valves to reduce velocity upstream of bends. Use computational fluid dynamics (CFD) to identify erosion hot-spots.');
+    rows+=ar('er','Velocity above the API RP 14E erosional velocity ('+vel+' m/s > '+V_erosion.toFixed(1)+' m/s)','API RP 14E gives Ve = C / sqrt(rho_m) for continuous service, C = 100 without solids; it is a screening criterion, and the recommended practice allows other C values where justified by operating experience.','');
   }
-
-  if(T>60&&T<100){
-    rows+=ar('ok','Temperature in protective scale formation zone ('+T+'°C)','Between 60-100°C, FeCO3 (siderite) and FeS protective scales form on carbon steel surface. NORSOK M-506 scale factor reduces corrosion rate significantly (f_T = '+f_T.toFixed(3)+'). This is accounted for in the NORSOK rate shown above.','Scales are brittle and can be disrupted by: slug flow, pigging, rapid depressurization, high wall shear stress (>50 Pa). Avoid velocity excursions that strip protective scales. After pigging, corrosion rate may spike for 24-48h until scale reforms.');
-  }
-
   html+='<div class="analysis"><div class="atitle">/// CO2 CORROSION ANALYSIS</div>'+rows+'</div>';
   document.getElementById('r1').innerHTML=html;
 
   // CO2 rate vs T chart
   var Temps=Array.from({length:25},function(_,i){return 20+i*6;});
-  var CR_vals_base=Temps.map(function(Tv){
-    return Math.pow(10, 5.8 - 1710/(Tv+273) + 0.67*Math.log10(PCO2));
-  });
-  var CR_vals_norsok=Temps.map(function(Tv){
-    var fT=Tv>60?Math.max(0.05,Math.min(1,Math.exp(-2500*(1/(Tv+273)-1/333)))):1.0;
-    return CR_vals_base[Temps.indexOf(Tv)]*f_pH*fT*f_v*f_wc*f_gly;
-  });
-
+  var CR_vals_base=Temps.map(function(Tv){return psaDWM(P,PCO2,Tv,glycol).V;});
+  var CR_vals_norsok=Temps.map(function(Tv){return psaDWM(P,PCO2,Tv,glycol).CR;});
   var ctx=document.getElementById('co2Chart').getContext('2d');
   if(co2Chart){co2Chart.destroy();}
   co2Chart=new Chart(ctx,{
@@ -734,7 +682,7 @@ function calcCO2(){
       datasets:[
         {label:'de Waard-Milliams (base)',data:Temps.map(function(T,i){return{x:T,y:CR_vals_base[i].toFixed(3)};}),
           borderColor:'#FF8800',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:0.4},
-        {label:'NORSOK M-506 (corrected)',data:Temps.map(function(T,i){return{x:T,y:CR_vals_norsok[i].toFixed(3)};}),
+        {label:'With scale and glycol factors',data:Temps.map(function(T,i){return{x:T,y:CR_vals_norsok[i].toFixed(3)};}),
           borderColor:'#CC6633',backgroundColor:'rgba(204,102,51,0.07)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.4},
         {label:'Current operating point',data:[{x:T,y:CR_norsok.toFixed(3)}],
           borderColor:'#fff',backgroundColor:'#fff',pointRadius:8,showLine:false},
@@ -776,74 +724,38 @@ function calcH2S(){
   var sour_psia=PH2S_MPa*145.04;
   var is_sour=PH2S_MPa>sour_threshold_MPa;
 
-  // pH limit for sour service regions
-  // NACE Region 1 (no special requirements): pH > 4.5 AND PH2S < 0.3 psia
-  // NACE Region 2 (SSC precautions): intermediate
-  // NACE Region 3 (severe sour): low pH and/or high PH2S
-  var nace_region;
-  var nace_color;
-  if(!is_sour){
-    nace_region='NON-SOUR SERVICE';nace_color='ok';
-  } else if(sour_psia<1.0&&pH>4.5){
-    nace_region='NACE REGION 1 (mild sour)';nace_color='wn';
-  } else if(sour_psia<1.5&&pH>3.5){
-    nace_region='NACE REGION 2 (moderate sour)';nace_color='wn';
-  } else {
-    nace_region='NACE REGION 3 (severe sour)';nace_color='er';
-  }
-
-  // CO2/H2S ratio
+  var nace_region=is_sour?'SOUR (pH2S >= 0.3 kPa): read the SSC region on ISO 15156-2 Figure 1':'NON-SOUR (pH2S < 0.3 kPa)';
+  var nace_color=is_sour?'wn':'ok';
   var ratio=PCO2/Math.max(PH2S,0.0001);
-  var corr_type=ratio>500?'Sweet CO2 dominates':ratio<20?'H2S sour dominates':'Mixed CO2/H2S';
-
-  // SSC risk assessment
-  var ssc_ok=HRC<=22&&SMYS<=690;
-  var hic_risk=Cl>10000&&PH2S_MPa>0.003;
-
-  // Hardness check NACE MR0175
-  var HRC_limit=22;
-  var HV_equiv=HRC<=0?0:HRC*9.81/0.31; // rough conversion
-
-  // CO2 corrosion rate (still active in sour service)
-  var CR_co2=Math.pow(10, 5.8 - 1710/(T+273) + 0.67*Math.log10(Math.max(PCO2,0.001)));
-  // In sour service, FeS scale forms, reducing CO2 rate
-  var fes_factor=ratio<20?0.1:ratio<200?0.5:1.0;
-  var CR_sour=CR_co2*fes_factor;
-
+  // Carbon and low-alloy steel hardness limit, ISO 15156-2: 22 HRC (250 HV)
+  var ssc_ok=HRC<=22;
+  var HV_equiv=psaHRCtoHV(HRC);
   var html='<div class="rgrid">';
   html+=rc('hl','H2S partial pressure',PH2S.toFixed(4),'bar','= '+PH2S_MPa.toFixed(5)+' MPa = '+sour_psia.toFixed(4)+' psia');
   html+=rc('hl','CO2 partial pressure',PCO2.toFixed(2),'bar','');
   html+=rc(is_sour?'wn':'ok','NACE sour service',is_sour?'YES - SOUR':'NO - SWEET','-','Threshold: 0.0003 MPa H2S');
   html+=rc(nace_color,is_sour?'NACE region':' ',nace_region,'-','');
-  html+=rc('','CO2/H2S ratio',ratio.toFixed(1),'-',corr_type);
-  html+=rc(ssc_ok?'ok':'er','SSC hardness',HRC+' HRC',ssc_ok?'≤ 22 HRC - PASS':'> 22 HRC - NACE LIMIT EXCEEDED');
-  html+=rc(hic_risk?'wn':'ok','HIC risk',hic_risk?'ELEVATED':'LOW','',Cl.toLocaleString()+' mg/L Cl, PH2S='+PH2S.toFixed(3)+' bar');
-  html+=rc('','Est. corrosion rate',CR_sour.toFixed(3),'mm/yr','CO2 rate x FeS scale factor '+fes_factor);
+  html+=rc('','CO2/H2S ratio',ratio.toFixed(1),'-','pCO2 / pH2S');
+  html+=rc(ssc_ok?'ok':'er','Hardness',HRC+' HRC','≈ '+Math.round(HV_equiv)+' HV',ssc_ok?'within 22 HRC / 250 HV (ISO 15156-2)':'above 22 HRC / 250 HV limit for carbon steel');
+  html+=rc('','HIC',is_sour?'test required':'not required','',is_sour?'HIC-resistant line pipe tested to NACE TM0284 (ISO 15156-2 Annex B)':'');
   html+='</div>';
 
   html+='<div class="fbox">'
     +'<strong>PH2S</strong> = '+P+' x '+H2S_pct+'/100 = <span class="hi">'+PH2S.toFixed(4)+' bar = '+PH2S_MPa.toFixed(5)+' MPa</span><br>'
     +'<strong>Sour threshold</strong> (NACE MR0175): PH2S &gt; 0.0003 MPa → <span class="hi">'+( is_sour?'SOUR SERVICE':'Not sour')+'</span><br>'
-    +'<strong>PCO2/PH2S</strong> = '+PCO2.toFixed(2)+'/'+PH2S.toFixed(4)+' = <span class="hi">'+ratio.toFixed(1)+'</span> → '+corr_type+'<br>'
-    +'<strong>Hardness limit</strong>: NACE MR0175 = 22 HRC max for CS → '+( HRC<=22?'<span class="hiok">PASS</span>':'<span style="color:var(--err)">FAIL - Exceeds 22 HRC</span>')+'<br>'
-    +'<strong>FeS scale factor</strong>: '+fes_factor+' (CO2 rate reduced by H2S-derived FeS scale) → <span class="hit">CR_sour = '+CR_sour.toFixed(3)+' mm/yr</span>'
+    +'<strong>Hardness</strong>: ISO 15156-2 limit for carbon steel 22 HRC (250 HV); '+HRC+' HRC ≈ '+Math.round(HV_equiv)+' HV (ASTM E140, approximate)<br>'
+    +'<em>The CO2 rate under H2S and the SSC severity region are not computed here.</em>'
     +'</div>';
 
   var rows='';
   if(!is_sour){
-    rows+=ar('ok','Non-sour service - standard carbon steel acceptable','H2S partial pressure ('+PH2S.toFixed(5)+' MPa) is below NACE MR0175/ISO 15156 sour threshold (0.0003 MPa). Standard carbon steel materials per API 5L and ASTM A106 are acceptable without special sour-service requirements.','Monitor CO2 corrosion using Tab 1 of this calculator. Even in non-sour service, CO2 can be significantly corrosive. Implement NORSOK M-506 based corrosion assessment for system design.');
-  } else if(nace_color==='wn'){
-    rows+=ar('wn','SOUR SERVICE - Mild to moderate ('+nace_region+')','H2S partial pressure ('+PH2S_MPa.toFixed(5)+' MPa) exceeds NACE sour threshold. Sulfide Stress Cracking (SSC) risk for susceptible materials. Standard low-alloy carbon steel must comply with NACE MR0175/ISO 15156 Part 2 hardness limits (22 HRC max).','Specify materials per NACE MR0175/ISO 15156: CS with max 22 HRC hardness, PWHT all welds. No cold-working. Restrict yield strength to SMYS ≤ 552 MPa for Region 1-2. Hydrogen permeation testing may be required for HIC-sensitive areas.');
+    rows+=ar('ok','Below the sour service threshold','pH2S = '+(PH2S*100).toFixed(3)+' kPa, below 0.3 kPa (ISO 15156-2 / NACE MR0175). The standard does not then require sour-service material qualification.','');
   } else {
-    rows+=ar('er','SEVERE SOUR SERVICE ('+nace_region+') - CRA materials required','Operating in NACE Region 3 (severe sour). High risk of SSC, HIC, and SOHIC cracking. Carbon steel, even with NACE compliance, has significantly elevated cracking risk in Region 3.','Materials: Duplex 22Cr or 25Cr (NACE MR0175 Part 3), Alloy 825, or Alloy 625 for pressure-containing components. Conduct H2S cracking testing (NACE TM0177 Method A/B) at actual service conditions. Engineering Critical Assessment (ECA) per API 579 / BS 7910 for any defects found in service.');
+    rows+=ar('wn','Sour service (pH2S = '+(PH2S*100).toFixed(2)+' kPa)','Materials must comply with ISO 15156-2 (carbon and low-alloy steels) or ISO 15156-3 (CRAs). Determine the SSC severity region from pH2S and in-situ pH on ISO 15156-2 Figure 1; the in-situ pH has to be calculated for the actual water chemistry.','');
   }
   if(HRC>22){
-    rows+=ar('er','HARDNESS EXCEEDS NACE MR0175 LIMIT ('+HRC+' HRC > 22 HRC)','Any carbon or low-alloy steel above 22 HRC (equiv. ~240 HV, ~250 HBW) in sour service is highly susceptible to SSC. Brittle fracture can occur within hours of exposure to wet H2S.','Mandatory action: (1) Heat treatment (PWHT/annealing) to achieve ≤ 22 HRC. (2) Replace with NACE MR0175-compliant material. (3) Restrict operating stress to < 60% SMYS and add corrosion inhibitor as temporary measure. Report as potential integrity concern to asset owner.');
+    rows+=ar('er','Hardness above the ISO 15156-2 limit ('+HRC+' HRC > 22 HRC)','For carbon and low-alloy steels in sour service the maximum hardness is 22 HRC (250 HV), including welds and heat-affected zones, subject to the provisions of the standard.','');
   }
-  if(hic_risk){
-    rows+=ar('wn','HIC risk elevated (Cl = '+Cl.toLocaleString()+' mg/L, PH2S = '+PH2S.toFixed(3)+' bar)','High chloride + H2S combination significantly increases risk of Hydrogen Induced Cracking (HIC). HIC occurs in CS without applied stress, driven by atomic hydrogen absorption at inclusions. Particularly severe in high-strength (API 5L X65+) or pipe with elongated MnS inclusions.','Specify HIC-resistant steel (NACE TM0284): S content < 0.002%, low Ca treatment, high Ca/S ratio (> 1.5). Mill certification with HIC test results (CLR < 15%, CTR < 1.5%, CSR < 0.5%). Ultrasonic inspection of pipe body for initial laminations before installation.');
-  }
-
   html+='<div class="analysis"><div class="atitle">/// SOUR SERVICE ASSESSMENT</div>'+rows+'</div>';
   document.getElementById('r2').innerHTML=html;
 
@@ -855,8 +767,6 @@ function calcH2S(){
     type:'scatter',
     data:{
       datasets:[
-        {label:'Region 1 boundary',data:pH_range.map(function(ph){return{x:ph,y:0.0034};}),
-          borderColor:'#FFCC00',backgroundColor:'transparent',showLine:true,borderDash:[5,3],pointRadius:0,borderWidth:1.5},
         {label:'Sour threshold (0.0003 MPa)',data:pH_range.map(function(ph){return{x:ph,y:0.0003};}),
           borderColor:'#FF8800',backgroundColor:'transparent',showLine:true,borderDash:[4,4],pointRadius:0,borderWidth:1.5},
         {label:'Operating point',data:[{x:pH,y:PH2S_MPa}],
@@ -900,13 +810,12 @@ function calcLife(){
   var life_consumed=(t_nom-t_now)/(t_nom-t_min)*100;
 
   // MAOP with current thickness
-  var t_eff_now=t_now*(1-0.125); // with mill tolerance
-  var MAOP_now=2*SMYS*t_eff_now/(OD-2*0.4*t_eff_now)/10; // bar
+  var t_eff_now=t_now; // measured thickness: no mill tolerance deduction
+  var MAOP_now=2*SMYS*0.72*t_eff_now/OD*10; // bar, Barlow with design factor 0.72 (ASME B31.4)
   var pressure_safety=MAOP_now/P_d;
 
   // Next inspection date
-  var insp_interval=RUL<5?0.5*RUL:Math.min(RUL*0.4,5);
-  insp_interval=Math.max(0.5,insp_interval);
+  var insp_interval=Math.max(0,Math.min(RUL/2,5)); // API 570: half the remaining life, at most 5 years for Class 1 piping
 
   var status=RUL<2?'CRITICAL':RUL<5?'MONITOR':RUL<10?'ACCEPTABLE':'GOOD';
   var statusCls=RUL<2?'er':RUL<5?'wn':RUL<10?'':'ok';
@@ -915,9 +824,9 @@ function calcLife(){
   html+=rc('hl','Estimated current thickness',t_now.toFixed(2),'mm','t_meas - CR x '+yrs+' yr');
   html+=rc(statusCls||'ok','Remaining useful life',RUL.toFixed(1),'years','Until t_min = '+t_min+' mm');
   html+=rc('','Life consumed',life_consumed.toFixed(0),'%',( t_nom-t_now).toFixed(2)+' mm lost of '+(t_nom-t_min).toFixed(2)+' mm allowable');
-  html+=rc('','MAOP with current t',MAOP_now.toFixed(0),'bar','Safety factor: x'+pressure_safety.toFixed(2)+' vs design '+P_d+' bar');
+  html+=rc('','Pressure limit with current t',MAOP_now.toFixed(0),'bar','Barlow, F = 0.72; ratio to design '+pressure_safety.toFixed(2));
   html+=rc('','Metal loss to date',(t_nom-t_now).toFixed(2),'mm','Since installation');
-  html+=rc('','Next inspection in',insp_interval.toFixed(1),'years','API 570 interval');
+  html+=rc('','Next thickness inspection',insp_interval.toFixed(1),'years','API 570: half the remaining life, max 5 yr (Class 1); 10 yr for Class 2 and 3');
   html+=rc('','Original design life',RUL_from_nominal.toFixed(0),'years','At current CR from nominal');
   html+=rc(statusCls||'ok','Status',status,'-','RUL = '+RUL.toFixed(1)+' years');
   html+='</div>';
@@ -926,7 +835,7 @@ function calcLife(){
     +'<strong>t_now</strong> = t_meas - CR x yrs_since = '+t_meas+' - '+CR+' x '+yrs+' = <span class="hit">'+t_now.toFixed(2)+' mm</span><br>'
     +'<strong>RUL</strong> = (t_now - t_min) / CR = ('+t_now.toFixed(2)+' - '+t_min+') / '+CR+' = <span class="hit">'+RUL.toFixed(1)+' years</span><br>'
     +'<strong>Life consumed</strong> = ('+t_nom+' - '+t_now.toFixed(2)+') / ('+t_nom+' - '+t_min+') = <span class="hit">'+life_consumed.toFixed(0)+'%</span><br>'
-    +'<strong>MAOP (current t):</strong> 2 x '+SMYS+' x '+t_eff_now.toFixed(2)+' / ('+OD+' - 2x0.4x'+t_eff_now.toFixed(2)+') / 10 = <span class="hit">'+MAOP_now.toFixed(0)+' bar</span>'
+    +'<strong>Pressure limit (Barlow, ASME B31.4, F = 0.72):</strong> 2 x '+SMYS+' x 0.72 x '+t_eff_now.toFixed(2)+' / '+OD+' x 10 = <span class="hit">'+MAOP_now.toFixed(0)+' bar</span>'
     +'</div>';
 
   var rows='';
@@ -1107,7 +1016,6 @@ function calcInhibitor(){
   html+=rc('','Product concentration',treat_ratio_ppm_product.toFixed(0),'ppm product','At '+active+'% active content');
   html+=rc('','Daily chemical cost','$'+cost_d.toFixed(0),'/day','= $'+Math.round(cost_y/1000)+'k/year');
   html+=rc('','Product per unit water',( vol_product_L_d/Qw*1000).toFixed(1),'mL/m3 water','Treat ratio for dosing verification');
-  html+=rc('','Batch treatment (monthly)',batch_vol_L.toFixed(0),'L per treatment','Alt. to continuous injection');
   html+=rc('','Injection pump required',rate_ml_min.toFixed(1),'mL/min','Chemical metering pump');
   html+='</div>';
 
