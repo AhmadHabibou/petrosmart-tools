@@ -660,6 +660,20 @@ function setHX(type){
 }
 
 /* ====== PANEL 1: LMTD ====== */
+/* LMTD correction factor for N shell passes and 2N or more tube passes (Bowman, Mueller and Nagle, 1940;
+   form as in Kern, Process Heat Transfer, and the TEMA standards). P = (t2 - t1)/(T1 - t1), R = (T1 - T2)/(t2 - t1). */
+function psaF12(P,R){
+  if(Math.abs(R-1)<1e-6){var r2=Math.SQRT2;return r2*P/((1-P)*Math.log((2-P*(2-r2))/(2-P*(2+r2))));}
+  var S=Math.sqrt(R*R+1), num=S*Math.log((1-P)/(1-R*P)), den=(R-1)*Math.log((2-P*(R+1-S))/(2-P*(R+1+S)));
+  return num/den;
+}
+function psaFshell(P,R,N){
+  N=N||1; if(N===1) return psaF12(P,R);
+  var P1;
+  if(Math.abs(R-1)<1e-6){P1=P/(N-N*P+P);}
+  else {var X=Math.pow((1-P*R)/(1-P),1/N); P1=(X-1)/(X-R);}
+  return psaF12(P1,R);
+}
 function calcLMTD(){
   var T1=psaNum('T1',180);
   var T2=psaNum('T2',100);
@@ -698,12 +712,7 @@ function calcLMTD(){
   var P=(t2-t1)/(T1-t1);
   var R=(T1-T2)/(t2-t1);
   var F=1.0;
-  if(hxType==='shell'&&n_pass>1){
-    var W=Math.pow((1-P*R)/(1-P),(1/n_pass));
-    var S=Math.sqrt(R*R+1);
-    F=S*Math.log(W)/(n_pass*(1-W)*(1-W*R)/(1-W)/(1-W*R)*Math.log((2/P-1-R+S*(1-P*R/P)/(1-R))/(2/P-1-R-S*(1-P*R/P)/(1-R))));
-    if(isNaN(F)||F<=0||F>1.1) F=0.95; // fallback
-  }
+  if(hxType==='shell'&&n_tube>=2){ F=psaFshell(P,R,n_pass); }
   var LMTD_eff=LMTD_cf*F;
 
   // U dirty
