@@ -575,7 +575,7 @@ select option{background:#0A0A12;}
 
 <div class="foot">
   <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
-  · GPSA Engineering Data Book / API 12J / API RP 11V10 separator sizing · Educational tool only
+  · GPSA Engineering Data Book / API 12J separator sizing · Educational tool only
 </div>
 </div>
 
@@ -638,7 +638,7 @@ function calcInlet(){
   var rho_air=1.2; // kg/m3 at std
 
   // Gas actual volumetric flow
-  var Qg_act=Qg_std/86400*Z*T_K/273.15*(1.01325/P_abs); // m3/s
+  var Qg_act=Qg_std/86400*Z*T_K/288.15*(1.01325/P_abs); // m3/s
   var Qg_act_m3d=Qg_act*86400; // m3/d actual
 
   // Oil density
@@ -672,7 +672,7 @@ function calcInlet(){
   html+='<div class="fbox">'
     +'<strong>Gas density (real gas):</strong> rho = P_abs x MW / (Z x R x T)<br>'
     +'= '+P_abs.toFixed(3)+' x 1e5 x '+MW+' / ('+Z+' x 8314 x '+T_K.toFixed(1)+') = <span class="hi">'+rho_g.toFixed(2)+' kg/m3</span><br>'
-    +'<strong>Gas actual flow:</strong> Qg_act = '+Qg_std.toLocaleString()+' Sm3/d x Z x T/273.15 x P_std/P_abs / 86400<br>'
+    +'<strong>Gas actual flow:</strong> Qg_act = '+Qg_std.toLocaleString()+' Sm3/d x Z x T/288.15 x P_std/P_abs / 86400 (Sm3 at 15 °C, 1.01325 bar, ISO 13443)<br>'
     +'= <span class="hi">'+Qg_act_m3d.toFixed(0)+' m3/d actual = '+(Qg_act*1000).toFixed(2)+' L/s</span><br>'
     +'<strong>Oil density:</strong> rho_oil = 141.5/('+API+'+131.5) x 1000 = <span class="hio">'+rho_oil.toFixed(0)+' kg/m3</span>'
     +'</div>';
@@ -726,7 +726,7 @@ function calcHoriz(){
   var Z=psaNum('Z_g',0.88);
   var P_abs=P_op+1.01325;
   var T_K=T_op+273.15;
-  var Qg_act=Qg_std/86400*Z*T_K/273.15*(1.01325/P_abs); // m3/s
+  var Qg_act=Qg_std/86400*Z*T_K/288.15*(1.01325/P_abs); // m3/s
 
   // Gas capacity requirement
   // For horizontal: Vg < Vt (acts over full cross section above liquid level)
@@ -818,7 +818,7 @@ function calcVert(){
   var Z=psaNum('Z_g',0.88);
   var P_abs=P_op+1.01325;
   var T_K=T_op+273.15;
-  var Qg_act=Qg_std/86400*Z*T_K/273.15*(1.01325/P_abs);
+  var Qg_act=Qg_std/86400*Z*T_K/288.15*(1.01325/P_abs);
 
   // Terminal velocity
   var Vt=K*Math.sqrt((rho_l-rho_g)/rho_g);
@@ -918,7 +918,7 @@ function calc3Ph(){
   var P_abs=P_op+1.01325;
   var T_K=T_op+273.15;
   var rho_g=P_abs*1e5*MW/(Z*8314*T_K);
-  var Qg_act=Qg_std/86400*Z*T_K/273.15*(1.01325/P_abs);
+  var Qg_act=Qg_std/86400*Z*T_K/288.15*(1.01325/P_abs);
   var K_3ph=0.107;
   var Vt=K_3ph*Math.sqrt((rho_o-rho_g)/rho_g);
   var D_gas=Math.sqrt(4*Qg_act/(Math.PI*Vt*0.5)); // 50% gas section
@@ -942,7 +942,7 @@ function calc3Ph(){
 
   // Settling time check
   var t_oil_residence=V_oil/(Qo_m3d/86400); // s
-  var h_settle=h_water; // water droplets must travel through oil pad
+  var h_settle=h_oil; // water droplets must settle through the oil pad
   var t_settle_w=h_settle/Vs_water; // s
   var settle_ok=t_oil_residence>=t_settle_w;
 
