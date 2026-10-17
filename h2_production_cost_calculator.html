@@ -249,7 +249,7 @@ select option{background:#0A0A14;}
     <div class="ibox">
       <strong>SMR process:</strong> CH4 + H2O → CO + 3H2 (reforming) | CO + H2O → CO2 + H2 (WGS reaction)<br>
       Overall: CH4 + 2H2O → CO2 + 4H2 | ΔH = +206 kJ/mol (endothermic)<br>
-      <strong>Typical plant:</strong> 100,000 Nm3/hr H2, operating at 800-900°C, 20-35 bar. CO2 is vented (grey H2) or captured (blue H2).
+      <strong>Example plant size:</strong> 100,000 Nm3/h H2; reformer outlet temperatures are typically 800 to 900 °C. CO2 is vented (grey H2) or captured (blue H2).
     </div>
 
     <div class="stitle">/// natural gas feedstock and energy</div>
@@ -260,11 +260,15 @@ select option{background:#0A0A14;}
       </div>
       <div class="field">
         <label class="lbl">Specific NG consumption</label>
-        <div class="ir"><input type="number" id="ng-cons" value="3.4" step="0.05" oninput="calcSMR()"><span class="unit">Nm3 NG/Nm3 H2</span></div>
+        <div class="ir"><input type="number" id="ng-cons" value="0.41" step="0.01" oninput="calcSMR()"><span class="unit">Nm3 NG/Nm3 H2 (feed + fuel)</span></div>
       </div>
       <div class="field">
         <label class="lbl">Steam export credit</label>
         <div class="ir"><input type="number" id="steam-cr" value="15" step="1" oninput="calcSMR()"><span class="unit">USD/tonne</span></div>
+      </div>
+      <div class="field">
+        <label class="lbl">Steam exported (from licensor heat balance)</label>
+        <div class="ir"><input type="number" id="steam-exp" value="0" step="0.5" oninput="calcSMR()"><span class="unit">t steam / t H2</span></div>
       </div>
     </div>
 
@@ -521,17 +525,17 @@ select option{background:#0A0A14;}
         <tr><td class="tw">Molecular weight</td><td>2.016</td><td>g/mol</td><td>H2</td></tr>
         <tr><td class="tw">LHV (Lower Heating Value)</td><td>119.96</td><td>MJ/kg</td><td>33.33 kWh/kg</td></tr>
         <tr><td class="tw">HHV (Higher Heating Value)</td><td>141.86</td><td>MJ/kg</td><td>39.41 kWh/kg</td></tr>
-        <tr><td class="tw">Energy density (gas, ambient)</td><td>0.01005</td><td>MJ/L</td><td>At STP (0°C, 1 atm)</td></tr>
+        <tr><td class="tw">Energy density (gas, 0 °C, 1 atm)</td><td>0.0108</td><td>MJ/L</td><td>LHV x 0.0899 kg/m3</td></tr>
         <tr><td class="tw">Energy density (liquid H2)</td><td>8.491</td><td>MJ/L</td><td>At -253°C, 1 atm</td></tr>
-        <tr><td class="tw">Energy density (700 bar CGH2)</td><td>5.32</td><td>MJ/L</td><td>Compressed gas, 700 bar</td></tr>
+        <tr><td class="tw">Energy density (700 bar, 15 °C)</td><td>about 4.8</td><td>MJ/L</td><td>density about 40 kg/m3, LHV basis</td></tr>
         <tr><td class="tw">Density (gas, ambient)</td><td>0.0899</td><td>kg/Nm3</td><td>At 0°C, 1 atm</td></tr>
         <tr><td class="tw">Boiling point</td><td>-252.9</td><td>°C</td><td>At 1 atm</td></tr>
-        <tr><td class="tw">Minimum thermodynamic energy</td><td>39.4</td><td>kWh/kg H2</td><td>ΔG = 237 kJ/mol</td></tr>
+        <tr><td class="tw">Water splitting energy</td><td>39.4 (ΔH) / 32.7 (ΔG)</td><td>kWh/kg H2</td><td>ΔH = 285.8 kJ/mol, ΔG = 237.1 kJ/mol at 25 °C</td></tr>
         <tr><td class="tw">Faraday constant</td><td>96485</td><td>C/mol</td><td>For electrolysis calculation</td></tr>
-        <tr><td class="tw">Water consumption (electrolysis)</td><td>9.0</td><td>L H2O / Nm3 H2</td><td>Or ~11 kg H2O/kg H2</td></tr>
+        <tr><td class="tw">Water consumption (electrolysis)</td><td>8.94</td><td>kg H2O / kg H2</td><td>Stoichiometric (0.80 L per Nm3 H2); this calculator uses 11 kg/kg to allow for treatment losses (assumption)</td></tr>
         <tr><td class="tw">1 kg H2 equivalent to</td><td>~33.3</td><td>kWh</td><td>LHV basis</td></tr>
-        <tr><td class="tw">SMR CH4 consumption (ideal)</td><td>0.25</td><td>kg CH4 / kg H2</td><td>Stoichiometric: CH4+2H2O→CO2+4H2</td></tr>
-        <tr><td class="tw">SMR CH4 consumption (real)</td><td>0.40-0.45</td><td>kg CH4 / kg H2</td><td>Including heat duty</td></tr>
+        <tr><td class="tw">SMR CH4 consumption (stoichiometric)</td><td>2.0</td><td>kg CH4 / kg H2</td><td>CH4 + 2 H2O → CO2 + 4 H2 (16 g CH4 for 8 g H2)</td></tr>
+        <tr><td class="tw">SMR natural gas use (unabated)</td><td>about 165</td><td>MJ (LHV) / kg H2</td><td>Feed + fuel, IEA, The Future of Hydrogen (2019); about 3.3 kg CH4/kg H2</td></tr>
       </tbody>
     </table>
     <div class="sep"></div>
@@ -595,7 +599,7 @@ var H2_LHV=33.3; // kWh/kg
 /* ====== PANEL 1: GREY SMR ====== */
 function calcSMR(){
   var ng=psaNum('ng-price',8.5); // USD/MMBtu
-  var ng_cons=psaNum('ng-cons',3.4); // Nm3 NG / Nm3 H2
+  var ng_cons=psaNum('ng-cons',0.41); // Nm3 NG / Nm3 H2; about 165 MJ(LHV)/kg H2 for unabated SMR (IEA, The Future of Hydrogen, 2019)
   var steam_cr=psaNum('steam-cr',15); // USD/t steam
   var cap_nm3=psaNum('smr-cap',100000); // Nm3/hr
   var capex=psaNum('smr-capex',120); // M USD
@@ -618,8 +622,8 @@ function calcSMR(){
   var ng_cost_annual=ng_cost_per_kg_h2*h2_annual_kg/1e6; // M USD
 
   // Steam credit: SMR exports ~0.6 t steam per Nm3 H2 (typical)
-  var steam_export=0.6; // t steam / kg H2 (rough)
-  var steam_credit_per_kg=steam_cr*steam_export/1000;
+  var steam_export=psaNum('steam-exp',0); // t steam / t H2
+  var steam_credit_per_kg=steam_cr*steam_export/1000; // USD/kg H2
   var steam_credit_annual=steam_credit_per_kg*h2_annual_kg/1e6;
 
   // CAPEX annuity
@@ -677,7 +681,7 @@ function calcSMR(){
   if(carbon_cost_per_kg>0.5){
     rows+=ar('wn','Significant carbon cost exposure ($'+carbon_cost_per_kg.toFixed(2)+'/kg H2)','At $'+cprice+'/tonne CO2, the carbon cost adds '+carbon_cost_per_kg.toFixed(2)+' USD/kg to grey H2 effective cost, making LCOH with carbon = '+lcoh_with_carbon.toFixed(2)+' USD/kg. If carbon price reaches $150/t (EU 2030 forecast), grey H2 LCOH rises to '+(lcoh_no_carbon+co2*150/1000).toFixed(2)+' USD/kg.','Grey H2 operators face increasing carbon price risk. Blue H2 with 90% capture reduces carbon exposure by 90%. At $'+Math.round((lcoh_no_carbon-1.5)/co2*1000)+'+ /t CO2, blue H2 becomes cost-competitive with grey H2 (rough estimate).');
   }
-  rows+=ar('blue','Grey H2 global cost context','Current global grey H2 LCOH: $0.90-2.50/kg depending on natural gas price and location. US ($3-4/MMBtu NG): LCOH ≈ $1.0-1.5/kg. Middle East ($1-2/MMBtu): LCOH ≈ $0.8-1.2/kg. Europe ($8-15/MMBtu): LCOH ≈ $1.8-3.0/kg.','Grey H2 remains the lowest-cost production route today but faces increasing risk from carbon pricing and stranded asset risk as energy transition accelerates. Investment in new SMR capacity without CCS is risky beyond 2030 in carbon-regulated markets.');
+  rows+=ar('info','Inputs drive the result','LCOH is the sum of the components shown; gas price, CAPEX, capacity factor and cost of capital should come from project data or a dated published source.','');
 
   html+='<div class="analysis"><div class="atitle">/// GREY H2 COST ANALYSIS</div>'+rows+'</div>';
   document.getElementById('r1').innerHTML=html;
@@ -707,7 +711,7 @@ function calcBlue(){
 
   var h2_annual_kg=cap_nm3*8760*(cf/100)*H2_kg_per_Nm3;
   var ng_per_MMBtu=0.03412;
-  var ng_cons=3.4;
+  var ng_cons=psaNum('ng-cons',0.41);
   var ng_cost_per_kg=ng*ng_cons*ng_per_MMBtu/H2_kg_per_Nm3;
   var capex_ann=annuity(capex,wacc,25)*1e6/h2_annual_kg;
   var om_per_kg=capex*0.04*1e6/h2_annual_kg;
@@ -715,7 +719,7 @@ function calcBlue(){
   var co2_vented=co2_gross*(1-cap_rate/100);
   var ccs_per_kg=co2_captured*ccs_cost/1000;
   var carbon_residual=co2_vented*cprice/1000;
-  var steam_credit_per_kg=0.6*15/1000;
+  var steam_credit_per_kg=psaNum('steam-cr',15)*psaNum('steam-exp',0)/1000;
   var lcoh=ng_cost_per_kg+capex_ann+om_per_kg+ccs_per_kg-steam_credit_per_kg;
   var lcoh_c=lcoh+carbon_residual;
 
@@ -777,14 +781,14 @@ function calcGreen(){
   var capex_ann=annuity(total_capex,wacc,life)*1e6/h2_annual; // USD/kg H2
 
   // Stack replacement
-  var n_replacements=Math.max(0,Math.floor(life*op_hours/stack_hr)-1);
+  var n_replacements=Math.max(0,Math.ceil(life*op_hours/stack_hr)-1);
   var stack_cost_per_rep=total_capex*(stack_pct/100); // M USD
   var stack_ann=n_replacements*stack_cost_per_rep/life*1e6/h2_annual; // USD/kg H2
 
   // O&M
   var om_per_kg=total_capex*(om_pct/100)*1e6/h2_annual;
 
-  // Water: 9 L H2O per Nm3 H2 = 9/0.0899 = ~100 L H2O / kg H2 (approx 11 kg H2O / kg H2)
+  // Water: 8.94 kg/kg stoichiometric; 11 kg/kg assumed with treatment losses
   var water_per_kg=water*11/1000; // USD/kg H2 (11 kg H2O/kg H2)
 
   var lcoh=elec_per_kg+capex_ann+stack_ann+om_per_kg+water_per_kg;
@@ -827,10 +831,10 @@ function calcGreen(){
     rows+=ar('green','Competitive electricity cost ('+elec+' USD/MWh)','At $'+elec+'/MWh, electricity cost is $'+elec_per_kg.toFixed(2)+'/kg H2. This is within the range where green H2 can approach cost parity with grey/blue H2 in high carbon-price environments. LCOH of $'+lcoh.toFixed(2)+'/kg is '+(lcoh<2?'below':'above')+' the $2/kg target.','');
   }
   if(capex_kw>600){
-    rows+=ar('wn','Electrolyzer CAPEX above current best-in-class ('+capex_kw+' USD/kW)','PEM electrolyzer CAPEX is declining rapidly: $1,200-1,500/kW (2020) → $600-900/kW (2024) → projected $200-400/kW (2030). At current '+capex_kw+' USD/kW, CAPEX contributes $'+capex_ann.toFixed(2)+'/kg H2.','CAPEX reduction roadmap: standardization + automation + scale-up. Nel, ITM Power, ThyssenKrupp Nucera are targeting $200-400/kW by 2030. This would reduce CAPEX contribution from $'+capex_ann.toFixed(2)+' to $'+(capex_ann*250/capex_kw).toFixed(2)+'/kg H2.');
+    rows+=ar('wn','Electrolyser CAPEX input: '+capex_kw+' USD/kW','CAPEX contributes $'+capex_ann.toFixed(2)+'/kg H2 at this input. Use quotations or a dated published benchmark for the system boundary considered (stack only or installed system).','');
   }
   if(cf<40){
-    rows+=ar('wn','Low capacity factor ('+cf+'%) reduces H2 output and increases CAPEX/kg','At '+cf+'% capacity factor, annual operating hours = '+op_hours.toFixed(0)+' hr/yr. Low CF (solar-only: 20-25%, wind-only: 35-45%) increases fixed cost allocation per kg H2. Hybrid solar+wind or grid backup can raise CF to 60-80%.','Optimize CF vs electricity cost tradeoff: lower CF = cheaper renewable electricity but higher fixed cost per kg. Use optimization model: LCOH_optimal = f(CF, electricity_price). For this plant: target CF of '+(elec<30?'45-55%':'55-70%')+' with hybrid renewable source.');
+    rows+=ar('wn','Low capacity factor ('+cf+'%)','At '+cf+'% capacity factor the plant runs '+op_hours.toFixed(0)+' h/yr, so fixed costs are spread over less hydrogen.','');
   }
 
   html+='<div class="analysis"><div class="atitle green">/// GREEN H2 COST ANALYSIS</div>'+rows+'</div>';
