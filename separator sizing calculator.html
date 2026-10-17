@@ -580,6 +580,8 @@ select option{background:#0A0A12;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 var ph3Chart=null;
 var nPhases=2;
 
@@ -620,14 +622,14 @@ function nextStdSize(D_mm){
 
 /* ====== PANEL 1: INLET CONDITIONS ====== */
 function calcInlet(){
-  var P=parseFloat(document.getElementById('P_op').value)||50; // bar(g)
-  var T=parseFloat(document.getElementById('T_op').value)||60; // °C
-  var Qg_std=parseFloat(document.getElementById('Qg').value)||500000; // Sm3/d
-  var MW=parseFloat(document.getElementById('MW_g').value)||18;
-  var Z=parseFloat(document.getElementById('Z_g').value)||0.88;
-  var Ql_oil_bbl=parseFloat(document.getElementById('Ql_oil').value)||2000; // bbl/d
-  var API=parseFloat(document.getElementById('API').value)||35;
-  var Ql_water_bbl=parseFloat(document.getElementById('Ql_water').value)||500;
+  var P=psaNum('P_op',50); // bar(g)
+  var T=psaNum('T_op',60); // °C
+  var Qg_std=psaNum('Qg',500000); // Sm3/d
+  var MW=psaNum('MW_g',18);
+  var Z=psaNum('Z_g',0.88);
+  var Ql_oil_bbl=psaNum('Ql_oil',2000); // bbl/d
+  var API=psaNum('API',35);
+  var Ql_water_bbl=psaNum('Ql_water',500);
 
   // Gas density at operating conditions
   var P_abs=(P+1.01325); // bar abs
@@ -705,23 +707,23 @@ function calcInlet(){
 
 /* ====== PANEL 2: HORIZONTAL ====== */
 function calcHoriz(){
-  var Qg_std=parseFloat(document.getElementById('h_Qg').value)||500000;
-  var Ql_m3d=parseFloat(document.getElementById('h_Ql').value)||397;
-  var rho_g=parseFloat(document.getElementById('h_rhog').value)||45;
-  var rho_l=parseFloat(document.getElementById('h_rhol').value)||830;
-  var tr=parseFloat(document.getElementById('h_tr').value)||3;
-  var ll_pct=parseFloat(document.getElementById('h_ll').value)||50;
-  var K=parseFloat(document.getElementById('h_K').value)||0.107;
-  var LD=parseFloat(document.getElementById('h_LD').value)||4;
-  var me=parseFloat(document.getElementById('h_me').value)||99;
+  var Qg_std=psaNum('h_Qg',500000);
+  var Ql_m3d=psaNum('h_Ql',397);
+  var rho_g=psaNum('h_rhog',45);
+  var rho_l=psaNum('h_rhol',830);
+  var tr=psaNum('h_tr',3);
+  var ll_pct=psaNum('h_ll',50);
+  var K=psaNum('h_K',0.107);
+  var LD=psaNum('h_LD',4);
+  var me=psaNum('h_me',99);
 
   // Souders-Brown terminal velocity
   var Vt=K*Math.sqrt((rho_l-rho_g)/rho_g); // m/s
 
   // Gas actual flow (approx using same conditions as tab 1)
-  var P_op=parseFloat(document.getElementById('P_op').value)||50;
-  var T_op=parseFloat(document.getElementById('T_op').value)||60;
-  var Z=parseFloat(document.getElementById('Z_g').value)||0.88;
+  var P_op=psaNum('P_op',50);
+  var T_op=psaNum('T_op',60);
+  var Z=psaNum('Z_g',0.88);
   var P_abs=P_op+1.01325;
   var T_K=T_op+273.15;
   var Qg_act=Qg_std/86400*Z*T_K/273.15*(1.01325/P_abs); // m3/s
@@ -802,18 +804,18 @@ function calcHoriz(){
 
 /* ====== PANEL 3: VERTICAL ====== */
 function calcVert(){
-  var Qg_std=parseFloat(document.getElementById('v_Qg').value)||500000;
-  var rho_g=parseFloat(document.getElementById('v_rhog').value)||45;
-  var rho_l=parseFloat(document.getElementById('v_rhol').value)||830;
-  var Ql_m3d=parseFloat(document.getElementById('v_Ql').value)||397;
-  var tr=parseFloat(document.getElementById('v_tr').value)||3;
-  var K=parseFloat(document.getElementById('v_K').value)||0.061;
-  var surge=parseFloat(document.getElementById('v_surge').value)||2;
-  var HD=parseFloat(document.getElementById('v_HD').value)||1.5;
+  var Qg_std=psaNum('v_Qg',500000);
+  var rho_g=psaNum('v_rhog',45);
+  var rho_l=psaNum('v_rhol',830);
+  var Ql_m3d=psaNum('v_Ql',397);
+  var tr=psaNum('v_tr',3);
+  var K=psaNum('v_K',0.061);
+  var surge=psaNum('v_surge',2);
+  var HD=psaNum('v_HD',1.5);
 
-  var P_op=parseFloat(document.getElementById('P_op').value)||50;
-  var T_op=parseFloat(document.getElementById('T_op').value)||60;
-  var Z=parseFloat(document.getElementById('Z_g').value)||0.88;
+  var P_op=psaNum('P_op',50);
+  var T_op=psaNum('T_op',60);
+  var Z=psaNum('Z_g',0.88);
   var P_abs=P_op+1.01325;
   var T_K=T_op+273.15;
   var Qg_act=Qg_std/86400*Z*T_K/273.15*(1.01325/P_abs);
@@ -881,15 +883,15 @@ function calcVert(){
 
 /* ====== PANEL 4: THREE-PHASE ====== */
 function calc3Ph(){
-  var Qo_bbl=parseFloat(document.getElementById('tp_Qo').value)||2000;
-  var Qw_bbl=parseFloat(document.getElementById('tp_Qw').value)||800;
-  var Qg_std=parseFloat(document.getElementById('tp_Qg').value)||500000;
-  var API=parseFloat(document.getElementById('tp_API').value)||35;
-  var mu_o=parseFloat(document.getElementById('tp_muo').value)||3.5; // cP
-  var rho_w=parseFloat(document.getElementById('tp_rhow').value)||1080;
-  var tro=parseFloat(document.getElementById('tp_tro').value)||10; // min oil
-  var trw=parseFloat(document.getElementById('tp_trw').value)||5; // min water
-  var dp_w=parseFloat(document.getElementById('tp_dp').value)||500; // micron
+  var Qo_bbl=psaNum('tp_Qo',2000);
+  var Qw_bbl=psaNum('tp_Qw',800);
+  var Qg_std=psaNum('tp_Qg',500000);
+  var API=psaNum('tp_API',35);
+  var mu_o=psaNum('tp_muo',3.5); // cP
+  var rho_w=psaNum('tp_rhow',1080);
+  var tro=psaNum('tp_tro',10); // min oil
+  var trw=psaNum('tp_trw',5); // min water
+  var dp_w=psaNum('tp_dp',500); // micron
 
   var rho_o=141.5/(API+131.5)*1000;
   var Qo_m3d=Qo_bbl*0.158987;
@@ -909,10 +911,10 @@ function calc3Ph(){
 
   // Use gas sizing result to get diameter (simplified: use horiz D from Tab 2)
   // Or calculate here using K=0.107 for 3-phase horizontal
-  var P_op=parseFloat(document.getElementById('P_op').value)||50;
-  var T_op=parseFloat(document.getElementById('T_op').value)||60;
-  var Z=parseFloat(document.getElementById('Z_g').value)||0.88;
-  var MW=parseFloat(document.getElementById('MW_g').value)||18;
+  var P_op=psaNum('P_op',50);
+  var T_op=psaNum('T_op',60);
+  var Z=psaNum('Z_g',0.88);
+  var MW=psaNum('MW_g',18);
   var P_abs=P_op+1.01325;
   var T_K=T_op+273.15;
   var rho_g=P_abs*1e5*MW/(Z*8314*T_K);
@@ -995,12 +997,12 @@ function calc3Ph(){
 
 /* ====== PANEL 5: NOZZLES ====== */
 function calcNozzle(){
-  var D=parseFloat(document.getElementById('nz_D').value)||1200; // mm vessel
-  var Q_in=parseFloat(document.getElementById('nz_Q').value)||0.25; // m3/s total
-  var rho_in=parseFloat(document.getElementById('nz_rho').value)||120; // kg/m3 mixture
-  var Qg_out=parseFloat(document.getElementById('nz_Qg_out').value)||0.22; // m3/s
-  var Ql_out=parseFloat(document.getElementById('nz_Ql_out').value)||0.005; // m3/s
-  var rhog_out=parseFloat(document.getElementById('nz_rhog_out').value)||45;
+  var D=psaNum('nz_D',1200); // mm vessel
+  var Q_in=psaNum('nz_Q',0.25); // m3/s total
+  var rho_in=psaNum('nz_rho',120); // kg/m3 mixture
+  var Qg_out=psaNum('nz_Qg_out',0.22); // m3/s
+  var Ql_out=psaNum('nz_Ql_out',0.005); // m3/s
+  var rhog_out=psaNum('nz_rhog_out',45);
 
   // Inlet nozzle sizing: target v < 5 m/s, check momentum rho*v2 < 4000 Pa
   var v_in_targets=[1,2,3,4,5]; // m/s

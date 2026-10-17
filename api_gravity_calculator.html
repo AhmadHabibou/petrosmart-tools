@@ -145,6 +145,8 @@ tr:hover td{background:#1A1A1A;cursor:pointer;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 var crudes=[
   {n:'Brent',o:'North Sea',a:38.3},
   {n:'WTI',o:'USA',a:39.6},
@@ -196,7 +198,7 @@ function c2(){
 
 function c3(){
   var a=parseFloat(document.getElementById('apm').value);
-  var v=parseFloat(document.getElementById('vol').value)||1;
+  var v=psaNum('vol',1);
   if(isNaN(a)||a<1)return;
   var s=toSG(a),cl2=cls(a),mbb=s*158.99,tot=mbb*v;
   document.getElementById('r3').innerHTML=

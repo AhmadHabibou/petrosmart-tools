@@ -492,6 +492,8 @@ select option{background:#0A0A14;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 var boChart=null,bgChart=null,pvtChart=null,phaseChart=null;
 var corrMethod='standing';
 
@@ -698,14 +700,14 @@ function mu_g(P_bar,T_C,gamma_g){
 
 /* ====== PANEL 1: OIL PVT ====== */
 function calcOil(){
-  var Pr=parseFloat(document.getElementById('o_Pr').value)||300;
-  var Tr=parseFloat(document.getElementById('o_Tr').value)||120;
-  var Pb=parseFloat(document.getElementById('o_Pb').value)||200;
-  var API=parseFloat(document.getElementById('o_API').value)||35;
-  var gamma=parseFloat(document.getElementById('o_gamma').value)||0.70;
-  var Rs_b=parseFloat(document.getElementById('o_Rs').value)||150;
-  var P=parseFloat(document.getElementById('o_P').value)||150;
-  var sal=parseFloat(document.getElementById('o_sal').value)||50000;
+  var Pr=psaNum('o_Pr',300);
+  var Tr=psaNum('o_Tr',120);
+  var Pb=psaNum('o_Pb',200);
+  var API=psaNum('o_API',35);
+  var gamma=psaNum('o_gamma',0.70);
+  var Rs_b=psaNum('o_Rs',150);
+  var P=psaNum('o_P',150);
+  var sal=psaNum('o_sal',50000);
 
   var corr=corrMethod.charAt(0).toUpperCase()+corrMethod.slice(1);
   var gamma_o=141.5/(API+131.5);
@@ -818,12 +820,12 @@ function calcOil(){
 
 /* ====== PANEL 2: GAS PVT ====== */
 function calcGas(){
-  var gamma=parseFloat(document.getElementById('g_gamma').value)||0.65;
-  var CO2=parseFloat(document.getElementById('g_CO2').value)||2;
-  var H2S=parseFloat(document.getElementById('g_H2S').value)||0.5;
-  var N2=parseFloat(document.getElementById('g_N2').value)||1;
-  var P=parseFloat(document.getElementById('g_P').value)||200;
-  var T=parseFloat(document.getElementById('g_T').value)||120;
+  var gamma=psaNum('g_gamma',0.65);
+  var CO2=psaNum('g_CO2',2);
+  var H2S=psaNum('g_H2S',0.5);
+  var N2=psaNum('g_N2',1);
+  var P=psaNum('g_P',200);
+  var T=psaNum('g_T',120);
   var method=document.getElementById('g_method').value;
 
   var MW=gamma*28.97;
@@ -918,13 +920,13 @@ function calcGas(){
 
 /* ====== PANEL 3: PVT TABLE ====== */
 function calcTable(){
-  var Pi=parseFloat(document.getElementById('t_Pi').value)||300;
-  var Pb=parseFloat(document.getElementById('t_Pb').value)||200;
-  var Tr=parseFloat(document.getElementById('t_Tr').value)||120;
-  var API=parseFloat(document.getElementById('t_API').value)||35;
-  var gamma=parseFloat(document.getElementById('t_gamma').value)||0.70;
-  var Rs_pb=parseFloat(document.getElementById('t_Rs_pb').value)||150;
-  var Pab=parseFloat(document.getElementById('t_Pab').value)||50;
+  var Pi=psaNum('t_Pi',300);
+  var Pb=psaNum('t_Pb',200);
+  var Tr=psaNum('t_Tr',120);
+  var API=psaNum('t_API',35);
+  var gamma=psaNum('t_gamma',0.70);
+  var Rs_pb=psaNum('t_Rs_pb',150);
+  var Pab=psaNum('t_Pab',50);
 
   // Generate pressure points
   var P_pts=[];
@@ -1007,13 +1009,13 @@ function calcTable(){
 
 /* ====== PANEL 4: FLUID PROPERTIES ====== */
 function calcFluid(){
-  var P=parseFloat(document.getElementById('fp_P').value)||200;
-  var T=parseFloat(document.getElementById('fp_T').value)||120;
-  var API=parseFloat(document.getElementById('fp_API').value)||35;
-  var Rs=parseFloat(document.getElementById('fp_Rs').value)||150;
-  var Pb=parseFloat(document.getElementById('fp_Pb').value)||200;
-  var gamma=parseFloat(document.getElementById('fp_gamma').value)||0.70;
-  var sal=parseFloat(document.getElementById('fp_sal').value)||50000;
+  var P=psaNum('fp_P',200);
+  var T=psaNum('fp_T',120);
+  var API=psaNum('fp_API',35);
+  var Rs=psaNum('fp_Rs',150);
+  var Pb=psaNum('fp_Pb',200);
+  var gamma=psaNum('fp_gamma',0.70);
+  var sal=psaNum('fp_sal',50000);
 
   var gamma_o=141.5/(API+131.5);
   var mu_od_v=mu_od(API,T);
@@ -1055,12 +1057,12 @@ function calcFluid(){
 
 /* ====== PANEL 5: PHASE DIAGRAM ====== */
 function calcPhase(){
-  var Pr=parseFloat(document.getElementById('ph_Pr').value)||300;
-  var Tr_C=parseFloat(document.getElementById('ph_Tr').value)||120;
-  var GOR=parseFloat(document.getElementById('ph_GOR').value)||500;
-  var API=parseFloat(document.getElementById('ph_API').value)||35;
-  var Pb=parseFloat(document.getElementById('ph_Pb').value)||200;
-  var gamma=parseFloat(document.getElementById('ph_gamma').value)||0.70;
+  var Pr=psaNum('ph_Pr',300);
+  var Tr_C=psaNum('ph_Tr',120);
+  var GOR=psaNum('ph_GOR',500);
+  var API=psaNum('ph_API',35);
+  var Pb=psaNum('ph_Pb',200);
+  var gamma=psaNum('ph_gamma',0.70);
 
   // Fluid classification
   var fluidType,fluidColor,fluidDesc;

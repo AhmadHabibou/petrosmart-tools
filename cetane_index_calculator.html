@@ -478,6 +478,8 @@ select option{background:#111;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 /* ====== UTILS ====== */
 function sw(n){
   for(var i=1;i<=5;i++){
@@ -526,14 +528,14 @@ function setFuel(id,rho,T10,T90,name){
 
 /* ====== PANEL 1: CI CALCULATOR ====== */
 function calcCI(){
-  var rho=parseFloat(document.getElementById('rho15').value)||840;
-  var T10=parseFloat(document.getElementById('T10').value)||250;
-  var T50=parseFloat(document.getElementById('T50').value)||280;
-  var T90=parseFloat(document.getElementById('T90').value)||295;
-  var flash=parseFloat(document.getElementById('flash').value)||65;
-  var sulfur=parseFloat(document.getElementById('sulfur').value)||10;
-  var visc=parseFloat(document.getElementById('visc').value)||3.2;
-  var arom=parseFloat(document.getElementById('arom').value)||25;
+  var rho=psaNum('rho15',840);
+  var T10=psaNum('T10',250);
+  var T50=psaNum('T50',280);
+  var T90=psaNum('T90',295);
+  var flash=psaNum('flash',65);
+  var sulfur=psaNum('sulfur',10);
+  var visc=psaNum('visc',3.2);
+  var arom=psaNum('arom',25);
 
   // ASTM D4737 (4-variable)
   var T10N=T10-215,T50N=T50-260,T90N=T90-310;
@@ -623,12 +625,12 @@ function calcCI(){
 
 /* ====== PANEL 2: CN ESTIMATOR ====== */
 function calcCN(){
-  var npar=parseFloat(document.getElementById('npar').value)||20;
-  var ipar=parseFloat(document.getElementById('ipar').value)||30;
-  var naph=parseFloat(document.getElementById('naph').value)||25;
-  var monoar=parseFloat(document.getElementById('monoar').value)||18;
-  var diar=parseFloat(document.getElementById('diar').value)||5;
-  var polyar=parseFloat(document.getElementById('polyar').value)||2;
+  var npar=psaNum('npar',20);
+  var ipar=psaNum('ipar',30);
+  var naph=psaNum('naph',25);
+  var monoar=psaNum('monoar',18);
+  var diar=psaNum('diar',5);
+  var polyar=psaNum('polyar',2);
   var total=npar+ipar+naph+monoar+diar+polyar;
 
   // CN of each molecular class (literature values)
@@ -719,7 +721,7 @@ function calcBlend(){
     totalVol+=c.vol;
     weightedCI+=c.ci*c.vol;
   });
-  var addDose=parseFloat(document.getElementById('add-dose').value)||0;
+  var addDose=psaNum('add-dose',0);
   // Cetane improver effect: each 0.1% 2-EHN adds ~3-4 CI (diminishing returns)
   var addEffect=addDose>0?Math.min(addDose*35*(1-addDose*0.5),8):0;
   var blendCI=totalVol>0?weightedCI/totalVol:0;

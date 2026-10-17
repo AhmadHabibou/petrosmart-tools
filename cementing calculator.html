@@ -586,6 +586,8 @@ select option{background:#0A0A12;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 var volChart=null,ecdChart=null,ttChart=null;
 
 /* ====== UTILS ====== */
@@ -617,14 +619,14 @@ function setCement(cls,sg,wc100){
 
 /* ====== PANEL 1: SLURRY DESIGN ====== */
 function calcSlurry(){
-  var sg_c=parseFloat(document.getElementById('sg-cem').value)||3.14;
-  var wc=parseFloat(document.getElementById('wc').value)||0.44;
-  var sg_add=parseFloat(document.getElementById('sg-add').value)||2.65;
-  var add_pct=parseFloat(document.getElementById('add-conc').value)||0;
-  var ret=parseFloat(document.getElementById('ret-dose').value)||0.3;
-  var disp=parseFloat(document.getElementById('disp-dose').value)||0.2;
-  var sack=parseFloat(document.getElementById('sack-wt').value)||94; // lbs
-  var bhct=parseFloat(document.getElementById('bhct').value)||80;
+  var sg_c=psaNum('sg-cem',3.14);
+  var wc=psaNum('wc',0.44);
+  var sg_add=psaNum('sg-add',2.65);
+  var add_pct=psaNum('add-conc',0);
+  var ret=psaNum('ret-dose',0.3);
+  var disp=psaNum('disp-dose',0.2);
+  var sack=psaNum('sack-wt',94); // lbs
+  var bhct=psaNum('bhct',80);
 
   // Per 100 kg cement (BWOC basis)
   var m_cem=100; // kg
@@ -744,17 +746,17 @@ function drawSlurryVis(rho,yield_s,wc,add){
 
 /* ====== PANEL 2: VOLUME ====== */
 function calcVol(){
-  var cas_od=parseFloat(document.getElementById('cas-od').value)||244.5; // mm
-  var cas_id=parseFloat(document.getElementById('cas-id').value)||220.5; // mm
-  var shoe_tvd=parseFloat(document.getElementById('shoe-tvd').value)||2500; // m
-  var toc=parseFloat(document.getElementById('toc').value)||1800; // m
-  var bit=parseFloat(document.getElementById('bit').value)||311.2; // mm
-  var excess=parseFloat(document.getElementById('excess').value)||1.35;
-  var prev_cas=parseFloat(document.getElementById('prev-cas').value)||0; // mm
-  var prev_shoe=parseFloat(document.getElementById('prev-shoe').value)||1500; // m
-  var rho=parseFloat(document.getElementById('vol-rho').value)||1.89;
-  var spacer=parseFloat(document.getElementById('spacer-vol').value)||5; // m3
-  var disp_rho=parseFloat(document.getElementById('disp-rho').value)||1.3;
+  var cas_od=psaNum('cas-od',244.5); // mm
+  var cas_id=psaNum('cas-id',220.5); // mm
+  var shoe_tvd=psaNum('shoe-tvd',2500); // m
+  var toc=psaNum('toc',1800); // m
+  var bit=psaNum('bit',311.2); // mm
+  var excess=psaNum('excess',1.35);
+  var prev_cas=psaNum('prev-cas',0); // mm
+  var prev_shoe=psaNum('prev-shoe',1500); // m
+  var rho=psaNum('vol-rho',1.89);
+  var spacer=psaNum('spacer-vol',5); // m3
+  var disp_rho=psaNum('disp-rho',1.3);
 
   // Cement column length
   var cem_len=shoe_tvd-toc; // m
@@ -864,17 +866,17 @@ function calcVol(){
 
 /* ====== PANEL 3: ECD ====== */
 function calcECD(){
-  var tvd=parseFloat(document.getElementById('ecd-tvd').value)||2500;
-  var shoe=parseFloat(document.getElementById('ecd-shoe').value)||2500;
-  var toc=parseFloat(document.getElementById('ecd-toc').value)||1800;
-  var rho_cem=parseFloat(document.getElementById('ecd-cem').value)||1.89;
-  var rho_disp=parseFloat(document.getElementById('ecd-disp').value)||1.30;
-  var rho_mud=parseFloat(document.getElementById('ecd-mud').value)||1.25;
-  var Q_bblmin=parseFloat(document.getElementById('ecd-q').value)||8;
-  var ppg=parseFloat(document.getElementById('ecd-ppg').value)||0.105;
-  var frac=parseFloat(document.getElementById('ecd-frac').value)||0.165;
-  var cid=parseFloat(document.getElementById('ecd-cid').value)||220.5; // mm
-  var aod=parseFloat(document.getElementById('ecd-aod').value)||311.2; // mm
+  var tvd=psaNum('ecd-tvd',2500);
+  var shoe=psaNum('ecd-shoe',2500);
+  var toc=psaNum('ecd-toc',1800);
+  var rho_cem=psaNum('ecd-cem',1.89);
+  var rho_disp=psaNum('ecd-disp',1.30);
+  var rho_mud=psaNum('ecd-mud',1.25);
+  var Q_bblmin=psaNum('ecd-q',8);
+  var ppg=psaNum('ecd-ppg',0.105);
+  var frac=psaNum('ecd-frac',0.165);
+  var cid=psaNum('ecd-cid',220.5); // mm
+  var aod=psaNum('ecd-aod',311.2); // mm
   var cas_od=244.5; // mm assumed
 
   var cem_len=shoe-toc;
@@ -983,14 +985,14 @@ function calcECD(){
 
 /* ====== PANEL 4: THICKENING TIME ====== */
 function calcTT(){
-  var tt=parseFloat(document.getElementById('tt-meas').value)||4.5; // hours
-  var vol=parseFloat(document.getElementById('tt-vol').value)||80; // m3
-  var rate=parseFloat(document.getElementById('tt-rate').value)||8; // bbl/min
-  var bhct=parseFloat(document.getElementById('tt-bhct').value)||80;
-  var bhst=parseFloat(document.getElementById('tt-bhst').value)||100;
-  var woc=parseFloat(document.getElementById('tt-woc').value)||24; // hours
-  var cs_24=parseFloat(document.getElementById('tt-cs').value)||3500; // psi
-  var cs_req=parseFloat(document.getElementById('tt-cs-req').value)||500; // psi
+  var tt=psaNum('tt-meas',4.5); // hours
+  var vol=psaNum('tt-vol',80); // m3
+  var rate=psaNum('tt-rate',8); // bbl/min
+  var bhct=psaNum('tt-bhct',80);
+  var bhst=psaNum('tt-bhst',100);
+  var woc=psaNum('tt-woc',24); // hours
+  var cs_24=psaNum('tt-cs',3500); // psi
+  var cs_req=psaNum('tt-cs-req',500); // psi
 
   var rate_m3min=rate*0.158987;
   var pump_time_min=vol/rate_m3min;
@@ -1067,17 +1069,17 @@ function calcTT(){
 
 /* ====== PANEL 5: LAB DATA ====== */
 function calcLab(){
-  var r300=parseFloat(document.getElementById('r300').value)||78;
-  var r600=parseFloat(document.getElementById('r600').value)||130;
-  var r3=parseFloat(document.getElementById('r3').value)||8;
-  var r6=parseFloat(document.getElementById('r6').value)||12;
-  var fw=parseFloat(document.getElementById('fw').value)||0.8;
-  var fl=parseFloat(document.getElementById('fl').value)||65;
-  var cs8=parseFloat(document.getElementById('cs8').value)||500;
-  var cs24=parseFloat(document.getElementById('cs24').value)||3500;
-  var cs72=parseFloat(document.getElementById('cs72').value)||5200;
-  var lab_rho=parseFloat(document.getElementById('lab-rho').value)||1.89;
-  var des_rho=parseFloat(document.getElementById('des-rho').value)||1.89;
+  var r300=psaNum('r300',78);
+  var r600=psaNum('r600',130);
+  var r3=psaNum('r3',8);
+  var r6=psaNum('r6',12);
+  var fw=psaNum('fw',0.8);
+  var fl=psaNum('fl',65);
+  var cs8=psaNum('cs8',500);
+  var cs24=psaNum('cs24',3500);
+  var cs72=psaNum('cs72',5200);
+  var lab_rho=psaNum('lab-rho',1.89);
+  var des_rho=psaNum('des-rho',1.89);
 
   var PV=r600-r300; // mPa.s
   var YP=r300-PV; // lbf/100ft2

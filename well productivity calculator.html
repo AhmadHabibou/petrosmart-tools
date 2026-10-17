@@ -589,6 +589,8 @@ select option{background:#0A0A14;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 var iprChart=null, vogelChart=null, gasChart=null, nodalChart=null;
 var vogelMethod='vogel';
 
@@ -625,21 +627,21 @@ function setMethod(m){
 
 /* ====== PANEL 1: PI & IPR ====== */
 function calcPI(){
-  var Pr=parseFloat(document.getElementById('Pr').value)||250;
-  var Pb=parseFloat(document.getElementById('Pb').value)||150;
-  var Pwf_t=parseFloat(document.getElementById('Pwf_t').value)||220;
-  var Q_test=parseFloat(document.getElementById('Q_test').value)||800;
-  var WC=parseFloat(document.getElementById('WC').value)||20;
-  var GOR=parseFloat(document.getElementById('GOR').value)||200;
-  var k=parseFloat(document.getElementById('k_res').value)||50;
-  var h=parseFloat(document.getElementById('h_res').value)||20;
+  var Pr=psaNum('Pr',250);
+  var Pb=psaNum('Pb',150);
+  var Pwf_t=psaNum('Pwf_t',220);
+  var Q_test=psaNum('Q_test',800);
+  var WC=psaNum('WC',20);
+  var GOR=psaNum('GOR',200);
+  var k=psaNum('k_res',50);
+  var h=psaNum('h_res',20);
   var h_ft=h/0.3048; // UI metres to feet for the field-unit Darcy coefficient
-  var mu_o=parseFloat(document.getElementById('mu_o').value)||2.5;
-  var Bo=parseFloat(document.getElementById('Bo').value)||1.25;
-  var re=parseFloat(document.getElementById('re').value)||500;
-  var rw=parseFloat(document.getElementById('rw').value)||0.108;
-  var S=parseFloat(document.getElementById('S_skin').value)||5;
-  var Pwf_des=parseFloat(document.getElementById('Pwf_des').value)||180;
+  var mu_o=psaNum('mu_o',2.5);
+  var Bo=psaNum('Bo',1.25);
+  var re=psaNum('re',500);
+  var rw=psaNum('rw',0.108);
+  var S=psaNum('S_skin',5);
+  var Pwf_des=psaNum('Pwf_des',180);
 
   // Test-derived PI (measured)
   var J_test=Q_test/(Pr-Pwf_t); // bbl/d/bar
@@ -759,9 +761,9 @@ function drawIPR(Pr,Pb,J,Qmax,Pwf_des,Q_des){
 
 /* ====== PANEL 2: VOGEL ====== */
 function calcVogel(){
-  var Pr=parseFloat(document.getElementById('v_Pr').value)||150;
-  var Qmax=parseFloat(document.getElementById('v_Qmax').value)||2000;
-  var Pwf=parseFloat(document.getElementById('v_Pwf').value)||80;
+  var Pr=psaNum('v_Pr',150);
+  var Qmax=psaNum('v_Qmax',2000);
+  var Pwf=psaNum('v_Pwf',80);
 
   var Pwf_r=Pwf/Pr;
   var Q_vogel=Qmax*(1-0.2*Pwf_r-0.8*Pwf_r*Pwf_r);
@@ -826,82 +828,67 @@ function calcVogel(){
 }
 
 /* ====== PANEL 3: GAS IPR ====== */
+/* PSA-CORE gas properties: Sutton pseudo-criticals, Dranchuk-Abou-Kassem Z, Lee-Gonzalez-Eakin viscosity */
+function psaPseudoCrit(g){return {Ppc:756.8-131.07*g-3.6*g*g, Tpc:169.2+349.5*g-74.0*g*g};}
+function psaZ(T_R,P_psia,g){
+  var pc=psaPseudoCrit(g),Tr=T_R/pc.Tpc,Pr=P_psia/pc.Ppc;
+  var A=[0,0.3265,-1.07,-0.5339,0.01569,-0.05165,0.5475,-0.7361,0.1844,0.1056,0.6134,0.721];
+  function f(Z){var r=0.27*Pr/(Z*Tr);
+    var z=1+(A[1]+A[2]/Tr+A[3]/Math.pow(Tr,3)+A[4]/Math.pow(Tr,4)+A[5]/Math.pow(Tr,5))*r
+      +(A[6]+A[7]/Tr+A[8]/(Tr*Tr))*r*r-A[9]*(A[7]/Tr+A[8]/(Tr*Tr))*Math.pow(r,5)
+      +A[10]*(1+A[11]*r*r)*(r*r/Math.pow(Tr,3))*Math.exp(-A[11]*r*r);
+    return Z-z;}
+  var lo=0.2,hi=3;for(var i=0;i<100;i++){var m=(lo+hi)/2;if(f(lo)*f(m)<=0)hi=m;else lo=m;}
+  return (lo+hi)/2;}
+function psaMuGas(T_R,P_psia,g,Z){
+  var M=28.97*g,rho=P_psia*M/(Z*10.7316*T_R)/62.428;
+  var K=(9.4+0.02*M)*Math.pow(T_R,1.5)/(209+19*M+T_R),X=3.5+986/T_R+0.01*M,Y=2.4-0.2*X;
+  return 1e-4*K*Math.exp(X*Math.pow(rho,Y));}
+
+/* Real-gas pseudo-pressure m(p) = 2 * integral p/(mu Z) dp, psia^2/cP (Al-Hussainy, Ramey and Crawford, 1966) */
+function psaPseudoP(p,T_R,g){var n=200,s=0,prev=0;for(var i=1;i<=n;i++){var pi=p*i/n,Z=psaZ(T_R,pi,g),mu=psaMuGas(T_R,pi,g,Z),v=pi/(mu*Z);s+=(prev+v)/2*(p/n);prev=v;}return 2*s;}
+function psaGasRate(o){
+  /* o: Pr,Pwf (bar a), T_C, g, k (mD), h (m), re, rw (m), S. Returns Mscf/d */
+  var T_R=(o.T_C*1.8+491.67),h_ft=o.h*3.28084,Pr=o.Pr*14.5038,Pwf=o.Pwf*14.5038;
+  var D=1422*T_R*(Math.log(o.re/o.rw)-0.75+o.S);
+  var mPr=psaPseudoP(Pr,T_R,o.g),mPwf=psaPseudoP(Pwf,T_R,o.g);
+  return {T_R:T_R,h_ft:h_ft,Pr:Pr,Pwf:Pwf,D:D,mPr:mPr,mPwf:mPwf,
+    q:o.k*h_ft*(mPr-mPwf)/D, aof:o.k*h_ft*mPr/D};
+}
 function calcGas(){
-  var Pr=parseFloat(document.getElementById('g_Pr').value)||300;
-  var gamma_g=parseFloat(document.getElementById('g_gamma').value)||0.65;
-  var T_C=parseFloat(document.getElementById('g_T').value)||120;
-  var k=parseFloat(document.getElementById('g_k').value)||20;
-  var h=parseFloat(document.getElementById('g_h').value)||25;
-  var re=parseFloat(document.getElementById('g_re').value)||600;
-  var rw=parseFloat(document.getElementById('g_rw').value)||0.108;
-  var S=parseFloat(document.getElementById('g_S').value)||3;
-  var Pwf=parseFloat(document.getElementById('g_Pwf').value)||100;
-
-  var T_R=T_C+273.15; // K → convert to Rankine for US formulas
-  var T_Rank=T_R*1.8; // Rankine
-
-  // Gas viscosity approximation (Lee-Kesler)
-  var MW_g=gamma_g*28.97;
-  var mu_g=0.0001*(( 9.4+0.02*MW_g)*Math.pow(T_R,1.5))/(209+19*MW_g+T_R)*Math.exp((3.5+0.986/T_R+(0.01*MW_g))); // cP rough
-  mu_g=Math.max(0.01,Math.min(mu_g,0.1));
-
-  // Z factor approximation (Hall-Yarborough simplified)
-  var Ppc=677+15*gamma_g-37.5*gamma_g*gamma_g; // psia
-  var Tpc=168+325*gamma_g-12.5*gamma_g*gamma_g; // R
-  var Ppr=(Pr*14.504)/Ppc;
-  var Tpr=T_Rank/Tpc;
-  var Z=1-3.52*Ppr/(10.73*Tpr)+0.274*Ppr*Ppr/(10.73*Tpr*Tpr); // very rough
-  Z=Math.max(0.5,Math.min(1.0,Z));
-
-  // Pressure-squared method (valid for P < 170 bar ≈ 2500 psia)
-  // Q_g [Mscf/d] = k*h*(Pr²-Pwf²) / (1422*T_R[R]*mu_g*Z*(ln(re/rw)-0.75+S))
-  var ln_term=Math.log(re/rw);
-  var denom=1422*T_Rank*mu_g*Z*(ln_term-0.75+S);
-  var Q_g=k*h*(Pr*Pr-Pwf*Pwf)*14.504*14.504/denom; // Mscf/d (pressures in psia)
-  var Q_g_Sm3d=Q_g*28.317; // Sm3/d
-
-  // AOF at Pwf=atm ≈ 0
-  var Q_AOF=k*h*Pr*Pr*14.504*14.504/denom;
-  var Q_AOF_Sm3d=Q_AOF*28.317;
-
-  // Deliverability index
-  var DI=Q_g/(Pr*Pr-Pwf*Pwf)*14.504*14.504; // Mscf/d/psia²
+  var Pr=psaNum('g_Pr',300), gamma_g=psaNum('g_gamma',0.65), T_C=psaNum('g_T',120);
+  var k=psaNum('g_k',20), h=psaNum('g_h',25), re=psaNum('g_re',600), rw=psaNum('g_rw',0.108);
+  var S=psaNum('g_S',3), Pwf=psaNum('g_Pwf',100);
+  var r=psaGasRate({Pr:Pr,Pwf:Pwf,T_C:T_C,g:gamma_g,k:k,h:h,re:re,rw:rw,S:S});
+  var T_Rank=r.T_R, ln_term=Math.log(re/rw), denom=r.D;
+  var Z=psaZ(T_Rank,r.Pr,gamma_g), mu_g=psaMuGas(T_Rank,r.Pr,gamma_g,Z);
+  var Q_g=r.q, Q_AOF=r.aof, Q_g_Sm3d=Q_g*28.317, Q_AOF_Sm3d=Q_AOF*28.317;
 
   var html='<div class="rgrid">';
-  html+=rc('hl','Gas flow rate',Q_g.toFixed(1),'Mscf/d','= '+(Q_g_Sm3d/1000).toFixed(1)+' MSm3/d');
-  html+=rc('hl','AOF (at Pwf ≈ 0)',Q_AOF.toFixed(0),'Mscf/d','= '+(Q_AOF_Sm3d/1e6).toFixed(2)+' BCF/d');
-  html+=rc('gas','Deliverability index',DI.toFixed(4),'Mscf/d/psia2','Laminar Darcy only');
-  html+=rc('','Z factor (estimated)',Z.toFixed(3),'-','Hall-Yarborough approx');
-  html+=rc('','Gas viscosity μg',mu_g.toFixed(4),'cP','Lee-Kesler correlation');
-  html+=rc('','ln(re/rw)',ln_term.toFixed(3),'-','re='+re+'m, rw='+rw+'m');
-  html+=rc('','Skin factor S',S,'-',S>0?'Damaged well':'Stimulated / ideal');
-  html+=rc('','% of AOF produced',(Q_g/Q_AOF*100).toFixed(1),'%','At Pwf='+Pwf+' bar');
+  html+=rc('hl','Gas flow rate',Q_g.toFixed(0),'Mscf/d','= '+(Q_g_Sm3d/1000).toFixed(1)+' thousand Sm3/d');
+  html+=rc('hl','AOF (Pwf = 0)',Q_AOF.toFixed(0),'Mscf/d','= '+(Q_AOF_Sm3d/1e6).toFixed(3)+' million Sm3/d');
+  html+=rc('','Z factor at Pr',Z.toFixed(3),'-','Dranchuk-Abou-Kassem, Sutton pseudo-criticals');
+  html+=rc('','Gas viscosity at Pr',mu_g.toFixed(4),'cP','Lee-Gonzalez-Eakin');
+  html+=rc('','ln(re/rw)',ln_term.toFixed(3),'-','re = '+re+' m, rw = '+rw+' m');
+  html+=rc('','Net pay used',r.h_ft.toFixed(1),'ft','= '+h+' m');
+  html+=rc('','Skin factor S',S,'-',S>0?'damaged':'stimulated or undamaged');
+  html+=rc('','Share of AOF',(Q_g/Q_AOF*100).toFixed(1),'%','at Pwf = '+Pwf+' bar');
   html+='</div>';
-
   html+='<div class="fbox">'
-    +'<strong>Q_g (pressure-squared):</strong> = k×h×(Pr²-Pwf²) / (1422×T_R×μg×Z×(ln(re/rw)-0.75+S))<br>'
-    +'= '+k+'×'+h+'×('+(Pr*14.504).toFixed(0)+'²-'+(Pwf*14.504).toFixed(0)+'²) / (1422×'+T_Rank.toFixed(0)+'×'+mu_g.toFixed(4)+'×'+Z.toFixed(3)+'×('+ln_term.toFixed(3)+'-0.75+'+S+'))<br>'
-    +'= <span class="hig">'+Q_g.toFixed(2)+' Mscf/d = '+(Q_g_Sm3d/1000).toFixed(2)+' MSm3/d</span><br>'
-    +'<strong>AOF</strong> = '+Q_AOF.toFixed(0)+' Mscf/d = <span class="hig">'+(Q_AOF_Sm3d/1e6).toFixed(4)+' BCF/d</span>'
+    +'<strong>Pseudo-steady-state radial flow, real-gas pseudo-pressure:</strong><br>'
+    +'q [Mscf/d] = k h [m(Pr) - m(Pwf)] / (1422 T (ln(re/rw) - 0.75 + S))<br>'
+    +'m(Pr) = '+r.mPr.toExponential(4)+' psia2/cP, m(Pwf) = '+r.mPwf.toExponential(4)+' psia2/cP<br>'
+    +'= '+k+' x '+r.h_ft.toFixed(1)+' x '+(r.mPr-r.mPwf).toExponential(4)+' / (1422 x '+T_Rank.toFixed(1)+' x '+(ln_term-0.75+S).toFixed(3)+')<br>'
+    +'= <span class="hig">'+Q_g.toFixed(0)+' Mscf/d</span>'
     +'</div>';
-
   var rows='';
-  if(Pr>170){
-    rows+=ar('wn','High reservoir pressure ('+Pr+' bar) - pseudo-pressure method recommended','Pressure-squared method is valid for P < ~170 bar (2500 psia). At '+Pr+' bar, gas deviation factor Z and viscosity vary significantly with pressure. Full pseudo-pressure m(p) integration per Al-Hussainy (1966) gives more accurate results.','Use reservoir simulation or specialized software (Kappa Saphir, Fekete FAST) for pseudo-pressure calculation. Alternatively, apply pressure-squared method at average pressure: P_avg = sqrt((Pr²+Pwf²)/2) for intermediate accuracy correction.');
-  }
-  if(S>5){
-    rows+=ar('wn','Significant skin in gas well (S = '+S+')','Gas wells are more sensitive to skin than oil wells because turbulent (non-Darcy) flow adds rate-dependent skin: S_total = S_Darcy + D×Q. At S = '+S+'+D×'+Q_g.toFixed(0)+' Mscf/d, actual effective skin may be higher than specified.','Evaluate well stimulation: acid treatment or hydraulic fracturing. For S > 10, HF is typically justified. Post-frac S typically -3 to -5 for radial HF, -5 to -7 for long planar HF. Potential gain: Δ_AOF = '+(Q_AOF*( (ln_term-0.75+S)/(ln_term-0.75+2)-1)).toFixed(0)+' Mscf/d at S=2 (estimate).');
-  }
-  rows+=ar('well','Gas well deliverability summary','AOF = '+Q_AOF.toFixed(0)+' Mscf/d ('+(Q_AOF_Sm3d/1e6).toFixed(4)+' BCF/d). At Pwf = '+Pwf+' bar: Q = '+Q_g.toFixed(1)+' Mscf/d ('+(Q_g/Q_AOF*100).toFixed(0)+'% of AOF). Deliverability index = '+DI.toFixed(4)+' Mscf/d/psia².','Gas wells may show backpressure effect (non-Darcy): effective S = S_Darcy + D × Q. Isochronal test or modified isochronal test (MITest) required to separate Darcy (S) and non-Darcy (D) components for accurate deliverability prediction.');
-
-  html+='<div class="analysis"><div class="atitle gas">/// GAS WELL IPR ANALYSIS</div>'+rows+'</div>';
+  rows+=ar('well','Scope of this estimate','Darcy flow only, pseudo-steady state, centred well in a circular drainage area, absolute pressures in bar. Rate-dependent (non-Darcy) skin is not included.','Use a multi-rate or isochronal test to measure the non-Darcy coefficient before relying on rates near the AOF.');
+  html+='<div class="analysis"><div class="atitle gas">/// GAS WELL IPR</div>'+rows+'</div>';
   document.getElementById('r3').innerHTML=html;
 
-  // Gas IPR chart
-  var Pwf_pts=Array.from({length:51},function(_,i){return i/50*Pr;});
+  var Pwf_pts=Array.from({length:26},function(_,i){return i/25*Pr;});
   var Q_pts=Pwf_pts.map(function(p){
-    var q=k*h*(Pr*Pr-p*p)*14.504*14.504/denom;
-    return Math.max(0,q);
+    return Math.max(0,psaGasRate({Pr:Pr,Pwf:p,T_C:T_C,g:gamma_g,k:k,h:h,re:re,rw:rw,S:S}).q);
   });
   var ctx=document.getElementById('gasChart').getContext('2d');
   if(gasChart){gasChart.destroy();}
@@ -928,15 +915,15 @@ function calcGas(){
 
 /* ====== PANEL 4: NODAL ====== */
 function calcNodal(){
-  var Pr=parseFloat(document.getElementById('n_Pr').value)||200;
-  var Qmax=parseFloat(document.getElementById('n_Qmax').value)||3000;
-  var Pb=parseFloat(document.getElementById('n_Pb').value)||150;
-  var THP=parseFloat(document.getElementById('n_THP').value)||20;
-  var depth=parseFloat(document.getElementById('n_depth').value)||2000;
-  var ID_mm=parseFloat(document.getElementById('n_ID').value)||76;
-  var grad=parseFloat(document.getElementById('n_grad').value)||0.085;
-  var GOR=parseFloat(document.getElementById('n_GOR').value)||300;
-  var WC=parseFloat(document.getElementById('n_WC').value)||20;
+  var Pr=psaNum('n_Pr',200);
+  var Qmax=psaNum('n_Qmax',3000);
+  var Pb=psaNum('n_Pb',150);
+  var THP=psaNum('n_THP',20);
+  var depth=psaNum('n_depth',2000);
+  var ID_mm=psaNum('n_ID',76);
+  var grad=psaNum('n_grad',0.085);
+  var GOR=psaNum('n_GOR',300);
+  var WC=psaNum('n_WC',20);
 
   var ID_m=ID_mm/1000;
   var A_tub=Math.PI/4*ID_m*ID_m;
@@ -1032,15 +1019,15 @@ function calcNodal(){
 
 /* ====== PANEL 5: SKIN ====== */
 function calcSkin(){
-  var S=parseFloat(document.getElementById('sk_S').value)||8;
-  var Pr=parseFloat(document.getElementById('sk_Pr').value)||250;
-  var Jo=parseFloat(document.getElementById('sk_Jo').value)||30;
-  var k=parseFloat(document.getElementById('sk_k').value)||50;
-  var h=parseFloat(document.getElementById('sk_h').value)||20;
-  var rw=parseFloat(document.getElementById('sk_rw').value)||0.108;
-  var kd=parseFloat(document.getElementById('sk_kd').value)||15;
-  var rd=parseFloat(document.getElementById('sk_rd').value)||0.5;
-  var Pwf=parseFloat(document.getElementById('sk_Pwf').value)||200;
+  var S=psaNum('sk_S',8);
+  var Pr=psaNum('sk_Pr',250);
+  var Jo=psaNum('sk_Jo',30);
+  var k=psaNum('sk_k',50);
+  var h=psaNum('sk_h',20);
+  var rw=psaNum('sk_rw',0.108);
+  var kd=psaNum('sk_kd',15);
+  var rd=psaNum('sk_rd',0.5);
+  var Pwf=psaNum('sk_Pwf',200);
 
   var re=500; // assumed
   var ln_term=Math.log(re/rw);

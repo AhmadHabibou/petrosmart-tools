@@ -532,6 +532,8 @@ select option{background:#0A0A14;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 var gasChart=null, profileChart=null, flowMapChart=null;
 
 function sw(n){
@@ -574,15 +576,15 @@ function frictionSJ(Re,eps_D){
 
 /* ====== PANEL 1: LIQUID ====== */
 function calcLiq(){
-  var D_mm=parseFloat(document.getElementById('l_D').value)||300;
-  var L_km=parseFloat(document.getElementById('l_L').value)||10;
-  var eps=parseFloat(document.getElementById('l_eps').value)||0.046; // mm
-  var Q_m3h=parseFloat(document.getElementById('l_Q').value)||500;
-  var rho=parseFloat(document.getElementById('l_rho').value)||870;
-  var mu_cP=parseFloat(document.getElementById('l_mu').value)||5;
-  var dz=parseFloat(document.getElementById('l_dz').value)||0;
-  var P1=parseFloat(document.getElementById('l_P1').value)||50;
-  var n_fit=parseFloat(document.getElementById('l_fit').value)||10;
+  var D_mm=psaNum('l_D',300);
+  var L_km=psaNum('l_L',10);
+  var eps=psaNum('l_eps',0.046); // mm
+  var Q_m3h=psaNum('l_Q',500);
+  var rho=psaNum('l_rho',870);
+  var mu_cP=psaNum('l_mu',5);
+  var dz=psaNum('l_dz',0);
+  var P1=psaNum('l_P1',50);
+  var n_fit=psaNum('l_fit',10);
 
   var D=D_mm/1000; // m
   var L=L_km*1000; // m
@@ -663,15 +665,15 @@ function calcLiq(){
 
 /* ====== PANEL 2: GAS ====== */
 function calcGas(){
-  var D_mm=parseFloat(document.getElementById('g_D').value)||500;
-  var L_km=parseFloat(document.getElementById('g_L').value)||100;
-  var eps=parseFloat(document.getElementById('g_eps').value)||0.046;
-  var Q_std=parseFloat(document.getElementById('g_Q').value)||5000000; // Sm3/d
-  var gamma=parseFloat(document.getElementById('g_gamma').value)||0.65;
-  var P1=parseFloat(document.getElementById('g_P1').value)||70; // bar(a)
-  var T_C=parseFloat(document.getElementById('g_T').value)||15;
-  var dz=parseFloat(document.getElementById('g_dz').value)||0;
-  var E=parseFloat(document.getElementById('g_E').value)||0.92;
+  var D_mm=psaNum('g_D',500);
+  var L_km=psaNum('g_L',100);
+  var eps=psaNum('g_eps',0.046);
+  var Q_std=psaNum('g_Q',5000000); // Sm3/d
+  var gamma=psaNum('g_gamma',0.65);
+  var P1=psaNum('g_P1',70); // bar(a)
+  var T_C=psaNum('g_T',15);
+  var dz=psaNum('g_dz',0);
+  var E=psaNum('g_E',0.92);
 
   var D=D_mm/1000;
   var L=L_km*1000;
@@ -825,17 +827,17 @@ function calcGas(){
 
 /* ====== PANEL 3: MULTIPHASE ====== */
 function calcMulti(){
-  var D_mm=parseFloat(document.getElementById('m_D').value)||200;
-  var L_km=parseFloat(document.getElementById('m_L').value)||20;
-  var theta=parseFloat(document.getElementById('m_theta').value)||0;
-  var Qo_bbl=parseFloat(document.getElementById('m_Qo').value)||2000;
-  var Qg_std=parseFloat(document.getElementById('m_Qg').value)||1000000;
-  var Qw_bbl=parseFloat(document.getElementById('m_Qw').value)||500;
-  var rho_o=parseFloat(document.getElementById('m_rho_o').value)||850;
-  var rho_g=parseFloat(document.getElementById('m_rho_g').value)||50;
-  var P=parseFloat(document.getElementById('m_P').value)||50;
-  var mu_o=parseFloat(document.getElementById('m_muo').value)||5;
-  var mu_g=parseFloat(document.getElementById('m_mug').value)||0.015;
+  var D_mm=psaNum('m_D',200);
+  var L_km=psaNum('m_L',20);
+  var theta=psaNum('m_theta',0);
+  var Qo_bbl=psaNum('m_Qo',2000);
+  var Qg_std=psaNum('m_Qg',1000000);
+  var Qw_bbl=psaNum('m_Qw',500);
+  var rho_o=psaNum('m_rho_o',850);
+  var rho_g=psaNum('m_rho_g',50);
+  var P=psaNum('m_P',50);
+  var mu_o=psaNum('m_muo',5);
+  var mu_g=psaNum('m_mug',0.015);
 
   var D=D_mm/1000;
   var L=L_km*1000;
@@ -951,14 +953,14 @@ function calcMulti(){
 /* ====== PANEL 4: PRESSURE PROFILE ====== */
 function calcProfile(){
   var fluid=document.getElementById('pp_fluid').value;
-  var D_mm=parseFloat(document.getElementById('pp_D').value)||300;
-  var L_km=parseFloat(document.getElementById('pp_L').value)||50;
-  var P_in=parseFloat(document.getElementById('pp_P1').value)||60;
-  var P_min=parseFloat(document.getElementById('pp_Pmin').value)||10;
-  var Q=parseFloat(document.getElementById('pp_Q').value)||500;
-  var rho=parseFloat(document.getElementById('pp_rho').value)||870;
-  var mu=parseFloat(document.getElementById('pp_mu').value)||5;
-  var dz=parseFloat(document.getElementById('pp_dz').value)||50;
+  var D_mm=psaNum('pp_D',300);
+  var L_km=psaNum('pp_L',50);
+  var P_in=psaNum('pp_P1',60);
+  var P_min=psaNum('pp_Pmin',10);
+  var Q=psaNum('pp_Q',500);
+  var rho=psaNum('pp_rho',870);
+  var mu=psaNum('pp_mu',5);
+  var dz=psaNum('pp_dz',50);
 
   var D=D_mm/1000;
   var nSeg=20;
@@ -1048,14 +1050,14 @@ function calcProfile(){
 
 /* ====== PANEL 5: EROSION ====== */
 function calcErosion(){
-  var D_mm=parseFloat(document.getElementById('e_D').value)||200;
-  var vsl=parseFloat(document.getElementById('e_vsl').value)||0.5;
-  var vsg=parseFloat(document.getElementById('e_vsg').value)||3;
-  var rhoL=parseFloat(document.getElementById('e_rhoL').value)||870;
-  var rhoG=parseFloat(document.getElementById('e_rhoG').value)||50;
-  var C=parseFloat(document.getElementById('e_inh').value)||100;
-  var muL=parseFloat(document.getElementById('e_muL').value)||5;
-  var muG=parseFloat(document.getElementById('e_muG').value)||0.015;
+  var D_mm=psaNum('e_D',200);
+  var vsl=psaNum('e_vsl',0.5);
+  var vsg=psaNum('e_vsg',3);
+  var rhoL=psaNum('e_rhoL',870);
+  var rhoG=psaNum('e_rhoG',50);
+  var C=psaNum('e_inh',100);
+  var muL=psaNum('e_muL',5);
+  var muG=psaNum('e_muG',0.015);
 
   var D=D_mm/1000;
   var A=Math.PI/4*D*D;

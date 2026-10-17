@@ -555,6 +555,8 @@ select option{background:#0A0A14;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 var compChart=null,sensChart=null,beChart=null;
 var lastSMR={},lastBlue={},lastGreen={};
 
@@ -592,17 +594,17 @@ var H2_LHV=33.3; // kWh/kg
 
 /* ====== PANEL 1: GREY SMR ====== */
 function calcSMR(){
-  var ng=parseFloat(document.getElementById('ng-price').value)||8.5; // USD/MMBtu
-  var ng_cons=parseFloat(document.getElementById('ng-cons').value)||3.4; // Nm3 NG / Nm3 H2
-  var steam_cr=parseFloat(document.getElementById('steam-cr').value)||15; // USD/t steam
-  var cap_nm3=parseFloat(document.getElementById('smr-cap').value)||100000; // Nm3/hr
-  var capex=parseFloat(document.getElementById('smr-capex').value)||120; // M USD
-  var life=parseFloat(document.getElementById('smr-life').value)||25;
-  var wacc=parseFloat(document.getElementById('smr-wacc').value)||8;
-  var cf=parseFloat(document.getElementById('smr-cf').value)||90;
-  var om_pct=parseFloat(document.getElementById('smr-om').value)||3.5;
-  var co2=parseFloat(document.getElementById('smr-co2').value)||9.5; // kg CO2/kg H2
-  var cprice=parseFloat(document.getElementById('smr-cprice').value)||85; // USD/tonne
+  var ng=psaNum('ng-price',8.5); // USD/MMBtu
+  var ng_cons=psaNum('ng-cons',3.4); // Nm3 NG / Nm3 H2
+  var steam_cr=psaNum('steam-cr',15); // USD/t steam
+  var cap_nm3=psaNum('smr-cap',100000); // Nm3/hr
+  var capex=psaNum('smr-capex',120); // M USD
+  var life=psaNum('smr-life',25);
+  var wacc=psaNum('smr-wacc',8);
+  var cf=psaNum('smr-cf',90);
+  var om_pct=psaNum('smr-om',3.5);
+  var co2=psaNum('smr-co2',9.5); // kg CO2/kg H2
+  var cprice=psaNum('smr-cprice',85); // USD/tonne
 
   // Annual H2 production
   var h2_annual_Nm3=cap_nm3*8760*(cf/100); // Nm3/yr
@@ -693,15 +695,15 @@ function costBar(label,val,max,color){
 
 /* ====== PANEL 2: BLUE H2 ====== */
 function calcBlue(){
-  var ng=parseFloat(document.getElementById('b-ng').value)||8.5;
-  var capex=parseFloat(document.getElementById('b-capex').value)||200;
-  var ccs_cost=parseFloat(document.getElementById('b-ccs-cost').value)||25;
-  var cap_rate=parseFloat(document.getElementById('b-cap-rate').value)||90;
-  var co2_gross=parseFloat(document.getElementById('b-co2-gross').value)||9.5;
-  var cprice=parseFloat(document.getElementById('b-cprice').value)||85;
-  var cap_nm3=parseFloat(document.getElementById('b-cap').value)||100000;
-  var wacc=parseFloat(document.getElementById('b-wacc').value)||8;
-  var cf=parseFloat(document.getElementById('b-cf').value)||90;
+  var ng=psaNum('b-ng',8.5);
+  var capex=psaNum('b-capex',200);
+  var ccs_cost=psaNum('b-ccs-cost',25);
+  var cap_rate=psaNum('b-cap-rate',90);
+  var co2_gross=psaNum('b-co2-gross',9.5);
+  var cprice=psaNum('b-cprice',85);
+  var cap_nm3=psaNum('b-cap',100000);
+  var wacc=psaNum('b-wacc',8);
+  var cf=psaNum('b-cf',90);
 
   var h2_annual_kg=cap_nm3*8760*(cf/100)*H2_kg_per_Nm3;
   var ng_per_MMBtu=0.03412;
@@ -748,17 +750,17 @@ function calcBlue(){
 
 /* ====== PANEL 3: GREEN H2 ====== */
 function calcGreen(){
-  var elec=parseFloat(document.getElementById('g-elec').value)||40; // USD/MWh
-  var eff=parseFloat(document.getElementById('g-eff').value)||70; // %
-  var cap_mw=parseFloat(document.getElementById('g-cap').value)||100; // MW
-  var capex_kw=parseFloat(document.getElementById('g-capex').value)||800; // USD/kW
-  var stack_pct=parseFloat(document.getElementById('g-stack').value)||40; // %
-  var stack_hr=parseFloat(document.getElementById('g-stlife').value)||80000; // hours
-  var cf=parseFloat(document.getElementById('g-cf').value)||45; // %
-  var life=parseFloat(document.getElementById('g-life').value)||20; // years
-  var wacc=parseFloat(document.getElementById('g-wacc').value)||8; // %
-  var water=parseFloat(document.getElementById('g-water').value)||2; // USD/m3
-  var om_pct=parseFloat(document.getElementById('g-om').value)||2.5; // % CAPEX/yr
+  var elec=psaNum('g-elec',40); // USD/MWh
+  var eff=psaNum('g-eff',70); // %
+  var cap_mw=psaNum('g-cap',100); // MW
+  var capex_kw=psaNum('g-capex',800); // USD/kW
+  var stack_pct=psaNum('g-stack',40); // %
+  var stack_hr=psaNum('g-stlife',80000); // hours
+  var cf=psaNum('g-cf',45); // %
+  var life=psaNum('g-life',20); // years
+  var wacc=psaNum('g-wacc',8); // %
+  var water=psaNum('g-water',2); // USD/m3
+  var om_pct=psaNum('g-om',2.5); // % CAPEX/yr
 
   // Specific energy consumption
   var sec=H2_HHV/(eff/100); // kWh/kg H2 (HHV basis)
@@ -930,11 +932,11 @@ function updateComparison(){
 
 /* ====== PANEL 5: BREAK-EVEN ====== */
 function calcBreakeven(){
-  var target=parseFloat(document.getElementById('be-target').value)||2.0;
-  var grey_lcoh=parseFloat(document.getElementById('be-grey').value)||1.5;
-  var capex_kw=parseFloat(document.getElementById('be-capex').value)||400;
-  var eff=parseFloat(document.getElementById('be-eff').value)||75;
-  var cf=parseFloat(document.getElementById('be-cf').value)||50;
+  var target=psaNum('be-target',2.0);
+  var grey_lcoh=psaNum('be-grey',1.5);
+  var capex_kw=psaNum('be-capex',400);
+  var eff=psaNum('be-eff',75);
+  var cf=psaNum('be-cf',50);
 
   var sec=H2_HHV/(eff/100);
   // Other costs (non-electricity): CAPEX + O&M + stack + water

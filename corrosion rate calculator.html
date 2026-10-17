@@ -576,6 +576,8 @@ select option{background:#0A0A14;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 var co2Chart=null,naceChart=null,lifeChart=null;
 
 /* ====== UTILS ====== */
@@ -610,15 +612,15 @@ function sevBadge(cr){
 
 /* ====== PANEL 1: CO2 ====== */
 function calcCO2(){
-  var P=parseFloat(document.getElementById('P_sys').value)||100;
-  var CO2=parseFloat(document.getElementById('CO2_pct').value)||3;
-  var T=parseFloat(document.getElementById('T_co2').value)||60;
-  var pH=parseFloat(document.getElementById('pH').value)||5.5;
-  var vel=parseFloat(document.getElementById('vel').value)||2;
-  var wc=parseFloat(document.getElementById('wc_pct').value)||30;
-  var api=parseFloat(document.getElementById('api_co2').value)||35;
+  var P=psaNum('P_sys',100);
+  var CO2=psaNum('CO2_pct',3);
+  var T=psaNum('T_co2',60);
+  var pH=psaNum('pH',5.5);
+  var vel=psaNum('vel',2);
+  var wc=psaNum('wc_pct',30);
+  var api=psaNum('api_co2',35);
   var glycol=parseInt(document.getElementById('glycol').value)||0;
-  var inh=parseFloat(document.getElementById('inh_eff').value)||0;
+  var inh=psaNum('inh_eff',0);
 
   // CO2 partial pressure
   var PCO2=P*(CO2/100); // bar
@@ -756,14 +758,14 @@ function calcCO2(){
 
 /* ====== PANEL 2: H2S ====== */
 function calcH2S(){
-  var P=parseFloat(document.getElementById('s_P').value)||100;
-  var H2S_pct=parseFloat(document.getElementById('s_H2S').value)||0.5;
-  var CO2_pct=parseFloat(document.getElementById('s_CO2').value)||2;
-  var T=parseFloat(document.getElementById('s_T').value)||80;
-  var pH=parseFloat(document.getElementById('s_pH').value)||5.0;
-  var Cl=parseFloat(document.getElementById('s_Cl').value)||50000;
-  var SMYS=parseFloat(document.getElementById('s_smys').value)||414;
-  var HRC=parseFloat(document.getElementById('s_hard').value)||22;
+  var P=psaNum('s_P',100);
+  var H2S_pct=psaNum('s_H2S',0.5);
+  var CO2_pct=psaNum('s_CO2',2);
+  var T=psaNum('s_T',80);
+  var pH=psaNum('s_pH',5.0);
+  var Cl=psaNum('s_Cl',50000);
+  var SMYS=psaNum('s_smys',414);
+  var HRC=psaNum('s_hard',22);
 
   var PH2S=P*(H2S_pct/100); // bar
   var PCO2=P*(CO2_pct/100); // bar
@@ -879,14 +881,14 @@ function calcH2S(){
 
 /* ====== PANEL 3: PIPE LIFE ====== */
 function calcLife(){
-  var t_nom=parseFloat(document.getElementById('t_nom').value)||9.5;
-  var t_meas=parseFloat(document.getElementById('t_meas').value)||8.2;
-  var t_min=parseFloat(document.getElementById('t_min').value)||5.5;
-  var CR=parseFloat(document.getElementById('cr_pipe').value)||0.3;
-  var yrs=parseFloat(document.getElementById('yrs_since').value)||2;
-  var P_d=parseFloat(document.getElementById('P_pipe').value)||50;
-  var SMYS=parseFloat(document.getElementById('smys_pipe').value)||241;
-  var OD=parseFloat(document.getElementById('OD_pipe').value)||168.3;
+  var t_nom=psaNum('t_nom',9.5);
+  var t_meas=psaNum('t_meas',8.2);
+  var t_min=psaNum('t_min',5.5);
+  var CR=psaNum('cr_pipe',0.3);
+  var yrs=psaNum('yrs_since',2);
+  var P_d=psaNum('P_pipe',50);
+  var SMYS=psaNum('smys_pipe',241);
+  var OD=psaNum('OD_pipe',168.3);
 
   // Current estimated thickness (extrapolated to now)
   var t_now=t_meas-CR*yrs;
@@ -979,11 +981,11 @@ function calcLife(){
 
 /* ====== PANEL 4: MATERIAL SELECTION ====== */
 function calcMatSel(){
-  var PCO2=parseFloat(document.getElementById('ms_pco2').value)||3;
-  var PH2S=parseFloat(document.getElementById('ms_ph2s').value)||0.05;
-  var T=parseFloat(document.getElementById('ms_T').value)||80;
-  var Cl=parseFloat(document.getElementById('ms_Cl').value)||50000;
-  var pH=parseFloat(document.getElementById('ms_pH').value)||5.0;
+  var PCO2=psaNum('ms_pco2',3);
+  var PH2S=psaNum('ms_ph2s',0.05);
+  var T=psaNum('ms_T',80);
+  var Cl=psaNum('ms_Cl',50000);
+  var pH=psaNum('ms_pH',5.0);
   var inh=document.getElementById('ms_inh').value;
 
   var PH2S_MPa=PH2S/10;
@@ -1067,14 +1069,14 @@ function calcMatSel(){
 
 /* ====== PANEL 5: INHIBITOR ====== */
 function calcInhibitor(){
-  var CR_unin=parseFloat(document.getElementById('inh_cr_unin').value)||1.2;
-  var CR_target=parseFloat(document.getElementById('inh_cr_target').value)||0.1;
-  var Qw=parseFloat(document.getElementById('inh_Qw').value)||500; // m3/d
-  var conc=parseFloat(document.getElementById('inh_conc').value)||25; // ppm
-  var active=parseFloat(document.getElementById('inh_active').value)||40; // %
-  var rho_inh=parseFloat(document.getElementById('inh_rho').value)||0.95; // kg/L
-  var cost_L=parseFloat(document.getElementById('inh_cost').value)||3.5; // USD/L
-  var L_pipe=parseFloat(document.getElementById('inh_L').value)||50; // km
+  var CR_unin=psaNum('inh_cr_unin',1.2);
+  var CR_target=psaNum('inh_cr_target',0.1);
+  var Qw=psaNum('inh_Qw',500); // m3/d
+  var conc=psaNum('inh_conc',25); // ppm
+  var active=psaNum('inh_active',40); // %
+  var rho_inh=psaNum('inh_rho',0.95); // kg/L
+  var cost_L=psaNum('inh_cost',3.5); // USD/L
+  var L_pipe=psaNum('inh_L',50); // km
 
   var eff_required=(1-CR_target/CR_unin)*100;
   // Dose calculation

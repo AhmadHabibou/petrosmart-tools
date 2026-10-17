@@ -564,6 +564,8 @@ select option{background:#0A0A14;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 var ecdChart=null,bitChart=null,pumpChart=null;
 
 function sw(n){
@@ -633,21 +635,21 @@ function bpAnn(Q_bblmin,Dh_in,Dp_in,L_m,PV_cP,YP_lb100ft2,rho_gcm3){
 
 /* ====== PANEL 1: DRILLSTRING ====== */
 function calcDS(){
-  var rho=parseFloat(document.getElementById('rho_mud').value)||1.3;
-  var PV=parseFloat(document.getElementById('PV').value)||18;
-  var YP=parseFloat(document.getElementById('YP').value)||12;
-  var Q=parseFloat(document.getElementById('Q_pump').value)||30;
-  var dp_OD=parseFloat(document.getElementById('dp_OD').value)||5;
-  var dp_ID=parseFloat(document.getElementById('dp_ID').value)||4.276;
-  var dp_L=parseFloat(document.getElementById('dp_L').value)||3000;
-  var hw_OD=parseFloat(document.getElementById('hw_OD').value)||5;
-  var hw_ID=parseFloat(document.getElementById('hw_ID').value)||3;
-  var hw_L=parseFloat(document.getElementById('hw_L').value)||180;
-  var dc_OD=parseFloat(document.getElementById('dc_OD').value)||6.5;
-  var dc_ID=parseFloat(document.getElementById('dc_ID').value)||2.875;
-  var dc_L=parseFloat(document.getElementById('dc_L').value)||180;
+  var rho=psaNum('rho_mud',1.3);
+  var PV=psaNum('PV',18);
+  var YP=psaNum('YP',12);
+  var Q=psaNum('Q_pump',30);
+  var dp_OD=psaNum('dp_OD',5);
+  var dp_ID=psaNum('dp_ID',4.276);
+  var dp_L=psaNum('dp_L',3000);
+  var hw_OD=psaNum('hw_OD',5);
+  var hw_ID=psaNum('hw_ID',3);
+  var hw_L=psaNum('hw_L',180);
+  var dc_OD=psaNum('dc_OD',6.5);
+  var dc_ID=psaNum('dc_ID',2.875);
+  var dc_L=psaNum('dc_L',180);
   var surf_dP=[40,100,210,510][parseInt(document.getElementById('surf_class').value)-1];
-  var bit_dp=parseFloat(document.getElementById('bit_dp').value)||1200;
+  var bit_dp=psaNum('bit_dp',1200);
 
   // DP pressure loss
   var dP_dp=bpPipe(Q,dp_ID,dp_L,PV,YP,rho);
@@ -704,17 +706,17 @@ function calcDS(){
 
 /* ====== PANEL 2: ANNULAR ====== */
 function calcAnn(){
-  var rho=parseFloat(document.getElementById('a_rho').value)||1.3;
-  var PV=parseFloat(document.getElementById('a_PV').value)||18;
-  var YP=parseFloat(document.getElementById('a_YP').value)||12;
-  var Q=parseFloat(document.getElementById('a_Q').value)||30;
-  var Dh1=parseFloat(document.getElementById('a_Dh1').value)||8.5;
-  var Dp1=parseFloat(document.getElementById('a_Dp1').value)||5;
-  var L1=parseFloat(document.getElementById('a_L1').value)||3000;
-  var Dh2=parseFloat(document.getElementById('a_Dh2').value)||8.5;
-  var Dp2=parseFloat(document.getElementById('a_Dp2').value)||6.5;
-  var L2=parseFloat(document.getElementById('a_L2').value)||360;
-  var inc=parseFloat(document.getElementById('a_inc').value)||0;
+  var rho=psaNum('a_rho',1.3);
+  var PV=psaNum('a_PV',18);
+  var YP=psaNum('a_YP',12);
+  var Q=psaNum('a_Q',30);
+  var Dh1=psaNum('a_Dh1',8.5);
+  var Dp1=psaNum('a_Dp1',5);
+  var L1=psaNum('a_L1',3000);
+  var Dh2=psaNum('a_Dh2',8.5);
+  var Dp2=psaNum('a_Dp2',6.5);
+  var L2=psaNum('a_L2',360);
+  var inc=psaNum('a_inc',0);
 
   var dP1=bpAnn(Q,Dh1,Dp1,L1,PV,YP,rho);
   var dP2=bpAnn(Q,Dh2,Dp2,L2,PV,YP,rho);
@@ -775,15 +777,15 @@ function calcAnn(){
 
 /* ====== PANEL 3: ECD ====== */
 function calcECD(){
-  var TVD=parseFloat(document.getElementById('ecd_TVD').value)||3500;
-  var MW=parseFloat(document.getElementById('ecd_MW').value)||1.30;
-  var APL=parseFloat(document.getElementById('ecd_APL').value)||120;
-  var PP=parseFloat(document.getElementById('ecd_PP').value)||1.05;
-  var FG=parseFloat(document.getElementById('ecd_FG').value)||1.65;
-  var margin=parseFloat(document.getElementById('ecd_margin').value)||0.05;
-  var Cs=parseFloat(document.getElementById('ecd_Cs').value)||0.03;
-  var Cg=parseFloat(document.getElementById('ecd_Cg').value)||0.04;
-  var Cc=parseFloat(document.getElementById('ecd_Cc').value)||0.02;
+  var TVD=psaNum('ecd_TVD',3500);
+  var MW=psaNum('ecd_MW',1.30);
+  var APL=psaNum('ecd_APL',120);
+  var PP=psaNum('ecd_PP',1.05);
+  var FG=psaNum('ecd_FG',1.65);
+  var margin=psaNum('ecd_margin',0.05);
+  var Cs=psaNum('ecd_Cs',0.03);
+  var Cg=psaNum('ecd_Cg',0.04);
+  var Cc=psaNum('ecd_Cc',0.02);
 
   var TVD_ft=TVD*3.2808;
   // ECD = MW + APL/(0.052 × TVD_ft)
@@ -895,15 +897,15 @@ function calcECD(){
 
 /* ====== PANEL 4: BIT HYDRAULICS ====== */
 function calcBit(){
-  var Q=parseFloat(document.getElementById('bit_Q').value)||30;
-  var SP=parseFloat(document.getElementById('bit_SP').value)||3000;
-  var PL=parseFloat(document.getElementById('bit_PL').value)||1800;
-  var rho=parseFloat(document.getElementById('bit_rho').value)||1.3;
-  var bit_size=parseFloat(document.getElementById('bit_size').value)||8.5;
+  var Q=psaNum('bit_Q',30);
+  var SP=psaNum('bit_SP',3000);
+  var PL=psaNum('bit_PL',1800);
+  var rho=psaNum('bit_rho',1.3);
+  var bit_size=psaNum('bit_size',8.5);
   var Nn=parseInt(document.getElementById('bit_Nn').value)||3;
-  var nz=[parseFloat(document.getElementById('nz1').value)||12,
-          parseFloat(document.getElementById('nz2').value)||12,
-          parseFloat(document.getElementById('nz3').value)||13];
+  var nz=[psaNum('nz1',12),
+          psaNum('nz2',12),
+          psaNum('nz3',13)];
 
   var rho_ppg=rho*8.345;
   var Q_gpm=Q*42; // gal/min
@@ -1011,14 +1013,14 @@ function calcBit(){
 
 /* ====== PANEL 5: PUMP ====== */
 function calcPump(){
-  var P_max=parseFloat(document.getElementById('pump_Pmax').value)||5000;
-  var Q_max=parseFloat(document.getElementById('pump_Qmax').value)||40;
-  var HP=parseFloat(document.getElementById('pump_HP').value)||1600;
-  var rho=parseFloat(document.getElementById('pump_rho').value)||1.3;
-  var PL_ref=parseFloat(document.getElementById('pump_PL_ref').value)||1800;
-  var Q_ref=parseFloat(document.getElementById('pump_Q_ref').value)||30;
-  var AV_min=parseFloat(document.getElementById('pump_AV_min').value)||0.5;
-  var Ann=parseFloat(document.getElementById('pump_Ann').value)||0.0183;
+  var P_max=psaNum('pump_Pmax',5000);
+  var Q_max=psaNum('pump_Qmax',40);
+  var HP=psaNum('pump_HP',1600);
+  var rho=psaNum('pump_rho',1.3);
+  var PL_ref=psaNum('pump_PL_ref',1800);
+  var Q_ref=psaNum('pump_Q_ref',30);
+  var AV_min=psaNum('pump_AV_min',0.5);
+  var Ann=psaNum('pump_Ann',0.0183);
 
   // Parasitic losses scale as Q^1.75 (turbulent) or Q^2 (turbulent approx)
   var n_PL=1.75;

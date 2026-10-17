@@ -605,6 +605,8 @@ select option{background:#0A0A16;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 var pvChart=null,msChart=null,mapChart1=null,mapChart2=null,icChart=null;
 var R_univ=8314; // J/(kmol.K)
 
@@ -656,17 +658,17 @@ function setGas(id,MW,gamma){
 
 /* ====== PANEL 1: SINGLE STAGE ====== */
 function calcComp(){
-  var MW=parseFloat(document.getElementById('MW').value)||16.04;
-  var gamma=parseFloat(document.getElementById('gamma').value)||1.307;
-  var Z1=parseFloat(document.getElementById('Z1').value)||0.98;
-  var P1=parseFloat(document.getElementById('P1').value)||5;
-  var P2=parseFloat(document.getElementById('P2').value)||25;
-  var T1_c=parseFloat(document.getElementById('T1_c').value)||35;
-  var mdot=parseFloat(document.getElementById('mdot').value)||10;
-  var eta_is=parseFloat(document.getElementById('eta_is').value)||78;
-  var eta_mech=parseFloat(document.getElementById('eta_mech').value)||98;
-  var eta_p=parseFloat(document.getElementById('eta_p').value)||82;
-  var eta_driver=parseFloat(document.getElementById('eta_driver').value)||95;
+  var MW=psaNum('MW',16.04);
+  var gamma=psaNum('gamma',1.307);
+  var Z1=psaNum('Z1',0.98);
+  var P1=psaNum('P1',5);
+  var P2=psaNum('P2',25);
+  var T1_c=psaNum('T1_c',35);
+  var mdot=psaNum('mdot',10);
+  var eta_is=psaNum('eta_is',78);
+  var eta_mech=psaNum('eta_mech',98);
+  var eta_p=psaNum('eta_p',82);
+  var eta_driver=psaNum('eta_driver',95);
 
   var T1=T1_c+273.15;
   var r=P2/P1; // compression ratio
@@ -814,15 +816,15 @@ function drawPV(P1,P2,T1,gamma,Z1,R,eta_is_pct){
 
 /* ====== PANEL 2: MULTI-STAGE ====== */
 function calcMulti(){
-  var P1=parseFloat(document.getElementById('ms_P1').value)||1.013;
-  var Pn=parseFloat(document.getElementById('ms_Pn').value)||200;
-  var T1_c=parseFloat(document.getElementById('ms_T1').value)||35;
+  var P1=psaNum('ms_P1',1.013);
+  var Pn=psaNum('ms_Pn',200);
+  var T1_c=psaNum('ms_T1',35);
   var N=parseInt(document.getElementById('ms_N').value)||3;
-  var MW=parseFloat(document.getElementById('ms_MW').value)||16.04;
-  var gamma=parseFloat(document.getElementById('ms_gamma').value)||1.307;
-  var mdot=parseFloat(document.getElementById('ms_mdot').value)||10;
-  var eta=parseFloat(document.getElementById('ms_eta').value)||78;
-  var Tic_c=parseFloat(document.getElementById('ms_Tic').value)||40;
+  var MW=psaNum('ms_MW',16.04);
+  var gamma=psaNum('ms_gamma',1.307);
+  var mdot=psaNum('ms_mdot',10);
+  var eta=psaNum('ms_eta',78);
+  var Tic_c=psaNum('ms_Tic',40);
 
   var R=R_univ/MW;
   var r_total=Pn/P1;
@@ -927,19 +929,19 @@ function calcMulti(){
 
 /* ====== PANEL 3: PUMP ====== */
 function calcPump(){
-  var rho=parseFloat(document.getElementById('p_rho').value)||850;
-  var visc=parseFloat(document.getElementById('p_visc').value)||3.5; // cP
-  var Pv=parseFloat(document.getElementById('p_Pv').value)||0.15; // bar(a)
-  var Q_m3h=parseFloat(document.getElementById('p_Q').value)||100;
-  var H=parseFloat(document.getElementById('p_H').value)||80;
-  var eta_p=parseFloat(document.getElementById('p_eta').value)||75;
-  var eta_m=parseFloat(document.getElementById('p_eta_m').value)||95;
-  var sf=parseFloat(document.getElementById('p_sf').value)||1.15;
-  var N_rpm=parseFloat(document.getElementById('p_N').value)||2950;
-  var Patm=parseFloat(document.getElementById('p_Patm').value)||1.013;
-  var Hs=parseFloat(document.getElementById('p_Hs').value)||2;
-  var Hfs=parseFloat(document.getElementById('p_Hfs').value)||0.5;
-  var NPSHr=parseFloat(document.getElementById('p_NPSHr').value)||4;
+  var rho=psaNum('p_rho',850);
+  var visc=psaNum('p_visc',3.5); // cP
+  var Pv=psaNum('p_Pv',0.15); // bar(a)
+  var Q_m3h=psaNum('p_Q',100);
+  var H=psaNum('p_H',80);
+  var eta_p=psaNum('p_eta',75);
+  var eta_m=psaNum('p_eta_m',95);
+  var sf=psaNum('p_sf',1.15);
+  var N_rpm=psaNum('p_N',2950);
+  var Patm=psaNum('p_Patm',1.013);
+  var Hs=psaNum('p_Hs',2);
+  var Hfs=psaNum('p_Hfs',0.5);
+  var NPSHr=psaNum('p_NPSHr',4);
 
   var Q_m3s=Q_m3h/3600;
   var g=9.81;
@@ -1018,12 +1020,12 @@ function calcPump(){
 
 /* ====== PANEL 4: PERFORMANCE MAP ====== */
 function calcMap(){
-  var P1=parseFloat(document.getElementById('pm_P1').value)||5;
-  var T1_c=parseFloat(document.getElementById('pm_T1').value)||35;
-  var mdot=parseFloat(document.getElementById('pm_mdot').value)||10;
-  var gamma=parseFloat(document.getElementById('pm_gamma').value)||1.307;
-  var MW=parseFloat(document.getElementById('pm_MW').value)||16.04;
-  var eta=parseFloat(document.getElementById('pm_eta').value)||78;
+  var P1=psaNum('pm_P1',5);
+  var T1_c=psaNum('pm_T1',35);
+  var mdot=psaNum('pm_mdot',10);
+  var gamma=psaNum('pm_gamma',1.307);
+  var MW=psaNum('pm_MW',16.04);
+  var eta=psaNum('pm_eta',78);
   var R=R_univ/MW;
 
   var ratios=Array.from({length:20},function(_,i){return 1.5+i*0.75;});
@@ -1103,14 +1105,14 @@ function calcMap(){
 
 /* ====== PANEL 5: INTERCOOLING ====== */
 function calcIC(){
-  var P1=parseFloat(document.getElementById('ic_P1').value)||1.013;
-  var Pn=parseFloat(document.getElementById('ic_Pn').value)||100;
-  var T1_c=parseFloat(document.getElementById('ic_T1').value)||35;
-  var gamma=parseFloat(document.getElementById('ic_gamma').value)||1.307;
-  var MW=parseFloat(document.getElementById('ic_MW').value)||16.04;
-  var mdot=parseFloat(document.getElementById('ic_mdot').value)||10;
-  var eta=parseFloat(document.getElementById('ic_eta').value)||78;
-  var Tic_c=parseFloat(document.getElementById('ic_Tic').value)||40;
+  var P1=psaNum('ic_P1',1.013);
+  var Pn=psaNum('ic_Pn',100);
+  var T1_c=psaNum('ic_T1',35);
+  var gamma=psaNum('ic_gamma',1.307);
+  var MW=psaNum('ic_MW',16.04);
+  var mdot=psaNum('ic_mdot',10);
+  var eta=psaNum('ic_eta',78);
+  var Tic_c=psaNum('ic_Tic',40);
 
   var R=R_univ/MW;
   var T1=T1_c+273.15;

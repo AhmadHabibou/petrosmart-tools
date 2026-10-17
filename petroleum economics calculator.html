@@ -495,6 +495,8 @@ select option{background:#0A0A14;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 // ─── GLOBAL STATE ──────────────────────────────────────────────────────────
 var N_PROJ = 3;
 var projects = [];  // computed results
@@ -643,8 +645,8 @@ function buildProjectCards(){
 
 // ─── CALC ALL PROJECTS ──────────────────────────────────────────────────────
 function calcAll(){
-  var rate = (parseFloat(document.getElementById('wacc_default').value)||12)/100;
-  var oil_price = parseFloat(document.getElementById('oil_price').value)||75;
+  var rate = (psaNum('wacc_default',12))/100;
+  var oil_price = psaNum('oil_price',75);
   var life = 15;
   projects = [];
 
@@ -703,12 +705,12 @@ function buildNPVDetail(){
 
 function calcNPVDetail(){
   var idx = parseInt(document.getElementById('npv_proj_sel').value)||0;
-  var rate = (parseFloat(document.getElementById('npv_rate').value)||12)/100;
+  var rate = (psaNum('npv_rate',12))/100;
   var life = parseInt(document.getElementById('npv_life').value)||15;
   var proj = projects[idx];
   if(!proj){return;}
 
-  var oil_price = parseFloat(document.getElementById('oil_price').value)||75;
+  var oil_price = psaNum('oil_price',75);
   var cfs = genCashflows(proj.p, oil_price, life);
   cashflows[idx] = cfs;
 
@@ -810,12 +812,12 @@ function calcNPVDetail(){
 
 // ─── PANEL 3: DECLINE CURVE ─────────────────────────────────────────────────
 function calcDecline(){
-  var qi = parseFloat(document.getElementById('dc_qi').value)||5000;
+  var qi = psaNum('dc_qi',5000);
   var Di = parseFloat(document.getElementById('dc_Di').value)/100||0.25;
-  var b  = parseFloat(document.getElementById('dc_b').value)||0.5;
-  var qmin = parseFloat(document.getElementById('dc_qmin').value)||50;
-  var price = parseFloat(document.getElementById('dc_price').value)||75;
-  var opex_bbl = parseFloat(document.getElementById('dc_opex').value)||18;
+  var b  = psaNum('dc_b',0.5);
+  var qmin = psaNum('dc_qmin',50);
+  var price = psaNum('dc_price',75);
+  var opex_bbl = psaNum('dc_opex',18);
 
   var years=[], q_pts=[], cum_pts=[], rev_pts=[];
   var cum=0, t_aban=-1, EUR=0;
@@ -881,14 +883,14 @@ function calcDecline(){
 
 // ─── PANEL 4: WACC ──────────────────────────────────────────────────────────
 function calcWACC(){
-  var E = parseFloat(document.getElementById('w_E').value)||60;
-  var D = parseFloat(document.getElementById('w_D').value)||40;
-  var Rd = parseFloat(document.getElementById('w_Rd').value)||7;
-  var tax = parseFloat(document.getElementById('w_tax').value)||30;
-  var Rf = parseFloat(document.getElementById('w_Rf').value)||4.5;
-  var ERP = parseFloat(document.getElementById('w_ERP').value)||5.5;
-  var beta = parseFloat(document.getElementById('w_beta').value)||1.15;
-  var CRP = parseFloat(document.getElementById('w_CRP').value)||2.0;
+  var E = psaNum('w_E',60);
+  var D = psaNum('w_D',40);
+  var Rd = psaNum('w_Rd',7);
+  var tax = psaNum('w_tax',30);
+  var Rf = psaNum('w_Rf',4.5);
+  var ERP = psaNum('w_ERP',5.5);
+  var beta = psaNum('w_beta',1.15);
+  var CRP = psaNum('w_CRP',2.0);
 
   var Re = Rf + beta*ERP + CRP;
   var Rd_AT = Rd*(1-tax/100);
@@ -951,8 +953,8 @@ function calcWACC(){
 
 // ─── PANEL 5: PORTFOLIO RANKING ──────────────────────────────────────────────
 function calcRanking(){
-  var budget = parseFloat(document.getElementById('budget').value)||500;
-  var hurdle = parseFloat(document.getElementById('hurdle').value)||15;
+  var budget = psaNum('budget',500);
+  var hurdle = psaNum('hurdle',15);
 
   if(projects.length===0){document.getElementById('r5').innerHTML='<div class="ibox">Calculate projects first (Tab 1).</div>';return;}
 
@@ -1020,9 +1022,9 @@ function calcRanking(){
 
 // ─── PANEL 6: CAPITAL ALLOCATION ────────────────────────────────────────────
 function calcAlloc(){
-  var budget = parseFloat(document.getElementById('alloc_budget').value)||500;
-  var npv_min = parseFloat(document.getElementById('alloc_npv_min').value)||0;
-  var irr_min = parseFloat(document.getElementById('alloc_irr_min').value)||12;
+  var budget = psaNum('alloc_budget',500);
+  var npv_min = psaNum('alloc_npv_min',0);
+  var irr_min = psaNum('alloc_irr_min',12);
 
   if(projects.length===0){document.getElementById('r6').innerHTML='<div class="ibox">Calculate projects first (Tab 1).</div>';return;}
 
