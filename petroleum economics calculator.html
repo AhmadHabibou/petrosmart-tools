@@ -469,9 +469,9 @@ select option{background:#0A0A14;}
       <strong>Arps decline (exponential b=0):</strong> q(t) = qi × exp(−Di×t)<br>
       <strong>EUR (exponential):</strong> EUR = qi / Di × (1 − exp(−Di×t_aban))<br>
       <strong>EUR (hyperbolic):</strong> EUR = (qi^b / ((1−b)×Di)) × (qi^(1−b) − qmin^(1−b))<br>
-      <strong>Economic limit:</strong> q_EL = OPEX / (Price × (1 − Royalty − Tax))<br>
-      <strong>Revenue CF:</strong> CF = Q×Price×(1−Royalty) − OPEX − CapexMaintenance − Taxes<br>
-      <strong>Govt take:</strong> GovernmentTake = (Royalty + TaxOnProfit) × Gross Revenue<br>
+      <strong>Economic limit:</strong> q_EL = OPEX / (Price × (1 − Royalty)); a profit tax does not move the limit<br>
+      <strong>Cash flow:</strong> CF = Q×Price×(1−Royalty) − OPEX − CAPEX − Tax; Tax = rate × (net revenue − OPEX − depreciation), losses carried forward<br>
+      <strong>Government take:</strong> (royalty + profit tax) / (gross revenue − CAPEX − OPEX), undiscounted, over field life<br>
       <strong>EMV (Expected Monetary Value):</strong> EMV = Psucc×NPV_success − Pfail×|NPV_failure|<br>
       <strong>Sensitivity:</strong> ΔNPV/ΔPrice = Σ [Q_t×(1−Royalty)×(1−Tax) / (1+r)^t]
     </div>
@@ -569,7 +569,8 @@ function genCashflows(p, oil_price, life){
   cfs.push(-capex_split);
   var capex_yr1 = p.capex * 0.4;
   // Years 1..life
-  var b=0.5, Di=0.20; // default decline params
+  var b=0.5, Di=0.20; // default decline params (assumption)
+  var lossCF=0;
   for(var t=1;t<=life;t++){
     var q_annual_bbl;
     if(t===1){
@@ -593,9 +594,13 @@ function genCashflows(p, oil_price, life){
     var royalty_cost = revenue * (p.royalty/100);
     var net_revenue = revenue - royalty_cost;
     var opex = p.opex_annual * 1e6; // M USD → USD
-    var ebitda = net_revenue - opex - capex_this2*1e6;
-    var tax = Math.max(0, ebitda * (p.tax/100));
-    var cf_net = (ebitda - tax) / 1e6; // M USD
+    // Tax: straight-line depreciation of the total CAPEX over 5 years from first production (assumption),
+    // losses carried forward without limit (assumption); fiscal terms vary by country and contract
+    var deprec = t<=5 ? p.capex*1e6/5 : 0;
+    var taxable = net_revenue - opex - deprec + lossCF;
+    var tax = 0;
+    if(taxable<0){ lossCF = taxable; } else { tax = taxable*(p.tax/100); lossCF = 0; }
+    var cf_net = (net_revenue - opex - capex_this2*1e6 - tax) / 1e6; // M USD
     cfs.push(cf_net);
   }
   return cfs;
@@ -755,8 +760,8 @@ function calcNPVDetail(){
   html+='</div>';
 
   // Decision badge
-  var dec_class = npv>50&&irr&&irr>15?'dec-go':npv>0&&irr&&irr>10?'dec-caution':'dec-no';
-  var dec_text = npv>50&&irr&&irr>15?'✅ GO — Economically attractive':npv>0?'⚠️ BORDERLINE — Review assumptions':'❌ NO-GO — Value destroying at these parameters';
+  var dec_class = npv>0?'dec-go':'dec-no';
+  var dec_text = npv>0?'NPV positive at the '+(rate*100).toFixed(1)+'% discount rate':'NPV negative at the '+(rate*100).toFixed(1)+'% discount rate';
   html+=`<div class="dec-badge ${dec_class}">${dec_text}</div>`;
 
   html+='<div class="fbox">'
