@@ -165,7 +165,7 @@ select option{background:#0A0A14;}
   <div class="hdr-icon">🔬</div>
   <div>
     <h1>Reservoir Fluid PVT Calculator</h1>
-    <p>Bo / Rs / Bg / co / μo - Standing / Vasquez-Beggs / Al-Marhoun / Lee-Kesler</p>
+    <p>Bo / Rs / Bg / co / μo - Standing / Vasquez-Beggs / Al-Marhoun / Lee-Gonzalez-Eakin</p>
   </div>
   <div class="hdr-tags">
     <div class="htag ht-pvt">PVT</div>
@@ -246,7 +246,7 @@ select option{background:#0A0A14;}
   <div class="card pvt-accent">
     <div class="stitle gas">/// gas PVT properties</div>
     <div class="ibox">
-      <strong>Gas compressibility factor Z:</strong> Hall-Yarborough, Papay, or Pitzer correlations. Z corrects ideal gas law for real gas behavior. Bg = (P_sc × Z × T) / (T_sc × P) [dimensionless or res bbl/scf]. Gas viscosity from Lee-Kesler (1966) correlation.
+      <strong>Gas compressibility factor Z:</strong> Hall-Yarborough, Papay, or Pitzer correlations. Z corrects ideal gas law for real gas behavior. Bg = (P_sc × Z × T) / (T_sc × P) [dimensionless or res bbl/scf]. Gas viscosity from Lee-Gonzalez-Eakin (1966) correlation.
     </div>
     <div class="row4">
       <div class="field">
@@ -434,52 +434,51 @@ select option{background:#0A0A14;}
       Bo = 0.9759 + 0.000120 × [Rs × (γg/γo)^0.5 + 1.25×T_F]^1.2<br>
       where γo = 141.5/(API+131.5), T_F = temperature in °F<br><br>
       <strong>Standing (1947) - Rs [scf/STB]:</strong><br>
-      Rs = γg × (P/18.2 + 1.4)^1.205 × 10^(0.0125×API - 0.00091×T_F)<br><br>
+      Rs = γg × [(P/18.2 + 1.4) × 10^(0.0125×API - 0.00091×T_F)]^1.2048<br><br>
       <strong>Vasquez-Beggs (1980) - Rs:</strong><br>
-      Rs = C1 × γgs × P^C2 × 10^(C3×API/T_R)<br>
-      C1,C2,C3 depend on API (above/below 30°API)<br><br>
-      <strong>Al-Marhoun (1988) - Bo:</strong><br>
-      Bo = -1.001621 + (0.000005 × a) where a = Rs^0.742390 × γg^0.323294 × γo^(-1.202040) × T_R^0.0<br><br>
-      <strong>Undersaturated oil compressibility co [psi-1]:</strong><br>
-      co = (Rs + 17.2×T_F - 1180×γg + 12.61×API - 1433) / (10^5 × P)<br>
-      or Vasquez-Beggs: co = 1433 + 5Rs + 17.2×T_F - 1180×γg + 12.61×API) / (10^5 × P)<br><br>
+      Rs = C1 × γgs × P^C2 × exp(C3×API/T_R); API ≤ 30: 0.0362, 1.0937, 25.7240; API &gt; 30: 0.0178, 1.1870, 23.931<br><br>
+      <strong>Al-Marhoun (1988):</strong> pb = 5.38088×10⁻³ Rs^0.715082 γg^-1.87784 γo^3.1437 T_R^1.32657<br>
+      Bo = 0.497069 + 0.862963×10⁻³ T_R + 0.182594×10⁻² F + 0.318099×10⁻⁵ F², F = Rs^0.742390 γg^0.323294 γo^-1.202040<br><br>
+      <strong>Glasø (1980):</strong> log pb = 1.7669 + 1.7447 log pb* - 0.30218 (log pb*)², pb* = (Rs/γg)^0.816 T_F^0.172 / API^0.989<br>
+      log(Bo - 1) = -6.58511 + 2.91329 log Bob* - 0.27683 (log Bob*)², Bob* = Rs (γg/γo)^0.526 + 0.968 T_F<br><br>
+      <strong>Undersaturated oil compressibility, Vasquez-Beggs [psi-1]:</strong><br>
+      co = (-1433 + 5 Rs + 17.2 T_F - 1180 γgs + 12.61 API) / (10^5 × P)<br><br>
       <strong>Dead oil viscosity (Beal, 1946):</strong><br>
       μod = (0.32 + 1.8×10^7/API^4.53) × (360/(T_F+200))^a, a = 10^(0.43+8.33/API)<br><br>
       <strong>Live oil viscosity (Chew-Connally, 1959):</strong><br>
-      μo = A × μod^B, A and B functions of Rs<br><br>
+      μo = A × μod^b, A = 10^[Rs (2.2×10⁻⁷ Rs - 7.4×10⁻⁴)], b = 0.68/10^(8.62×10⁻⁵ Rs) + 0.25/10^(1.1×10⁻³ Rs) + 0.062/10^(3.74×10⁻³ Rs)<br><br>
       <strong>Gas Z-factor (Hall-Yarborough):</strong><br>
-      Ppr = P/Ppc, Tpr = T/Tpc | Solve: -APpr + [y+y²+y³-y⁴]/(1-y)³ - (14.76/Tpr - 9.76/Tpr² + 4.58/Tpr³)y + (90.7/Tpr - 242.2/Tpr² + 42.4/Tpr³)y^(2.18+2.82/Tpr) = 0<br>
-      Z = APpr / y<br><br>
+      t = 1/Tpr, A = 0.06125 t exp(-1.2 (1-t)²) | Solve: -A Ppr + (y+y²+y³-y⁴)/(1-y)³ - (14.76t - 9.76t² + 4.58t³)y² + (90.7t - 242.2t² + 42.4t³)y^(2.18+2.82t) = 0<br>
+      Z = A Ppr / y<br><br>
       <strong>Gas formation volume factor Bg [res bbl/scf]:</strong><br>
       Bg = 0.00504 × Z × T_R / P [T in °R = (T_F+460), P in psia]<br><br>
-      <strong>Gas viscosity (Lee-Kesler, 1966):</strong><br>
+      <strong>Gas viscosity (Lee, Gonzalez and Eakin, 1966):</strong><br>
       μg = 10^-4 × K × exp(X × (ρg/62.4)^Y) where K = (9.4 + 0.02×MW)×T_R^1.5 / (209+19×MW+T_R)<br>
       X = 3.5 + 986/T_R + 0.01×MW | Y = 2.4 - 0.2×X
     </div>
     <div class="sep"></div>
-    <div class="stitle pvt">/// reservoir fluid classification</div>
+    <div class="stitle pvt">/// reservoir fluid classification (McCain, 1990)</div>
     <table class="tbl">
-      <thead><tr><th>Fluid type</th><th>GOR (scf/STB)</th><th>API (°API)</th><th>Bo at Pb</th><th>Characteristics</th></tr></thead>
+      <thead><tr><th>Fluid type</th><th>Initial producing GOR (scf/STB)</th><th>Stock-tank API</th><th>Characteristics</th></tr></thead>
       <tbody>
-        <tr><td class="tw">Black oil</td><td>&lt; 200</td><td>15-35</td><td>1.05-1.3</td><td>High shrinkage, heavy crude</td></tr>
-        <tr><td class="tw">Low-shrinkage oil</td><td>200-500</td><td>30-40</td><td>1.1-1.5</td><td>Moderate Bo</td></tr>
-        <tr><td class="tw">Volatile oil</td><td>500-3300</td><td>40-50</td><td>1.5-2.0</td><td>High shrinkage, near-critical</td></tr>
-        <tr><td class="tw">Gas condensate (rich)</td><td>3300-100k</td><td>&gt; 50</td><td>-</td><td>Retrograde condensation</td></tr>
-        <tr><td class="tw">Wet gas</td><td>100k-300k</td><td>&gt; 60</td><td>-</td><td>Liquids at surface only</td></tr>
-        <tr><td class="tw">Dry gas</td><td>&gt; 300k</td><td>-</td><td>-</td><td>No liquids at surface</td></tr>
+        <tr><td class="tw">Black oil</td><td>&lt; 1,750</td><td>&lt; 45</td><td>Bubble point at reservoir conditions</td></tr>
+        <tr><td class="tw">Volatile oil</td><td>1,750 to 3,200</td><td>&gt; 40</td><td>High shrinkage below the bubble point</td></tr>
+        <tr><td class="tw">Retrograde gas</td><td>&gt; 3,200</td><td>40 to 60</td><td>Dew point; liquid drops out in the reservoir</td></tr>
+        <tr><td class="tw">Wet gas</td><td>&gt; 15,000</td><td>up to 70</td><td>Liquid at the surface only</td></tr>
+        <tr><td class="tw">Dry gas</td><td>&gt; 100,000 (no liquid in practice)</td><td>-</td><td>No liquid at reservoir or surface</td></tr>
       </tbody>
     </table>
     <div class="sep"></div>
-    <div class="stitle pvt">/// PVT correlations accuracy guide</div>
+    <div class="stitle pvt">/// PVT correlations: origin of the data sets</div>
     <table class="tbl">
-      <thead><tr><th>Correlation</th><th>Region developed</th><th>API range</th><th>Accuracy Bo</th><th>Best use</th></tr></thead>
+      <thead><tr><th>Correlation</th><th>Region developed</th><th>API range</th></tr></thead>
       <tbody>
-        <tr><td class="tw">Standing (1947)</td><td>California (US)</td><td>16-63°API</td><td>±4%</td><td>General, light-medium crude</td></tr>
-        <tr><td class="tw">Vasquez-Beggs (1980)</td><td>Worldwide</td><td>15-59°API</td><td>±3%</td><td>Most widely used globally</td></tr>
-        <tr><td class="tw">Al-Marhoun (1988)</td><td>Middle East</td><td>19-44°API</td><td>±3%</td><td>Middle East crude oils</td></tr>
-        <tr><td class="tw">Glaso (1980)</td><td>North Sea</td><td>22-48°API</td><td>±4%</td><td>North Sea crude oils</td></tr>
-        <tr><td class="tw">Petrosky-Farshad (1993)</td><td>Gulf of Mexico</td><td>25-46°API</td><td>±3%</td><td>GOM offshore</td></tr>
-        <tr><td class="tw">De Ghetto (1994)</td><td>Mediterranean</td><td>6-56°API</td><td>±4%</td><td>Heavy oils, extra-heavy</td></tr>
+        <tr><td class="tw">Standing (1947)</td><td>California (US)</td><td>16-63°API</td></tr>
+        <tr><td class="tw">Vasquez-Beggs (1980)</td><td>Worldwide</td><td>15-59°API</td></tr>
+        <tr><td class="tw">Al-Marhoun (1988)</td><td>Middle East</td><td>19-44°API</td></tr>
+        <tr><td class="tw">Glaso (1980)</td><td>North Sea</td><td>22-48°API</td></tr>
+        <tr><td class="tw">Petrosky-Farshad (1993)</td><td>Gulf of Mexico</td><td>25-46°API</td></tr>
+        <tr><td class="tw">De Ghetto (1994)</td><td>Mediterranean</td><td>6-56°API</td></tr>
       </tbody>
     </table>
   </div>
@@ -487,7 +486,7 @@ select option{background:#0A0A14;}
 
 <div class="foot">
   <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
-  · Standing 1947 / Vasquez-Beggs 1980 / Al-Marhoun 1988 / Hall-Yarborough / Lee-Kesler · Educational tool only
+  · Standing 1947 / Vasquez-Beggs 1980 / Al-Marhoun 1988 / Hall-Yarborough / Lee-Gonzalez-Eakin · Educational tool only
 </div>
 </div>
 
@@ -533,76 +532,57 @@ function barToPsi(b){return b*14.5038;}
 function cToF(c){return c*9/5+32;}
 function cToR(c){return (c+273.15)*1.8;}
 
+/* Correlations as published; field units inside (psia, deg F or deg R, scf/STB). Sources:
+   Standing (1947, 1977); Vasquez and Beggs (1980), JPT 32(6); Al-Marhoun (1988), JPT 40(5); Glaso (1980), JPT 32(5);
+   Beal (1946); Chew and Connally (1959). Forms as compiled in Ahmed, Reservoir Engineering Handbook. */
 /* Standing Rs [scf/STB] */
 function Rs_standing(P_bar,T_C,API,gamma_g){
-  var P=barToPsi(P_bar);
-  var T=cToF(T_C);
-  var x=0.0125*API-0.00091*T;
-  return gamma_g*Math.pow(P/18.2+1.4,1.205)*Math.pow(10,x);
+  var P=barToPsi(P_bar), T=cToF(T_C), x=0.0125*API-0.00091*T;
+  return gamma_g*Math.pow((P/18.2+1.4)*Math.pow(10,x),1.2048);
 }
-
 /* Standing Bo [RB/STB] */
 function Bo_standing(Rs,T_C,API,gamma_g){
-  var T=cToF(T_C);
-  var gamma_o=141.5/(API+131.5);
+  var T=cToF(T_C), gamma_o=141.5/(API+131.5);
   var F=Rs*Math.pow(gamma_g/gamma_o,0.5)+1.25*T;
   return 0.9759+0.000120*Math.pow(F,1.2);
 }
-
-/* Vasquez-Beggs Rs */
+/* Vasquez-Beggs Rs: Rs = C1 gs p^C2 exp(C3 API/T_R); gas gravity taken as separator-corrected value gs = gamma_g */
 function Rs_vasquez(P_bar,T_C,API,gamma_g){
-  var P=barToPsi(P_bar);
-  var T=cToR(T_C);
-  var C1,C2,C3;
-  if(API<=30){C1=0.0362;C2=1.0937;C3=25.7240;}
-  else{C1=0.0178;C2=1.1870;C3=23.9310;}
-  var gamma_gs=gamma_g*(1+5.912e-5*API*(cToF(T_C)-60)*Math.log10(P/114.7));
-  return C1*gamma_gs*Math.pow(P,C2)*Math.pow(10,C3*API/(T));
+  var P=barToPsi(P_bar), T=cToR(T_C), C1,C2,C3;
+  if(API<=30){C1=0.0362;C2=1.0937;C3=25.7240;} else {C1=0.0178;C2=1.1870;C3=23.9310;}
+  return C1*gamma_g*Math.pow(P,C2)*Math.exp(C3*API/T);
 }
-
-/* Vasquez-Beggs Bo */
+/* Vasquez-Beggs Bo (saturated) */
 function Bo_vasquez(Rs,T_C,API,gamma_g){
-  var T=cToF(T_C);
-  var C1,C2,C3;
-  if(API<=30){C1=4.677e-4;C2=1.751e-5;C3=-1.811e-8;}
-  else{C1=4.670e-4;C2=1.100e-5;C3=1.337e-9;}
-  return 1+C1*Rs+C2*(T-60)*(API/gamma_g)+C3*Rs*(T-60)*(API/gamma_g);
+  var T=cToF(T_C), C1,C2,C3;
+  if(API<=30){C1=4.677e-4;C2=1.751e-5;C3=-1.811e-8;} else {C1=4.670e-4;C2=1.100e-5;C3=1.337e-9;}
+  return 1+C1*Rs+(T-60)*(API/gamma_g)*(C2+C3*Rs);
 }
-
-/* Al-Marhoun Rs (inverted from Bo, use Standing Rs for now) */
+/* Al-Marhoun (1988): pb = 5.38088e-3 Rs^0.715082 gg^-1.87784 go^3.1437 T_R^1.32657, inverted for Rs */
 function Rs_almarhoun(P_bar,T_C,API,gamma_g){
-  var P=barToPsi(P_bar);
-  var T=cToF(T_C)+460; // Rankine
-  var gamma_o=141.5/(API+131.5);
-  return Math.pow(P/(5.38088e-3*Math.pow(gamma_g,0.715082)*Math.pow(gamma_o,-1.87784)*Math.pow(T,3.1437)),1/1.326976);
+  var P=barToPsi(P_bar), T=cToR(T_C), go=141.5/(API+131.5);
+  return Math.pow(P/(5.38088e-3*Math.pow(gamma_g,-1.87784)*Math.pow(go,3.1437)*Math.pow(T,1.32657)),1/0.715082);
 }
-
-/* Al-Marhoun Bo */
+/* Al-Marhoun Bo: F = Rs^0.742390 gg^0.323294 go^-1.202040 */
 function Bo_almarhoun(Rs,T_C,API,gamma_g){
-  var T=cToF(T_C)+460;
-  var gamma_o=141.5/(API+131.5);
-  var a=Rs*Math.pow(gamma_g,0.742390)*Math.pow(gamma_o,-1.202040)*Math.pow(T,0.323294);
-  return 0.497069+0.862963e-3*T+0.182594e-2*a+0.318099e-5*a*a;
+  var T=cToR(T_C), go=141.5/(API+131.5);
+  var F=Math.pow(Rs,0.742390)*Math.pow(gamma_g,0.323294)*Math.pow(go,-1.202040);
+  return 0.497069+0.862963e-3*T+0.182594e-2*F+0.318099e-5*F*F;
 }
-
-/* Glaso Rs */
+/* Glaso: log pb = 1.7669 + 1.7447 log pb* - 0.30218 (log pb*)^2, pb* = (Rs/gg)^0.816 T^0.172 / API^0.989; inverted for Rs */
 function Rs_glaso(P_bar,T_C,API,gamma_g){
-  var P=barToPsi(P_bar);
-  var T=cToF(T_C);
-  var Pb_star=Math.pow(10,1.7669+1.7447*Math.log10(P/gamma_g)-0.30218*Math.pow(Math.log10(P/gamma_g),2));
-  return gamma_g*Math.pow(Pb_star/Math.pow(10,0.00164*T-1.769/API),1.2255);
+  var P=barToPsi(P_bar), T=cToF(T_C);
+  var disc=1.7447*1.7447-4*0.30218*(Math.log10(P)-1.7669);
+  var lx=(1.7447-Math.sqrt(Math.max(disc,0)))/(2*0.30218);
+  var pbs=Math.pow(10,lx);
+  return gamma_g*Math.pow(pbs*Math.pow(API,0.989)/Math.pow(T,0.172),1/0.816);
 }
-
-/* Glaso Bo */
+/* Glaso Bo: log(Bo - 1) = -6.58511 + 2.91329 log Bob* - 0.27683 (log Bob*)^2, Bob* = Rs (gg/go)^0.526 + 0.968 T */
 function Bo_glaso(Rs,T_C,API,gamma_g){
-  var T=cToF(T_C);
-  var gamma_o=141.5/(API+131.5);
-  var F=Rs*Math.pow(gamma_g/gamma_o,0.526)+0.968*T;
-  var lnBo=-6.58511+2.91329*Math.log(F)-0.27683*Math.pow(Math.log(F),2);
-  return Math.exp(lnBo);
+  var T=cToF(T_C), go=141.5/(API+131.5);
+  var L=Math.log10(Rs*Math.pow(gamma_g/go,0.526)+0.968*T);
+  return 1+Math.pow(10,-6.58511+2.91329*L-0.27683*L*L);
 }
-
-/* Generic Rs and Bo by method */
 function calcRs(P,T,API,gamma_g){
   if(corrMethod==='vasquez') return Rs_vasquez(P,T,API,gamma_g);
   if(corrMethod==='almarhoun') return Rs_almarhoun(P,T,API,gamma_g);
@@ -615,27 +595,24 @@ function calcBo(Rs,T,API,gamma_g){
   if(corrMethod==='glaso') return Bo_glaso(Rs,T,API,gamma_g);
   return Bo_standing(Rs,T,API,gamma_g);
 }
-
-/* Undersaturated oil compressibility co [psi-1] */
+/* Vasquez-Beggs undersaturated oil compressibility [1/psi] */
 function co_vasquez(Rs_b,T_C,API,gamma_g,P_bar){
-  var P=barToPsi(P_bar);
-  var T=cToF(T_C);
-  return (1433+5*Rs_b+17.2*T-1180*gamma_g+12.61*API)/(1e5*P);
+  var P=barToPsi(P_bar), T=cToF(T_C);
+  return (-1433+5*Rs_b+17.2*T-1180*gamma_g+12.61*API)/(1e5*P);
 }
-
-/* Dead oil viscosity (Beal) */
+/* Beal dead oil viscosity [cP] */
 function mu_od(API,T_C){
-  var T=cToF(T_C);
-  var a=Math.pow(10,0.43+8.33/API);
+  var T=cToF(T_C), a=Math.pow(10,0.43+8.33/API);
   return (0.32+1.8e7/Math.pow(API,4.53))*Math.pow(360/(T+200),a);
 }
-
-/* Live oil viscosity (Chew-Connally) */
+/* Chew-Connally live oil viscosity [cP] */
 function mu_o_live(mu_od_val,Rs){
   var A=Math.pow(10,Rs*(2.2e-7*Rs-7.4e-4));
-  var b=0.68/Math.pow(10,8.62e-5*Rs)+0.25/Math.pow(10,5.79e-4*Rs)+0.062/Math.pow(10,1.1e-5*Rs*Rs);
+  var b=0.68/Math.pow(10,8.62e-5*Rs)+0.25/Math.pow(10,1.1e-3*Rs)+0.062/Math.pow(10,3.74e-3*Rs);
   return A*Math.pow(mu_od_val,b);
 }
+/* Oil density at reservoir conditions (Standing): rho = (62.4 go + 0.0136 Rs gg) / Bo, lb/ft3 */
+function rho_oil_res(API,Rs,gamma_g,Bo){return (62.4*141.5/(API+131.5)+0.0136*Rs*gamma_g)/Bo*16.0185;}
 
 /* Z-factor correlations */
 function calcZ(P_bar,T_C,gamma_g,CO2_pct,H2S_pct,N2_pct,method){
@@ -656,17 +633,16 @@ function calcZ(P_bar,T_C,gamma_g,CO2_pct,H2S_pct,N2_pct,method){
   var Tpr=T/Tpc;
 
   if(method==='papay'){
-    return 1-3.52*Ppr/(10.73*Tpr)+0.274*Ppr*Ppr/(10.73*Tpr*Tpr);
+    return 1-3.52*Ppr/Math.pow(10,0.9813*Tpr)+0.274*Ppr*Ppr/Math.pow(10,0.8157*Tpr);
   }
   if(method==='bk'){
     // Beggs-Brill
-    var A_=1.39*(Tpr-0.92)^0.5-0.36*Tpr-0.101;
-    var E=9*(Tpr-1);
-    var B2=0.62-0.23*Tpr;
+    var A_=1.39*Math.sqrt(Tpr-0.92)-0.36*Tpr-0.101;
+    var B2=(0.62-0.23*Tpr)*Ppr+(0.066/(Tpr-0.86)-0.037)*Ppr*Ppr+0.32*Math.pow(Ppr,6)/Math.pow(10,9*(Tpr-1));
     var C=0.132-0.32*Math.log10(Tpr);
-    var F=0.3106-0.49*Tpr+0.1824*Tpr*Tpr;
-    var Z=A_+(1-A_)/Math.exp(E)+C*Math.pow(Ppr,F)+Math.pow(Ppr,B2)*Math.pow(10,-9*(Tpr-1));
-    return Math.max(0.2,Math.min(1.2,Z||0.88));
+    var D=Math.pow(10,0.3106-0.49*Tpr+0.1824*Tpr*Tpr);
+    var Z=A_+(1-A_)/Math.exp(B2)+C*Math.pow(Ppr,D);
+    return Z;
   }
   // Hall-Yarborough (default)
   var t=1/Tpr;
@@ -687,15 +663,13 @@ function calcZ(P_bar,T_C,gamma_g,CO2_pct,H2S_pct,N2_pct,method){
   return -A_HY*Ppr/y;
 }
 
-/* Gas viscosity (Lee-Kesler) */
-function mu_g(P_bar,T_C,gamma_g){
-  var T_R=cToR(T_C);
-  var MW=gamma_g*28.97;
-  var rho_g=barToPsi(P_bar)/(10.7316*T_R)*MW/1; // lbm/ft3 approx
-  var K=(9.4+0.02*MW)*Math.pow(T_R,1.5)/(209+19*MW+T_R);
-  var X=3.5+986/T_R+0.01*MW;
-  var Y=2.4-0.2*X;
-  return 1e-4*K*Math.exp(X*Math.pow(rho_g/62.4,Y));
+/* Gas viscosity, Lee, Gonzalez and Eakin (1966) [cP]; gas density from Z (Hall-Yarborough) */
+function mu_g(P_bar,T_C,gamma_g,Z){
+  var T_R=cToR(T_C), MW=gamma_g*28.97;
+  if(!Z) Z=calcZ(P_bar,T_C,gamma_g,0,0,0,'hy');
+  var rho_g=barToPsi(P_bar)*MW/(Z*10.7316*T_R); // lbm/ft3
+  var K=(9.4+0.02*MW)*Math.pow(T_R,1.5)/(209+19*MW+T_R), X=3.5+986/T_R+0.01*MW, Y=2.4-0.2*X;
+  return 1e-4*K*Math.exp(X*Math.pow(rho_g/62.428,Y));
 }
 
 /* ====== PANEL 1: OIL PVT ====== */
@@ -738,7 +712,7 @@ function calcOil(){
   var shrinkage=(1-1/Bo_pb)*100;
 
   // Oil density at reservoir conditions
-  var rho_res=rho_o/(Bo_P*(1+Rs_P/5.615));
+  var rho_res=rho_oil_res(API,Rs_P,gamma,Bo_P);
 
   var html='<div class="rgrid">';
   html+=rc('hl','Bo at eval. pressure P='+P+' bar',Bo_P.toFixed(4),'RB/STB','Correlation: '+corr);
@@ -750,7 +724,7 @@ function calcOil(){
   html+=rc('','Oil compressibility co',co_val.toExponential(3),'psi-1','Vasquez-Beggs');
   html+=rc('','Shrinkage (ΔBo at Pb)',shrinkage.toFixed(1),'%','1 - 1/Bo_pb');
   html+=rc('','Oil stock-tank density',rho_o.toFixed(1),'kg/m3 (STC)','At '+API+'°API');
-  html+=rc('','Fluid type',API<20?'Heavy oil':API<35?'Medium crude':API<45?'Light crude':'Very light/condensate','-',API+'°API');
+  html+=rc('','Oil density at P, T',rho_res.toFixed(1),'kg/m3','Standing: (62.4 γo + 0.0136 Rs γg)/Bo');
   html+='</div>';
 
   html+='<div class="fbox">'
@@ -762,12 +736,7 @@ function calcOil(){
     +'</div>';
 
   var rows='';
-  var fluidType=API<20?'Heavy oil':API<30?'Medium crude':API<45?'Light crude':'Volatile/condensate';
-  rows+=ar('pvt','Fluid classification: '+fluidType,'API = '+API+'°. '+
-    (API<20?'Heavy oil: low Bo (<1.1), high viscosity (>100 cP). EOR (thermal: SAGD, CSS) typically required. Low solution GOR.':
-     API<30?'Medium crude: moderate Bo (1.1-1.3). Conventional primary and secondary recovery applicable.':
-     API<45?'Light crude: good Bo (1.2-1.5), low viscosity (<5 cP). Excellent primary recovery potential. Full range of EOR applicable.':
-     'Volatile/very light crude: high Bo (>1.5), near-critical fluid. High shrinkage below Pb. Retrograde condensation risk near wellbore.'),'');
+  rows+=ar('pvt','Correlation range','Black-oil correlations are empirical: results outside the data range of the chosen correlation (API, temperature, GOR, pressure) can be wrong by more than 10 %. Calibrate against a PVT laboratory report when one exists.','');
   if(mu_o_val>10){
     rows+=ar('wn','High oil viscosity ('+mu_o_val.toFixed(1)+' cP at reservoir conditions)','At reservoir T = '+Tr+'°C, oil viscosity '+mu_o_val.toFixed(1)+' cP. High-viscosity oil may require: artificial lift optimization, viscosity-reducing additives, or thermal stimulation. Surface facilities must be designed for '+Math.min(mu_o_val*3,1000).toFixed(0)+' cP+ at wellhead temperature.','Viscosity at surface (20°C, dead oil): approximately '+mu_od(API,20).toFixed(0)+' cP. Heat tracing or insulation of flowlines required if μ_surface > 200 cP. Consider pipeline viscosity break.');
   }
@@ -845,8 +814,8 @@ function calcGas(){
   var Eg=1/Bg_bbl;
 
   // Gas viscosity
-  var mu_g_val=mu_g(P,T,gamma);
-  var mu_g_cP=mu_g_val*1000;
+  var mu_g_val=mu_g(P,T,gamma,Z);
+  var mu_g_cP=mu_g_val;
 
   // Gas density at op. conditions
   var rho_g=P*1e5*MW/(Z*8314*(T+273.15));
@@ -862,7 +831,7 @@ function calcGas(){
   html+=rc('hl','Bg',Bg_bbl.toExponential(4),'res bbl/scf','= '+(Bg_m3).toFixed(5)+' m3/Sm3');
   html+=rc('gas','Gas expansion factor Eg',Eg.toFixed(1),'scf/res bbl','= '+( 1/Bg_m3).toFixed(0)+' Sm3/m3');
   html+=rc('','Gas density at op. cond.',rho_g.toFixed(2),'kg/m3','At P='+P+' bar, T='+T+'°C');
-  html+=rc('','Gas viscosity μg',mu_g_cP.toFixed(4),'cP','Lee-Kesler (1966)');
+  html+=rc('','Gas viscosity μg',mu_g_cP.toFixed(4),'cP','Lee-Gonzalez-Eakin (1966)');
   html+=rc('','Reduced pressure Ppr',Ppr.toFixed(3),'-','P/Ppc');
   html+=rc('','Reduced temperature Tpr',Tpr.toFixed(3),'-','T/Tpc');
   html+=rc('','MW gas',MW.toFixed(2),'g/mol','γg × 28.97');
@@ -1021,26 +990,25 @@ function calcFluid(){
   var mu_od_v=mu_od(API,T);
   var mu_o_v=mu_o_live(mu_od_v,Rs);
   var co=co_vasquez(Rs,T,API,gamma,Pb);
-  var mu_g_v=mu_g(P,T,gamma)*1000; // cP
+  var mu_g_v=mu_g(P,T,gamma); // cP
 
-  // Water PVT (Dodson-Standing for Bw, Collins for μw)
-  var Bw=1+3.17e-5*(T-60/1.8)+8.5e-7*barToPsi(P)*barToPsi(P)*(T-60/1.8)-1.47e-6*(barToPsi(P)-14.7);
-  var Bw_sal=Bw-sal*7e-8; // salinity correction (approximate)
-  var mu_w=Math.exp(1.003-1.479e-2*cToF(T)+1.982e-5*cToF(T)*cToF(T)); // cP dead water
-  var mu_w_pres=mu_w*Math.pow(1+3.5e-12*barToPsi(P)*barToPsi(P)*(cToF(T)-40),1); // rough pressure correction
-
-  // Interfacial tension (Firoozabadi-Ramey)
-  var IFT=Math.max(0,(52.5-1.847*T+0.0149*T*T)*Math.exp(-0.0001*barToPsi(P))); // mN/m rough
-
+  // Water PVT, McCain (1990): Bw = (1 + dVwt)(1 + dVwp); viscosity with salinity and pressure correction (T in F, p in psia, S in wt %)
+  var TF=cToF(T), pp=barToPsi(P), S=sal/1e4;
+  var dVwt=-1.0001e-2+1.33391e-4*TF+5.50654e-7*TF*TF;
+  var dVwp=-1.95301e-9*pp*TF-1.72834e-13*pp*pp*TF-3.58922e-7*pp-2.25341e-10*pp*pp;
+  var Bw_sal=(1+dVwt)*(1+dVwp);
+  var Aw=109.574-8.40564*S+0.313314*S*S+8.72213e-3*S*S*S;
+  var Bwv=-1.12166+2.63951e-2*S-6.79461e-4*S*S-5.47119e-5*S*S*S+1.55586e-6*S*S*S*S;
+  var mu_w=Aw*Math.pow(TF,Bwv);
+  var mu_w_pres=mu_w*(0.9994+4.0295e-5*pp+3.1062e-9*pp*pp);
   var html='<div class="rgrid">';
   html+=rc('hl','Oil viscosity μo (live)',mu_o_v.toFixed(3),'cP','Chew-Connally at Rs='+Rs);
   html+=rc('hl','Oil viscosity μod (dead)',mu_od_v.toFixed(2),'cP','Beal at '+T+'°C');
   html+=rc('oil','Oil compressibility co',co.toExponential(3),'psi-1','Vasquez-Beggs');
   html+=rc('oil','Oil density (stock tank)',(gamma_o*1000).toFixed(1),'kg/m3',''+API+'°API');
-  html+=rc('gas','Gas viscosity μg',mu_g_v.toFixed(4),'cP','Lee-Kesler at '+P+' bar, '+T+'°C');
-  html+=rc('','Water Bw (Dodson-Standing)',Bw_sal.toFixed(4),'RB/STB','At '+sal.toLocaleString()+' ppm TDS');
-  html+=rc('','Water viscosity μw',mu_w_pres.toFixed(3),'cP','At '+T+'°C, '+P+' bar');
-  html+=rc('','Oil-gas IFT (approx)',IFT.toFixed(1),'mN/m','At P='+P+' bar, T='+T+'°C');
+  html+=rc('gas','Gas viscosity μg',mu_g_v.toFixed(4),'cP','Lee-Gonzalez-Eakin at '+P+' bar, '+T+'°C');
+  html+=rc('','Water Bw (McCain)',Bw_sal.toFixed(4),'RB/STB','Salinity effect on Bw neglected (small)');
+  html+=rc('','Water viscosity μw (McCain)',mu_w_pres.toFixed(3),'cP','At '+T+'°C, '+P+' bar, '+(sal/1e4).toFixed(1)+' wt% solids');
   html+=rc('','Gas/oil viscosity ratio',(mu_g_v/mu_o_v).toFixed(4),'-','μg/μo - mobility ratio impact');
   html+=rc('','Oil/water viscosity ratio',(mu_o_v/mu_w_pres).toFixed(1),'-','μo/μw - water flooding sweep');
   html+='</div>';
@@ -1049,7 +1017,7 @@ function calcFluid(){
     +'<strong>μod (Beal):</strong> a = 10^(0.43+8.33/'+API+') = '+Math.pow(10,0.43+8.33/API).toFixed(2)+'<br>'
     +'μod = (0.32+1.8×10^7/'+API+'^4.53)×(360/('+cToF(T).toFixed(0)+'+200))^a = <span class="hio">'+mu_od_v.toFixed(2)+' cP</span><br>'
     +'<strong>μo (Chew-Connally):</strong> A = 10^(Rs×(2.2×10^-7×Rs - 7.4×10^-4)) → μo = A×μod^b = <span class="hio">'+mu_o_v.toFixed(3)+' cP</span><br>'
-    +'<strong>Bw (Dodson-Standing):</strong> ≈ <span class="hi">'+Bw_sal.toFixed(4)+' RB/STB</span> at '+sal.toLocaleString()+' ppm TDS'
+    +'<strong>Bw (McCain 1990):</strong> ≈ <span class="hi">'+Bw_sal.toFixed(4)+' RB/STB</span> at '+sal.toLocaleString()+' ppm TDS'
     +'</div>';
 
   document.getElementById('r4').innerHTML=html;
@@ -1066,12 +1034,12 @@ function calcPhase(){
 
   // Fluid classification
   var fluidType,fluidColor,fluidDesc;
-  if(GOR<200){fluidType='Black Oil';fluidColor='#AA3300';}
-  else if(GOR<500){fluidType='Low-Shrinkage Oil';fluidColor='#CC6600';}
-  else if(GOR<3300){fluidType='Volatile Oil';fluidColor='#CC8800';}
-  else if(GOR<100000){fluidType='Gas Condensate';fluidColor='#2266EE';}
-  else if(GOR<300000){fluidType='Wet Gas';fluidColor='#5599FF';}
-  else{fluidType='Dry Gas';fluidColor='#88BBFF';}
+  // Initial producing GOR thresholds, McCain (1990), Petroleum Engineering Handbook / "The Properties of Petroleum Fluids"
+  if(GOR<1750){fluidType='Black Oil';fluidColor='#AA3300';}
+  else if(GOR<3200){fluidType='Volatile Oil';fluidColor='#CC8800';}
+  else if(GOR<15000){fluidType='Retrograde Gas (gas condensate)';fluidColor='#2266EE';}
+  else if(GOR<100000){fluidType='Wet Gas or lean condensate';fluidColor='#5599FF';}
+  else{fluidType='Dry Gas (likely)';fluidColor='#88BBFF';}
 
   var html='<div class="rgrid">';
   html+=rc('hl','Fluid type',fluidType,'-','Based on GOR = '+GOR.toLocaleString()+' scf/STB');
