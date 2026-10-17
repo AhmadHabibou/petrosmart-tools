@@ -314,7 +314,7 @@ select option{background:#111;}
   <div class="card">
     <div class="stitle">/// cetane number estimator from molecular composition</div>
     <div class="ibox">
-      <strong>Cetane Number (CN) vs Cetane Index (CI):</strong> CN is measured by ASTM D613 engine test (expensive, ~$2,000/test). CI is calculated from distillation and density data per ASTM D976 or D4737 and correlates well with CN for conventional petroleum diesel (±2 CN units typically). CI cannot be used for oxygenated fuels (biodiesel, alcohols) or additized fuels.
+      <strong>Cetane Number (CN) vs Cetane Index (CI):</strong> CN is measured by the ASTM D613 engine test. CI is calculated from distillation and density data per ASTM D976 or D4737 and approximates CN for conventional petroleum diesel. CI cannot be used for oxygenated fuels (biodiesel, alcohols) or additized fuels.
     </div>
     <div class="stitle">/// molecular class composition (% vol)</div>
     <div class="row3">
@@ -354,12 +354,16 @@ select option{background:#111;}
   <div class="card">
     <div class="stitle">/// diesel blend cetane index calculator (up to 4 components)</div>
     <div class="ibox">
-      <strong>Blending rule:</strong> Cetane Index blends approximately linearly by volume fraction. Cetane Improver additives (2-EHN, di-tert-butyl peroxide) can raise CN by 3-8 units at 0.1-0.5% dose. Biodiesel (FAME) has higher CI (~55-65) but lower energy density.
+      <strong>Blending rule:</strong> a linear volume average is an approximation; cetane number blending can deviate from linearity. A cetane improver raises the cetane number (ASTM D613) but not the calculated cetane index, which ASTM D4737 does not apply to fuels containing cetane improver. The improver response depends on the base fuel and must come from engine tests or supplier data.
     </div>
     <div id="blend-comps"></div>
     <div class="field" style="margin-top:10px;">
       <label class="lbl">Cetane improver additive (2-EHN equivalent)</label>
       <div class="ir"><input type="number" id="add-dose" value="0" step="0.05" min="0" max="1" oninput="calcBlend()"><span class="unit">% vol</span></div>
+    </div>
+    <div class="field" style="margin-top:10px;">
+      <label class="lbl">Measured cetane number gain at this dose (engine test or supplier data)</label>
+      <div class="ir"><input type="number" id="add-gain" value="0" step="0.5" min="0" oninput="calcBlend()"><span class="unit">CN units</span></div>
     </div>
     <div id="r3"></div>
   </div>
@@ -722,8 +726,8 @@ function calcBlend(){
     weightedCI+=c.ci*c.vol;
   });
   var addDose=psaNum('add-dose',0);
-  // Cetane improver effect: each 0.1% 2-EHN adds ~3-4 CI (diminishing returns)
-  var addEffect=addDose>0?Math.min(addDose*35*(1-addDose*0.5),8):0;
+  // Improver response is fuel-specific: the user enters the measured CN gain (no generic response curve is applied)
+  var addEffect=psaNum('add-gain',0);
   var blendCI=totalVol>0?weightedCI/totalVol:0;
   var finalCI=blendCI+addEffect;
 
@@ -734,9 +738,9 @@ function calcBlend(){
 
   html+='<div class="rgrid">';
   html+=rc('hl','Blend CI (volume-weighted)',blendCI.toFixed(2),'-','Before additive');
-  html+=rc('hl','Final CI (with improver)',finalCI.toFixed(2),'-',addDose>0?'+'+addEffect.toFixed(1)+' from '+addDose+'% 2-EHN':'No additive');
+  html+=rc('hl','Estimated CN with improver',finalCI.toFixed(2),'-',addEffect>0?'blend value + '+addEffect.toFixed(1)+' measured gain':'No improver gain entered');
   html+=rc(finalCI>=51?'ok':finalCI>=46?'wn':'er','EN 590 CN compliance',finalCI>=51?'PASS':finalCI>=46?'CI OK / CN test req.':'FAIL','-',finalCI>=51?'CI ≥ 46, CN likely ≥ 51':'Below EN 590 requirements');
-  html+=rc('','Additive CI boost',addEffect.toFixed(1),'CI units',addDose>0?addDose+'% 2-EHN equivalent':'0% additive dose');
+  html+=rc('','Improver CN gain (input)',addEffect.toFixed(1),'CN units',addDose+'% dose');
   html+='</div>';
 
   html+='<div class="fbox">'
