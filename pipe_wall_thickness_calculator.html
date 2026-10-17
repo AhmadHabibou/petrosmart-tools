@@ -201,14 +201,14 @@ select option{background:#111;}
   <div class="card">
     <div class="stitle">/// material selection</div>
     <div class="mat-btns" id="mat-btns">
-      <button class="mbtn on" onclick="setMat('a106b',241,'A106 Gr.B CS')">A106 Gr.B</button>
-      <button class="mbtn" onclick="setMat('a53b',207,'A53 Gr.B CS')">A53 Gr.B</button>
-      <button class="mbtn" onclick="setMat('api5lx52',358,'API 5L X52')">API 5L X52</button>
-      <button class="mbtn" onclick="setMat('api5lx65',448,'API 5L X65')">API 5L X65</button>
-      <button class="mbtn" onclick="setMat('api5lx70',482,'API 5L X70')">API 5L X70</button>
+      <button class="mbtn on" onclick="setMat('a106b',138,'A106 Gr.B CS')">A106 Gr.B</button>
+      <button class="mbtn" onclick="setMat('a53b',138,'A53 Gr.B CS')">A53 Gr.B</button>
+      <button class="mbtn" onclick="setMat('api5lx52',152,'API 5L X52')">API 5L X52</button>
+      <button class="mbtn" onclick="setMat('api5lx65',177,'API 5L X65')">API 5L X65</button>
+      <button class="mbtn" onclick="setMat('api5lx70',188,'API 5L X70')">API 5L X70</button>
       <button class="mbtn" onclick="setMat('304ss',138,'304 SS')">304 SS</button>
       <button class="mbtn" onclick="setMat('316ss',138,'316 SS')">316 SS</button>
-      <button class="mbtn" onclick="setMat('duplex',450,'Duplex 2205')">Duplex 2205</button>
+      <button class="mbtn" onclick="setMat('duplex',207,'Duplex 2205')">Duplex 2205</button>
       <button class="mbtn" onclick="setMat('custom',0,'Custom')">Custom</button>
     </div>
 
@@ -223,8 +223,8 @@ select option{background:#111;}
         <div class="ir"><input type="number" id="OD" value="168.3" step="0.1" oninput="calc1()"><span class="unit">mm</span></div>
       </div>
       <div class="field">
-        <label class="lbl">Allowable stress S</label>
-        <div class="ir"><input type="number" id="S" value="241" step="1" oninput="calc1()"><span class="unit">MPa</span></div>
+        <label class="lbl">Allowable stress S (B31.3 Table A-1 at design temperature)</label>
+        <div class="ir"><input type="number" id="S" value="138" step="1" oninput="calc1()"><span class="unit">MPa</span></div>
       </div>
     </div>
     <div class="row3">
@@ -299,8 +299,8 @@ select option{background:#111;}
     </div>
     <div class="row3">
       <div class="field">
-        <label class="lbl">Allowable stress S</label>
-        <div class="ir"><input type="number" id="p2_S" value="241" step="1" oninput="calc2()"><span class="unit">MPa</span></div>
+        <label class="lbl">Allowable stress S (B31.3 Table A-1 at design temperature)</label>
+        <div class="ir"><input type="number" id="p2_S" value="138" step="1" oninput="calc2()"><span class="unit">MPa</span></div>
       </div>
       <div class="field">
         <label class="lbl">Quality factor E</label>
@@ -460,23 +460,27 @@ select option{background:#111;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 /* ====== DATA ====== */
+/* S = basic allowable stress at ambient temperature per ASME B31.3 para. 302.3.2: lower of SMTS/3 and 2/3 SMYS (MPa).
+   Values must be checked against Table A-1 at the design temperature. */
 var materials=[
-  {mat:'Carbon steel',grade:'ASTM A106 Gr.B',smys:241,smts:414,S:241,Tmax:450,app:'General piping, oil & gas'},
-  {mat:'Carbon steel',grade:'ASTM A53 Gr.B',smys:241,smts:414,S:207,Tmax:370,app:'Standard pipelines'},
-  {mat:'Carbon steel',grade:'API 5L Gr.B',smys:241,smts:414,S:241,Tmax:400,app:'Oil and gas pipelines'},
-  {mat:'HSLA steel',grade:'API 5L X42',smys:290,smts:414,S:290,Tmax:400,app:'Cross-country pipelines'},
-  {mat:'HSLA steel',grade:'API 5L X52',smys:358,smts:455,S:358,Tmax:400,app:'High pressure pipelines'},
-  {mat:'HSLA steel',grade:'API 5L X60',smys:413,smts:517,S:413,Tmax:400,app:'Long distance gas'},
-  {mat:'HSLA steel',grade:'API 5L X65',smys:448,smts:531,S:448,Tmax:400,app:'Offshore pipelines'},
-  {mat:'HSLA steel',grade:'API 5L X70',smys:482,smts:565,S:482,Tmax:400,app:'HPHT applications'},
-  {mat:'Stainless steel',grade:'ASTM A312 TP304',smys:206,smts:515,S:138,Tmax:815,app:'Corrosive service, chemical'},
-  {mat:'Stainless steel',grade:'ASTM A312 TP316',smys:206,smts:515,S:138,Tmax:815,app:'Chloride environments'},
-  {mat:'Stainless steel',grade:'ASTM A312 TP316L',smys:170,smts:485,S:115,Tmax:815,app:'Low temp, cryogenic'},
-  {mat:'Duplex SS',grade:'SAF 2205',smys:450,smts:620,S:300,Tmax:300,app:'Sour service, offshore'},
-  {mat:'Duplex SS',grade:'Super Duplex 2507',smys:550,smts:750,S:367,Tmax:260,app:'HPHT sour, deepwater'},
-  {mat:'Nickel alloy',grade:'Alloy 625 (N06625)',smys:275,smts:690,S:183,Tmax:815,app:'Subsea, extreme corrosion'},
-  {mat:'Carbon steel',grade:'ASTM A333 Gr.6 (LT)',smys:241,smts:414,S:241,Tmax:null,app:'Low temperature service'},
+  {mat:'Carbon steel',grade:'ASTM A106 Gr.B',smys:241,smts:414,S:138,Tmax:null,app:'General process piping'},
+  {mat:'Carbon steel',grade:'ASTM A53 Gr.B',smys:241,smts:414,S:138,Tmax:null,app:'General piping (E = 0.85 if ERW)'},
+  {mat:'Carbon steel',grade:'API 5L Gr.B',smys:241,smts:414,S:138,Tmax:null,app:'Line pipe used in plant piping'},
+  {mat:'HSLA steel',grade:'API 5L X42',smys:290,smts:414,S:138,Tmax:null,app:'Line pipe'},
+  {mat:'HSLA steel',grade:'API 5L X52',smys:359,smts:455,S:152,Tmax:null,app:'Line pipe'},
+  {mat:'HSLA steel',grade:'API 5L X60',smys:414,smts:517,S:172,Tmax:null,app:'Line pipe'},
+  {mat:'HSLA steel',grade:'API 5L X65',smys:448,smts:531,S:177,Tmax:null,app:'Line pipe'},
+  {mat:'HSLA steel',grade:'API 5L X70',smys:483,smts:565,S:188,Tmax:null,app:'Line pipe'},
+  {mat:'Stainless steel',grade:'ASTM A312 TP304',smys:207,smts:517,S:138,Tmax:null,app:'Corrosive service'},
+  {mat:'Stainless steel',grade:'ASTM A312 TP316',smys:207,smts:517,S:138,Tmax:null,app:'Chloride-bearing service'},
+  {mat:'Stainless steel',grade:'ASTM A312 TP316L',smys:172,smts:483,S:115,Tmax:null,app:'Welded corrosive service'},
+  {mat:'Duplex SS',grade:'ASTM A790 S31803 (2205)',smys:448,smts:621,S:207,Tmax:null,app:'Chlorides, offshore'},
+  {mat:'Super duplex SS',grade:'ASTM A790 S32750 (2507)',smys:552,smts:800,S:267,Tmax:null,app:'Seawater, offshore'},
+  {mat:'Nickel alloy',grade:'Alloy 625 (N06625) Gr.2',smys:276,smts:690,S:184,Tmax:null,app:'Severe corrosion'},
+  {mat:'Carbon steel',grade:'ASTM A333 Gr.6 (LT)',smys:241,smts:414,S:138,Tmax:null,app:'Low temperature service'},
 ];
 
 /* NPS data: OD (mm) + schedules {name, t} */
@@ -489,14 +493,14 @@ var npsData={
   3:{OD:88.9,schs:[{n:'Sch 40',t:5.49},{n:'Sch 80',t:7.62},{n:'Sch 160',t:11.13},{n:'XXS',t:15.24}]},
   4:{OD:114.3,schs:[{n:'Sch 40',t:6.02},{n:'Sch 80',t:8.56},{n:'Sch 120',t:11.13},{n:'Sch 160',t:13.49},{n:'XXS',t:17.12}]},
   6:{OD:168.3,schs:[{n:'Sch 40',t:7.11},{n:'Sch 80',t:10.97},{n:'Sch 120',t:14.27},{n:'Sch 160',t:18.26},{n:'XXS',t:21.95}]},
-  8:{OD:219.1,schs:[{n:'Sch 40',t:8.18},{n:'Sch 80',t:12.70},{n:'Sch 120',t:15.09},{n:'Sch 160',t:20.62},{n:'XXS',t:22.23}]},
-  10:{OD:273.1,schs:[{n:'Sch 40',t:9.27},{n:'Sch 80',t:12.70},{n:'Sch 100',t:15.09},{n:'Sch 120',t:18.26},{n:'Sch 160',t:21.44}]},
-  12:{OD:323.8,schs:[{n:'Sch 40',t:9.53},{n:'Sch 80',t:12.70},{n:'Sch 120',t:17.48},{n:'Sch 160',t:21.44},{n:'XXS',t:25.40}]},
-  14:{OD:355.6,schs:[{n:'Sch 20',t:7.92},{n:'Sch 40',t:9.53},{n:'Sch 80',t:12.70},{n:'Sch 120',t:19.05},{n:'Sch 160',t:23.83}]},
-  16:{OD:406.4,schs:[{n:'Sch 20',t:7.92},{n:'Sch 40',t:9.53},{n:'Sch 80',t:12.70},{n:'Sch 120',t:19.05},{n:'Sch 160',t:26.19}]},
-  18:{OD:457.2,schs:[{n:'Sch 20',t:7.92},{n:'Sch 40',t:9.53},{n:'Sch 80',t:12.70},{n:'Sch 120',t:19.05},{n:'Sch 160',t:29.36}]},
-  20:{OD:508.0,schs:[{n:'Sch 20',t:9.53},{n:'Sch 40',t:9.53},{n:'Sch 60',t:12.70},{n:'Sch 80',t:15.09},{n:'Sch 120',t:20.62}]},
-  24:{OD:609.6,schs:[{n:'Sch 20',t:9.53},{n:'Sch 30',t:9.53},{n:'Sch 40',t:9.53},{n:'Sch 60',t:14.27},{n:'Sch 80',t:17.48},{n:'Sch 120',t:24.61}]},
+  8:{OD:219.1,schs:[{n:'Sch 40',t:8.18},{n:'Sch 60',t:10.31},{n:'Sch 80',t:12.70},{n:'Sch 100',t:15.09},{n:'Sch 120',t:18.26},{n:'Sch 140',t:20.62},{n:'XXS',t:22.23},{n:'Sch 160',t:23.01}]},
+  10:{OD:273.1,schs:[{n:'Sch 40',t:9.27},{n:'Sch 60',t:12.70},{n:'Sch 80',t:15.09},{n:'Sch 100',t:18.26},{n:'Sch 120',t:21.44},{n:'Sch 140',t:25.40},{n:'Sch 160',t:28.58}]},
+  12:{OD:323.8,schs:[{n:'STD',t:9.53},{n:'Sch 40',t:10.31},{n:'XS',t:12.70},{n:'Sch 60',t:14.27},{n:'Sch 80',t:17.48},{n:'Sch 100',t:21.44},{n:'Sch 120',t:25.40},{n:'Sch 140',t:28.58},{n:'Sch 160',t:33.32}]},
+  14:{OD:355.6,schs:[{n:'Sch 20',t:7.92},{n:'Sch 30',t:9.53},{n:'Sch 40',t:11.13},{n:'XS',t:12.70},{n:'Sch 60',t:15.09},{n:'Sch 80',t:19.05},{n:'Sch 100',t:23.83},{n:'Sch 120',t:27.79},{n:'Sch 140',t:31.75},{n:'Sch 160',t:35.71}]},
+  16:{OD:406.4,schs:[{n:'Sch 20',t:7.92},{n:'Sch 30',t:9.53},{n:'Sch 40',t:12.70},{n:'Sch 60',t:16.66},{n:'Sch 80',t:21.44},{n:'Sch 100',t:26.19},{n:'Sch 120',t:30.96},{n:'Sch 140',t:36.53},{n:'Sch 160',t:40.49}]},
+  18:{OD:457.2,schs:[{n:'Sch 20',t:7.92},{n:'Sch 30',t:11.13},{n:'XS',t:12.70},{n:'Sch 40',t:14.27},{n:'Sch 60',t:19.05},{n:'Sch 80',t:23.83},{n:'Sch 100',t:29.36},{n:'Sch 120',t:34.93},{n:'Sch 140',t:39.67},{n:'Sch 160',t:45.24}]},
+  20:{OD:508.0,schs:[{n:'Sch 20',t:9.53},{n:'Sch 30',t:12.70},{n:'Sch 40',t:15.09},{n:'Sch 60',t:20.62},{n:'Sch 80',t:26.19},{n:'Sch 100',t:32.54},{n:'Sch 120',t:38.10},{n:'Sch 140',t:44.45},{n:'Sch 160',t:50.01}]},
+  24:{OD:609.6,schs:[{n:'Sch 20',t:9.53},{n:'XS',t:12.70},{n:'Sch 30',t:14.27},{n:'Sch 40',t:17.48},{n:'Sch 60',t:24.61},{n:'Sch 80',t:30.96},{n:'Sch 100',t:38.89},{n:'Sch 120',t:46.02},{n:'Sch 140',t:52.37},{n:'Sch 160',t:59.54}]},
 };
 
 /* ====== UTILS ====== */
@@ -528,14 +532,14 @@ function setMat(id,S,name){
 
 /* ====== PANEL 1: B31.3 DESIGN ====== */
 function calc1(){
-  var P_bar=+document.getElementById('P').value||100;
-  var OD=+document.getElementById('OD').value||168.3;
-  var S=+document.getElementById('S').value||241;
-  var E=+document.getElementById('E').value||1.0;
-  var W=+document.getElementById('W').value||1.0;
-  var Y=+document.getElementById('Y').value||0.4;
-  var c=+document.getElementById('c1').value||3;
-  var mill=+document.getElementById('mill').value||12.5;
+  var P_bar=psaNum('P',100);
+  var OD=psaNum('OD',168.3);
+  var S=psaNum('S',138);
+  var E=psaNum('E',1.0);
+  var W=psaNum('W',1.0);
+  var Y=psaNum('Y',0.4);
+  var c=psaNum('c1',3);
+  var mill=psaNum('mill',12.5);
 
   var P=barToMPa(P_bar); // MPa
 
@@ -595,26 +599,12 @@ function calc1(){
     rows+=ar('ok','Schedule selection appropriate ('+thick_ratio.toFixed(0)+'% utilized)','Required wall '+t_required.toFixed(2)+'mm uses '+thick_ratio.toFixed(0)+'% of selected '+t_nom.n+' wall ('+t_nom.t+'mm). The '+((t_nom.t-t_required)).toFixed(2)+'mm margin provides adequate buffer against mill tolerance and localized corrosion.','');
   }
 
-  // Pressure class guidance
-  if(P_bar<=20){
-    rows+=ar('ok','Low design pressure ('+P_bar+' bar) - Cl. 150 flanges adequate','Pressure is in ASME Class 150 flange range. Standard carbon steel flanges, gaskets and fittings are adequate. No special pressure containment concerns. Corrosion ('+c+'mm) likely governs over pressure.','Verify corrosion allowance is appropriate for the fluid. For petroleum service with H2S or CO2, increase to 3-6mm and specify inhibited service or CRA-lined pipe for high-risk zones.');
-  } else if(P_bar<=50){
-    rows+=ar('ok','Medium design pressure ('+P_bar+' bar) - Cl. 300/600 flanges','Pressure requires Class 300-600 ASME flanges. Standard pipe schedules available for all common sizes. ERW pipe with E=0.85 may be adequate if weld quality is verified.','Specify hydrostatic test at 1.5x design pressure ('+Math.round(P_bar*1.5)+' bar) per ASME B31.3. For corrosive service, use seamless pipe (E=1.0) to avoid weld seam corrosion issues.');
-  } else if(P_bar<=200){
-    rows+=ar('wn','High design pressure ('+P_bar+' bar) - Cl. 900/1500 flanges required','Design pressure requires ASME Class 900 or 1500 flanges. Thick-wall schedules (Sch 80-160) likely required. Stress analysis per ASME B31.3 Appendix D mandatory. D/R = '+DR.toFixed(1)+' - '+( DR<=20?'thick wall Lamé equations apply':'thin wall approximation valid')+'.','For high-pressure petroleum service: specify NACE MR0175/ISO 15156 for sour service (H2S > 0.0003 MPa partial pressure). Require full radiography (RT) on all butt welds. Material certification to EN 10204 Type 3.2 for critical service.');
-  } else {
-    rows+=ar('er','Very high design pressure ('+P_bar+' bar) - HPHT engineering required','Pressure above 200 bar requires specialized HPHT design. ASME Class 2500 flanges minimum. Thick wall piping with D/R < 10 likely required. Full Lamé stress analysis essential. Third-party verification mandatory.','Engage specialist HPHT piping engineer. Design per ASME VIII Div 2 rules if pressure x diameter > 3500 bar.mm. Specify hydrogen embrittlement testing for high-strength steel (SMYS > 690 MPa). Consider forged fittings only - no fabricated fittings at this pressure class.');
-  }
-
-  // Corrosion
-  if(c>=6){
-    rows+=ar('wn','High corrosion allowance ('+c+'mm) - verify adequacy','A '+c+'mm corrosion allowance suggests aggressive service. Verify this is based on actual corrosion rate data. At typical oil and gas corrosion rate of 0.1-0.5 mm/year, '+c+'mm provides '+Math.round(c/0.3)+' years design life.','Implement online corrosion monitoring (Microcor or UT thickness probes). Consider glass-reinforced epoxy (GRE) or CRA-clad pipe for highly corrosive service instead of carbon steel with heavy corrosion allowance. Calculate inspection interval: T_inspect = c/2 / corrosion_rate.');
-  } else if(c<1.5){
-    rows+=ar('info','Low corrosion allowance ('+c+'mm) - verify fluid service','Only '+c+'mm corrosion allowance. This may be insufficient for petroleum service with CO2 or H2S which can cause 0.5-2 mm/year corrosion in untreated conditions.','Verify fluid is dry gas, treated crude, or a non-corrosive service. If water-containing service, increase to 3mm minimum. For sour service, 3-6mm is industry standard. Specify corrosion inhibitor injection for wet gas or water-cut crude service.');
-  } else {
-    rows+=ar('ok','Standard corrosion allowance ('+c+'mm)','The '+c+'mm corrosion allowance is in the standard range (1.5-3mm) for general oil and gas service with corrosion inhibitor treatment. Design life ≈ '+Math.round(c/0.2)+' years at typical 0.2mm/year treated service corrosion rate.','');
-  }
-
+  // Flange class: ASME B16.5 Group 1.1 (A105 / A216 WCB) ratings at 38 °C; ratings fall with temperature
+  var cls=[[150,19.6],[300,51.1],[600,102.1],[900,153.2],[1500,255.3],[2500,425.5]], fc=null;
+  for(var ci=0;ci<cls.length;ci++){if(P_bar<=cls[ci][1]){fc=cls[ci];break;}}
+  rows+=ar(fc?'info':'er',fc?('Lowest ASME B16.5 class at 38 °C: Class '+fc[0]+' ('+fc[1]+' bar)'):'Design pressure above Class 2500 rating at 38 °C','Group 1.1 carbon steel ratings at ambient temperature. At higher temperature or for other material groups, read the rating table of ASME B16.5 for the actual group and temperature.','');
+  // Corrosion allowance
+  rows+=ar('info','Corrosion allowance '+c+' mm','The allowance should be the expected corrosion rate times the design life, from measured or modelled rates for this fluid. Design life = '+c+' mm / rate (mm/yr).','');
   html+='<div class="analysis"><div class="atitle">/// DESIGN ANALYSIS AND ENGINEERING GUIDANCE</div>'+rows+'</div>';
   document.getElementById('r1').innerHTML=html;
 
@@ -649,13 +639,13 @@ function drawPipeSVG(OD,t_nom,t_req){
 
 /* ====== PANEL 2: PRESSURE RATING ====== */
 function calc2(){
-  var OD=+document.getElementById('p2_OD').value||168.3;
-  var t=+document.getElementById('p2_t').value||7.11;
-  var c=+document.getElementById('p2_c').value||3;
-  var S=+document.getElementById('p2_S').value||241;
-  var E=+document.getElementById('p2_E').value||1.0;
-  var mill=+document.getElementById('p2_mill').value||12.5;
-  var Pop_bar=+document.getElementById('p2_Pop').value||80;
+  var OD=psaNum('p2_OD',168.3);
+  var t=psaNum('p2_t',7.11);
+  var c=psaNum('p2_c',3);
+  var S=psaNum('p2_S',138);
+  var E=psaNum('p2_E',1.0);
+  var mill=psaNum('p2_mill',12.5);
+  var Pop_bar=psaNum('p2_Pop',80);
 
   var Y=0.4;
   var t_actual=t*(1-mill/100); // after mill tolerance
@@ -708,12 +698,12 @@ function calc2(){
 
 /* ====== PANEL 3: HOOP STRESS ====== */
 function calc3(){
-  var OD=+document.getElementById('h_OD').value||168.3;
-  var t=+document.getElementById('h_t').value||7.11;
-  var P_bar=+document.getElementById('h_P').value||100;
-  var SMYS=+document.getElementById('h_SMYS').value||241;
-  var F=+document.getElementById('h_F').value||0; // kN
-  var df=+document.getElementById('h_df').value||0.72;
+  var OD=psaNum('h_OD',168.3);
+  var t=psaNum('h_t',7.11);
+  var P_bar=psaNum('h_P',100);
+  var SMYS=psaNum('h_SMYS',241);
+  var F=psaNum('h_F',0); // kN
+  var df=psaNum('h_df',0.72);
 
   var P=barToMPa(P_bar); // MPa
   var ro=OD/2;
@@ -789,8 +779,8 @@ function calc3(){
 
 /* ====== PANEL 4: SCHEDULE SELECTOR ====== */
 function calcSch(){
-  var nps=+document.getElementById('nps-sel').value||6;
-  var S=+document.getElementById('sch-S').value||241;
+  var nps=psaNum('nps-sel',6);
+  var S=psaNum('sch-S',241);
   var data=npsData[nps];
   if(!data){document.getElementById('r4').innerHTML='<div class="alert a-wn">NPS not found in database.</div>';return;}
 
@@ -838,7 +828,7 @@ function buildMatTable(){
       +'<td>'+m.smys+'</td>'
       +'<td>'+m.smts+'</td>'
       +'<td class="tw">'+m.S+'</td>'
-      +'<td>'+(m.Tmax||'varies')+'</td>'
+      +'<td>see B31.3 Table A-1</td>'
       +'<td>'+m.app+'</td>'
     +'</tr>';
   }).join('');

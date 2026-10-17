@@ -474,6 +474,8 @@ select option{background:#1A1A1A;}
 </div><!-- end wrap -->
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 /* ===================== DATA ===================== */
 var fluids=[
   {name:'Fresh water',rho:1000,notes:'Standard reference'},
@@ -535,11 +537,11 @@ function setFluid(id,rho,name){
 
 /* ===================== PANEL 1 ===================== */
 function calc1(){
-  var rho=+document.getElementById('rho1').value||1000;
-  var h=+document.getElementById('h1').value||100;
-  var p0=+document.getElementById('p01').value||0;
-  var g=+document.getElementById('g1').value||9.81;
-  var dia=+document.getElementById('dia1').value||0.20;
+  var rho=psaNum('rho1',1000);
+  var h=psaNum('h1',100);
+  var p0=psaNum('p01',0);
+  var g=psaNum('g1',9.81);
+  var dia=psaNum('dia1',0.20);
 
   var P_Pa=rho*g*h;
   var P_bar=P_Pa/100000+p0;
@@ -673,7 +675,7 @@ function removeLayer(){
 }
 
 function calcMulti(){
-  var p0=+document.getElementById('p0multi').value||0;
+  var p0=psaNum('p0multi',0);
   var P=p0;
   var totalH=0;
   var rows='<div style="margin-top:14px;">';
@@ -734,14 +736,14 @@ function calcMulti(){
 
 /* ===================== PANEL 3: WELLBORE ===================== */
 function calcWell(){
-  var TVD=+document.getElementById('tvd').value||3000;
-  var mud=+document.getElementById('mud_rho').value||1300;
-  var scp=+document.getElementById('scp').value||0;
-  var Pf=+document.getElementById('Pf').value||380;
-  var apl=+document.getElementById('apl').value||25;
-  var frac=+document.getElementById('frac').value||0.18;
-  var ppg=+document.getElementById('ppg').value||0.105;
-  var shoe=+document.getElementById('shoe').value||1500;
+  var TVD=psaNum('tvd',3000);
+  var mud=psaNum('mud_rho',1300);
+  var scp=psaNum('scp',0);
+  var Pf=psaNum('Pf',380);
+  var apl=psaNum('apl',25);
+  var frac=psaNum('frac',0.18);
+  var ppg=psaNum('ppg',0.105);
+  var shoe=psaNum('shoe',1500);
 
   // BHP (static)
   var BHP_static=mud*9.81*TVD/100000+scp;
@@ -822,7 +824,7 @@ function calcWell(){
 var toBar={bar:1,psi:0.0689476,kPa:0.01,MPa:10,atm:1.01325,Pa:1e-5,kg_cm2:0.980665,mH2O:0.0980665,mmHg:0.00133322,inHg:0.033864,ppg:0.163};
 
 function calcConv(){
-  var val=+document.getElementById('pconv').value||100;
+  var val=psaNum('pconv',100);
   var unit=document.getElementById('unit-in').value;
   var inBar=val*(toBar[unit]||1);
 
@@ -848,8 +850,8 @@ function calcConv(){
 }
 
 function calcDensConv(){
-  var rho=+document.getElementById('mud-dens').value||1300;
-  var h=+document.getElementById('mud-depth').value||1000;
+  var rho=psaNum('mud-dens',1300);
+  var h=psaNum('mud-depth',1000);
   var P_bar=rho*9.81*h/100000;
   var SG=rho/1000;
   var grad_bar=rhoToGrad(rho);
