@@ -894,7 +894,7 @@ function updateComparison(){
   var elPrices=[20,30,40,50,60,70,80];
   // Grey LCOH vs NG price (simplified)
   var greyLCOH=ngPrices.map(function(ng){
-    return (ng*3.4*0.03412/H2_kg_per_Nm3+(lastSMR.capex||0.2)+(lastSMR.om||0.1)-(lastSMR.steam||0));
+    return (ng*psaNum('ng-cons',0.41)*0.03412/H2_kg_per_Nm3+(lastSMR.capex||0.2)+(lastSMR.om||0.1)+(lastSMR.steam||0));
   });
   // Green LCOH vs electricity price
   var greenLCOH=elPrices.map(function(el){
