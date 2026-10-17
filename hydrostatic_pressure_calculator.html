@@ -574,26 +574,19 @@ function calc1(){
   // Analysis
   var rows='';
 
-  // Classify pressure level
-  if(P_bar<10){
-    rows+=ar('ok','Low pressure regime (<10 bar)','At '+P_bar.toFixed(2)+' bar, this is a low-pressure application. Standard carbon steel piping (ASME B31.3 Class 150/300) is adequate. No special pressure containment design required.','Use Schedule 40 carbon steel pipe or standard PVC for ambient-temperature water service. Minimum design pressure should be 1.5x operating pressure per ASME B31.3.');
-  } else if(P_bar<70){
-    rows+=ar('ok','Medium pressure regime (10-70 bar)','At '+P_bar.toFixed(2)+' bar, this is a medium-pressure application. Class 300-600 flanges, ASME B31.3 Schedule 80-160 piping required. Typical for production manifolds and surface pipelines.','Verify pipe wall thickness: t_min = P.D / (2.S.E) where S = allowable stress. For API 5L Grade B (S=241 MPa), minimum wall = '+((P_bar*100000*dia)/(2*241e6*1000)).toFixed(1)+' mm for '+dia*1000+'mm ID.');
-  } else if(P_bar<350){
-    rows+=ar('wn','High pressure regime (70-350 bar)','At '+P_bar.toFixed(2)+' bar, this is a high-pressure application. ASME Class 1500-2500 flanges, special material selection (NACE MR0175 for sour service), rigorous pressure testing required.','Pressure test at 1.5x MAWP minimum. For subsea applications at this pressure, use DNV-ST-F101 standard for pipeline design. Specify corrosion allowance of 3-6mm for petroleum service.');
-  } else {
-    rows+=ar('er','Very high / HPHT regime (>350 bar)','At '+P_bar.toFixed(2)+' bar, this is an HPHT (High Pressure, High Temperature) application. Special HPHT wellhead, BOP stack design required. API 17TR8 / API 16A Class 15000 equipment minimum.','HPHT wells require specialized well integrity management. All barriers must be dual-verified per API RP 65-2. BOP pressure rating must exceed '+P_bar.toFixed(0)+' bar with 25% safety margin.');
+  // Pressure level: equipment selection depends on the applicable code (ASME B31.3, B16.5, API 6A); no class is inferred here
+  if(P_bar>=689.5){
+    rows+=ar('wn','Pressure at or above 10,000 psi (689.5 bar)','Together with a temperature above 300 °F (149 °C) this falls in the HPHT range defined by API TR 17TR8.','');
   }
-
   // Density analysis
   if(rho>1800){
-    rows+=ar('wn','Very high fluid density ('+rho+' kg/m3)','This density corresponds to '+SG.toFixed(2)+' SG, typical of heavy cement slurry or maximum-weight drilling mud. At this density, formation fracture risk exists if applied in a shallow-cased section.','Check fracture gradient before applying this mud weight. Typical fracture gradient in Cameroon/Central Africa basins: 0.155-0.165 bar/m. Equivalent mud weight at '+h+'m: '+rho.toFixed(0)+' kg/m3. Calculate LOT (Leak-Off Test) pressure before increasing mud weight above 1.6 SG.');
+    rows+=ar('wn','Very high fluid density ('+rho+' kg/m3)','This density corresponds to '+SG.toFixed(2)+' SG, typical of heavy cement slurry or maximum-weight drilling mud. At this density, formation fracture risk exists if applied in a shallow-cased section.','Compare with the fracture gradient measured by leak-off or formation integrity test at the last casing shoe.');
   } else if(rho<900&&rho>700){
     rows+=ar('info','Light oil or solvent density ('+rho+' kg/m3)','This density corresponds to '+SG.toFixed(2)+' SG, typical of light crude oil ('+((141.5/SG)-131.5).toFixed(0)+'°API), diesel, or condensate. Hydrostatic pressure is '+((1000-rho)/1000*100).toFixed(0)+'% lower than water at the same depth.','For oil columns in reservoirs, remember the oil-water contact: hydrostatic pressure from oil column is LESS than water leg. This creates the buoyancy force that drives oil to surface. Oil-water contact depth calculation: h_owc = (P_aquifer - P_res) / ((rho_w - rho_o) x g)');
   }
 
   // Force analysis
-  rows+=ar('info','Hydraulic force on pipe cross-section ('+dia*1000+' mm ID)','At '+P_bar.toFixed(2)+' bar, the net axial force on the pipe cross-section (area = '+area.toFixed(4)+' m2) is '+force.toFixed(1)+' kN. This is the end-cap effect force that every pressure vessel must resist.','This '+force.toFixed(0)+' kN axial force governs flange bolt sizing. Using ASME PCC-1 / ASME VIII: Number of M24 bolts required at '+P_bar.toFixed(0)+' bar: approximately '+Math.ceil(force*1000/(145*354)).toLocaleString()+' bolts (Grade 8.8, 50% proof load). Always verify with full ASME bolted flange calculation.');
+  rows+=ar('info','Pressure end force on the bore ('+dia*1000+' mm ID)','At '+P_bar.toFixed(2)+' bar on '+area.toFixed(4)+' m2 the end force is '+force.toFixed(1)+' kN. Flange bolting must be checked with ASME Section VIII Appendix 2 or ASME B16.5 rated flanges, not from this figure alone.','');
 
   html+='<div class="analysis"><div class="atitle">/// ANALYSIS AND ENGINEERING IMPLICATIONS</div>'+rows+'</div>';
   document.getElementById('r1').innerHTML=html;
@@ -813,7 +806,7 @@ function calcWell(){
 
   // Kill mud
   if(KMW>mud*1.15){
-    rows+=ar('wn','Significant kill mud weight increase required','Kill mud weight ('+KMW.toFixed(0)+' kg/m3) is '+(KMW-mud).toFixed(0)+' kg/m3 above current mud weight ('+mud+' kg/m3). This is a '+((KMW-mud)/mud*100).toFixed(0)+'% increase. Time and volume required to weight up must be planned.','Weight-up rate: mixing +0.1 SG typically requires 5-10 bbl barite/bbl mud increase. Volume to kill: strokes to bit x pump output. Ensure barite supply on hand: approx '+(Math.round((KMW-mud)*0.5)).toLocaleString()+' kg barite per m3 of mud to add '+(KMW-mud).toFixed(0)+' kg/m3.');
+    rows+=ar('wn','Significant kill mud weight increase required','Kill mud weight ('+KMW.toFixed(0)+' kg/m3) is '+(KMW-mud).toFixed(0)+' kg/m3 above current mud weight ('+mud+' kg/m3). This is a '+((KMW-mud)/mud*100).toFixed(0)+'% increase. Time and volume required to weight up must be planned.','Barite needed (SG 4.20, API 13A minimum): '+Math.round(4200*(KMW-mud)/(4200-KMW)).toLocaleString()+' kg per m3 of initial mud, from m = 4200 (rho2 - rho1)/(4200 - rho2), before any volume increase is removed.');
   }
 
   html+='<div class="analysis"><div class="atitle">/// WELLBORE PRESSURE ANALYSIS</div>'+rows+'</div>';
