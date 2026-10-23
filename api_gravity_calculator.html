@@ -82,12 +82,12 @@ tr:hover td{background:#1A1A1A;cursor:pointer;}
         <div class="track"><div class="marker" id="mk" style="left:50%"></div></div>
         <div class="scale">
           <span>Extra-heavy (&lt;10)</span>
-          <span>Heavy (10-25)</span>
-          <span>Medium (25-35)</span>
-          <span>Light (&gt;35)</span>
+          <span>Heavy (10-22.3)</span>
+          <span>Medium (22.3-31.1)</span>
+          <span>Light (&gt;31.1)</span>
         </div>
       </div>
-      <div class="formula"><strong>Formula:</strong> API = 141.5 / SG - 131.5</div>
+      <div class="formula"><strong>Formula:</strong> API = 141.5 / SG - 131.5 (SG at 60 °F). Classes: light &gt; 31.1, medium 22.3 to 31.1, heavy 10 to 22.3, extra-heavy &lt; 10 °API (heavy and extra-heavy limits from the 1987 World Petroleum Congress; the 31.1 °API light/medium boundary is a common convention, not a standard).</div>
     </div>
 
     <!-- Panel 2 -->
@@ -145,6 +145,8 @@ tr:hover td{background:#1A1A1A;cursor:pointer;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 var crudes=[
   {n:'Brent',o:'North Sea',a:38.3},
   {n:'WTI',o:'USA',a:39.6},
@@ -159,9 +161,9 @@ var crudes=[
 function toSG(a){return 141.5/(a+131.5);}
 function toAPI(s){return (141.5/s)-131.5;}
 function cls(a){
-  if(a>35)return{l:'Light',c:'#00CC66',b:'rgba(0,204,102,0.15)'};
-  if(a>25)return{l:'Medium',c:'#FFA500',b:'rgba(255,165,0,0.15)'};
-  if(a>10)return{l:'Heavy',c:'#FF4444',b:'rgba(204,0,0,0.15)'};
+  if(a>31.1)return{l:'Light',c:'#00CC66',b:'rgba(0,204,102,0.15)'};
+  if(a>22.3)return{l:'Medium',c:'#FFA500',b:'rgba(255,165,0,0.15)'};
+  if(a>=10)return{l:'Heavy',c:'#FF4444',b:'rgba(204,0,0,0.15)'};
   return{l:'Extra-heavy',c:'#FF6666',b:'rgba(120,0,0,0.2)'};
 }
 function mkpct(a){return((Math.max(1,Math.min(70,a))-1)/69*100).toFixed(1)+'%';}
@@ -196,7 +198,7 @@ function c2(){
 
 function c3(){
   var a=parseFloat(document.getElementById('apm').value);
-  var v=parseFloat(document.getElementById('vol').value)||1;
+  var v=psaNum('vol',1);
   if(isNaN(a)||a<1)return;
   var s=toSG(a),cl2=cls(a),mbb=s*158.99,tot=mbb*v;
   document.getElementById('r3').innerHTML=

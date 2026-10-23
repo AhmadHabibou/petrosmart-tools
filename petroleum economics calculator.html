@@ -209,27 +209,27 @@ select option{background:#0A0A14;}
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-icon">💰</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>Petroleum Project Economics Calculator</h1>
     <p>NPV · IRR · Payback · WACC · Decline Curve · Capital Allocation · Portfolio Ranking</p>
   </div>
   <div class="hdr-kpis">
-    <div class="kpi-pill"><div class="kpi-val" id="hdr-npv">—</div><div class="kpi-lbl">Portfolio NPV</div></div>
-    <div class="kpi-pill"><div class="kpi-val" id="hdr-irr">—</div><div class="kpi-lbl">Best IRR</div></div>
+    <div class="kpi-pill"><div class="kpi-val" id="hdr-npv">-</div><div class="kpi-lbl">Portfolio NPV</div></div>
+    <div class="kpi-pill"><div class="kpi-val" id="hdr-irr">-</div><div class="kpi-lbl">Best IRR</div></div>
     <div class="kpi-pill"><div class="kpi-val" id="hdr-n">0</div><div class="kpi-lbl">Projects</div></div>
   </div>
 </div>
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab on" id="t1" onclick="sw(1)">📋 Projects Input</button>
-  <button class="tab" id="t2" onclick="sw(2)">📈 NPV and IRR</button>
-  <button class="tab" id="t3" onclick="sw(3)">📉 Decline Curve</button>
-  <button class="tab" id="t4" onclick="sw(4)">⚖️ WACC</button>
-  <button class="tab" id="t5" onclick="sw(5)">🏆 Portfolio Ranking</button>
-  <button class="tab" id="t6" onclick="sw(6)">💵 Capital Allocation</button>
-  <button class="tab" id="t7" onclick="sw(7)">📚 Reference</button>
+  <button class="tab on" id="t1" onclick="sw(1)"> Projects Input</button>
+  <button class="tab" id="t2" onclick="sw(2)"> NPV and IRR</button>
+  <button class="tab" id="t3" onclick="sw(3)"> Decline Curve</button>
+  <button class="tab" id="t4" onclick="sw(4)"> WACC</button>
+  <button class="tab" id="t5" onclick="sw(5)"> Portfolio Ranking</button>
+  <button class="tab" id="t6" onclick="sw(6)"> Capital Allocation</button>
+  <button class="tab" id="t7" onclick="sw(7)"> Reference</button>
 </div>
 
 <!-- ===== PANEL 1: PROJECTS INPUT ===== -->
@@ -265,7 +265,7 @@ select option{background:#0A0A14;}
     <div style="text-align:center;margin-top:8px;">
       <button onclick="calcAll()" style="background:var(--gold);color:#000;border:none;border-radius:10px;
         padding:10px 32px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);">
-        ⚡ CALCULATE ALL PROJECTS
+         CALCULATE ALL PROJECTS
       </button>
     </div>
   </div>
@@ -307,7 +307,7 @@ select option{background:#0A0A14;}
   <div class="card gold-accent">
     <div class="stitle gold">/// decline curve analysis - Arps equation</div>
     <div class="ibox">
-      <strong>Arps (1945):</strong> q(t) = qi / (1 + b×Di×t)^(1/b) — Exponential (b=0), Hyperbolic (0&lt;b&lt;1), Harmonic (b=1). Used to forecast production and calculate EUR (Estimated Ultimate Recovery) for economic limit analysis.
+      <strong>Arps (1945):</strong> q(t) = qi / (1 + b×Di×t)^(1/b) - Exponential (b=0), Hyperbolic (0&lt;b&lt;1), Harmonic (b=1). Used to forecast production and calculate EUR (Estimated Ultimate Recovery) for economic limit analysis.
     </div>
     <div class="row3">
       <div class="field">
@@ -392,7 +392,7 @@ select option{background:#0A0A14;}
     </div>
     <div id="r4"></div>
     <div class="chart-wrap">
-      <div class="chart-title">WACC sensitivity — NPV vs discount rate</div>
+      <div class="chart-title">WACC sensitivity - NPV vs discount rate</div>
       <canvas id="waccChart" height="190"></canvas>
     </div>
   </div>
@@ -401,9 +401,9 @@ select option{background:#0A0A14;}
 <!-- ===== PANEL 5: PORTFOLIO RANKING ===== -->
 <div class="panel" id="p5">
   <div class="card gold-accent">
-    <div class="stitle gold">/// portfolio ranking — all projects</div>
+    <div class="stitle gold">/// portfolio ranking - all projects</div>
     <div class="ibox">
-      Projects are ranked by <strong>NPV/Investment ratio</strong> (Profitability Index PI) — the preferred metric for capital-constrained ranking per <strong>SPE-PRMS</strong> and IOC portfolio standards. Secondary rank by IRR. Budget constraint applied to select optimal project mix.
+      Projects are ranked by <strong>NPV/Investment ratio</strong> (Profitability Index PI) - the preferred metric for capital-constrained ranking per <strong>SPE-PRMS</strong> and IOC portfolio standards. Secondary rank by IRR. Budget constraint applied to select optimal project mix.
     </div>
     <div class="row2">
       <div class="field">
@@ -426,7 +426,7 @@ select option{background:#0A0A14;}
 <!-- ===== PANEL 6: CAPITAL ALLOCATION ===== -->
 <div class="panel" id="p6">
   <div class="card gold-accent">
-    <div class="stitle gold">/// capital allocation — optimised portfolio selection</div>
+    <div class="stitle gold">/// capital allocation - optimised portfolio selection</div>
     <div class="ibox">
       <strong>Capital allocation:</strong> Given a budget constraint, select the combination of projects that maximises total NPV (0/1 knapsack or fractional). Includes sensitivity analysis: how much additional NPV per additional M USD of budget.
     </div>
@@ -469,9 +469,9 @@ select option{background:#0A0A14;}
       <strong>Arps decline (exponential b=0):</strong> q(t) = qi × exp(−Di×t)<br>
       <strong>EUR (exponential):</strong> EUR = qi / Di × (1 − exp(−Di×t_aban))<br>
       <strong>EUR (hyperbolic):</strong> EUR = (qi^b / ((1−b)×Di)) × (qi^(1−b) − qmin^(1−b))<br>
-      <strong>Economic limit:</strong> q_EL = OPEX / (Price × (1 − Royalty − Tax))<br>
-      <strong>Revenue CF:</strong> CF = Q×Price×(1−Royalty) − OPEX − CapexMaintenance − Taxes<br>
-      <strong>Govt take:</strong> GovernmentTake = (Royalty + TaxOnProfit) × Gross Revenue<br>
+      <strong>Economic limit:</strong> q_EL = OPEX / (Price × (1 − Royalty)); a profit tax does not move the limit<br>
+      <strong>Cash flow:</strong> CF = Q×Price×(1−Royalty) − OPEX − CAPEX − Tax; Tax = rate × (net revenue − OPEX − depreciation), losses carried forward<br>
+      <strong>Government take:</strong> (royalty + profit tax) / (gross revenue − CAPEX − OPEX), undiscounted, over field life<br>
       <strong>EMV (Expected Monetary Value):</strong> EMV = Psucc×NPV_success − Pfail×|NPV_failure|<br>
       <strong>Sensitivity:</strong> ΔNPV/ΔPrice = Σ [Q_t×(1−Royalty)×(1−Tax) / (1+r)^t]
     </div>
@@ -490,11 +490,13 @@ select option{background:#0A0A14;}
 
 <div class="foot">
   <a href="https://www.petrosmartacademy.com" target="_blank">petrosmartacademy.com</a>
-  · SPE-PRMS / Arps 1945 / CAPM Sharpe 1964 · For educational use — verify with qualified petroleum economist
+  · SPE-PRMS / Arps 1945 / CAPM Sharpe 1964 · For educational use - verify with qualified petroleum economist
 </div>
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 // ─── GLOBAL STATE ──────────────────────────────────────────────────────────
 var N_PROJ = 3;
 var projects = [];  // computed results
@@ -535,7 +537,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',gold:'d-gold',green:'d-green'}[type]||'d-gold';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 function fmt(v,dec){
   dec=dec===undefined?1:dec;
@@ -567,7 +569,8 @@ function genCashflows(p, oil_price, life){
   cfs.push(-capex_split);
   var capex_yr1 = p.capex * 0.4;
   // Years 1..life
-  var b=0.5, Di=0.20; // default decline params
+  var b=0.5, Di=0.20; // default decline params (assumption)
+  var lossCF=0;
   for(var t=1;t<=life;t++){
     var q_annual_bbl;
     if(t===1){
@@ -591,9 +594,13 @@ function genCashflows(p, oil_price, life){
     var royalty_cost = revenue * (p.royalty/100);
     var net_revenue = revenue - royalty_cost;
     var opex = p.opex_annual * 1e6; // M USD → USD
-    var ebitda = net_revenue - opex - capex_this2*1e6;
-    var tax = Math.max(0, ebitda * (p.tax/100));
-    var cf_net = (ebitda - tax) / 1e6; // M USD
+    // Tax: straight-line depreciation of the total CAPEX over 5 years from first production (assumption),
+    // losses carried forward without limit (assumption); fiscal terms vary by country and contract
+    var deprec = t<=5 ? p.capex*1e6/5 : 0;
+    var taxable = net_revenue - opex - deprec + lossCF;
+    var tax = 0;
+    if(taxable<0){ lossCF = taxable; } else { tax = taxable*(p.tax/100); lossCF = 0; }
+    var cf_net = (net_revenue - opex - capex_this2*1e6 - tax) / 1e6; // M USD
     cfs.push(cf_net);
   }
   return cfs;
@@ -643,8 +650,8 @@ function buildProjectCards(){
 
 // ─── CALC ALL PROJECTS ──────────────────────────────────────────────────────
 function calcAll(){
-  var rate = (parseFloat(document.getElementById('wacc_default').value)||12)/100;
-  var oil_price = parseFloat(document.getElementById('oil_price').value)||75;
+  var rate = (psaNum('wacc_default',12))/100;
+  var oil_price = psaNum('oil_price',75);
   var life = 15;
   projects = [];
 
@@ -682,7 +689,7 @@ function calcAll(){
   var total_npv = projects.reduce(function(s,p){return s+p.npv;},0);
   var best_irr = Math.max.apply(null, projects.filter(function(p){return p.irr;}).map(function(p){return p.irr;}));
   document.getElementById('hdr-npv').textContent = fmtM(total_npv);
-  document.getElementById('hdr-irr').textContent = best_irr>0?best_irr.toFixed(1)+'%':'—';
+  document.getElementById('hdr-irr').textContent = best_irr>0?best_irr.toFixed(1)+'%':'-';
   document.getElementById('hdr-n').textContent = N_PROJ;
 
   // Refresh NPV selector
@@ -703,12 +710,12 @@ function buildNPVDetail(){
 
 function calcNPVDetail(){
   var idx = parseInt(document.getElementById('npv_proj_sel').value)||0;
-  var rate = (parseFloat(document.getElementById('npv_rate').value)||12)/100;
+  var rate = (psaNum('npv_rate',12))/100;
   var life = parseInt(document.getElementById('npv_life').value)||15;
   var proj = projects[idx];
   if(!proj){return;}
 
-  var oil_price = parseFloat(document.getElementById('oil_price').value)||75;
+  var oil_price = psaNum('oil_price',75);
   var cfs = genCashflows(proj.p, oil_price, life);
   cashflows[idx] = cfs;
 
@@ -753,8 +760,8 @@ function calcNPVDetail(){
   html+='</div>';
 
   // Decision badge
-  var dec_class = npv>50&&irr&&irr>15?'dec-go':npv>0&&irr&&irr>10?'dec-caution':'dec-no';
-  var dec_text = npv>50&&irr&&irr>15?'✅ GO — Economically attractive':npv>0?'⚠️ BORDERLINE — Review assumptions':'❌ NO-GO — Value destroying at these parameters';
+  var dec_class = npv>0?'dec-go':'dec-no';
+  var dec_text = npv>0?'NPV positive at the '+(rate*100).toFixed(1)+'% discount rate':'NPV negative at the '+(rate*100).toFixed(1)+'% discount rate';
   html+=`<div class="dec-badge ${dec_class}">${dec_text}</div>`;
 
   html+='<div class="fbox">'
@@ -765,22 +772,22 @@ function calcNPVDetail(){
 
   var rows='';
   if(npv<0){
-    rows+=ar('er','Negative NPV ('+fmtM(npv)+') — project destroys value at '+( rate*100).toFixed(0)+'% WACC',
+    rows+=ar('er','Negative NPV ('+fmtM(npv)+') - project destroys value at '+( rate*100).toFixed(0)+'% WACC',
       'At the current discount rate, the project does not recover its cost of capital. Present value of cash inflows is less than CAPEX.',
       'Levers to improve NPV: (1) Reduce CAPEX by 10-15% through value engineering. (2) Increase initial rate qi via hydraulic fracturing or ESP optimization. (3) Negotiate lower royalty rate. (4) Apply for tax incentives / fiscal stabilization. (5) Find a lower-cost-of-capital partner (farm-out).');
   } else if(irr && irr < rate*100){
-    rows+=ar('wn','IRR ('+irr.toFixed(1)+'%) below WACC ('+(rate*100).toFixed(0)+'%) — thin margin',
+    rows+=ar('wn','IRR ('+irr.toFixed(1)+'%) below WACC ('+(rate*100).toFixed(0)+'%) - thin margin',
       'Project has positive NPV at the selected rate but IRR is below WACC. This is only possible if the rate used for NPV < IRR. Check consistency.',
       '');
   }
   if(pb>0&&pb>10){
     rows+=ar('wn','Long payback period ('+pb+' years)',
       'Payback beyond 10 years exposes the project to significant oil price and political risk. Investors may require higher return to compensate.',
-      'Strategies to accelerate payback: (1) Phased development — smaller first phase recovers early cash. (2) Optimize plateau rate upward (more wells). (3) Pre-sell production (offtake agreement) to improve early cash flow certainty.');
+      'Strategies to accelerate payback: (1) Phased development - smaller first phase recovers early cash. (2) Optimize plateau rate upward (more wells). (3) Pre-sell production (offtake agreement) to improve early cash flow certainty.');
   }
   if(!rows) rows=ar('ok','Project economics acceptable','NPV '+fmtM(npv)+' | IRR '+(irr?irr.toFixed(1)+'%':'N/A')+' | PI '+pi.toFixed(2)+' | Payback '+pb+' years. All key metrics indicate value creation at '+(rate*100).toFixed(0)+'% discount rate.','');
 
-  html+='<div class="analysis"><div class="atitle">/// NPV AND IRR ANALYSIS — '+proj.name.toUpperCase()+'</div>'+rows+'</div>';
+  html+='<div class="analysis"><div class="atitle">/// NPV AND IRR ANALYSIS - '+proj.name.toUpperCase()+'</div>'+rows+'</div>';
   document.getElementById('r2').innerHTML=html;
 
   // NPV chart
@@ -810,12 +817,12 @@ function calcNPVDetail(){
 
 // ─── PANEL 3: DECLINE CURVE ─────────────────────────────────────────────────
 function calcDecline(){
-  var qi = parseFloat(document.getElementById('dc_qi').value)||5000;
+  var qi = psaNum('dc_qi',5000);
   var Di = parseFloat(document.getElementById('dc_Di').value)/100||0.25;
-  var b  = parseFloat(document.getElementById('dc_b').value)||0.5;
-  var qmin = parseFloat(document.getElementById('dc_qmin').value)||50;
-  var price = parseFloat(document.getElementById('dc_price').value)||75;
-  var opex_bbl = parseFloat(document.getElementById('dc_opex').value)||18;
+  var b  = psaNum('dc_b',0.5);
+  var qmin = psaNum('dc_qmin',50);
+  var price = psaNum('dc_price',75);
+  var opex_bbl = psaNum('dc_opex',18);
 
   var years=[], q_pts=[], cum_pts=[], rev_pts=[];
   var cum=0, t_aban=-1, EUR=0;
@@ -881,14 +888,14 @@ function calcDecline(){
 
 // ─── PANEL 4: WACC ──────────────────────────────────────────────────────────
 function calcWACC(){
-  var E = parseFloat(document.getElementById('w_E').value)||60;
-  var D = parseFloat(document.getElementById('w_D').value)||40;
-  var Rd = parseFloat(document.getElementById('w_Rd').value)||7;
-  var tax = parseFloat(document.getElementById('w_tax').value)||30;
-  var Rf = parseFloat(document.getElementById('w_Rf').value)||4.5;
-  var ERP = parseFloat(document.getElementById('w_ERP').value)||5.5;
-  var beta = parseFloat(document.getElementById('w_beta').value)||1.15;
-  var CRP = parseFloat(document.getElementById('w_CRP').value)||2.0;
+  var E = psaNum('w_E',60);
+  var D = psaNum('w_D',40);
+  var Rd = psaNum('w_Rd',7);
+  var tax = psaNum('w_tax',30);
+  var Rf = psaNum('w_Rf',4.5);
+  var ERP = psaNum('w_ERP',5.5);
+  var beta = psaNum('w_beta',1.15);
+  var CRP = psaNum('w_CRP',2.0);
 
   var Re = Rf + beta*ERP + CRP;
   var Rd_AT = Rd*(1-tax/100);
@@ -951,8 +958,8 @@ function calcWACC(){
 
 // ─── PANEL 5: PORTFOLIO RANKING ──────────────────────────────────────────────
 function calcRanking(){
-  var budget = parseFloat(document.getElementById('budget').value)||500;
-  var hurdle = parseFloat(document.getElementById('hurdle').value)||15;
+  var budget = psaNum('budget',500);
+  var hurdle = psaNum('hurdle',15);
 
   if(projects.length===0){document.getElementById('r5').innerHTML='<div class="ibox">Calculate projects first (Tab 1).</div>';return;}
 
@@ -964,7 +971,7 @@ function calcRanking(){
     +'<th>Payback (yr)</th><th>Hurdle</th><th>Status</th>'
     +'</tr></thead><tbody>';
 
-  var ranks=['🥇','🥈','🥉'];
+  var ranks=['','',''];
   sorted.forEach(function(p,idx){
     var go = p.npv>0 && p.irr && p.irr>hurdle;
     var rankClass = idx<3?'rank-'+(idx+1):'';
@@ -976,7 +983,7 @@ function calcRanking(){
       <td class="${p.irr&&p.irr>hurdle?'tpos':'tneg'}">${p.irr?p.irr.toFixed(1)+'%':'N/A'}</td>
       <td class="${p.pi>1.2?'tpos':p.pi>1?'':'tneg'}">${p.pi.toFixed(3)}</td>
       <td style="font-family:var(--mono);">${p.pb>0?p.pb:'N/A'}</td>
-      <td style="color:${go?'var(--ok)':'var(--err)'};font-weight:700;">${go?'✅ Pass':'❌ Fail'}</td>
+      <td style="color:${go?'var(--ok)':'var(--err)'};font-weight:700;">${go?' Pass':' Fail'}</td>
       <td style="color:${go?'var(--ok)':'var(--warn)'};font-weight:700;">${go?'GO':'REVIEW'}</td>
     </tr>`;
   });
@@ -1020,9 +1027,9 @@ function calcRanking(){
 
 // ─── PANEL 6: CAPITAL ALLOCATION ────────────────────────────────────────────
 function calcAlloc(){
-  var budget = parseFloat(document.getElementById('alloc_budget').value)||500;
-  var npv_min = parseFloat(document.getElementById('alloc_npv_min').value)||0;
-  var irr_min = parseFloat(document.getElementById('alloc_irr_min').value)||12;
+  var budget = psaNum('alloc_budget',500);
+  var npv_min = psaNum('alloc_npv_min',0);
+  var irr_min = psaNum('alloc_irr_min',12);
 
   if(projects.length===0){document.getElementById('r6').innerHTML='<div class="ibox">Calculate projects first (Tab 1).</div>';return;}
 
@@ -1063,7 +1070,7 @@ function calcAlloc(){
   html+=rc('','Projects deferred/rejected',not_selected.length,'',not_selected.map(function(p){return p.name;}).join(', ')||'None');
   html+='</div>';
 
-  html+='<div class="analysis"><div class="atitle">/// CAPITAL ALLOCATION — OPTIMAL PORTFOLIO</div>';
+  html+='<div class="analysis"><div class="atitle">/// CAPITAL ALLOCATION - OPTIMAL PORTFOLIO</div>';
   html+=ar('gold','Optimal selection via 0/1 Knapsack algorithm',
     'Selected: '+selected_alloc.map(function(p){return p.name+' (CAPEX $'+p.capex+'M, NPV $'+p.npv.toFixed(0)+'M, PI '+p.pi.toFixed(2)+')'}).join(' | ')+'.',
     'Budget remaining: $'+(budget-used_cap).toFixed(0)+'M. Consider: (1) Partial investment (farm-down) in next-ranked project. (2) Phased development to fit within budget. (3) Project finance / reserve-based lending (RBL) to increase effective budget.');

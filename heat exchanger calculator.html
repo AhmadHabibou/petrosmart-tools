@@ -177,7 +177,7 @@ select option{background:#0A0A12;}
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-icon">🔥</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>Heat Exchanger Calculator</h1>
     <p>LMTD method - NTU-effectiveness - Fouling - Shell and tube / Plate</p>
@@ -190,12 +190,12 @@ select option{background:#0A0A12;}
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab on" id="t1" onclick="sw(1)">🌡️ LMTD Method</button>
-  <button class="tab" id="t2" onclick="sw(2)">📊 NTU-Effectiveness</button>
-  <button class="tab" id="t3" onclick="sw(3)">⚗️ Fouling Analysis</button>
-  <button class="tab" id="t4" onclick="sw(4)">🔧 Shell and Tube</button>
-  <button class="tab" id="t5" onclick="sw(5)">📋 Plate HX</button>
-  <button class="tab" id="t6" onclick="sw(6)">📚 Reference</button>
+  <button class="tab on" id="t1" onclick="sw(1)"> LMTD Method</button>
+  <button class="tab" id="t2" onclick="sw(2)"> NTU-Effectiveness</button>
+  <button class="tab" id="t3" onclick="sw(3)"> Fouling Analysis</button>
+  <button class="tab" id="t4" onclick="sw(4)"> Shell and Tube</button>
+  <button class="tab" id="t5" onclick="sw(5)"> Plate HX</button>
+  <button class="tab" id="t6" onclick="sw(6)"> Reference</button>
 </div>
 
 <!-- ===== PANEL 1: LMTD METHOD ===== -->
@@ -204,7 +204,7 @@ select option{background:#0A0A12;}
     <div class="stitle hot">/// heat exchanger type</div>
     <div class="hx-types">
       <div class="hxbtn on" id="hx-counter" onclick="setHX('counter')">
-        <div class="hxbtn-icon">↔️</div>
+        <div class="hxbtn-icon">↔</div>
         <div class="hxbtn-name">Counter-flow</div>
         <div class="hxbtn-desc">Most efficient</div>
       </div>
@@ -214,12 +214,12 @@ select option{background:#0A0A12;}
         <div class="hxbtn-desc">Co-current</div>
       </div>
       <div class="hxbtn" id="hx-shell" onclick="setHX('shell')">
-        <div class="hxbtn-icon">🏭</div>
+        <div class="hxbtn-icon"></div>
         <div class="hxbtn-name">Shell & Tube</div>
         <div class="hxbtn-desc">1-2 pass</div>
       </div>
       <div class="hxbtn" id="hx-cross" onclick="setHX('cross')">
-        <div class="hxbtn-icon">✚</div>
+        <div class="hxbtn-icon"></div>
         <div class="hxbtn-name">Cross flow</div>
         <div class="hxbtn-desc">Unmixed</div>
       </div>
@@ -625,6 +625,8 @@ select option{background:#0A0A12;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 var lmtdChart=null, ntuChart=null, foulChart=null;
 var hxType='counter';
 
@@ -646,7 +648,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',hot:'d-hot',cold:'d-cold'}[type]||'d-hot';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 
 function setHX(type){
@@ -658,18 +660,32 @@ function setHX(type){
 }
 
 /* ====== PANEL 1: LMTD ====== */
+/* LMTD correction factor for N shell passes and 2N or more tube passes (Bowman, Mueller and Nagle, 1940;
+   form as in Kern, Process Heat Transfer, and the TEMA standards). P = (t2 - t1)/(T1 - t1), R = (T1 - T2)/(t2 - t1). */
+function psaF12(P,R){
+  if(Math.abs(R-1)<1e-6){var r2=Math.SQRT2;return r2*P/((1-P)*Math.log((2-P*(2-r2))/(2-P*(2+r2))));}
+  var S=Math.sqrt(R*R+1), num=S*Math.log((1-P)/(1-R*P)), den=(R-1)*Math.log((2-P*(R+1-S))/(2-P*(R+1+S)));
+  return num/den;
+}
+function psaFshell(P,R,N){
+  N=N||1; if(N===1) return psaF12(P,R);
+  var P1;
+  if(Math.abs(R-1)<1e-6){P1=P/(N-N*P+P);}
+  else {var X=Math.pow((1-P*R)/(1-P),1/N); P1=(X-1)/(X-R);}
+  return psaF12(P1,R);
+}
 function calcLMTD(){
-  var T1=parseFloat(document.getElementById('T1').value)||180;
-  var T2=parseFloat(document.getElementById('T2').value)||100;
-  var mh=parseFloat(document.getElementById('mh').value)||10;
-  var Cph=parseFloat(document.getElementById('Cph').value)||2200;
-  var Rh=parseFloat(document.getElementById('Rh').value)||0.0002;
-  var t1=parseFloat(document.getElementById('t1').value)||30;
-  var t2=parseFloat(document.getElementById('t2').value)||90;
-  var mc=parseFloat(document.getElementById('mc').value)||12;
-  var Cpc=parseFloat(document.getElementById('Cpc').value)||4182;
-  var Rc=parseFloat(document.getElementById('Rc').value)||0.0002;
-  var U_c=parseFloat(document.getElementById('U_clean').value)||800;
+  var T1=psaNum('T1',180);
+  var T2=psaNum('T2',100);
+  var mh=psaNum('mh',10);
+  var Cph=psaNum('Cph',2200);
+  var Rh=psaNum('Rh',0.0002);
+  var t1=psaNum('t1',30);
+  var t2=psaNum('t2',90);
+  var mc=psaNum('mc',12);
+  var Cpc=psaNum('Cpc',4182);
+  var Rc=psaNum('Rc',0.0002);
+  var U_c=psaNum('U_clean',800);
   var n_pass=parseInt(document.getElementById('n_pass').value)||1;
   var n_tube=parseInt(document.getElementById('n_tube').value)||2;
 
@@ -696,12 +712,7 @@ function calcLMTD(){
   var P=(t2-t1)/(T1-t1);
   var R=(T1-T2)/(t2-t1);
   var F=1.0;
-  if(hxType==='shell'&&n_pass>1){
-    var W=Math.pow((1-P*R)/(1-P),(1/n_pass));
-    var S=Math.sqrt(R*R+1);
-    F=S*Math.log(W)/(n_pass*(1-W)*(1-W*R)/(1-W)/(1-W*R)*Math.log((2/P-1-R+S*(1-P*R/P)/(1-R))/(2/P-1-R-S*(1-P*R/P)/(1-R))));
-    if(isNaN(F)||F<=0||F>1.1) F=0.95; // fallback
-  }
+  if(hxType==='shell'&&n_tube>=2){ F=psaFshell(P,R,n_pass); }
   var LMTD_eff=LMTD_cf*F;
 
   // U dirty
@@ -797,14 +808,14 @@ function drawTempProfile(T1,T2,t1,t2,type){
 
 /* ====== PANEL 2: NTU ====== */
 function calcNTU(){
-  var T1=parseFloat(document.getElementById('ntu_T1').value)||180;
-  var t1=parseFloat(document.getElementById('ntu_t1').value)||30;
-  var A=parseFloat(document.getElementById('ntu_A').value)||50;
-  var Cph=parseFloat(document.getElementById('ntu_Cph').value)||2200;
-  var Cpc=parseFloat(document.getElementById('ntu_Cpc').value)||4182;
-  var U=parseFloat(document.getElementById('ntu_U').value)||650;
-  var mh=parseFloat(document.getElementById('ntu_mh').value)||10;
-  var mc=parseFloat(document.getElementById('ntu_mc').value)||12;
+  var T1=psaNum('ntu_T1',180);
+  var t1=psaNum('ntu_t1',30);
+  var A=psaNum('ntu_A',50);
+  var Cph=psaNum('ntu_Cph',2200);
+  var Cpc=psaNum('ntu_Cpc',4182);
+  var U=psaNum('ntu_U',650);
+  var mh=psaNum('ntu_mh',10);
+  var mc=psaNum('ntu_mc',12);
   var flow=document.getElementById('ntu_flow').value;
 
   var Ch=mh*Cph;
@@ -901,14 +912,14 @@ function calcNTU(){
 
 /* ====== PANEL 3: FOULING ====== */
 function calcFoul(){
-  var Uc=parseFloat(document.getElementById('f_Uc').value)||800;
-  var Rh=parseFloat(document.getElementById('f_Rh').value)||0.0002;
-  var Rc=parseFloat(document.getElementById('f_Rc').value)||0.0002;
-  var wall_k=parseFloat(document.getElementById('f_wall_mat').value)||0.00003;
-  var tw=parseFloat(document.getElementById('f_tw').value)||3;
-  var A=parseFloat(document.getElementById('f_A').value)||50;
-  var rate=parseFloat(document.getElementById('f_rate').value)||0.00005;
-  var maxloss=parseFloat(document.getElementById('f_maxloss').value)||25;
+  var Uc=psaNum('f_Uc',800);
+  var Rh=psaNum('f_Rh',0.0002);
+  var Rc=psaNum('f_Rc',0.0002);
+  var wall_k=psaNum('f_wall_mat',0.00003);
+  var tw=psaNum('f_tw',3);
+  var A=psaNum('f_A',50);
+  var rate=psaNum('f_rate',0.00005);
+  var maxloss=psaNum('f_maxloss',25);
 
   var Rwall=wall_k*tw/1000; // if wall_k is k/thickness, else direct
   // Actually: Rwall = tw/k. k from selection = 0.00003 means tw=1mm/50W/m.K = 0.00002 m2K/W
@@ -985,15 +996,15 @@ function calcFoul(){
 
 /* ====== PANEL 4: SHELL AND TUBE ====== */
 function calcST(){
-  var Q=parseFloat(document.getElementById('st_Q').value)||1760; // kW
-  var LMTD=parseFloat(document.getElementById('st_LMTD').value)||52;
-  var U=parseFloat(document.getElementById('st_U').value)||650;
-  var do_mm=parseFloat(document.getElementById('st_do').value)||25;
-  var tw=parseFloat(document.getElementById('st_tw').value)||2;
-  var L=parseFloat(document.getElementById('st_L').value)||4.88;
-  var pt_mm=parseFloat(document.getElementById('st_pt').value)||32;
+  var Q=psaNum('st_Q',1760); // kW
+  var LMTD=psaNum('st_LMTD',52);
+  var U=psaNum('st_U',650);
+  var do_mm=psaNum('st_do',25);
+  var tw=psaNum('st_tw',2);
+  var L=psaNum('st_L',4.88);
+  var pt_mm=psaNum('st_pt',32);
   var layout=document.getElementById('st_layout').value;
-  var Bsp=parseFloat(document.getElementById('st_Bsp').value)||40;
+  var Bsp=psaNum('st_Bsp',40);
 
   var A_req=Q*1000/(U*LMTD); // m2
   var di_mm=do_mm-2*tw;
@@ -1084,15 +1095,15 @@ function drawTubeBundleSVG(Ds,do_mm,pt,Nt,layout){
 
 /* ====== PANEL 5: PLATE HX ====== */
 function calcPlate(){
-  var Q=parseFloat(document.getElementById('ph_Q').value)||1760; // kW
-  var LMTD=parseFloat(document.getElementById('ph_LMTD').value)||52;
-  var U=parseFloat(document.getElementById('ph_U').value)||4000;
-  var ap=parseFloat(document.getElementById('ph_ap').value)||0.5;
-  var gap=parseFloat(document.getElementById('ph_gap').value)||3; // mm
+  var Q=psaNum('ph_Q',1760); // kW
+  var LMTD=psaNum('ph_LMTD',52);
+  var U=psaNum('ph_U',4000);
+  var ap=psaNum('ph_ap',0.5);
+  var gap=psaNum('ph_gap',3); // mm
   var mat=document.getElementById('ph_mat').value;
-  var P=parseFloat(document.getElementById('ph_P').value)||10;
-  var mh=parseFloat(document.getElementById('ph_mh').value)||10;
-  var mc=parseFloat(document.getElementById('ph_mc').value)||12;
+  var P=psaNum('ph_P',10);
+  var mh=psaNum('ph_mh',10);
+  var mc=psaNum('ph_mc',12);
 
   var A_req=Q*1000/(U*LMTD);
   var N_plates=Math.ceil(A_req/ap)+2; // +2 for end plates

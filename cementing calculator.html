@@ -32,7 +32,7 @@ body::before{
   display:flex;align-items:center;gap:14px;
   box-shadow:0 0 50px rgba(200,169,110,0.05);position:relative;overflow:hidden;
 }
-.hdr::before{content:'🏗';position:absolute;right:20px;top:50%;transform:translateY(-50%);
+.hdr::before{content:'';position:absolute;right:20px;top:50%;transform:translateY(-50%);
   font-size:80px;opacity:0.04;pointer-events:none;}
 .hdr-icon{width:52px;height:52px;background:linear-gradient(135deg,var(--cement),var(--cement2));
   border-radius:14px;display:flex;align-items:center;justify-content:center;
@@ -178,7 +178,7 @@ select option{background:#0A0A12;}
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-icon">🏗️</div>
+  <div class="hdr-icon"></div>
   <div>
     <h1>Well Cementing Calculator</h1>
     <p>Primary cementing - slurry design, volume, pressure, ECD - API Class G/H cement</p>
@@ -191,12 +191,12 @@ select option{background:#0A0A12;}
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab on" id="t1" onclick="sw(1)">🧮 Slurry Design</button>
-  <button class="tab" id="t2" onclick="sw(2)">📐 Volume Calc.</button>
-  <button class="tab" id="t3" onclick="sw(3)">⚡ ECD and Pressure</button>
-  <button class="tab" id="t4" onclick="sw(4)">⏱️ Thickening Time</button>
-  <button class="tab" id="t5" onclick="sw(5)">🔬 Lab Data</button>
-  <button class="tab" id="t6" onclick="sw(6)">📚 API Reference</button>
+  <button class="tab on" id="t1" onclick="sw(1)"> Slurry Design</button>
+  <button class="tab" id="t2" onclick="sw(2)"> Volume Calc.</button>
+  <button class="tab" id="t3" onclick="sw(3)"> ECD and Pressure</button>
+  <button class="tab" id="t4" onclick="sw(4)"> Thickening Time</button>
+  <button class="tab" id="t5" onclick="sw(5)"> Lab Data</button>
+  <button class="tab" id="t6" onclick="sw(6)"> API Reference</button>
 </div>
 
 <!-- ===== PANEL 1: SLURRY DESIGN ===== -->
@@ -407,7 +407,7 @@ select option{background:#0A0A12;}
   <div class="card cement-accent">
     <div class="stitle">/// thickening time and safety factor</div>
     <div class="ibox">
-      <strong>Thickening time (TT):</strong> Time for cement slurry to reach 100 Bearden Consistency Units (Bc) at BHCT. Per API RP 10B-2, TT must be at least: Pumping time + 30 min safety margin. Pumping time = Total volume / pump rate.
+      <strong>Thickening time (TT):</strong> Time for cement slurry to reach 100 Bearden Consistency Units (Bc) at BHCT. API RP 10B-2 sets the test method; the margin over pumping time (30 min here) is an operator criterion. Pumping time = Total volume / pump rate.
     </div>
     <div class="row3">
       <div class="field">
@@ -533,14 +533,14 @@ select option{background:#0A0A12;}
     <table class="tbl">
       <thead><tr><th>Class</th><th>SG</th><th>w/c ratio</th><th>Slurry density (g/cm3)</th><th>Yield (L/sack)</th><th>Typical application</th></tr></thead>
       <tbody>
-        <tr><td class="tw">A</td><td>3.15</td><td>0.46</td><td>1.78</td><td>59.9</td><td>Surface casing, 0-1830m, no special conditions</td></tr>
-        <tr><td class="tw">B</td><td>3.14</td><td>0.46</td><td>1.78</td><td>59.7</td><td>Surface casing, moderate sulfate resistance</td></tr>
-        <tr><td class="tw">C</td><td>3.10</td><td>0.56</td><td>1.67</td><td>67.4</td><td>Early strength, shallow wells, large lost circ zones</td></tr>
-        <tr><td class="tw">D</td><td>3.14</td><td>0.38</td><td>1.97</td><td>53.8</td><td>Moderate HPHT, 1830-3050m</td></tr>
-        <tr><td class="tw">E</td><td>3.14</td><td>0.38</td><td>1.97</td><td>53.8</td><td>High temperature, 1830-4270m</td></tr>
-        <tr><td class="tw">F</td><td>3.14</td><td>0.38</td><td>1.97</td><td>53.8</td><td>HPHT, 3050-4880m</td></tr>
-        <tr><td class="tw">G</td><td>3.14</td><td>0.44</td><td>1.89</td><td>57.5</td><td>Universal (most widely used), 0-2440m base</td></tr>
-        <tr><td class="tw">H</td><td>3.18</td><td>0.38</td><td>1.97</td><td>53.5</td><td>HPHT with coarser grind, higher density</td></tr>
+        <tr><td class="tw">A</td><td>3.15</td><td>0.46</td><td>1.88</td><td>33.1</td><td>surface casing, 0 to 1,830 m (6,000 ft), no special properties</td></tr>
+        <tr><td class="tw">B</td><td>3.15</td><td>0.46</td><td>1.88</td><td>33.1</td><td>0 to 1,830 m, moderate or high sulfate resistance</td></tr>
+        <tr><td class="tw">C</td><td>3.15</td><td>0.56</td><td>1.78</td><td>37.4</td><td>0 to 1,830 m, high early strength</td></tr>
+        <tr><td class="tw">D</td><td>3.15</td><td>0.38</td><td>1.98</td><td>29.7</td><td>1,830 to 3,050 m, moderately high temperature and pressure</td></tr>
+        <tr><td class="tw">E</td><td>3.15</td><td>0.38</td><td>1.98</td><td>29.7</td><td>3,050 to 4,270 m, high temperature and pressure</td></tr>
+        <tr><td class="tw">F</td><td>3.15</td><td>0.38</td><td>1.98</td><td>29.7</td><td>3,050 to 4,880 m, extremely high temperature and pressure</td></tr>
+        <tr><td class="tw">G</td><td>3.15</td><td>0.44</td><td>1.90</td><td>32.3</td><td>basic well cement, 0 to 2,440 m as manufactured; used with additives over wide ranges</td></tr>
+        <tr><td class="tw">H</td><td>3.15</td><td>0.38</td><td>1.98</td><td>29.7</td><td>basic well cement, 0 to 2,440 m as manufactured; coarser grind</td></tr>
       </tbody>
     </table>
     <div class="sep"></div>
@@ -562,12 +562,12 @@ select option{background:#0A0A12;}
     <div class="stitle">/// cementing formulas reference</div>
     <div class="fbox">
       <strong>Slurry density (g/cm3):</strong> rho_s = (W_cement + W_water + W_additive) / (V_cement + V_water + V_additive)<br>
-      <strong>Yield (L/sack):</strong> Y = (m_water/rho_water + m_add/rho_add + m_cem/rho_cem) x 1000 (in liters)<br>
-      <strong>Annular volume:</strong> V_ann (L/m) = pi/4 x (D_oh^2 - D_cas^2) x excess / 1000000 (D in mm)<br>
+      <strong>Yield (L/sack):</strong> Y = m_cem/SG_cem + m_water/1.0 + m_add/SG_add, masses in kg per sack (94 lb = 42.64 kg)<br>
+      <strong>Annular capacity:</strong> V_ann (L/m) = pi/4 x (D_oh^2 - D_cas^2) x excess / 1000 (D in mm)<br>
       <strong>Casing internal volume:</strong> V_cas (L/m) = pi/4 x D_cas_ID^2 / 1000000 x 1000<br>
-      <strong>Hydrostatic pressure:</strong> P_hydro = rho x g x TVD / 100000 (bar)<br>
-      <strong>ECD:</strong> ECD (g/cm3) = mud_density + APL_bar x 100000 / (9.81 x TVD)<br>
-      <strong>Differential pressure (end of job):</strong> dP = (rho_cement - rho_disp) x 9.81 x cement_length / 100000 (bar)<br>
+      <strong>Hydrostatic pressure:</strong> P_hydro (bar) = rho (g/cm3) x 0.0980665 x TVD (m)<br>
+      <strong>Equivalent density:</strong> rho_eq (g/cm3) = P (bar) / (0.0980665 x TVD (m))<br>
+      <strong>Differential pressure (end of job):</strong> dP (bar) = (rho_cement - rho_disp) x 0.0980665 x cement_length (m), densities in g/cm3<br>
       <strong>Number of sacks:</strong> N_sacks = V_total (L) / Yield (L/sack)<br>
       <strong>Pump time (min):</strong> t = V_total (m3) / (Q_bbl_min x 0.158987)<br>
       <strong>Plastic viscosity (Fann):</strong> PV = R600 - R300 (mPa.s)<br>
@@ -586,6 +586,8 @@ select option{background:#0A0A12;}
 </div>
 
 <script>
+function psaNum(id,d){var e=document.getElementById(id);if(!e)return d;var v=parseFloat(String(e.value).replace(',','.'));return isNaN(v)?d:v;}
+
 var volChart=null,ecdChart=null,ttChart=null;
 
 /* ====== UTILS ====== */
@@ -603,7 +605,7 @@ function rc(cls,lbl,val,unit,sub){
 }
 function ar(type,title,body,sugg){
   var d={ok:'d-ok',wn:'d-wn',er:'d-er',cem:'d-cem',info:'d-info'}[type]||'d-cem';
-  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg">&#128161; '+sugg+'</div>':'')+' </div></div>';
+  return '<div class="arow"><div class="adot '+d+'"></div><div class="atxt"><strong>'+title+'</strong><p>'+body+'</p>'+(sugg?'<div class="asugg"> '+sugg+'</div>':'')+' </div></div>';
 }
 
 /* ====== CEMENT CLASS PRESETS ====== */
@@ -616,15 +618,19 @@ function setCement(cls,sg,wc100){
 }
 
 /* ====== PANEL 1: SLURRY DESIGN ====== */
+/* Absolute volume method: yield per sack (L) and density (g/cm3) from the slurry inputs */
+function psaSlurry(sg_c,wc,sg_add,add_pct,sack_lb){
+  var mc=100,mw=wc*100,ma=add_pct;var V=mc/sg_c+mw/1.0+ma/sg_add; // L per 100 kg cement
+  return {rho:(mc+mw+ma)/V,yieldSack:V*sack_lb*0.453592/100,kgSack:sack_lb*0.453592};}
 function calcSlurry(){
-  var sg_c=parseFloat(document.getElementById('sg-cem').value)||3.14;
-  var wc=parseFloat(document.getElementById('wc').value)||0.44;
-  var sg_add=parseFloat(document.getElementById('sg-add').value)||2.65;
-  var add_pct=parseFloat(document.getElementById('add-conc').value)||0;
-  var ret=parseFloat(document.getElementById('ret-dose').value)||0.3;
-  var disp=parseFloat(document.getElementById('disp-dose').value)||0.2;
-  var sack=parseFloat(document.getElementById('sack-wt').value)||94; // lbs
-  var bhct=parseFloat(document.getElementById('bhct').value)||80;
+  var sg_c=psaNum('sg-cem',3.14);
+  var wc=psaNum('wc',0.44);
+  var sg_add=psaNum('sg-add',2.65);
+  var add_pct=psaNum('add-conc',0);
+  var ret=psaNum('ret-dose',0.3);
+  var disp=psaNum('disp-dose',0.2);
+  var sack=psaNum('sack-wt',94); // lbs
+  var bhct=psaNum('bhct',80);
 
   // Per 100 kg cement (BWOC basis)
   var m_cem=100; // kg
@@ -652,8 +658,6 @@ function calcSlurry(){
   // Absolute volume method check
   var rho_check=(m_cem+m_water+m_add)/(V_total*1000);
 
-  // Estimated compressive strength at 24h (rough correlation with w/c)
-  var cs_24h=Math.max(0,(0.55-wc)*15000); // psi rough
   // Expected TT range based on BHCT and retarder
   var tt_est=2.5+bhct*0.02+ret*1.5;
 
@@ -662,8 +666,6 @@ function calcSlurry(){
   html+=rc('hl','Slurry yield',yield_sack.toFixed(1),'L/sack','Per '+sack+' lb sack ('+kg_per_sack.toFixed(1)+' kg)');
   html+=rc('','Water per sack',water_sack_L.toFixed(1),'L/sack','= '+(water_sack_L*0.2642).toFixed(2)+' US gal');
   html+=rc('','Mix water volume',(V_water/V_total*100).toFixed(1),'% vol','In slurry');
-  html+=rc('','Est. comp. strength 24h',Math.round(cs_24h),'psi','At BHST (rough estimate)');
-  html+=rc('','Est. thickening time',tt_est.toFixed(1),'hr','At BHCT='+bhct+'°C (estimate only)');
   html+=rc('','Cement volume fraction',(V_cem/V_total*100).toFixed(1),'% vol',sg_c+' SG cement');
   html+=rc('','Additive volume fraction',(V_add/V_total*100).toFixed(1),'% vol',add_pct+'% BWOC at SG '+sg_add);
   html+='</div>';
@@ -688,7 +690,7 @@ function calcSlurry(){
     rows+=ar('ok','Slurry density acceptable ('+rho_slurry.toFixed(3)+' g/cm3)','Slurry density is within the standard range (1.50-2.10 g/cm3) for API Class G cement. Standard Class G at normal w/c = 0.44 gives 1.89 g/cm3.','');
   }
   if(wc>0.55){
-    rows+=ar('wn','High water-cement ratio (w/c = '+wc+')','High w/c reduces compressive strength and increases permeability of set cement. At w/c = '+wc+', estimated 24h CS ≈ '+Math.round(cs_24h)+' psi, which may be below the 500 psi minimum for drill-out.','Maximum recommended w/c for Class G: 0.44 (API 10A). For extended slurries with bentonite pre-hydration, w/c up to 0.65 is acceptable. Add fluid loss additive to prevent water migration from high w/c slurries.');
+    rows+=ar('wn','High water-cement ratio (w/c = '+wc+')','High w/c reduces compressive strength and increases permeability of set cement. Compressive strength must be measured in the laboratory at well conditions.','Maximum recommended w/c for Class G: 0.44 (API 10A). For extended slurries with bentonite pre-hydration, w/c up to 0.65 is acceptable. Add fluid loss additive to prevent water migration from high w/c slurries.');
   }
   if(bhct>110&&add_pct<35){
     rows+=ar('wn','High BHCT ('+bhct+'°C) without silica - strength retrogression risk','Above 110°C, Portland cement undergoes mineralogical conversion (C-S-H to alpha-dicalcium silicate hydrate) causing strength retrogression and increased permeability. Long-term zonal isolation is compromised.','Add 35-40% BWOC silica flour (325 mesh) to all cement slurries for BHST > 110°C. Silica reacts with Ca(OH)2 to form tobermorite, which is stable at high temperature. Above 150°C BHST, use 35% silica sand (coarser) for better placement.');
@@ -744,87 +746,63 @@ function drawSlurryVis(rho,yield_s,wc,add){
 
 /* ====== PANEL 2: VOLUME ====== */
 function calcVol(){
-  var cas_od=parseFloat(document.getElementById('cas-od').value)||244.5; // mm
-  var cas_id=parseFloat(document.getElementById('cas-id').value)||220.5; // mm
-  var shoe_tvd=parseFloat(document.getElementById('shoe-tvd').value)||2500; // m
-  var toc=parseFloat(document.getElementById('toc').value)||1800; // m
-  var bit=parseFloat(document.getElementById('bit').value)||311.2; // mm
-  var excess=parseFloat(document.getElementById('excess').value)||1.35;
-  var prev_cas=parseFloat(document.getElementById('prev-cas').value)||0; // mm
-  var prev_shoe=parseFloat(document.getElementById('prev-shoe').value)||1500; // m
-  var rho=parseFloat(document.getElementById('vol-rho').value)||1.89;
-  var spacer=parseFloat(document.getElementById('spacer-vol').value)||5; // m3
-  var disp_rho=parseFloat(document.getElementById('disp-rho').value)||1.3;
+  var cas_od=psaNum('cas-od',244.5); // mm
+  var cas_id=psaNum('cas-id',220.5); // mm
+  var shoe_tvd=psaNum('shoe-tvd',2500); // m
+  var toc=psaNum('toc',1800); // m
+  var bit=psaNum('bit',311.2); // mm
+  var excess=psaNum('excess',1.35);
+  var prev_cas=psaNum('prev-cas',0); // mm
+  var prev_shoe=psaNum('prev-shoe',1500); // m
+  var rho=psaNum('vol-rho',1.89);
+  var spacer=psaNum('spacer-vol',5); // m3
+  var disp_rho=psaNum('disp-rho',1.3);
 
-  // Cement column length
+  // Geometry: open hole from the shoe up to the previous shoe (or TOC), cased annulus above (no excess)
   var cem_len=shoe_tvd-toc; // m
-
-  // Annular capacity (L/m)
-  // Open hole section: bit size vs casing OD
-  var ann_oh=Math.PI/4*((bit*bit)-(cas_od*cas_od))/1e6*excess*1000; // L/m
-  // If there's a previous casing:
-  var ann_cas_section=prev_cas>0?Math.PI/4*((prev_cas*prev_cas)-(cas_od*cas_od))/1e6*1000:0; // L/m
-
-  // Open hole annular volume (from shoe to TOC, assuming full open hole)
-  var V_ann_oh=ann_oh*cem_len; // L
-
-  // Previous casing annular volume (from prev shoe to shoe, if any)
-  var prev_len=prev_cas>0?Math.max(0,shoe_tvd-prev_shoe):0;
+  var ann_oh=Math.PI/4*((bit*bit)-(cas_od*cas_od))/1e6*excess*1000; // L/m, excess applied
+  var ann_cas_section=prev_cas>0?Math.PI/4*((prev_cas*prev_cas)-(cas_od*cas_od))/1e6*1000:0; // L/m, prev-cas = previous casing ID
+  var oh_top=(prev_cas>0)?Math.max(toc,prev_shoe):toc;
+  var oh_len=Math.max(0,shoe_tvd-oh_top);
+  var prev_len=(prev_cas>0)?Math.max(0,prev_shoe-toc):0;
+  var V_ann_oh=ann_oh*oh_len; // L
   var V_ann_cas=ann_cas_section*prev_len; // L
-
   var V_ann_total=V_ann_oh+V_ann_cas; // L
-
-  // Casing internal volume (fill-up below float collar)
-  var V_cas_int=Math.PI/4*(cas_id*cas_id)/1e6*shoe_tvd*1000; // L (full casing)
-
-  // Float collar height (typical 30-60m above shoe)
-  var float_collar=40; // m
-  var V_float=Math.PI/4*(cas_id*cas_id)/1e6*float_collar*1000; // L (below float collar)
-
-  // Tail slurry (50-100m around shoe)
-  var tail_len=Math.min(100,cem_len);
-  var V_tail=ann_oh*tail_len;
-  var V_lead=V_ann_oh-V_tail;
-
-  // Total cement
-  var V_cem_total=V_ann_total; // L
+  // Shoe track: cement left inside the casing between float collar and shoe
+  var float_collar=40; // m above the shoe (assumption, about two joints)
+  var V_float=Math.PI/4*(cas_id*cas_id)/1e6*float_collar*1000; // L
+  var V_cem_total=V_ann_total+V_float; // L
   var V_cem_m3=V_cem_total/1000; // m3
-
-  // Add 10% contingency
   var V_with_contingency=V_cem_m3*1.10;
-
-  // Displacement volume
-  var V_disp_m3=V_cas_int/1000-spacer; // m3
-
-  // Sacks needed (using yield from slurry design, assume 57.5 L/sack for Class G std)
-  var yield_sack=57.5; // L/sack (Class G standard)
-  var sacks=Math.ceil(V_cem_total/yield_sack);
-
-  // Cement mass
-  var mass_cem=sacks*42.64; // kg (94 lb sacks)
+  // Displacement: casing volume from surface to the float collar (the spacer is pumped ahead and does not reduce it)
+  var V_disp_m3=Math.PI/4*(cas_id*cas_id)/1e6*Math.max(0,shoe_tvd-float_collar); // m3
+  // Yield from the slurry design tab (absolute volume method)
+  var sl=psaSlurry(psaNum('sg-cem',3.14),psaNum('wc',0.44),psaNum('sg-add',2.65),psaNum('add-conc',0),psaNum('sack-wt',94));
+  var yield_sack=Math.round(sl.yieldSack*10)/10; // L/sack
+  var sacks=Math.ceil(V_cem_total/sl.yieldSack);
+  var mass_cem=sacks*sl.kgSack; // kg
   var mass_slurry=V_cem_m3*rho*1000; // kg
-
-  // Pump time at 8 bbl/min
+  // Pump time at an assumed 8 bbl/min (cement + displacement)
   var pump_rate_m3min=8*0.158987; // m3/min
   var pump_time_min=(V_cem_m3+V_disp_m3)/pump_rate_m3min;
 
   var html='<div class="rgrid">';
-  html+=rc('hl','Annular cement volume',V_cem_m3.toFixed(2),'m3','= '+V_cem_total.toFixed(0)+' L');
+  html+=rc('hl','Cement volume (annulus + shoe track)',V_cem_m3.toFixed(2),'m3','annulus '+(V_ann_total/1000).toFixed(2)+' m3 + shoe track '+(V_float/1000).toFixed(2)+' m3');
   html+=rc('hl','With 10% contingency',V_with_contingency.toFixed(2),'m3','Recommended order volume');
   html+=rc('','Open hole ann. capacity',ann_oh.toFixed(2),'L/m','With x'+excess+' excess factor');
   html+=rc('','Cement column length',cem_len,'m','Shoe to TOC');
   html+=rc('','Cement sacks required',sacks,'sacks','At '+yield_sack+' L/sack');
   html+=rc('','Dry cement mass',Math.round(mass_cem).toLocaleString(),'kg','= '+Math.round(mass_cem/1000)+'+ tonnes');
-  html+=rc('','Displacement volume',V_disp_m3.toFixed(1),'m3','Casing internal vol');
+  html+=rc('','Displacement volume',V_disp_m3.toFixed(1),'m3','Surface to float collar ('+float_collar+' m above shoe)');
   html+=rc('','Est. pump time',(pump_time_min).toFixed(0),'min','At 8 bbl/min = '+(pump_time_min/60).toFixed(1)+' hr');
   html+='</div>';
 
   html+='<div class="fbox">'
     +'<strong>Ann. capacity (OH):</strong> pi/4 x ('+bit+'^2 - '+cas_od+'^2) / 1e6 x '+excess+' x 1000 = <span class="hi">'+ann_oh.toFixed(3)+' L/m</span><br>'
     +'<strong>Cement column:</strong> Shoe '+shoe_tvd+'m - TOC '+toc+'m = <span class="hi">'+cem_len+'m</span><br>'
-    +'<strong>Annular volume:</strong> '+ann_oh.toFixed(3)+' L/m x '+cem_len+'m = <span class="hi">'+V_ann_oh.toFixed(0)+' L = '+V_cem_m3.toFixed(2)+' m3</span><br>'
+    +'<strong>Open hole:</strong> '+ann_oh.toFixed(3)+' L/m x '+oh_len+' m = '+V_ann_oh.toFixed(0)+' L ; <strong>cased annulus:</strong> '+ann_cas_section.toFixed(3)+' L/m x '+prev_len+' m = '+V_ann_cas.toFixed(0)+' L ; <strong>shoe track:</strong> '+V_float.toFixed(0)+' L ; total <span class="hi">'+V_cem_m3.toFixed(2)+' m3</span><br>'
     +'<strong>Sacks:</strong> '+V_cem_total.toFixed(0)+' L / '+yield_sack+' L/sack = <span class="hi">'+sacks+' sacks</span><br>'
-    +'<strong>Displacement:</strong> pi/4 x '+cas_id+'^2 / 1e6 x '+shoe_tvd+'m = <span class="hi">'+V_disp_m3.toFixed(2)+' m3</span>'
+    +'<strong>Displacement:</strong> pi/4 x '+cas_id+'^2 / 1e6 x ('+shoe_tvd+' - '+float_collar+') m = <span class="hi">'+V_disp_m3.toFixed(2)+' m3</span>'
     +'</div>';
 
   var rows='';
@@ -864,54 +842,33 @@ function calcVol(){
 
 /* ====== PANEL 3: ECD ====== */
 function calcECD(){
-  var tvd=parseFloat(document.getElementById('ecd-tvd').value)||2500;
-  var shoe=parseFloat(document.getElementById('ecd-shoe').value)||2500;
-  var toc=parseFloat(document.getElementById('ecd-toc').value)||1800;
-  var rho_cem=parseFloat(document.getElementById('ecd-cem').value)||1.89;
-  var rho_disp=parseFloat(document.getElementById('ecd-disp').value)||1.30;
-  var rho_mud=parseFloat(document.getElementById('ecd-mud').value)||1.25;
-  var Q_bblmin=parseFloat(document.getElementById('ecd-q').value)||8;
-  var ppg=parseFloat(document.getElementById('ecd-ppg').value)||0.105;
-  var frac=parseFloat(document.getElementById('ecd-frac').value)||0.165;
-  var cid=parseFloat(document.getElementById('ecd-cid').value)||220.5; // mm
-  var aod=parseFloat(document.getElementById('ecd-aod').value)||311.2; // mm
+  var tvd=psaNum('ecd-tvd',2500);
+  var shoe=psaNum('ecd-shoe',2500);
+  var toc=psaNum('ecd-toc',1800);
+  var rho_cem=psaNum('ecd-cem',1.89);
+  var rho_disp=psaNum('ecd-disp',1.30);
+  var rho_mud=psaNum('ecd-mud',1.25);
+  var Q_bblmin=psaNum('ecd-q',8);
+  var ppg=psaNum('ecd-ppg',0.105);
+  var frac=psaNum('ecd-frac',0.165);
+  var cid=psaNum('ecd-cid',220.5); // mm
+  var aod=psaNum('ecd-aod',311.2); // mm
   var cas_od=244.5; // mm assumed
 
   var cem_len=shoe-toc;
   var Q_m3s=Q_bblmin*0.158987/60; // m3/s
 
-  // Hydrostatic - just cement in annulus (end of job scenario)
-  var P_cem=rho_cem*9.81*cem_len/100000; // bar (cement column)
-  var P_mud_above=rho_mud*9.81*toc/100000; // bar (mud above TOC)
+  // Static pressures at the shoe at the end of displacement (g/cm3 x 0.0980665 = bar/m). Friction is not modelled.
+  var G=0.0980665;
+  var P_cem=rho_cem*G*cem_len; // bar (cement column)
+  var P_mud_above=rho_mud*G*toc; // bar (mud above TOC)
   var P_hydro_total=P_cem+P_mud_above; // bar at shoe
-
-  // Compare to formation pressure
   var P_pore=ppg*shoe;
   var P_frac=frac*shoe;
-
-  // Differential pressure (cement vs displaced fluid)
-  var dP_diff=(rho_cem-rho_disp)*9.81*cem_len/100000; // bar
-
-  // Friction pressure loss (simplified Hagen-Poiseuille for laminar, Darcy-Weisbach turbulent)
-  // Casing ID velocity
-  var A_cas=Math.PI/4*(cid/1000)*(cid/1000); // m2
-  var v_cas=Q_m3s/A_cas; // m/s
-  // Annular velocity
-  var A_ann=Math.PI/4*((aod/1000)*(aod/1000)-(cas_od/1000)*(cas_od/1000)); // m2
-  var v_ann=Q_m3s/Math.max(A_ann,0.001); // m/s
-
-  // Simplified friction (assume 0.1 bar/100m for cement in annulus - rough estimate)
-  var f_ann_bar_m=0.001; // bar/m rough
-  var APL_ann=f_ann_bar_m*cem_len; // bar
-  var APL_cas=0.0008*shoe; // bar rough
-
-  // ECD at shoe
-  var ECD_rho=rho_mud+APL_ann*100000/(9.81*shoe); // kg/m3 (approx)
-  var ECD_gcm3=ECD_rho/1000;
-
-  // Surface pump pressure (approximate)
-  var P_pump=dP_diff+APL_ann+APL_cas; // bar
-
+  var dP_diff=(rho_cem-rho_disp)*G*cem_len; // bar, annulus vs casing
+  var Q_m3s=Q_bblmin*0.158987/60;
+  var A_ann=Math.PI/4*((aod/1000)*(aod/1000)-(cas_od/1000)*(cas_od/1000)), v_ann=Q_m3s/Math.max(A_ann,0.001);
+  var P_pump=dP_diff; // bar, static differential only
   var mudWindow=P_frac-P_pore;
   var operatingP=P_hydro_total;
   var margin_frac=P_frac-operatingP;
@@ -924,15 +881,15 @@ function calcECD(){
   html+=rc('','Fracture pressure',P_frac.toFixed(1),'bar','At '+shoe+'m TVD');
   html+=rc(margin_frac>0?'ok':'er','Margin to fracture',margin_frac.toFixed(1),'bar',margin_frac>10?'ADEQUATE':'TIGHT - CHECK!');
   html+=rc(margin_pore>0?'ok':'er','Margin to pore P',margin_pore.toFixed(1),'bar',margin_pore>5?'ADEQUATE':'LOW - KICK RISK');
-  html+=rc('','Est. pump pressure',P_pump.toFixed(0),'bar','Displacement + friction (approx)');
+  html+=rc('','Static differential (end of job)',P_pump.toFixed(0),'bar','Friction not included');
   html+=rc('','Annular velocity',v_ann.toFixed(2),'m/s',Q_bblmin+' bbl/min through annulus');
   html+='</div>';
 
   html+='<div class="fbox">'
     +'<strong>P_hydro at shoe</strong> = rho_cem x g x cem_len + rho_mud x g x toc<br>'
-    +'= '+rho_cem+' x 9.81 x '+cem_len+' / 1e5 + '+rho_mud+' x 9.81 x '+toc+' / 1e5<br>'
+    +'= '+rho_cem+' x 0.0981 x '+cem_len+' + '+rho_mud+' x 0.0981 x '+toc+' (g/cm3 x 0.0981 = bar/m)<br>'
     +'= '+P_cem.toFixed(2)+' + '+P_mud_above.toFixed(2)+' = <span class="hi">'+P_hydro_total.toFixed(2)+' bar</span><br>'
-    +'<strong>dP differential:</strong> ('+rho_cem+' - '+rho_disp+') x 9.81 x '+cem_len+' / 1e5 = <span class="hi">'+dP_diff.toFixed(2)+' bar</span><br>'
+    +'<strong>dP differential:</strong> ('+rho_cem+' - '+rho_disp+') x 0.0981 x '+cem_len+' = <span class="hi">'+dP_diff.toFixed(2)+' bar</span><br>'
     +'<strong>Mud window:</strong> P_frac - P_pore = '+P_frac.toFixed(1)+' - '+P_pore.toFixed(1)+' = <span class="hi">'+mudWindow.toFixed(1)+' bar</span>'
     +'</div>';
 
@@ -950,10 +907,10 @@ function calcECD(){
 
   // Pressure chart
   var depths=[0,toc,shoe];
-  var P_mud_prof=depths.map(function(d){return rho_mud*9.81*d/100000;});
+  var P_mud_prof=depths.map(function(d){return rho_mud*0.0980665*d;});
   var P_cem_prof=depths.map(function(d){
-    if(d<=toc)return rho_mud*9.81*d/100000;
-    return rho_mud*9.81*toc/100000+rho_cem*9.81*(d-toc)/100000;
+    if(d<=toc)return rho_mud*0.0980665*d;
+    return rho_mud*0.0980665*toc+rho_cem*0.0980665*(d-toc);
   });
   var P_pore_prof=depths.map(function(d){return ppg*d;});
   var P_frac_prof=depths.map(function(d){return frac*d;});
@@ -983,27 +940,27 @@ function calcECD(){
 
 /* ====== PANEL 4: THICKENING TIME ====== */
 function calcTT(){
-  var tt=parseFloat(document.getElementById('tt-meas').value)||4.5; // hours
-  var vol=parseFloat(document.getElementById('tt-vol').value)||80; // m3
-  var rate=parseFloat(document.getElementById('tt-rate').value)||8; // bbl/min
-  var bhct=parseFloat(document.getElementById('tt-bhct').value)||80;
-  var bhst=parseFloat(document.getElementById('tt-bhst').value)||100;
-  var woc=parseFloat(document.getElementById('tt-woc').value)||24; // hours
-  var cs_24=parseFloat(document.getElementById('tt-cs').value)||3500; // psi
-  var cs_req=parseFloat(document.getElementById('tt-cs-req').value)||500; // psi
+  var tt=psaNum('tt-meas',4.5); // hours
+  var vol=psaNum('tt-vol',80); // m3
+  var rate=psaNum('tt-rate',8); // bbl/min
+  var bhct=psaNum('tt-bhct',80);
+  var bhst=psaNum('tt-bhst',100);
+  var woc=psaNum('tt-woc',24); // hours
+  var cs_24=psaNum('tt-cs',3500); // psi
+  var cs_req=psaNum('tt-cs-req',500); // psi
 
   var rate_m3min=rate*0.158987;
   var pump_time_min=vol/rate_m3min;
   var pump_time_hr=pump_time_min/60;
   var safety_margin_hr=tt-pump_time_hr;
-  var required_tt=pump_time_hr+0.5; // 30 min safety margin per API
+  var required_tt=pump_time_hr+0.5; // 30 min margin: operator practice, not an API requirement
 
   var cs_ok=cs_24>=cs_req;
   var tt_ok=tt>=required_tt;
 
   var html='<div class="rgrid">';
   html+=rc('hl','Thickening time (lab)',tt.toFixed(2),'hr','At BHCT = '+bhct+'°C');
-  html+=rc('hl','Required TT (API)',required_tt.toFixed(2),'hr','Pump time + 30 min');
+  html+=rc('hl','Required TT',required_tt.toFixed(2),'hr','Pump time + 30 min margin (operator criterion)');
   html+=rc(tt_ok?'ok':'er','Safety margin',safety_margin_hr.toFixed(2),'hr',tt_ok?'ADEQUATE (> 30 min)':'INSUFFICIENT - REDESIGN');
   html+=rc('','Pump time (calculated)',pump_time_hr.toFixed(2),'hr','= '+pump_time_min.toFixed(0)+' min');
   html+=rc('','BHCT / BHST ratio',(bhct/bhst*100).toFixed(0),'%','Circulating vs static temp');
@@ -1012,7 +969,7 @@ function calcTT(){
 
   html+='<div class="fbox">'
     +'<strong>Pump time:</strong> '+vol+' m3 / ('+rate+' bbl/min x 0.158987 m3/bbl) = <span class="hi">'+pump_time_min.toFixed(0)+' min = '+pump_time_hr.toFixed(2)+' hr</span><br>'
-    +'<strong>Required TT (API RP 10B-2):</strong> pump_time + 30 min = '+pump_time_hr.toFixed(2)+' + 0.5 = <span class="hi">'+required_tt.toFixed(2)+' hr minimum</span><br>'
+    +'<strong>Required TT:</strong> pump_time + 30 min margin (operator criterion; API RP 10B-2 sets the test method, not the margin) = '+pump_time_hr.toFixed(2)+' + 0.5 = <span class="hi">'+required_tt.toFixed(2)+' hr minimum</span><br>'
     +'<strong>Actual TT (lab):</strong> '+tt+' hr at BHCT='+bhct+'°C<br>'
     +'<strong>Safety margin:</strong> '+tt+' - '+pump_time_hr.toFixed(2)+' = <span class="hi">'+(tt-pump_time_hr).toFixed(2)+' hr = '+((tt-pump_time_hr)*60).toFixed(0)+' min</span>'
     +'</div>';
@@ -1021,7 +978,7 @@ function calcTT(){
   if(!tt_ok){
     rows+=ar('er','THICKENING TIME INSUFFICIENT - JOB AT RISK','Lab TT of '+tt+' hr is less than the required '+required_tt.toFixed(2)+' hr (pump time '+pump_time_hr.toFixed(2)+' hr + 30 min minimum). The cement could set in the pipe before job completion, causing a cement plug in the casing - a potentially catastrophic event.','Increase retarder dose. Retarders: lignosulfonate (0.1-1.0% BWOC), AMPS polymer, sodium gluconate. Each 0.1% increase in lignosulfonate adds approximately 30-60 min of TT at BHCT of '+bhct+'°C. Retest lab sample at increased retarder dose. Do not start the job until TT ≥ '+required_tt.toFixed(2)+' hr.');
   } else if(safety_margin_hr<0.75){
-    rows+=ar('wn','Safety margin tight ('+Math.round(safety_margin_hr*60)+' min)','TT provides only '+Math.round(safety_margin_hr*60)+' min safety margin above the API 30-min minimum. Any operational delay (equipment issue, NPT) could result in premature cement hardening in pipe.','Increase retarder to target minimum 45-60 min safety margin. Check contingency plan for potential shut-down mid-job. Brief the crew on emergency procedures if pump pressure spikes suddenly (potential cement hardening indicator).');
+    rows+=ar('wn','Safety margin tight ('+Math.round(safety_margin_hr*60)+' min)','TT provides only '+Math.round(safety_margin_hr*60)+' min safety margin above the 30-min margin used here. Any operational delay (equipment issue, NPT) could result in premature cement hardening in pipe.','Increase retarder to target minimum 45-60 min safety margin. Check contingency plan for potential shut-down mid-job. Brief the crew on emergency procedures if pump pressure spikes suddenly (potential cement hardening indicator).');
   } else {
     rows+=ar('ok','Thickening time adequate ('+Math.round(safety_margin_hr*60)+' min safety margin)','TT of '+tt+' hr provides '+Math.round(safety_margin_hr*60)+' min safety margin above the required '+required_tt.toFixed(2)+' hr. The job can proceed within the lab-defined safe window.','');
   }
@@ -1067,17 +1024,17 @@ function calcTT(){
 
 /* ====== PANEL 5: LAB DATA ====== */
 function calcLab(){
-  var r300=parseFloat(document.getElementById('r300').value)||78;
-  var r600=parseFloat(document.getElementById('r600').value)||130;
-  var r3=parseFloat(document.getElementById('r3').value)||8;
-  var r6=parseFloat(document.getElementById('r6').value)||12;
-  var fw=parseFloat(document.getElementById('fw').value)||0.8;
-  var fl=parseFloat(document.getElementById('fl').value)||65;
-  var cs8=parseFloat(document.getElementById('cs8').value)||500;
-  var cs24=parseFloat(document.getElementById('cs24').value)||3500;
-  var cs72=parseFloat(document.getElementById('cs72').value)||5200;
-  var lab_rho=parseFloat(document.getElementById('lab-rho').value)||1.89;
-  var des_rho=parseFloat(document.getElementById('des-rho').value)||1.89;
+  var r300=psaNum('r300',78);
+  var r600=psaNum('r600',130);
+  var r3=psaNum('r3',8);
+  var r6=psaNum('r6',12);
+  var fw=psaNum('fw',0.8);
+  var fl=psaNum('fl',65);
+  var cs8=psaNum('cs8',500);
+  var cs24=psaNum('cs24',3500);
+  var cs72=psaNum('cs72',5200);
+  var lab_rho=psaNum('lab-rho',1.89);
+  var des_rho=psaNum('des-rho',1.89);
 
   var PV=r600-r300; // mPa.s
   var YP=r300-PV; // lbf/100ft2
@@ -1097,10 +1054,10 @@ function calcLab(){
   html+=rc('hl','Yield point (YP)',YP,'lbf/100ft2','R300 - PV');
   html+=rc('','Flow behavior index n',n.toFixed(3),'-','Power Law n = 3.32 x log(R600/R300)');
   html+=rc('','Consistency index k',k.toExponential(3),'lbf.sn/100ft2','k = 0.511 x R300 / 511^n');
-  html+=rc(fwOk?'ok':'wn','Free water',fw,'% vol',fwOk?'PASS (< 4.0%)':'FAIL - Risk of channeling');
+  html+=rc(fwOk?'ok':'wn','Free water',fw,'% vol',fwOk?'below 4.0% screening value':'above 4.0% screening value');
   html+=rc(flOk?'ok':'wn','API fluid loss',fl,'mL/30min',flOk?'Acceptable':'High - Add FL additive');
   html+=rc(cs8ok?'ok':'wn','CS at 8 hours',cs8,'psi',cs8ok?'Adequate early strength':'Low early CS');
-  html+=rc(cs24ok?'ok':'er','CS at 24 hours',cs24,'psi',cs24ok?'PASS (> 500 psi)':'FAIL - Below drill-out minimum');
+  html+=rc(cs24ok?'ok':'er','CS at 24 hours',cs24,'psi',cs24ok?'above 500 psi screening value':'below 500 psi screening value');
   html+=rc(rhoOk?'ok':'wn','Density match',rho_diff.toFixed(3),'g/cm3 diff',rhoOk?'PASS (Δ < 0.03 g/cm3)':'HIGH deviation - Check mixing');
   html+=rc('','Gel strength (10s)',GS10s,'lbf/100ft2','At 3 RPM reading');
   html+='</div>';
@@ -1116,10 +1073,10 @@ function calcLab(){
 
   var rows='';
   if(!cs24ok){
-    rows+=ar('er','COMPRESSIVE STRENGTH BELOW MINIMUM ('+cs24+' psi at 24h)','24h CS of '+cs24+' psi is below the 500 psi minimum required for safe drill-out of the float equipment. Drilling-out weak cement risks pulling the plug back into the casing and losing well control.','Reduce w/c ratio to increase CS. Add accelerator (CaCl2 at 1-2% BWOC) to accelerate strength gain. Extend WOC time beyond 24h until minimum CS is reached. Re-design slurry and re-test in lab before field use.');
+    rows+=ar('er','COMPRESSIVE STRENGTH BELOW MINIMUM ('+cs24+' psi at 24h)','24h CS of '+cs24+' psi is below the 500 psi screening value used here; drill-out criteria are set by the operator. Drilling-out weak cement risks pulling the plug back into the casing and losing well control.','Reduce w/c ratio to increase CS. Add accelerator (CaCl2 at 1-2% BWOC) to accelerate strength gain. Extend WOC time beyond 24h until minimum CS is reached. Re-design slurry and re-test in lab before field use.');
   }
   if(!fwOk){
-    rows+=ar('wn','FREE WATER EXCEEDS LIMIT ('+fw+'%)','Free water of '+fw+'% exceeds the typical limit of 4% (API RP 10B-2). In deviated or horizontal wells, free water can form channels at the high side of the annulus, creating migration paths for gas and formation fluids.','Add free water control additives: CMHEC (0.3-0.6% BWOC), latex (2-5% vol), or microsilica. In deviated wells (>30°): limit free water to <0.5%. Re-test modified slurry in inclined API free water test (deviated position).');
+    rows+=ar('wn','FREE WATER EXCEEDS LIMIT ('+fw+'%)','Free water of '+fw+'% exceeds the 4% screening value used here; the acceptance limit is set by the operator specification. In deviated or horizontal wells, free water can form channels at the high side of the annulus, creating migration paths for gas and formation fluids.','Add free water control additives: CMHEC (0.3-0.6% BWOC), latex (2-5% vol), or microsilica. In deviated wells (>30°): limit free water to <0.5%. Re-test modified slurry in inclined API free water test (deviated position).');
   }
   if(fl>100){
     rows+=ar('wn','FLUID LOSS HIGH ('+fl+' mL/30min)','API fluid loss of '+fl+' mL/30min indicates rapid dehydration of slurry. High fluid loss causes: slurry bridging in permeable zones, increased annular friction, potential gas migration, and early set around perforations.','Add fluid loss control polymer: CMHEC (0.5-1.5% BWOC) typically reduces FL from 400+ to <100 mL/30min. Target: < 50 mL/30min for productive intervals. < 100 mL/30min acceptable for non-productive intervals. Latex-based FLC provides combined gas migration and FL control.');
