@@ -172,6 +172,7 @@ select option{background:#111;}
 </style>
 </head>
 <body>
+<div style="padding:12px 20px;font-size:13px;background:#172330;color:#fff">Educational arithmetic tool. Version 2026.10.25.1. Verify S, E, W, Y, material, temperature and code edition independently. Results do not authorize operation, inspection intervals or pressure testing.</div>
 <div class="wrap">
 
 <!-- HEADER -->
@@ -229,30 +230,13 @@ select option{background:#111;}
     </div>
     <div class="row3">
       <div class="field">
-        <label class="lbl">Quality factor E</label>
-        <select id="E" onchange="calc1()">
-          <option value="1.0">1.0 - Seamless pipe</option>
-          <option value="0.85">0.85 - ERW / SAW</option>
-          <option value="0.80">0.80 - Furnace butt weld</option>
-          <option value="0.60">0.60 - Furnace lap weld</option>
-        </select>
+        <label class="lbl">Joint quality factor E: verified code input</label><input type="number" id="E" value="1" step="0.01" oninput="calc1()">
       </div>
       <div class="field">
-        <label class="lbl">Weld joint factor W</label>
-        <select id="W" onchange="calc1()">
-          <option value="1.0">1.0 - Weld examined</option>
-          <option value="0.85">0.85 - Random exam</option>
-          <option value="0.70">0.70 - No examination</option>
-        </select>
+        <label class="lbl">Weld strength reduction factor W: verified temperature input</label><input type="number" id="W" value="1" step="0.01" oninput="calc1()">
       </div>
       <div class="field">
-        <label class="lbl">Temperature factor Y</label>
-        <select id="Y" onchange="calc1()">
-          <option value="0.4">0.4 - T ≤ 482°C (ferritics)</option>
-          <option value="0.5">0.5 - T 482-510°C</option>
-          <option value="0.7">0.7 - T 510-566°C</option>
-          <option value="0.4">0.4 - Austenitic SS all T</option>
-        </select>
+        <label class="lbl">Coefficient Y: verified material and temperature input</label><input type="number" id="Y" value="0.4" step="0.01" oninput="calc1()">
       </div>
     </div>
     <div class="row2">
@@ -320,7 +304,7 @@ select option{background:#111;}
       <div class="ir"><input type="number" id="p2_Pop" value="80" step="1" oninput="calc2()"><span class="unit">bar</span></div>
     </div>
 
-    <div id="r2"></div>
+    <div class="row2"><div class="field"><label class="lbl">Weld strength reduction factor W: verified input</label><input type="number" id="p2_W" value="1" step="0.01" oninput="calc2()"></div><div class="field"><label class="lbl">Coefficient Y: verified input</label><input type="number" id="p2_Y" value="0.4" step="0.01" oninput="calc2()"></div></div><div id="r2"></div>
   </div>
 </div>
 
@@ -531,87 +515,29 @@ function setMat(id,S,name){
 }
 
 /* ====== PANEL 1: B31.3 DESIGN ====== */
+function psaStrict(ids){return ids.map(function(id){var e=document.getElementById(id),raw=e?String(e.value).trim():'';return raw===''?NaN:Number(raw.replace(',','.'));});}
+function psaPipeError(id,msg){document.getElementById(id).innerHTML='<div class="alert a-er">'+msg+' No result or schedule approval is issued.</div>';if(id==='r1')document.getElementById('pipe-svg1').innerHTML='';}
 function calc1(){
-  var P_bar=psaNum('P',100);
-  var OD=psaNum('OD',168.3);
-  var S=psaNum('S',138);
-  var E=psaNum('E',1.0);
-  var W=psaNum('W',1.0);
-  var Y=psaNum('Y',0.4);
-  var c=psaNum('c1',3);
-  var mill=psaNum('mill',12.5);
-
-  var P=barToMPa(P_bar); // MPa
-
-  // ASME B31.3 minimum required thickness (before mill/corrosion)
-  var t_calc=P*OD/(2*S*E*W+2*P*Y);
-  // Add corrosion
-  var t_with_c=t_calc+c;
-  // Add mill tolerance
-  var t_required=t_with_c/(1-mill/100);
-
-  // Find next available schedule
-  var nps=findNPS(OD);
-  var t_nom=findNextSch(nps,t_required);
-
-  var ID_nom=OD-2*t_nom.t;
-  var A_metal=Math.PI/4*(OD*OD-ID_nom*ID_nom);
-  var weight_per_m=A_metal/1e6*7850; // kg/m (steel density)
-  var flow_area=Math.PI/4*ID_nom*ID_nom; // mm2
-  var DR=OD/t_nom.t; // diameter ratio
-
-  // MAOP with selected schedule
-  var t_eff=t_nom.t*(1-mill/100)-c;
-  var MAOP_MPa=(2*S*E*t_eff)/(OD-2*Y*t_eff);
-  var MAOP_bar=MAOP_MPa*10;
-
-  var thick_ratio=t_required/t_nom.t*100;
-
-  var html='<div class="rgrid">';
-  html+=rc('hl','Required t (calc)',t_calc.toFixed(2),'mm','Per ASME B31.3 formula');
-  html+=rc('hl','Required t (with c + mill)',t_required.toFixed(2),'mm','Ready for schedule selection');
-  html+=rc('ok','Recommended schedule',t_nom.n,'',t_nom.t.toFixed(2)+' mm wall');
-  html+=rc('','MAOP with selected sch.',MAOP_bar.toFixed(1),'bar','Design P: '+P_bar+' bar');
-  html+=rc('','Inside diameter ID',ID_nom.toFixed(1),'mm','With selected schedule');
-  html+=rc('','D/R ratio',DR.toFixed(1),'OD/t',DR>20?'Thin wall':'Thick wall (use Lamé)');
-  html+=rc('','Pipe weight',weight_per_m.toFixed(1),'kg/m','Steel density 7850 kg/m3');
-  html+=rc('','Flow area',Math.round(flow_area/100)/100,'cm2','ID = '+ID_nom.toFixed(1)+' mm');
-  html+='</div>';
-
-  html+='<div class="fbox">'
-    +'<strong>ASME B31.3 formula:</strong> t = P x D / (2 x S x E x W + 2 x P x Y)<br>'
-    +'t_calc = '+P.toFixed(3)+' x '+OD+' / (2 x '+S+' x '+E+' x '+W+' + 2 x '+P.toFixed(3)+' x '+Y+')<br>'
-    +'t_calc = <span class="hi">'+t_calc.toFixed(3)+' mm</span><br>'
-    +'t_with_corrosion = '+t_calc.toFixed(3)+' + '+c+' = '+t_with_c.toFixed(3)+' mm<br>'
-    +'t_required = '+t_with_c.toFixed(3)+' / (1 - '+mill+'/100) = <span class="hi">'+t_required.toFixed(3)+' mm</span><br>'
-    +'Selected schedule: '+t_nom.n+' (t = '+t_nom.t+' mm) - Utilization: '+(t_required/t_nom.t*100).toFixed(0)+'%'
-    +'</div>';
-
-  // Analysis
-  var rows='';
-
-  // Schedule utilization
-  if(thick_ratio>95){
-    rows+=ar('wn','Schedule fully utilized ('+thick_ratio.toFixed(0)+'% of wall used)','The required wall thickness ('+t_required.toFixed(2)+'mm) uses '+thick_ratio.toFixed(0)+'% of the selected schedule wall ('+t_nom.t+'mm). Very little margin remains. Any underrun in actual wall thickness will be critical.','Consider upgrading to next heavier schedule. At 95%+ utilization, hydrotest margins (1.5x MAWP per ASME B31.3) may be tight. Verify actual mill certificates before installation.');
-  } else if(thick_ratio<60){
-    rows+=ar('info','Schedule significantly over-rated ('+thick_ratio.toFixed(0)+'% utilized)','Required wall is only '+thick_ratio.toFixed(0)+'% of the selected schedule. This adds unnecessary weight and cost. Weight difference vs next lighter schedule: ~'+(Math.round((weight_per_m-weight_per_m*0.85)*10)/10)+' kg/m.','Evaluate a lighter schedule if pressure is the only loading. Consider that piping may have other loads (thermal, mechanical) requiring heavier wall. Confirm with stress analysis before downgrading.');
-  } else {
-    rows+=ar('ok','Schedule selection appropriate ('+thick_ratio.toFixed(0)+'% utilized)','Required wall '+t_required.toFixed(2)+'mm uses '+thick_ratio.toFixed(0)+'% of selected '+t_nom.n+' wall ('+t_nom.t+'mm). The '+((t_nom.t-t_required)).toFixed(2)+'mm margin provides adequate buffer against mill tolerance and localized corrosion.','');
-  }
-
-  // Flange class: ASME B16.5 Group 1.1 (A105 / A216 WCB) ratings at 38 °C; ratings fall with temperature
-  var cls=[[150,19.6],[300,51.1],[600,102.1],[900,153.2],[1500,255.3],[2500,425.5]], fc=null;
-  for(var ci=0;ci<cls.length;ci++){if(P_bar<=cls[ci][1]){fc=cls[ci];break;}}
-  rows+=ar(fc?'info':'er',fc?('Lowest ASME B16.5 class at 38 °C: Class '+fc[0]+' ('+fc[1]+' bar)'):'Design pressure above Class 2500 rating at 38 °C','Group 1.1 carbon steel ratings at ambient temperature. At higher temperature or for other material groups, read the rating table of ASME B16.5 for the actual group and temperature.','');
-  // Corrosion allowance
-  rows+=ar('info','Corrosion allowance '+c+' mm','The allowance should be the expected corrosion rate times the design life, from measured or modelled rates for this fluid. Design life = '+c+' mm / rate (mm/yr).','');
-  html+='<div class="analysis"><div class="atitle">/// DESIGN ANALYSIS AND ENGINEERING GUIDANCE</div>'+rows+'</div>';
-  document.getElementById('r1').innerHTML=html;
-
-  // Draw pipe SVG
-  drawPipeSVG(OD,t_nom.t,t_required);
+ var v=psaStrict(['P','OD','S','E','W','Y','c1','mill']);
+ var Pbar=v[0],OD=v[1],S=v[2],E=v[3],W=v[4],Y=v[5],c=v[6],mill=v[7];
+ if(v.some(function(x){return !Number.isFinite(x);})||Pbar<0||OD<=0||S<=0||E<=0||E>1||W<=0||W>1||Y<0||c<0||mill<0||mill>=100){psaPipeError('r1','Invalid input. Check dimensions, coefficients and mill tolerance.');return;}
+ var P=Pbar/10,tcalc=P*OD/(2*(S*E*W+P*Y));
+ if(tcalc>=OD/6||P/(S*E)>0.385){psaPipeError('r1','Outside the simplified straight-pipe equation screening limits; use the applicable code assessment.');return;}
+ var required=(tcalc+c)/(1-mill/100),nps=findNPS(OD),choice=findNextSch(nps,required);
+ if(!choice){psaPipeError('r1','No adequate listed schedule for this outside diameter and required nominal wall '+required.toFixed(3)+' mm. A custom product requires independent specification.');return;}
+ var teff=choice.t*(1-mill/100)-c,den=OD-2*Y*teff;
+ if(teff<=0||den<=0||2*choice.t>=OD){psaPipeError('r1','Invalid remaining-wall geometry.');return;}
+ var cap=2*S*E*W*teff/den*10,ID=OD-2*choice.t,area=Math.PI*ID*ID/4;
+ var h='<div class="rgrid">';
+ h+=rc('hl','Required t (calc)',tcalc.toFixed(2),'mm','Pressure term only');
+ h+=rc('hl','Required t (with c + mill)',required.toFixed(2),'mm','Assumed allowance and product tolerance');
+ h+=rc('info','Listed schedule meeting wall arithmetic',choice.n,'',choice.t.toFixed(2)+' mm; not a complete design approval');
+ h+=rc('','Formula pressure capacity',cap.toFixed(1),'bar','Includes S, E, W and Y; not an authorized MAOP');
+ h+=rc('','Inside diameter ID',ID.toFixed(1),'mm','Nominal geometry');
+ h+=rc('','Flow area',(area/100).toFixed(2),'cm2','1 cm2 = 100 mm2');
+ h+='</div><div class="fbox">t = PD / [2(SEW + PY)]<br>P = 2SEW t_eff / (OD - 2Y t_eff)<br>Inputs must come from the applicable material, temperature and code edition. External pressure, fatigue, thermal/mechanical loads, fittings, joints, minimum construction wall and test requirements are not assessed.</div>';
+ document.getElementById('r1').innerHTML=h;drawPipeSVG(OD,choice.t,required);
 }
-
 function drawPipeSVG(OD,t_nom,t_req){
   var cx=200,cy=100,scale=0.45;
   var ro=Math.min(OD/2*scale,85);
@@ -639,144 +565,24 @@ function drawPipeSVG(OD,t_nom,t_req){
 
 /* ====== PANEL 2: PRESSURE RATING ====== */
 function calc2(){
-  var OD=psaNum('p2_OD',168.3);
-  var t=psaNum('p2_t',7.11);
-  var c=psaNum('p2_c',3);
-  var S=psaNum('p2_S',138);
-  var E=psaNum('p2_E',1.0);
-  var mill=psaNum('p2_mill',12.5);
-  var Pop_bar=psaNum('p2_Pop',80);
-
-  var Y=0.4;
-  var t_actual=t*(1-mill/100); // after mill tolerance
-  var t_eff=t_actual-c; // effective after corrosion
-  if(t_eff<=0){document.getElementById('r2').innerHTML='<div class="alert a-er">Effective wall thickness is zero or negative. Corrosion allowance exceeds pipe wall. Pipe has reached end of design life.</div>';return;}
-
-  var MAOP_MPa=2*S*E*t_eff/(OD-2*Y*t_eff);
-  var MAOP_bar=MAOP_MPa*10;
-  var hydrotest_bar=MAOP_bar*1.5;
-  var Pop_MPa=barToMPa(Pop_bar);
-  var utilization=Pop_bar/MAOP_bar*100;
-  var DR=OD/t;
-  var ID=OD-2*t;
-
-  var html='<div class="rgrid">';
-  html+=rc('hl','MAOP (MAWP)',MAOP_bar.toFixed(1),'bar','Maximum allowable operating P');
-  html+=rc('hl','MAOP in psi',(MAOP_bar*14.504).toFixed(0),'psi','= '+MAOP_MPa.toFixed(2)+' MPa');
-  html+=rc('','Hydrotest pressure',hydrotest_bar.toFixed(1),'bar','1.5 x MAOP per B31.3');
-  html+=rc('','Effective wall t_eff',t_eff.toFixed(2),'mm','After mill tol. + corrosion');
-  html+=rc(utilization<=100?'ok':'er','Operating pressure',Pop_bar,'bar',utilization.toFixed(0)+'% of MAOP - '+(utilization<=100?'SAFE':'EXCEEDS MAOP'));
-  html+=rc('','Pressure utilization',utilization.toFixed(1),'%','Operating / MAOP');
-  html+='</div>';
-
-  html+='<div class="fbox">'
-    +'<strong>MAOP (B31.3):</strong> P = 2 x S x E x t_eff / (OD - 2 x Y x t_eff)<br>'
-    +'t_actual (after mill) = '+t+' x (1 - '+mill+'/100) = '+t_actual.toFixed(3)+' mm<br>'
-    +'t_eff (after corrosion) = '+t_actual.toFixed(3)+' - '+c+' = <strong>'+t_eff.toFixed(3)+' mm</strong><br>'
-    +'MAOP = 2 x '+S+' x '+E+' x '+t_eff.toFixed(3)+' / ('+OD+' - 2 x 0.4 x '+t_eff.toFixed(3)+')<br>'
-    +'MAOP = <span class="hi">'+MAOP_MPa.toFixed(3)+' MPa = '+MAOP_bar.toFixed(1)+' bar</span>'
-    +'</div>';
-
-  var rows='';
-  if(Pop_bar>MAOP_bar){
-    rows+=ar('er','OPERATING PRESSURE EXCEEDS MAOP - IMMEDIATE ACTION REQUIRED','Operating pressure '+Pop_bar+' bar is '+(Pop_bar-MAOP_bar).toFixed(1)+' bar above MAOP ('+MAOP_bar.toFixed(1)+' bar). This pipe is operating beyond its code-calculated limit. Risk of failure is elevated.','Immediately reduce operating pressure to below MAOP. Initiate engineering assessment of remaining life. If corrosion has reduced wall thickness, schedule inspection (UT thickness survey). Consider replacing pipe or reducing design pressure through relief valve setting adjustment.');
-  } else if(utilization>90){
-    rows+=ar('wn','High operating pressure utilization ('+utilization.toFixed(0)+'%)','Operating at '+utilization.toFixed(0)+'% of MAOP. Only '+(MAOP_bar-Pop_bar).toFixed(1)+' bar margin to MAOP. Consider that pressure surges (water hammer) can temporarily exceed this by 10-30%.','Ensure surge analysis has been performed. Hydrotest at '+hydrotest_bar.toFixed(0)+' bar before commissioning or re-commissioning. Monitor for any increase in operating pressure. Inspect wall thickness annually at minimum.');
-  } else {
-    rows+=ar('ok','Operating pressure within limits ('+utilization.toFixed(0)+'% of MAOP)','The pipe operates at '+Pop_bar+' bar which is '+utilization.toFixed(0)+'% of its MAOP ('+MAOP_bar.toFixed(1)+' bar). Adequate safety margin of '+(MAOP_bar-Pop_bar).toFixed(1)+' bar is available.','');
-  }
-
-  if(t_eff/t<0.5){
-    rows+=ar('wn','More than 50% of wall consumed by corrosion + mill tolerance','Effective wall '+t_eff.toFixed(2)+'mm is '+(t_eff/t*100).toFixed(0)+'% of nominal '+t+'mm. When effective wall drops below 50% of nominal, fitness-for-service assessment per API 579 / ASME FFS-1 is recommended.','Commission UT (ultrasonic thickness) inspection survey to map remaining wall thickness. If minimum measured thickness < t_eff assumed here, immediate integrity assessment required. Consider a corrosion growth model to predict remaining life.');
-  }
-
-  rows+=ar('info','Hydrotest pressure requirement','Hydrostatic pressure test at '+hydrotest_bar.toFixed(0)+' bar (1.5x MAOP per ASME B31.3 Clause 345.4). Hold time: 10 minutes minimum, preferably 30 minutes. Inspect all joints, fittings and welds during pressurized hold.','Hydrotest medium: water (preferred) at ambient temperature. If pneumatic test required, apply safety exclusion zone per ASME B31.3. Verify gauge calibration (±0.5% accuracy) before test.');
-
-  html+='<div class="analysis"><div class="atitle">/// PRESSURE RATING ANALYSIS</div>'+rows+'</div>';
-  document.getElementById('r2').innerHTML=html;
+ var v=psaStrict(['p2_OD','p2_t','p2_c','p2_S','p2_E','p2_mill','p2_Pop','p2_W','p2_Y']);
+ var OD=v[0],t=v[1],c=v[2],S=v[3],E=v[4],mill=v[5],Pbar=v[6],W=v[7],Y=v[8];
+ if(v.some(function(x){return !Number.isFinite(x);})||OD<=0||t<=0||2*t>=OD||c<0||S<=0||E<=0||E>1||W<=0||W>1||Y<0||mill<0||mill>=100||Pbar<0){psaPipeError('r2','Invalid pressure-capacity input.');return;}
+ var teff=t*(1-mill/100)-c,den=OD-2*Y*teff;
+ if(teff<=0||teff>=OD/6||den<=0){psaPipeError('r2','Remaining wall is non-positive or outside the simplified equation limit.');return;}
+ var cap=2*S*E*W*teff/den*10;
+ if((cap/10)/(S*E)>0.385){psaPipeError('r2','Computed pressure capacity exceeds the simplified equation screening limit.');return;}
+ var h='<div class="rgrid">';h+=rc('hl','Formula pressure capacity',cap.toFixed(1),'bar','Not a code-approved MAOP/MAWP');h+=rc('','Effective wall',teff.toFixed(3),'mm','After declared allowance and undertolerance');h+=rc('','Pressure/capacity ratio',(100*Pbar/cap).toFixed(1),'%','Arithmetic comparison only; does not establish safe operation');h+='</div><div class="fbox">P = 2SEW t_eff / (OD - 2Y t_eff)<br>No hydrotest pressure, inspection interval or operating intervention is prescribed. Test conditions require the applicable code procedure and temperature-dependent stress limits.</div>';document.getElementById('r2').innerHTML=h;
 }
-
 /* ====== PANEL 3: HOOP STRESS ====== */
 function calc3(){
-  var OD=psaNum('h_OD',168.3);
-  var t=psaNum('h_t',7.11);
-  var P_bar=psaNum('h_P',100);
-  var SMYS=psaNum('h_SMYS',241);
-  var F=psaNum('h_F',0); // kN
-  var df=psaNum('h_df',0.72);
-
-  var P=barToMPa(P_bar); // MPa
-  var ro=OD/2;
-  var ri=ro-t;
-  var ID=OD-2*t;
-  var DR=OD/t;
-  var A=Math.PI*(ro*ro-ri*ri); // mm2
-
-  var sigma_h,sigma_L,sigma_r;
-
-  if(DR>20){
-    // Thin wall (Barlow)
-    sigma_h=P*OD/(2*t); // MPa
-    sigma_L=P*ID*ID/(OD*OD-ID*ID)/2+(F*1000/A); // hoop/2 + axial
-    sigma_L=P*ri*ri/(ro*ro-ri*ri)+(F*1000/A);
-    sigma_r=-P/2; // average
-  } else {
-    // Thick wall (Lamé) at inner wall (maximum)
-    sigma_h=P*(ri*ri+ro*ro)/(ro*ro-ri*ri); // at inner wall
-    sigma_L=P*ri*ri/(ro*ro-ri*ri)+(F*1000/A);
-    sigma_r=-P; // at inner wall
-  }
-
-  // Simple thin-wall hoop for display
-  var sigma_h_barlows=P*OD/(2*t);
-  // Von Mises
-  var sigma_vm=Math.sqrt(sigma_h*sigma_h - sigma_h*sigma_L + sigma_L*sigma_L);
-  var SF_hoop=SMYS/sigma_h_barlows;
-  var SF_vm=SMYS/sigma_vm;
-  var allow=SMYS*df;
-  var hoop_ok=sigma_h_barlows<=allow;
-  var vm_ok=sigma_vm<=allow;
-
-  var html='<div class="rgrid">';
-  html+=rc('hl','Hoop stress (Barlow)',sigma_h_barlows.toFixed(2),'MPa','sigma_h = P x OD / (2 x t)');
-  html+=rc(DR>20?'inf':'hl','Hoop stress (Lamé inner)',sigma_h.toFixed(2),'MPa',DR>20?'Thin wall - same as Barlow':'Thick wall formula');
-  html+=rc('','Longitudinal stress',sigma_L.toFixed(2),'MPa','Pressure + axial load');
-  html+=rc('','Radial stress',sigma_r.toFixed(2),'MPa','At inner wall');
-  html+=rc(vm_ok?'ok':'er','Von Mises equivalent',sigma_vm.toFixed(2),'MPa',vm_ok?'< Allow. '+allow.toFixed(0)+' MPa - PASS':'> Allow. '+allow.toFixed(0)+' MPa - FAIL');
-  html+=rc(hoop_ok?'ok':'er','Safety factor (hoop)',SF_hoop.toFixed(2),'-',hoop_ok?'SMYS/sigma_h - ADEQUATE':'< 1.0 - FAILURE');
-  html+=rc(vm_ok?'ok':'er','Safety factor (VM)',SF_vm.toFixed(2),'-',vm_ok?'Adequate margin':'INSUFFICIENT');
-  html+=rc('','Thin/thick wall regime',DR>20?'THIN WALL':'THICK WALL','D/t='+DR.toFixed(1),DR>20?'Barlow valid':'Use Lamé equations');
-  html+='</div>';
-
-  html+='<div class="fbox">'
-    +'<strong>Thin wall check:</strong> D/t = '+OD+'/'+t+' = '+DR.toFixed(1)+' → '+(DR>20?'THIN (Barlow valid)':'THICK (Lamé required)')+' wall<br>'
-    +'<strong>Hoop (Barlow):</strong> sigma_h = P x OD / (2t) = '+P.toFixed(3)+' x '+OD+' / (2 x '+t+') = <span class="hi">'+sigma_h_barlows.toFixed(2)+' MPa</span><br>'
-    +'<strong>Lamé (inner):</strong> sigma_h = P x (ri^2+ro^2)/(ro^2-ri^2) = '+P.toFixed(3)+' x ('+ri.toFixed(1)+'^2+'+ro.toFixed(1)+'^2)/('+ro.toFixed(1)+'^2-'+ri.toFixed(1)+'^2) = <span class="hi">'+sigma_h.toFixed(2)+' MPa</span><br>'
-    +'<strong>Longitudinal:</strong> sigma_L = P x ri^2/(ro^2-ri^2) + F/A = '+P.toFixed(3)+' x '+ri.toFixed(1)+'^2/('+ro.toFixed(1)+'^2-'+ri.toFixed(1)+'^2) + '+(F*1000/A).toFixed(2)+' = <span class="hi">'+sigma_L.toFixed(2)+' MPa</span><br>'
-    +'<strong>Von Mises:</strong> sigma_VM = sqrt(sh^2 - sh.sL + sL^2) = <span class="hi">'+sigma_vm.toFixed(2)+' MPa</span><br>'
-    +'<strong>Allowable:</strong> SMYS x design_factor = '+SMYS+' x '+df+' = <span class="hi">'+allow.toFixed(0)+' MPa</span>'
-    +'</div>';
-
-  var rows='';
-  if(!hoop_ok){
-    rows+=ar('er','HOOP STRESS EXCEEDS ALLOWABLE - PIPE INADEQUATE','Hoop stress '+sigma_h_barlows.toFixed(1)+' MPa exceeds allowable '+allow.toFixed(0)+' MPa ('+(sigma_h_barlows/allow*100).toFixed(0)+'% of limit). At this stress level, pipe will yield under pressure. Risk of burst failure.','Increase wall thickness. Required minimum t = P x OD / (2 x SMYS x '+df+') = '+(P*OD/(2*SMYS*df)).toFixed(2)+' mm. Select next heavier schedule or upgrade to higher-grade material (e.g. API 5L X52 SMYS=358 MPa).');
-  } else {
-    rows+=ar('ok','Hoop stress within limit ('+((sigma_h_barlows/allow)*100).toFixed(0)+'% of allowable)','Hoop stress '+sigma_h_barlows.toFixed(2)+' MPa is '+(allow-sigma_h_barlows).toFixed(1)+' MPa below allowable '+allow.toFixed(0)+' MPa. Safety factor of '+SF_hoop.toFixed(2)+'x against yielding is adequate.','');
-  }
-  if(!vm_ok){
-    rows+=ar('er','VON MISES STRESS EXCEEDS ALLOWABLE','Combined equivalent stress (VM) of '+sigma_vm.toFixed(1)+' MPa exceeds allowable '+allow.toFixed(0)+' MPa. Multiaxial stress state is more critical than hoop stress alone. Axial loading significantly increases combined stress.','Reduce axial load or increase wall thickness. If thermal expansion creates axial loads, design adequate flexibility with expansion loops or bellows. Perform formal piping flexibility analysis per ASME B31.3 Appendix S.');
-  }
-  if(DR<=20){
-    rows+=ar('info','Thick-wall cylinder - Lamé equations required (D/t = '+DR.toFixed(1)+')','Diameter-to-thickness ratio D/t = '+DR.toFixed(1)+' ≤ 20. The thin-wall (Barlow) approximation is not valid. Hoop stress varies significantly through the wall thickness - highest at inner surface ('+sigma_h.toFixed(1)+' MPa) and lowest at outer surface ('+( P*(2*ri*ri)/(ro*ro-ri*ri)).toFixed(1)+' MPa).','Use Lamé equations for all stress calculations. For ASME pressure vessel design (closed end caps), use ASME VIII Division 1 thick-shell equations. Ensure FEA (Finite Element Analysis) is used for complex geometries with D/t < 10.');
-  }
-  if(Math.abs(F)>0){
-    rows+=ar('info','Axial load applied (F = '+F+' kN)','Axial force creates longitudinal stress of '+(F*1000/A).toFixed(1)+' MPa additional to pressure-induced longitudinal stress. Total longitudinal stress: '+sigma_L.toFixed(1)+' MPa. This changes the Von Mises equivalent stress from pure pressure.','For buried pipelines, thermal expansion creates axial compressive stress: sigma_thermal = E x alpha x Delta_T. For steel: E=200 GPa, alpha=12x10-6/°C. For Delta_T=30°C: additional stress = 200000 x 12e-6 x 30 = 72 MPa compressive in restrained pipe.');
-  }
-
-  html+='<div class="analysis"><div class="atitle">/// STRESS ANALYSIS</div>'+rows+'</div>';
-  document.getElementById('r3').innerHTML=html;
+ var v=psaStrict(['h_OD','h_t','h_P','h_SMYS','h_df','h_F']);
+ var OD=v[0],t=v[1],P=v[2]/10,SMYS=v[3],df=v[4],F=v[5];
+ if(v.some(function(x){return !Number.isFinite(x);})||OD<=0||t<=0||2*t>=OD||P<0||SMYS<=0||df<=0||df>1){psaPipeError('r3','Invalid cylinder geometry, pressure or assumed strength factor.');return;}
+ var ro=OD/2,ri=ro-t,A=Math.PI*(ro*ro-ri*ri),sh=P*(ri*ri+ro*ro)/(ro*ro-ri*ri),sl=P*ri*ri/(ro*ro-ri*ri)+F*1000/A,sr=-P;
+ var equiv=Math.sqrt(((sh-sl)**2+(sl-sr)**2+(sr-sh)**2)/2),limit=SMYS*df;
+ var h='<div class="rgrid">';h+=rc('','Inner-wall hoop stress',sh.toFixed(3),'MPa','Lame cylinder; zero external pressure');h+=rc('','Longitudinal stress',sl.toFixed(3),'MPa','Closed ends plus specified axial load');h+=rc('','Inner-wall radial stress',sr.toFixed(3),'MPa','Compression negative');h+=rc('hl','Inner-wall von Mises stress',equiv.toFixed(3),'MPa','Includes all three principal stresses');h+=rc('','Assumed screening limit',limit.toFixed(3),'MPa','SMYS times user factor; not a universal code allowable');h+='</div><div class="fbox">Elastic straight-cylinder model, closed ends, uniform internal pressure, zero external pressure and no bending, thermal or residual stresses. Axial force is positive in tension. This is not a complete piping-code stress evaluation or burst prediction.</div>';document.getElementById('r3').innerHTML=h;
 }
-
 /* ====== PANEL 4: SCHEDULE SELECTOR ====== */
 function calcSch(){
   var nps=psaNum('nps-sel',6);
@@ -850,12 +656,8 @@ function findNPS(OD){
 }
 
 function findNextSch(nps,t_req){
-  if(!nps||!npsData[nps]) return {n:'Custom',t:Math.ceil(t_req*2)/2};
-  var schs=npsData[nps].schs;
-  for(var i=0;i<schs.length;i++){
-    if(schs[i].t>=t_req) return schs[i];
-  }
-  return schs[schs.length-1];
+ if(!Number.isFinite(t_req)||t_req<0||!nps||!npsData[nps])return null;
+ var schs=npsData[nps].schs;for(var i=0;i<schs.length;i++){if(schs[i].t>=t_req)return schs[i];}return null;
 }
 
 /* ====== INIT ====== */

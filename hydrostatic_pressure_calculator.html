@@ -232,6 +232,7 @@ select option{background:#1A1A1A;}
 </style>
 </head>
 <body>
+<div style="padding:12px 20px;font-size:13px;background:#172330;color:#fff">Educational arithmetic tool. Version 2026.10.25.1. Uniform-density columns only; pressure, gradients and profile use the entered gravity. No operational well-control approval is provided.</div>
 <div class="wrap">
 
 <!-- HEADER -->
@@ -504,8 +505,8 @@ var fluids=[
 function barToPsi(b){return b*14.5038;}
 function barToKpa(b){return b*100;}
 function barToMpa(b){return b/10;}
-function rhoToGrad(rho){return rho*9.81/100000;}// bar/m
-function rhoToGradPsi(rho){return rho/1000*0.4335;}// psi/ft
+function rhoToGrad(rho,g){return rho*(g===undefined?9.81:g)/100000;}// bar/m
+function rhoToGradPsi(rho,g){return rho*(g===undefined?9.81:g)*0.3048/6894.757293168;}// psi/ft
 
 function sw(n){
   for(var i=1;i<=5;i++){
@@ -537,6 +538,12 @@ function setFluid(id,rho,name){
 
 /* ===================== PANEL 1 ===================== */
 function calc1(){
+  var ids=['rho1','h1','p01','g1','dia1'];
+  var vals=ids.map(function(id){var raw=String(document.getElementById(id).value).trim();return raw===''?NaN:Number(raw.replace(',','.'));});
+  if(vals.some(function(v){return !Number.isFinite(v);}) || vals[0]<=0 || vals[1]<0 || vals[3]<=0 || vals[4]<=0){
+    document.getElementById('r1').innerHTML='<div class="alert a-er">Enter finite numeric inputs: density, gravity and diameter must be positive; vertical depth must be non-negative. No result is calculated.</div>';
+    document.getElementById('gauge1').innerHTML=''; return;
+  }
   var rho=psaNum('rho1',1000);
   var h=psaNum('h1',100);
   var p0=psaNum('p01',0);
@@ -549,8 +556,8 @@ function calc1(){
   var P_kPa=barToKpa(P_bar);
   var P_MPa=barToMpa(P_bar);
   var SG=rho/1000;
-  var grad_bar=rhoToGrad(rho);
-  var grad_psi=rhoToGradPsi(rho);
+  var grad_bar=rhoToGrad(rho,g);
+  var grad_psi=rhoToGradPsi(rho,g);
   var area=Math.PI*(dia/2)*(dia/2);
   var force=P_bar*1e5*area/1000; // kN
 
@@ -619,7 +626,7 @@ function calc1(){
       +'<div style="font-size:10px;color:#555;margin-bottom:8px;font-family:var(--mono);">PRESSURE PROFILE</div>'
       +[0,25,50,75,100].map(function(pct){
         var depth=h*pct/100;
-        var pb=(rho*9.81*depth/100000+p0).toFixed(2);
+        var pb=(rho*g*depth/100000+p0).toFixed(2);
         return '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #111;">'
           +'<span style="font-size:10px;color:#666;font-family:var(--mono);">'+depth.toFixed(0)+' m</span>'
           +'<span style="font-size:10px;color:#aaa;font-family:var(--mono);">'+pb+' bar</span>'
