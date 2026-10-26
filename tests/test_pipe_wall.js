@@ -6,7 +6,7 @@ c.calc1();
 const h=c.__els.r1.innerHTML;
 const t=parseFloat(h.match(/Required t \(calc\)<\/div><div[^>]*>([\d.]+)/)[1]);
 near('t_calc 6 in, 100 bar, A106 B',t,10*168.3/(2*(138+10*0.4)),0.001);
-console.log('schedule:',h.match(/Recommended schedule<\/div><div[^>]*>([^<]+)/)[1].trim(),'(expected Sch 80, 10.97 mm)');
+console.log('schedule:',h.match(/Listed schedule meeting wall arithmetic<\/div><div[^>]*>([^<]+)/)[1].trim(),'(expected Sch 80, 10.97 mm)');
 // ASME B36.10M spot checks
 const s20=c.npsData[20].schs.find(x=>x.n==='Sch 40').t, s12=c.npsData[12].schs.find(x=>x.n==='Sch 80').t;
 near('20 in Sch 40 wall mm',s20,15.09,1e-6);near('12 in Sch 80 wall mm',s12,17.48,1e-6);
