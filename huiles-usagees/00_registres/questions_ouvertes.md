@@ -1,0 +1,26 @@
+# Registre des questions ouvertes
+
+Chaque question porte le lot qui la pose, la personne ou l'institution qui peut y répondre et l'effet de la réponse. Priorité selon MoSCoW (M : indispensable avant décision, S : à régler avant lancement, C : utile).
+
+| ID | Lot | Question | Qui peut répondre | Effet de la réponse | Priorité |
+|---|---|---|---|---|---|
+| Q-01 | 02 | Texte intégral et officiel de l'arrêté n°001/MINEPDED du 15 octobre 2012 : l'article 1 cite la « valorisation » dans la définition du permis [S-02], mais le chapitre II ne vise que le tri, la collecte, le transport et l'élimination finale des déchets dangereux. La fabrication d'un combustible est-elle couverte ? | MINEPDED, Direction des normes et du contrôle ; juriste en droit de l'environnement | détermine si un second titre (établissement classé, agrément de valorisation) est nécessaire | M |
+| Q-02 | 02 | Le réseau de travail bloque FAOLEX et episciences : le promoteur peut-il fournir les PDF officiels (arrêtés n°001 et n°002 de 2012, décret n°2012/2809/PM, loi n°96/12, décret n°99/818/PM) ? | promoteur (bibliothèque HIKMA) | passage des textes de « connu par résumé » à « lu en entier » | M |
+| Q-03 | 00b, 02 | Un apporteur d'affaires ou un courtier qui ne détient, ne transporte et ne stocke aucun déchet doit-il détenir un permis environnemental ? | MINEPDED, par écrit | maintien ou retrait des pistes A1 et A10 | M |
+| Q-04 | 00b | Bocom International, SECA ou un autre collecteur agréé acceptent-ils un accord de commission ? Sur quelle base (litre, montant facturé, contrat) ? | collecteurs | valeur de H-21 | S |
+| Q-05 | 00b, 04b | Quels laboratoires au Cameroun ou dans la sous-région réalisent l'analyse d'huile en service et l'analyse complète d'huile usagée (PCB, métaux, chlore, soufre, eau) ? À quel prix, en quel délai, avec quelle accréditation ? SGS Cameroun dispose-t-il d'un laboratoire local ou expédie-t-il à l'étranger ? | SGS Cameroun (176 rue Victoria, Douala) [S-12], autres laboratoires à identifier | valeurs de H-23 et H-43 ; faisabilité des pistes A2 et du protocole 4 bis n°2 | M |
+| Q-06 | 00b | Quels fournisseurs d'absorbants, kits antipollution, bacs de rétention et fûts homologués existent au Cameroun et acceptent un agent commercial ou un dépôt-vente ? | prospection directe | valeur de H-25 | S |
+| Q-07 | 00b | La formation intra-entreprise par un prestataire non agréé est-elle autorisée, ou faut-il l'agrément MINEFOP (validité de 2 ans selon [S-20]) ? Quel prix les entreprises forestières paient-elles une journée de formation HSE ? | MINEFOP ; responsables HSE des clients | légalité et valeur de H-27 | M |
+| Q-08 | 00b, 11 | Coût réel et délai de création d'une SARL ou d'un établissement au Centre de formalités de création d'entreprises (CFCE) en 2026 | CFCE | valeur de H-30 | S |
+| Q-09 | 00b | STIHL Cameroun accepte-t-il un agent sans stock ou un dépôt-vente pour l'huile de chaîne BioPlus ? | STIHL, 44 rue Dr Bebey Eyidi, Douala [S-17] | réintégration éventuelle de la piste A4 | C |
+| Q-10 | 00b, 11 | HIKMA accepte-t-elle par écrit que son directeur de projets exerce une activité commerciale auprès de clients de HIKMA, et à quelles conditions ? | associés de HIKMA | condition préalable à toute prospection des clients forestiers | M |
+| Q-11 | 04 | L'unité Ecoslops de Valtech Energy à Kribi (au moins 7 000 t/an annoncées [S-03][S-04]) a-t-elle été mise en service ? Achète-t-elle des huiles usagées, à quel prix ? | Valtech Energy, groupe SCIN | concurrent ou débouché majeur ; peut changer le modèle | M |
+| Q-12 | 04 | Le chiffre de 64 % d'huiles « régénérées par des entreprises agréées » cité par [S-01] : quelle source primaire, quelle année, quelles entreprises ? | auteurs de [S-01], MINEPDED | gisement réellement disponible | M |
+| Q-13 | 09 | Cours du dollar en FCFA à retenir à chaque devis | BEAC, cours du jour | H-41 | C |
+| Q-14 | 04b | Transitaire capable d'expédier des échantillons d'huile usagée (marchandise dangereuse) hors du Cameroun, coût et formalités (y compris convention de Bâle pour des échantillons) | transitaires, MINEPDED | H-44 | S |
+| Q-15 | 04b | Loueur ou prestataire de mesure des gaz de combustion (Testo 350 ou équivalent) au Cameroun ou dans la sous-région | prospection | H-46 | S |
+| Q-16 | 04b, 05 | Prix d'achat, prix de location et disponibilité des cartouches de rechange du Parker DFC14WS25VVX1 rendu Douala | distributeur Parker | H-47 | M |
+| Q-17 | 02, 04b | Peut-on fabriquer un lot d'essai de combustible et le brûler chez un industriel sans permis ? Une autorisation d'essai du MINEPDED existe-t-elle ? | MINEPDED | faisabilité du protocole 4 bis n°3 | M |
+| Q-18 | 04b | Les collecteurs agréés acceptent-ils une sous-traitance d'enlèvement en forêt (pistes, distances) et à quel prix ? | Bocom International, SECA | H-48 ; faisabilité du pilote | M |
+| Q-19 | 02 | Montants actuels des amendes des articles 80 à 82 de la loi n°96/12 : la source secondaire [S-23] donne des bornes incohérentes pour l'article 82 | texte officiel [S-24] | argumentaire commercial, grille tarifaire | S |
+| Q-20 | 00b | Tractafric Equipment Cameroun propose-t-il le programme d'analyse d'huile de Caterpillar à ses clients forestiers, à quel prix et avec quel délai ? | Tractafric Equipment Cameroun | taille de la cible de A2 | S |

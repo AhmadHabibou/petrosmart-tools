@@ -1,0 +1,39 @@
+# Registre des hypothèses
+
+Fichier généré par `commun/registres.py` depuis `commun/hypotheses.py`. Toute modification se fait dans le module Python, puis `python run_all.py`.
+
+| ID | Lot | Libellé | Bas | Central | Haut | Unité | Justification | Impact | Vérification | Statut |
+|---|---|---|---:|---:|---:|---|---|---|---|---|
+| H-01 | BP initial | Huiles usagees par client forestier | 10 000 | 10 000 | 10 000 | L/an | valeur du business plan initial [S-29], sans mesure | critique pour le modele foret | pilote 4 bis n°1 et releve des achats de lubrifiants des clients | supposé |
+| H-02 | BP initial | Huiles urbaines collectees en annee 5 | 1 200 000 | 1 200 000 | 1 200 000 | L/an | valeur du business plan initial [S-29], non verifiee | critique : seuil de VAN nulle a 320 000 L/an | enquete 30 garages et flottes (lot 4), pilote | supposé |
+| H-03 | BP initial | Prix d'achat des huiles urbaines | 50 | 50 | 50 | FCFA/L | valeur du business plan initial [S-29] | critique : le circuit informel fixe ce prix | enquete garages (lot 4) | supposé |
+| H-04 | BP initial | Prix de vente du combustible | 400 | 400 | 400 | FCFA/L | valeur du business plan initial [S-29] ; gasoil pompe 828 FCFA/L [S-09] | critique : seuil de VAN nulle a 250 FCFA/L | lettre d'intention apres essai de combustion (4 bis n°3) | supposé |
+| H-05 | BP initial | Rendement en combustible | 0,80 | 0,80 | 0,80 | fraction | valeur du business plan initial [S-29] | fort | bilan matiere sur 10 a 15 echantillons (4 bis n°2) | supposé |
+| H-20 | 00b | Lot 0, apporteur d'affaires : volume apporte sur 12 mois | 20 000 | 50 000 | 100 000 | L | ordre de grandeur : 2 a 10 clients de taille H-01 | moyen | accord de commission signe avec un collecteur agree | supposé |
+| H-21 | 00b | Lot 0, apporteur d'affaires : commission | 10 | 20 | 30 | FCFA/L | aucune reference publiee ; base a negocier (Q-04) | moyen | proposition ecrite du collecteur | supposé |
+| H-22 | 00b | Lot 0, analyse d'huile : analyses vendues sur 12 mois | 60 | 120 | 240 | analyses | 5 clients x 4 engins suivis x 3 a 12 prelevements par an | moyen | bons de commande prepayes | supposé |
+| H-23 | 00b | Lot 0, analyse d'huile : marge nette par analyse | 10 000 | 15 000 | 25 000 | FCFA | prix de vente moins cout laboratoire (inconnu, Q-05) et acheminement | fort | devis SGS Cameroun et d'un second laboratoire | supposé |
+| H-24 | 00b | Lot 0, kits antipollution : commandes sur 12 mois | 5 | 10 | 20 | commandes | achats ponctuels de chantiers et d'ateliers | moyen | bons de commande avec acompte | supposé |
+| H-25 | 00b | Lot 0, kits antipollution : marge par commande | 50 000 | 90 000 | 150 000 | FCFA | marge d'agent sur prix fournisseur (fournisseur a identifier, Q-06) | moyen | contrat d'agent ou de depot-vente | supposé |
+| H-26 | 00b | Lot 0, formation : sessions vendues sur 12 mois | 4 | 8 | 12 | sessions | une session par client cible et par semestre | fort | conventions de formation signees et payees | supposé |
+| H-27 | 00b | Lot 0, formation : marge nette par session (1 jour, chez le client) | 400 000 | 600 000 | 1 000 000 | FCFA | prix de session moins deplacement et supports ; aucun prix de marche publie trouve (Q-07) | fort | test de prix aupres des 5 premiers prospects | supposé |
+| H-28 | 00b | Lot 0, contenu en ligne : ventes sur 12 mois | 10 | 25 | 50 | ventes | audience de la plateforme du promoteur non mesuree | faible | statistiques de la plateforme | supposé |
+| H-29 | 00b | Lot 0, contenu en ligne : revenu net par vente | 15 000 | 20 000 | 30 000 | FCFA | prix d'un module court | faible | test de prix | supposé |
+| H-33 | 00b | Lot 0, formation : prix d'appel d'une session d'1 jour, jusqu'a 15 participants, hors frais de mission | 600 000 | 800 000 | 1 200 000 | FCFA HT | prix a tester ; aucun prix de marche publie trouve (Q-07) | fort | reaction des 5 premiers prospects | supposé |
+| H-34 | 00b | Lot 0, analyse d'huile : majoration appliquee au cout laboratoire | 10 000 | 15 000 | 25 000 | FCFA/analyse | egale a la marge nette visee H-23 ; prix client = cout laboratoire + majoration + acheminement | fort | devis laboratoire (Q-05) | supposé |
+| H-30 | 00b | Lot 0 : frais de creation d'une structure juridique pour facturer | 50 000 | 100 000 | 200 000 | FCFA | montant a confirmer au CFCE (Q-08) | moyen | bareme du CFCE | supposé |
+| H-31 | 00b | Lot 0 : supports commerciaux (impression, cartes, plaquette) | 50 000 | 75 000 | 100 000 | FCFA | devis d'imprimerie a Yaounde a obtenir | faible | deux devis | supposé |
+| H-32 | 00b | Lot 0 : deplacements de prospection avant premier encaissement | 100 000 | 150 000 | 200 000 | FCFA | 4 a 8 deplacements Yaounde-Douala ou vers les UTB | moyen | releve des depenses | supposé |
+| H-40 | 04b | Kit Dexsil Clor-D-Tect 1000, prix unitaire hors port | 22 | 22 | 30 | USD | prix catalogue Hazmat Resource [S-14] ; commande minimale 10 kits [S-15] | faible | devis rendu Douala | probable |
+| H-41 | 04b | Cours du dollar retenu pour les budgets | 560 | 600 | 650 | FCFA/USD | fourchette de travail ; le cours du jour doit etre releve et source a chaque devis (Q-13) | faible | cours BEAC du jour de la commande | supposé |
+| H-42 | 04b | Fret et dedouanement des petits consommables importes | 0,30 | 0,40 | 0,60 | fraction du prix | coefficient de travail, aucun bareme consulte | moyen | devis transitaire | supposé |
+| H-43 | 04b | Analyse complete en laboratoire externe (PCB, metaux, chlore, soufre, eau) | 150 000 | 250 000 | 400 000 | FCFA/echantillon | aucun tarif publie trouve (Q-05) | fort | trois devis de laboratoires | supposé |
+| H-44 | 04b | Envoi international d'un echantillon (emballage et transport de marchandise dangereuse) | 50 000 | 100 000 | 200 000 | FCFA/envoi | a confirmer aupres d'un transitaire agree pour les matieres dangereuses (Q-14) | moyen | devis transitaire | supposé |
+| H-45 | 04b | Materiel de prelevement (echantillonneur, flacons, glaciere, etiquettes) | 150 000 | 250 000 | 400 000 | FCFA | Koehler K27400 et consommables, prix rendu Douala inconnu | faible | devis | supposé |
+| H-46 | 04b | Location d'un analyseur de gaz de combustion pour 1 semaine, ou prestataire | 500 000 | 900 000 | 1 500 000 | FCFA | location Testo signalee par le promoteur, aucun loueur en Afrique centrale identifie (Q-15) | moyen | devis loueur ou prestataire | supposé |
+| H-47 | 04b | Pilote : location ou mise a disposition d'une unite de purification du gasoil (3 mois) | 600 000 | 1 200 000 | 2 500 000 | FCFA | prix d'achat et de location du Parker DFC14WS25VVX1 non consultes (Q-16) | fort | devis distributeur Parker ou loueur | supposé |
+| H-48 | 04b | Pilote : cout d'une tournee d'enlevement sous-traitee a un collecteur agree | 300 000 | 500 000 | 900 000 | FCFA/tournee | aucun tarif publie ; depend de la distance et de l'etat des pistes | fort | devis Bocom International, SECA ou autre collecteur agree | supposé |
+| H-49 | 04b | Pilote : nombre de tournees d'enlevement en 3 mois (2 clients) | 2 | 3 | 4 | tournees | un enlevement par client et par trimestre, plus un enlevement d'urgence | moyen | planning du pilote | supposé |
+| H-50 | 04b | Pilote : frais de mission du promoteur et d'un technicien (3 mois) | 600 000 | 900 000 | 1 500 000 | FCFA | 6 a 10 sejours de 2 a 3 jours sur chantier | moyen | releve reel | supposé |
+| H-51 | 04b | Releve des sanctions : frais de deplacement et de reproduction | 50 000 | 100 000 | 150 000 | FCFA | visites aux services des clients | faible | releve reel | supposé |
+| H-52 | 04b | Essai de combustion : fabrication d'un lot de 200 L par un partenaire autorise | 100 000 | 200 000 | 400 000 | FCFA | a negocier ; la fabrication par la societe sans permis est exclue (Q-17) | fort | accord ecrit du partenaire | supposé |

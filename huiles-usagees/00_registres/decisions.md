@@ -1,0 +1,10 @@
+# Registre des décisions
+
+| ID | Date | Décision | Auteur | Justification | Réversible |
+|---|---|---|---|---|---|
+| D-01 | 17/11/2026 | Le projet est logé dans le dossier `huiles-usagees/` du dépôt `petrosmart-tools`, sans modifier les calculateurs existants. | chef de projet | dépôt fourni par le promoteur ; séparation nette des contenus | oui, déplacement possible vers un dépôt dédié |
+| D-02 | 17/11/2026 | Les livrables ne portent pas la marque HIKMA. La charte typographique HIKMA (Arial, marges, numérotation) est appliquée aux documents Word du lot 15, sans logo ni mention HIKMA. | chef de projet | la société est distincte de HIKMA (contrainte d'éthique) | oui |
+| D-03 | 17/11/2026 | Toute valeur chiffrée utilisée par le code est déclarée dans `commun/hypotheses.py` ; les fichiers `.md` chiffrés sont générés par `run_all.py`. | chef de projet | règles 3 et 11 | non |
+| D-04 | 17/11/2026 | Lot 0 : trois activités recommandées, A5 formation, A2 analyse d'huile en service, A1 apporteur d'affaires d'un collecteur agréé. Lancement subordonné aux réponses Q-07, Q-03 et Q-10. | chef de projet, après contre-expertise | matrice `00b_amorcage/matrice_amorcage.md`, classement stable sous deux jeux de poids | oui, revue à J+90 |
+| D-05 | 17/11/2026 | Pilote 4 bis n°1 : l'enlèvement et le transport des huiles sont sous-traités à un collecteur agréé tant que la société n'a pas son permis. La société ne transporte aucun déchet dangereux. | chef de projet, sur alerte du contre-expert | l'arrêté n°001/MINEPDED soumet la collecte et le transport des déchets dangereux à permis [S-02] | non, sauf obtention du permis |
+| D-06 | à prendre | Viabilité du projet et modèle retenu, à inscrire à la fin du lot 4. | | | |

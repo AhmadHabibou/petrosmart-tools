@@ -1,0 +1,37 @@
+# Registre des sources
+
+Date de consultation de toutes les sources ci-dessous : 17/11/2026.
+
+**Limite de méthode.** Le réseau de l'environnement de travail bloque le téléchargement direct des PDF (FAOLEX, episciences : refus du proxy, code 403). Les sources marquées « extrait » ont été lues par extraits de moteur de recherche, pas en texte intégral. Aucune d'elles ne vaut « texte lu en entier » au sens de la règle 5. Les textes réglementaires sont donc tous classés « connus par résumé » tant que le promoteur ou un juriste n'a pas confronté le texte officiel (question Q-01).
+
+| ID | Auteur ou institution | Titre | Date | Lien | Mode de lecture |
+|---|---|---|---|---|---|
+| S-01 | Mbomen Mbomen L. M. et al. (Université de Dschang, Université de Yaoundé I) | Validation d'une méthode de valorisation matière et énergie des huiles de vidange, Déchets Sciences et Techniques n°83, DOI 10.4267/dechets-sciences-techniques.4244 | 03/2020 | https://eid.episciences.org/7721/pdf | extrait (résumé, introduction) |
+| S-02 | FAO, FAOLEX, relayé par UNEP LEAP | Notice et texte de l'arrêté n°001/MINEPDED du 15 octobre 2012 fixant les conditions d'obtention d'un permis environnemental en matière de gestion des déchets | 2012 | https://leap.unep.org/en/countries/cm/national-legislation/arrete-ndeg001minepded-du-15-octobre-2012-fixant-les-conditions ; https://faolex.fao.org/docs/pdf/cmr195742.pdf | extrait (article 1 partiel, titre du chapitre II) |
+| S-03 | EcoMatin | Port de Kribi : 32 milliards de FCFA pour recycler les déchets pétroliers | non datée dans l'extrait | https://ecomatin.net/port-de-kribi-32-milliards-de-fcfa-pour-recycler-les-dechets-petroliers/ | extrait |
+| S-04 | MarketScreener (communiqué Ecoslops) | Ecoslops announces first sales contract close to EUR 5 million signed with Valtech Energy | 2021 | https://ca.marketscreener.com/quote/stock/ECOSLOPS-SA-20773281/news/Ecoslops-S-A-Announces-First-Sales-Contract-Close-to-EUR-5-Million-Signed-with-Valtech-Energy-in-33476900 | extrait |
+| S-05 | Afrik21 | Africa: Ecoslops and Parlym join forces to recycle used engine oil | 04/2023 | https://afrik21.africa/en/africa-ecoslops-and-parlym-join-forces-to-recycle-used-engine-oil | extrait |
+| S-06 | EcoMatin | PAD : l'entreprise SECA décroche un contrat de 141 millions de F pour le traitement des déchets solides | non datée dans l'extrait | https://ecomatin.net/pad-lentreprise-seca-decroche-un-contrat-de-141-millions-de-f-pour-le-traitement-des-dechets-solides | extrait |
+| S-07 | EcoMatin | Sonara : Bocom International décroche le marché d'enlèvement des déchets industriels dangereux | non datée dans l'extrait | https://ecomatin.net/sonara-bocom-international-decroche-le-marche-denlevement-des-dechets-industriels-dangereux | extrait |
+| S-08 | Maligah (annuaire) | Fiche entreprise Bocom International | non datée | https://maligah.com/entreprises/details/Bocom-International?id=43241 | extrait |
+| S-09 | Cameroun24 | Près de 975 FCFA pour importer un litre, 828 FCFA à la pompe : l'écart se creuse pour le gasoil au Cameroun | 10 ou 11/2026 | https://cameroun24.net/article/76269-pres-de-975-fcfa-pour-importer-un-litre-828-fcfa-a-la-pompe-lecart-se-creuse-pour-le-gasoil-au-cameroun.html | extrait (cite la grille CSPH) |
+| S-10 | Financial Afrik | Cameroun : l'État crée une bourse nationale des déchets | 12/06/2025 | https://www.financialafrik.com/2025/06/12/cameroun-letat-creee-une-bourse-nationale-des-dechets/ | extrait |
+| S-11 | Cameroon Tribune | Bourse nationale des déchets : l'équipe dirigeante en place | 2025 | https://cameroon-tribune.cm/article.html/71629/fr.html/details_2 | extrait |
+| S-12 | SGS Cameroun | Oil Condition Monitoring (OCM) | non datée | https://www.sgs.com/en-cm/services/oil-condition-monitoring-ocm | extrait (adresse Douala : 176 rue Victoria) |
+| S-13 | AMSOIL | Oil Analyzers Test Kit, Postage Pre-Paid | non datée | https://www.amsoil.com/p/oil-analyzers-test-kit-postage-pre-paid-oaippkit/ | extrait (référence de prix aux États-Unis, non transposable) |
+| S-14 | Hazmat Resource | Dexsil Clor-D-Tect 1000, Chlorine Halogen Test Kit | non datée | https://hazmatresource.com/?p=8144 | extrait (22 USD) |
+| S-15 | Environmental Expert (fiche Dexsil) | Chlorine halogen test kit | non datée | https://www.environmental-expert.com/products/chlorine-halogen-test-kit-206586 | extrait (commande minimale 10, puis multiples de 20) |
+| S-16 | STIHL (communiqué) | STIHL expands in Africa | 14/04/2025 | https://corporate.stihl.com/en/press/press-release-company/2025/stihl-expands-in-africa | extrait (filiale à Douala) |
+| S-17 | STIHL | Adresses en Afrique | non datée | https://corporate.stihl.com/fr/footer/contact/adresses-dans-le-monde/afrique | extrait |
+| S-18 | Tractafric Equipment | Cameroon, Forestry operations | non datée | https://www.tractafric-equipment.com/en/cameroon--car.html | extrait (concessionnaire exclusif Caterpillar) |
+| S-19 | EcoMatin | Tractafric Equipment met l'énergie Caterpillar au service des chantiers | non datée | https://ecomatin.net/tractafric-equipment-met-lenergie-caterpillar-au-service-des-chantiers | extrait (plus de 6 500 machines CAT et SEM suivies) |
+| S-20 | Cameroon Tribune | Formation professionnelle : 730 centres sont en règle | non datée | https://www.cameroon-tribune.cm/article.html/21373/fr.html/details_2 | extrait (agrément de 2 ans) |
+| S-21 | Organisation internationale de la Francophonie | Appel à candidatures incubateurs, innovations Bassin du Congo 2026 | 01/2026 | https://www.francophonie.org/sites/default/files/2026-01/Appel_incubateurs_innovations_Bassin_Congo_2026.pdf | extrait (clôture 13/03/2026) |
+| S-22 | PNUD Cameroun | Appel à propositions de projets économie bleue | 07/2026 | https://www.undp.org/sites/g/files/zskgke326/files/2026-07/appel_a_propositions_de_projets_economie_bleue.pdf | extrait (clôture 09/07/2026, 30 000 USD maximum) |
+| S-23 | Memoire Online | La gestion des déchets dangereux au Cameroun | 2013 | https://www.memoireonline.com/11/13/7826/m_La-gestion-des-dechets-dangereux-au-Cameroun19.html | extrait, source secondaire (articles 80 et 81 de la loi n°96/12) |
+| S-24 | WIPO Lex | Loi n°96/12 du 5 août 1996 portant loi-cadre relative à la gestion de l'environnement (PDF) | 1996 | https://wipolex-resources-eu-central-1-358922420655.s3.amazonaws.com/edocs/lexdocs/laws/fr/cm/cm004fr.pdf | repérée, non lue |
+| S-25 | EcoMatin | Pollution : 3 milliards de FCFA d'amendes impayées par les entreprises | non datée | https://ecomatin.net/pollution-3-milliards-de-fcfa-damendes-impayees-par-les-entreprises | titre seul, non lue |
+| S-26 | CTC-N | Rapport sur les cimenteries du Congo (combustibles alternatifs dont huiles usées) | non datée | https://www.ctc-n.org/file-download/download/private/35113 | extrait |
+| S-27 | EcoMatin | Cimencam importe 9 000 tonnes de combustible des États-Unis pour son usine de Figuil | non datée | https://ecomatin.net/cimencam-importe-9000-metres-tonnes-de-combustible-des-etats-unis-pour2-son-usine-de-figuil | titre seul |
+| S-28 | Fiches produits fournies par le promoteur (annexe A du cahier des charges) | Dexsil, Megger KF-LAB MkII, Testo 350, Koehler K27400, location Testo | consultées par le promoteur le 17/11/2026 | voir annexe A | non reconsultées |
+| S-29 | Promoteur | Cahier des charges de la mission et premier business plan (desk study) | 17/11/2026 | document interne | lu en entier |
