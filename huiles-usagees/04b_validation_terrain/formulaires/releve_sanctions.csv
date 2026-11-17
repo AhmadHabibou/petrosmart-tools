@@ -1,0 +1,1 @@
+client;date_acte;type_acte(mise_en_demeure|PV|amende|transaction|suspension|observation_audit);autorite;service;motif;texte_vise_numero_date;article;montant_FCFA;montant_paye_FCFA;delai_regularisation;suite_donnee;lien_avec_huiles_oui_non;piece_justificative_ref;confidentialite

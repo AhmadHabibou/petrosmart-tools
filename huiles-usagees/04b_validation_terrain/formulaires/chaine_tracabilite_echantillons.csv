@@ -1,0 +1,1 @@
+id_echantillon;date_heure;preleveur;client_ou_fournisseur;site;coord_gps;type_contenant;id_contenant;methode_prelevement;hauteur_prelevee;volume_mL;flacon_type;aspect;odeur_solvant_oui_non;clor_d_tect_resultat;eau_test_crepitement;scelle_n;remis_a;date_remise;signature_remise;signature_reception

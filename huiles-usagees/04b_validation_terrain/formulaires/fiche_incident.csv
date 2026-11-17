@@ -1,0 +1,1 @@
+id_incident;date_heure;lieu;activite;type(deversement|incendie|blessure|quasi_accident|non_conformite);volume_L;description;cause_immediate;mesures_prises;declare_a;actions_correctives;responsable;date_cloture
