@@ -41,3 +41,4 @@ Chaque question porte le lot qui la pose, la personne ou l'institution qui peut 
 | Q-35 | 08 | Conditions de crédit-bail ou de location d'un purificateur et d'un véhicule léger (loyer, durée, garanties) | sociétés de crédit-bail, loueurs | H-93, H-94 | S |
 | Q-36 | 05, 09 | Grille tarifaire Eneo applicable à un petit site industriel en basse tension | Eneo, facture d'un site voisin | H-113 | C |
 | Q-37 | 05 | Délais de livraison, service après-vente et pièces en Afrique centrale pour Parker (Racor), les purificateurs TYA et les appareils Pensky-Martens | distributeurs, demandes de prix du lot 15 | choix des fournisseurs | S |
+| Q-38 | 06 | Calendrier et durée des barrières de pluie sur les routes forestières de l'Est, par département | MINFOF, MINTP, clients forestiers | planification des enlèvements, stock tampon | S |

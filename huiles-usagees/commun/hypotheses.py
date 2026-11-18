@@ -230,6 +230,8 @@ _H = [
               "a remplacer par le lot 13 (assureur)", "moyen", "devis assureur", lot="06"),
     Hypothese("H-134", "Location d'un camion-citerne avec chauffeur", 250_000, 350_000, 500_000, "FCFA/jour",
               "aucune offre consultee", "fort", "offres de loueurs", lot="06"),
+    Hypothese("H-138", "Surcout d'entretien d'un camion d'occasion par rapport au neuf", 1.2, 1.3, 1.5, "facteur",
+              "vehicule plus age, pieces et immobilisations", "moyen", "carnet d'entretien", lot="06"),
     Hypothese("H-135", "Litres collectes par arret urbain (garage, flotte)", 100, 200, 400, "L/arret",
               "un a deux futs par garage", "fort", "enquete garages", lot="06"),
     Hypothese("H-136", "Arrets urbains par jour de tournee", 8, 12, 18, "arrets/jour",

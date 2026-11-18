@@ -72,3 +72,10 @@ def test_chiffres_lot5_concordent():
     assert "| 0,000 | 0,000 | 0,000 |" in b
     m = _lire("05_technique/matrice_filieres.md")
     assert "| 4,30 |" in m and "| 3,55 |" in m
+
+
+def test_chiffres_lot6_concordent():
+    t = _lire("06_logistique/tournees.md")
+    for fragment in ("| Sous-traitance à un collecteur agréé (H-48 par enlèvement) | 200 | 200 |", "coefficient de détour calé sur deux paires sourcées : 1,30".capitalize(),
+                     "23 420 km", "40 FCFA/L pour 2 400 L"):
+        assert fragment in t, fragment

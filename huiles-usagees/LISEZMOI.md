@@ -57,7 +57,7 @@ python3 run_all.py      # régénère les fichiers chiffrés et contrôle les ti
 python3 -m pytest -q tests
 ```
 
-ou `make` puis `make test`. Dépendances : Python 3.11 ou plus, bibliothèque standard seulement à ce stade.
+ou `make` puis `make test`. Dépendances : Python 3.11 ou plus et `pip install -r requirements.txt` (OR-Tools, NumPy, openpyxl, pytest).
 
 ## Limites de cette livraison
 

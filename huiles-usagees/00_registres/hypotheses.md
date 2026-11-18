@@ -82,6 +82,7 @@ Fichier généré par `commun/registres.py` depuis `commun/hypotheses.py`. Toute
 | H-132 | 06 | Duree d'amortissement economique : neuf / occasion | 5 | 6 | 8 | ans (neuf) | occasion : moitie de cette duree dans le calcul | moyen | politique comptable | supposé |
 | H-133 | 06 | Assurance, visite technique, autorisations, GPS du camion | 2 500 000 | 3 500 000 | 5 000 000 | FCFA/an | a remplacer par le lot 13 (assureur) | moyen | devis assureur | supposé |
 | H-134 | 06 | Location d'un camion-citerne avec chauffeur | 250 000 | 350 000 | 500 000 | FCFA/jour | aucune offre consultee | fort | offres de loueurs | supposé |
+| H-138 | 06 | Surcout d'entretien d'un camion d'occasion par rapport au neuf | 1,20 | 1,30 | 1,50 | facteur | vehicule plus age, pieces et immobilisations | moyen | carnet d'entretien | supposé |
 | H-135 | 06 | Litres collectes par arret urbain (garage, flotte) | 100 | 200 | 400 | L/arret | un a deux futs par garage | fort | enquete garages | supposé |
 | H-136 | 06 | Arrets urbains par jour de tournee | 8 | 12 | 18 | arrets/jour | embouteillages de Douala | fort | pilote urbain | supposé |
 | H-137 | 06 | Kilometres par jour de tournee urbaine | 60 | 90 | 130 | km/jour | approche, inter-arrets et retour | moyen | traces GPS | supposé |
