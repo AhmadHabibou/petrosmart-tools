@@ -46,3 +46,4 @@ Chaque question porte le lot qui la pose, la personne ou l'institution qui peut 
 | Q-40 | 10 | Organismes de formation au transport de matières dangereuses au Cameroun | MINT, transporteurs pétroliers | module F6 | C |
 | Q-41 | 11 | Régime de la SAS au Cameroun (capital minimum, recours au notaire, coût de constitution) | CFCE, avocat | choix de la forme sociale | C |
 | Q-42 | 11 | Régime de TVA et régime d'imposition applicables selon le chiffre d'affaires d'une jeune société de services | DGI, centre des impôts de rattachement | trésorerie et déclarations | S |
+| Q-43 | 13 | Quels assureurs agréés au Cameroun proposent une garantie des atteintes à l'environnement (pollution accidentelle et graduelle), avec quels plafonds, franchises et primes ? | assureurs membres de l'ASAC, courtiers | condition du premier enlèvement | M |

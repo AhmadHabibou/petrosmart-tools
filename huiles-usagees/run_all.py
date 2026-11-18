@@ -23,6 +23,7 @@ ETAPES = [
     "10_organisation/masse_salariale.py",
     "11_juridique/forme_sociale.py",
     "12_parties_prenantes/parties_prenantes.py",
+    "13_risques/registre_risques.py",
     "09_finance/rapport_finance.py",
 ]
 

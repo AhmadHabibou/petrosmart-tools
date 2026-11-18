@@ -147,3 +147,8 @@ def test_guides_entretien_10_a_15_questions():
     for b in blocs:
         n = len(re.findall(r"^\d+\. ", b, flags=re.M))
         assert 10 <= n <= 15, b.splitlines()[0]
+
+
+def test_chiffres_lot13_concordent():
+    r = _lire("13_risques/registre_risques.md")
+    assert "17 sur 20 avant mesures, 2 après mesures" in r and "P04, P11, P18" in r
