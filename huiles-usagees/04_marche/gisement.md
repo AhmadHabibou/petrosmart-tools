@@ -36,3 +36,16 @@ En cas central, le chiffre de l'étude [S-01] vaut 6,8 fois l'estimation par le 
 
 Une part supérieure à 20 % du gisement des deux villes, face à un circuit informel installé et à des collecteurs agréés, est jugée irréaliste à 5 ans par le chef de projet (seuil de décision, pas une donnée).
 
+
+## Prix de référence du combustible
+
+| Référence | FCFA/L | Source |
+|---|---:|---|
+| Gasoil à la pompe, Douala | 828 | [S-09] |
+| Coût d'importation du gasoil, novembre 2026 | 984 | [S-09] |
+| Prix moyen des carburants et lubrifiants importés en 2025, converti (cas bas, central, haut de H-66) | 312 ; 331 ; 370 | [S-63], H-66 |
+| Prix de vente du combustible retenu par le premier business plan | 400 | H-04 |
+| Seuil de VAN nulle du premier business plan | 250 | [S-29] |
+
+Le prix du premier business plan représente 48 % du prix du gasoil à la pompe. Aucun prix du fioul lourd industriel n'a été trouvé : c'est la référence pertinente pour un acheteur équipé d'un brûleur à fioul (Q-29).
+

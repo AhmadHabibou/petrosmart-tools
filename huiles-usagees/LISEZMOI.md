@@ -1,18 +1,18 @@
 # Projet de collecte et de valorisation des huiles usagées et du gasoil au Cameroun
 
-**État au 17/11/2026 : livraison intermédiaire (phase A).** Lots livrés : 0, 1 et 4 bis, avec les registres et le socle de calcul. Les lots 2 à 17 restent à produire. Ce fichier sera réécrit en version finale avec la synthèse du lot 17.
+**État au 18/11/2026 : livraison intermédiaire (phases A et B).** Lots livrés : 0, 1, 2, 3, 4 et 4 bis, avec les registres et le socle de calcul. Décision de viabilité D-06 prise. Les lots 4 ter et 5 à 17 restent à produire. Ce fichier sera réécrit en version finale avec la synthèse du lot 17.
 
 ## Conclusion provisoire en cinq lignes
 
-1. Le projet n'est ni validé ni invalidé : les preuves décisives (volumes réels, qualité des huiles, acheteur, statut légal de la valorisation) sont de terrain.
+1. Go conditionnel (D-06) : le projet est viable comme service de conformité et de collecte payé par les producteurs, pas encore comme fabricant de combustible.
 2. Le promoteur peut encaisser dès le premier mois avec trois activités sous 500 000 FCFA de dépenses : formation en atelier, analyse d'huile en service, apport d'affaires à un collecteur agréé.
 3. Tant que la société n'a pas de permis, elle ne transporte aucun déchet dangereux : le pilote sous-traite l'enlèvement à un collecteur agréé.
-4. Une unité de traitement d'au moins 7 000 t/an a été commandée par Valtech Energy pour Kribi ; son statut doit être éclairci avant tout choix de modèle.
-5. L'arrêté n°001/MINEPDED cite la valorisation dans la définition du permis, mais son chapitre sur les déchets dangereux ne la vise pas : la réponse écrite du MINEPDED conditionne le modèle « unité de traitement ».
+4. Le gisement national de 70 000 t/an est probablement surestimé (environ 11 M L/an par le parc en cas central) et aucun acheteur de combustible n'est confirmé.
+5. Le permis déchets peut couvrir la valorisation, mais le statut légal du combustible vendu n'est pas tranché : l'unité de traitement est gelée jusqu'à une réponse écrite du MINEPDED.
 
 ## Modèle recommandé
 
-Non tranché avant le lot 8. Orientation provisoire : démarrage par le service (conformité, purification du gasoil) et la sous-traitance de la collecte, sans unité de traitement propre.
+Non tranché avant le lot 8. Orientation fixée par D-06 et D-07 : service de conformité, purification du gasoil, collecte sous-traitée puis en propre, remise des huiles à un valorisateur titulaire, sans unité de traitement propre.
 
 ## Budget de démarrage
 
@@ -34,15 +34,18 @@ La liste complète est dans `00_registres/questions_ouvertes.md`.
 1. `01_cadrage/lot1_cadrage.md`
 2. `00b_amorcage/lot0_amorcage.md`, puis `matrice_amorcage.md`
 3. `04b_validation_terrain/lot4bis_protocoles.md`, `procedure_acceptation_lots.md`, `budget_protocoles.md`
-4. `00_registres/` : décisions, questions ouvertes, hypothèses, sources
+4. `02_reglementaire/lot2_reglementaire.md`, puis `calendrier.md`
+5. `03_benchmark/lot3_benchmark.md`
+6. `04_marche/lot4_marche.md`, `gisement.md`, `questionnaire_garages.md`
+7. `00_registres/` : décisions (D-06), questions ouvertes, hypothèses, sources
 
 ## Lundi prochain
 
-1. Envoyer trois lettres : HIKMA (Q-10), MINEFOP (Q-07), MINEPDED (Q-01, Q-03, Q-17).
+1. Envoyer trois lettres : HIKMA (Q-10), MINEFOP (Q-07), MINEPDED (Q-01, Q-03, Q-17, Q-21, Q-23).
 2. Demander les devis : SGS Cameroun et deux laboratoires (Q-05), Bocom International et SECA (Q-18), distributeur Parker (Q-16).
 3. Déposer le dossier de création de la société au CFCE (Q-08).
 4. Faire 10 appels de prospection avec le script du lot 0, en commençant par les flottes urbaines et les concessionnaires.
-5. Transmettre au chef de projet les PDF officiels des textes réglementaires (Q-02) pour le lot 2.
+5. Transmettre au chef de projet les PDF officiels des textes réglementaires (Q-02) pour confirmer le lot 2 ; lancer l'enquête de 30 garages (`04_marche/questionnaire_garages.md`).
 
 ## Reproduire les calculs
 

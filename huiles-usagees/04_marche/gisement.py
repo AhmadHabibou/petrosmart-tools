@@ -20,6 +20,11 @@ NGA_HUILE_USAGEE_L = 150e6         # L/an, Nigeria [S-50]
 PARC_2014 = 675_000                # vehicules [S-43]
 ENGINS_CAT_SEM = 6_500             # machines CAT et SEM suivies au Cameroun [S-19]
 SEUIL_VAN_NULLE_URBAIN_L = 320_000 # L/an, premier business plan [S-29]
+GASOIL_POMPE = 828                 # FCFA/L, novembre 2026 [S-09]
+GASOIL_IMPORT = 984.46             # FCFA/L, grille novembre 2026, depot de Douala-Bonaberi [S-09]
+IMPORT_MOYEN_T = 389_917           # FCFA/t, carburants et lubrifiants importes, moyenne 2025 [S-63]
+PRIX_BP = 400                      # FCFA/L, H-04
+SEUIL_PRIX_VAN_NULLE = 250         # FCFA/L [S-29]
 
 CAS = ("bas", "central", "haut")
 
@@ -93,6 +98,16 @@ def rapport():
                    ("Seuil de VAN nulle du premier business plan [S-29]", SEUIL_VAN_NULLE_URBAIN_L)):
         out.append(f"| {lib} | {_m(v)} | {pct(v / r['bas']['urbain_dy'])} | {pct(v / rc['urbain_dy'])} | {pct(v / r['haut']['urbain_dy'])} |")
     out += ["", "Une part supérieure à 20 % du gisement des deux villes, face à un circuit informel installé et à des collecteurs agréés, est jugée irréaliste à 5 ans par le chef de projet (seuil de décision, pas une donnée).", ""]
+    out += ["", "## Prix de référence du combustible", "",
+            "| Référence | FCFA/L | Source |", "|---|---:|---|",
+            f"| Gasoil à la pompe, Douala | {nombre(GASOIL_POMPE)} | [S-09] |",
+            f"| Coût d'importation du gasoil, novembre 2026 | {nombre(GASOIL_IMPORT)} | [S-09] |",
+            f"| Prix moyen des carburants et lubrifiants importés en 2025, converti (cas bas, central, haut de H-66) | "
+            f"{nombre(IMPORT_MOYEN_T / 1000 * val('H-66', 'bas'))} ; {nombre(IMPORT_MOYEN_T / 1000 * val('H-66'))} ; {nombre(IMPORT_MOYEN_T / 1000 * val('H-66', 'haut'))} | [S-63], H-66 |",
+            f"| Prix de vente du combustible retenu par le premier business plan | {nombre(PRIX_BP)} | H-04 |",
+            f"| Seuil de VAN nulle du premier business plan | {nombre(SEUIL_PRIX_VAN_NULLE)} | [S-29] |", "",
+            f"Le prix du premier business plan représente {pct(PRIX_BP / GASOIL_POMPE)} du prix du gasoil à la pompe. "
+            "Aucun prix du fioul lourd industriel n'a été trouvé : c'est la référence pertinente pour un acheteur équipé d'un brûleur à fioul (Q-29).", ""]
     return "\n".join(out) + "\n", r
 
 
