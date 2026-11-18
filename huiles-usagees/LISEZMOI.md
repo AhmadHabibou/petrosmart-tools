@@ -1,71 +1,65 @@
 # Projet de collecte et de valorisation des huiles usagées et du gasoil au Cameroun
 
-**État au 18/11/2026 : livraison intermédiaire (phases A à E).** Lots livrés : 0 à 14 (dont 4 bis et 4 ter), avec les registres et le socle de calcul. Décisions de viabilité (D-06), de modèle (D-09), de financement (D-11), de forme sociale (D-12) et de plan (D-13) prises. Restent : kit opérationnel (15), application (16), synthèse (17). Ce fichier sera réécrit en version finale avec la synthèse du lot 17.
+**Livraison du 18 novembre 2026. Lots 0 à 17 livrés.** Ce fichier est généré par `17_synthese/construire_synthese.py`.
 
-## Conclusion provisoire en cinq lignes
+## Conclusion en cinq lignes
 
-1. Go conditionnel (D-06) : le projet est viable comme service de conformité et de collecte payé par les producteurs, pas encore comme fabricant de combustible.
-2. Le promoteur peut encaisser dès le premier mois avec trois activités sous 500 000 FCFA de dépenses : formation en atelier, analyse d'huile en service, apport d'affaires à un collecteur agréé.
-3. Tant que la société n'a pas de permis, elle ne transporte aucun déchet dangereux : le pilote sous-traite l'enlèvement à un collecteur agréé.
-4. Le gisement national de 70 000 t/an est probablement surestimé (environ 11 M L/an par le parc en cas central) et aucun acheteur de combustible n'est confirmé.
-5. Le permis déchets peut couvrir la valorisation, mais le statut légal du combustible vendu n'est pas tranché : l'unité de traitement est gelée jusqu'à une réponse écrite du MINEPDED.
+1. Go conditionnel : créer la société et lancer un pilote payant de trois mois, sans achat d'équipement ni demande de permis à ce stade.
+2. Le marché porteur est le service de conformité payé par les forestiers : collecter en forêt coûte 200 à 237 FCFA/L, que seul le producteur peut payer.
+3. Le scénario de base donne une VAN à 5 ans de 9,0 M FCFA, un TRI de 27,5 % et un point mort d'environ 8 clients sous contrat.
+4. Le risque est de démarrage : VAN à 5 ans négative dans 29,5 % des 10 000 tirages, trésorerie tendue en année 2.
+5. L'unité de fabrication de combustible est gelée : statut légal du produit non tranché, aucun acheteur confirmé, gisement national probablement surestimé.
 
 ## Modèle recommandé
 
-Trajectoire par étapes (D-09) : démarrage en modèle à faible capital (purificateur loué, enlèvements sous-traités, contrat de conformité), passage en prestataire équipé quand au moins 4 contrats annuels sont signés, permis propre en année 3, traitement seulement aux conditions de D-06. Point mort : environ 8 à 9 clients forestiers sous contrat (`08_modele_entreprise/comparaison_modeles.md`).
+Trajectoire par étapes (décision D-09) : démarrage à faible capital (purificateur loué, enlèvements sous-traités à un collecteur titulaire, contrat annuel de conformité), passage en prestataire équipé à 4 contrats et 3 mois d'EBITDA positif, permis propre à 320 000 L/an, traitement seulement aux conditions de D-06.
 
 ## Budget de démarrage
 
-- Amorçage (lot 0) : au plus 500 000 FCFA avant le premier encaissement (`00b_amorcage/matrice_amorcage.md`).
-- Financement de la trajectoire retenue : environ 20 M FCFA de fonds propres et quasi-fonds propres, équipements en crédit-bail (`09_finance/lot9_finance.md`).
-- Preuves de terrain (lot 4 bis) : voir `04b_validation_terrain/budget_protocoles.md`, en partie refacturé aux clients pilotes.
+- amorçage : au plus 500 000 FCFA avant le premier encaissement ;
+- six premiers mois : 16,64 M FCFA de décaissements, besoin maximal de 9,84 M FCFA (`14_plan_action/budget_preoperationnel.md`) ;
+- fonds propres et quasi-fonds propres d'environ 20 M FCFA ; équipements en crédit-bail (environ 15,0 M FCFA) ; besoin au 90e centile de 45,6 M FCFA.
 
 ## Cinq questions ouvertes à régler sur le terrain
 
-1. Q-01 : la valorisation en combustible est-elle couverte par le permis « déchets dangereux » ?
-2. Q-10 : HIKMA accepte-t-elle par écrit la prospection de ses clients, et à quelles conditions ?
-3. Q-11 : l'unité de Valtech Energy à Kribi fonctionne-t-elle, et à quel prix achète-t-elle les huiles ?
-4. Q-05 : quel laboratoire accrédité, à quel prix et en quel délai ?
-5. Q-18 : un collecteur agréé accepte-t-il de monter en forêt, et à quel prix ?
+1. Q-10 : HIKMA signe-t-elle la charte de prévention des conflits d'intérêts ?
+2. Q-01 et Q-21 : le permis couvre-t-il la valorisation, et quand l'huile traitée cesse-t-elle d'être un déchet ? (réponse écrite du MINEPDED)
+3. H-80 : quel prix annuel les forestiers acceptent-ils pour le contrat de conformité ? (pilote)
+4. Q-18 : quel collecteur titulaire accepte de sous-traiter les enlèvements en forêt, et à quel prix ?
+5. Q-11 : l'unité de Valtech Energy à Kribi fonctionne-t-elle, et achète-t-elle les huiles ?
 
-La liste complète est dans `00_registres/questions_ouvertes.md`.
+Liste complète : `00_registres/questions_ouvertes.md`.
 
 ## Ordre de lecture
 
-1. `01_cadrage/lot1_cadrage.md`
-2. `00b_amorcage/lot0_amorcage.md`, puis `matrice_amorcage.md`
-3. `04b_validation_terrain/lot4bis_protocoles.md`, `procedure_acceptation_lots.md`, `budget_protocoles.md`
-4. `02_reglementaire/lot2_reglementaire.md`, puis `calendrier.md`
-5. `03_benchmark/lot3_benchmark.md`
-6. `04_marche/lot4_marche.md`, `gisement.md`, `questionnaire_garages.md`
-7. `04c_extensions/lot4ter_extensions.md`, puis `matrice_extensions.md`
-8. `08_modele_entreprise/lot8_modele_entreprise.md`, puis `comparaison_modeles.md`
-9. `05_technique/lot5_technique.md`, `06_logistique/lot6_logistique.md`, `07_hse_eies/lot7_hse_eies.md`
-10. `09_finance/lot9_finance.md`, `resultats_finance.md`, `modele_financier.xlsx`
-11. `10_organisation/`, `11_juridique/` (statuts, pacte, charte), `12_parties_prenantes/` (guides d'entretien), `13_risques/`
-12. `14_plan_action/lot14_plan_action.md` (portes de décision, 100 jours, check-list), `budget_preoperationnel.md`
-13. `00_registres/` : décisions, questions ouvertes, hypothèses, sources
+1. `17_synthese/livrables/` : note Go/No Go, business plan, présentations (banque, forestiers)
+2. `00b_amorcage/lot0_amorcage.md` et `14_plan_action/lot14_plan_action.md` : ce qu'il faut faire tout de suite
+3. `04b_validation_terrain/lot4bis_protocoles.md` : les preuves de terrain
+4. `02_reglementaire/`, `03_benchmark/`, `04_marche/`, `04c_extensions/` : le diagnostic
+5. `08_modele_entreprise/`, `05_technique/`, `06_logistique/`, `07_hse_eies/`, `09_finance/` : le modèle et ses chiffres
+6. `10_organisation/`, `11_juridique/`, `12_parties_prenantes/`, `13_risques/` : l'exécution
+7. `15_kit_operationnel/docx/` et `pdf/` : les documents prêts à l'emploi ; `16_application/` : l'application
+8. `00_registres/` : sources, hypothèses, questions ouvertes, décisions
 
-## Lundi prochain
+## Lundi
 
-1. Envoyer trois lettres : HIKMA (Q-10), MINEFOP (Q-07), MINEPDED (Q-01, Q-03, Q-17, Q-21, Q-23).
-2. Demander les devis : SGS Cameroun et deux laboratoires (Q-05), Bocom International et SECA (Q-18), distributeur Parker (Q-16).
-3. Déposer le dossier de création de la société au CFCE (Q-08).
-4. Faire 10 appels de prospection avec le script du lot 0, en commençant par les flottes urbaines et les concessionnaires.
-5. Transmettre au chef de projet les PDF officiels des textes réglementaires (Q-02) pour confirmer le lot 2 ; lancer l'enquête de 30 garages (`04_marche/questionnaire_garages.md`).
+1. Envoyer les quatre lettres du kit (A2) : HIKMA, MINEPDED, MINMIDT, MINEFOP.
+2. Demander les devis : laboratoires (SGS Cameroun et deux autres), Bocom International et SECA, distributeur Parker ou loueur, deux assureurs.
+3. Déposer le dossier de la SARL au CFCE (statuts J1 relus par un avocat).
+4. Faire dix appels de prospection avec le script K4, en commençant par les flottes urbaines et les concessionnaires.
+5. Lancer l'enquête des 30 garages et ouvrir le tour de table des comptes courants.
 
-## Reproduire les calculs
+## Reproduire
 
 ```
 cd huiles-usagees
-python3 run_all.py      # régénère les fichiers chiffrés et contrôle les tirets
-python3 -m pytest -q tests
+pip install -r requirements.txt -r 16_application/requirements.txt
+python3 run_all.py        # régénère tous les chiffres, le kit et la synthèse ; contrôle les tirets
+make test                 # tests du dépôt et de l'application
 ```
 
-ou `make` puis `make test`. Dépendances : Python 3.11 ou plus et `pip install -r requirements.txt` (OR-Tools, NumPy, openpyxl, pytest).
+## Limites de la livraison
 
-## Limites de cette livraison
-
-1. Le réseau de travail bloque le téléchargement des PDF officiels : les textes réglementaires et l'article de référence [S-01] sont connus par extraits.
-2. Toutes les valeurs économiques du lot 0 et des budgets du lot 4 bis sont des hypothèses sans devis.
-3. Les acheteurs de combustible, les laboratoires et les loueurs d'équipement au Cameroun restent à identifier et à confirmer.
+1. Le réseau de travail a bloqué les PDF officiels et OpenStreetMap : textes réglementaires lus par extraits, distances reconstruites.
+2. Aucune donnée de terrain, aucun devis, aucun entretien : les hypothèses décisives restent « supposées » jusqu'au pilote.
+3. Les documents juridiques sont des projets à faire relire par un avocat ou un notaire camerounais.

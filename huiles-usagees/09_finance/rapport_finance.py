@@ -119,5 +119,14 @@ def rapport():
 if __name__ == "__main__":
     texte, ind, mc = rapport()
     Path(__file__).with_name("resultats_finance.md").write_text(texte, encoding="utf-8")
+    import json
+    s_base = mm.simuler(mm.parametres())[0]
+    annuel = {k: [float(s_base[k][12 * a: 12 * a + 12].sum()) for a in range(5)] for k in ("ca", "ebitda", "resultat_net", "flux_disponible", "capex")}
+    annuel["tresorerie_fin"] = [float(s_base["tresorerie"][12 * a + 11]) for a in range(5)]
+    annuel["clients_fin"] = [float(s_base["clients"][12 * a + 11]) for a in range(5)]
+    pg = mm.parametres(); pg["guerre_prix"] = True
+    sortie = dict(scenarios={sc: {k: v for k, v in i.items()} for sc, i in ind.items()}, annuel_base=annuel,
+                  monte_carlo={k: v for k, v in mc.items() if not hasattr(v, "shape")}, guerre_prix=mm.simuler(pg)[1])
+    Path(__file__).with_name("resultats_finance.json").write_text(json.dumps(sortie, ensure_ascii=False, indent=1, default=float), encoding="utf-8")
     export_xlsx.construire()
     print("Lot 9 : VAN base", round(ind["base"]["van"] / 1e6, 1), "P(VAN5<0)", round(mc["p_van5_negative"], 3))

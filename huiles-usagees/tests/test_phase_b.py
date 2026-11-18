@@ -157,3 +157,30 @@ def test_chiffres_lot13_concordent():
 def test_chiffres_lot14_concordent():
     b = _lire("14_plan_action/budget_preoperationnel.md")
     assert "**16,64** |" in b and "9,84 M FCFA" in b and "marge de seulement 0,16 M FCFA" in b
+
+
+def test_synthese_concordante():
+    import json
+    F = json.loads((RACINE / "09_finance" / "resultats_finance.json").read_text(encoding="utf-8"))
+    bp = _lire("17_synthese/business_plan.md")
+    fin = _lire("09_finance/resultats_finance.md")
+    assert "VAN à 5 ans de 9,0 M FCFA" in bp and "| 9,0 |" in fin
+    assert "29,5 %" in bp and "29,5 %" in fin
+    assert abs(F["scenarios"]["base"]["van"] / 1e6 - 9.0) < 0.05
+    li = _lire("LISEZMOI.md")
+    assert "TRI de 27,5 %" in li and "200 à 237 FCFA/L" in li
+    t = _lire("06_logistique/tournees.md")
+    assert "| 200 | 200 |" in t and "| 237 |" in t
+
+
+def test_synthese_formats():
+    import shutil
+    from pptx import Presentation
+    liv = RACINE / "17_synthese" / "livrables"
+    assert len(Presentation(next(liv.glob("*Presentation banque.pptx"))).slides) == 12
+    assert len(Presentation(next(liv.glob("*Presentation forestiers.pptx"))).slides) == 8
+    if shutil.which("pdfinfo"):
+        out = subprocess.run(["pdfinfo", str(next(liv.glob("*Note Go No Go.pdf")))], capture_output=True, text=True).stdout
+        assert "Pages:           2" in out
+    for f in list(liv.iterdir()) + list((RACINE / "15_kit_operationnel" / "docx").iterdir()):
+        assert "_" not in f.name, f.name
