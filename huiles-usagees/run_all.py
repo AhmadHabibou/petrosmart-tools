@@ -26,6 +26,7 @@ ETAPES = [
     "13_risques/registre_risques.py",
     "14_plan_action/budget_preoperationnel.py",
     "09_finance/rapport_finance.py",
+    "15_kit_operationnel/construire_kit.py",
 ]
 
 
