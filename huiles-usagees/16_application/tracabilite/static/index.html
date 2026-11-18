@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Traçabilité des huiles</title>
+<link rel="manifest" href="/static/manifest.json">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>Traçabilité des huiles</h1>
+  <div id="etat" class="etat">…</div>
+</header>
+<nav>
+  <button data-vue="tdb" class="actif">Tableau de bord</button>
+  <button data-vue="clients">Clients et sites</button>
+  <button data-vue="futs">Fûts</button>
+  <button data-vue="enlevements">Enlèvements</button>
+  <button data-vue="lots">Stock et lots</button>
+  <button data-vue="ventes">Ventes</button>
+  <button data-vue="reglages">Réglages</button>
+</nav>
+<main id="contenu"></main>
+<footer><span id="attente">0</span> saisie(s) en attente de synchronisation · <button id="sync">Synchroniser</button></footer>
+<script src="/static/app.js"></script>
+</body>
+</html>

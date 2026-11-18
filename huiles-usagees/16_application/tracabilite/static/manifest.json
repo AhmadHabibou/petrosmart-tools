@@ -1,0 +1,9 @@
+{
+  "name": "Traçabilité des huiles usagées",
+  "short_name": "Huiles",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1F3864",
+  "lang": "fr"
+}
