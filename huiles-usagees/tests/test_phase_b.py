@@ -131,3 +131,9 @@ def test_xlsx_formules_egales_python(tmp_path):
 def test_chiffres_lot10_concordent():
     m = _lire("10_organisation/masse_salariale.md")
     assert "| 1 109 000 | 600 000 (H-150) | -46 % |" in m and "13,7 %" in m
+
+
+def test_chiffres_lot11_concordent():
+    m = _lire("11_juridique/matrice_forme_sociale.md")
+    assert "**2,60** | **4,05** | **4,10** | **3,40**" in m
+    assert "SAS 4,10, SARL 4,05, SA 3,40, établissement individuel 2,60" in _lire("11_juridique/lot11_juridique.md")

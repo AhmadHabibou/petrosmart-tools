@@ -44,3 +44,5 @@ Chaque question porte le lot qui la pose, la personne ou l'institution qui peut 
 | Q-38 | 06 | Calendrier et durée des barrières de pluie sur les routes forestières de l'Est, par département | MINFOF, MINTP, clients forestiers | planification des enlèvements, stock tampon | S |
 | Q-39 | 10, 09 | Prélèvements sur salaires à la charge de l'employeur autres que la CNPS (Crédit foncier, Fonds national de l'emploi, redevance audiovisuelle) et leurs taux en 2026 | DGI, CNPS, cabinet comptable | coût employeur | S |
 | Q-40 | 10 | Organismes de formation au transport de matières dangereuses au Cameroun | MINT, transporteurs pétroliers | module F6 | C |
+| Q-41 | 11 | Régime de la SAS au Cameroun (capital minimum, recours au notaire, coût de constitution) | CFCE, avocat | choix de la forme sociale | C |
+| Q-42 | 11 | Régime de TVA et régime d'imposition applicables selon le chiffre d'affaires d'une jeune société de services | DGI, centre des impôts de rattachement | trésorerie et déclarations | S |
