@@ -126,3 +126,8 @@ def test_xlsx_formules_egales_python(tmp_path):
             assert max(ecarts) < 1
             return
     raise AssertionError("ligne de controle absente")
+
+
+def test_chiffres_lot10_concordent():
+    m = _lire("10_organisation/masse_salariale.md")
+    assert "| 1 109 000 | 600 000 (H-150) | -46 % |" in m and "13,7 %" in m

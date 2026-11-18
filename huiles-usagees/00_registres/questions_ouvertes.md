@@ -42,3 +42,5 @@ Chaque question porte le lot qui la pose, la personne ou l'institution qui peut 
 | Q-36 | 05, 09 | Grille tarifaire Eneo applicable à un petit site industriel en basse tension | Eneo, facture d'un site voisin | H-113 | C |
 | Q-37 | 05 | Délais de livraison, service après-vente et pièces en Afrique centrale pour Parker (Racor), les purificateurs TYA et les appareils Pensky-Martens | distributeurs, demandes de prix du lot 15 | choix des fournisseurs | S |
 | Q-38 | 06 | Calendrier et durée des barrières de pluie sur les routes forestières de l'Est, par département | MINFOF, MINTP, clients forestiers | planification des enlèvements, stock tampon | S |
+| Q-39 | 10, 09 | Prélèvements sur salaires à la charge de l'employeur autres que la CNPS (Crédit foncier, Fonds national de l'emploi, redevance audiovisuelle) et leurs taux en 2026 | DGI, CNPS, cabinet comptable | coût employeur | S |
+| Q-40 | 10 | Organismes de formation au transport de matières dangereuses au Cameroun | MINT, transporteurs pétroliers | module F6 | C |
