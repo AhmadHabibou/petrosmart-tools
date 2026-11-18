@@ -139,7 +139,116 @@ def _entete_pied(doc, titre_court, reference):
     _champ(f, "NUMPAGES")
 
 
-def convertir(md_path, docx_path, titre_court=None, reference=None):
+SIGLES = {
+    "AGF": "African Guarantee Fund", "ASTM": "American Society for Testing and Materials", "BEAC": "Banque des États de l'Afrique centrale",
+    "CA": "chiffre d'affaires", "CDEC": "Caisse des dépôts et consignations du Cameroun", "CEMAC": "Communauté économique et monétaire de l'Afrique centrale",
+    "CFCE": "Centre de formalités de création d'entreprises", "DSCR": "ratio de couverture du service de la dette",
+    "EBITDA": "excédent brut d'exploitation", "EIES": "étude d'impact environnemental et social", "FCFA": "franc de la Coopération financière en Afrique centrale",
+    "FSC": "Forest Stewardship Council", "HSE": "hygiène, sécurité et environnement", "HT": "hors taxes",
+    "MINEPDED": "ministère de l'Environnement, de la Protection de la Nature et du Développement durable", "MINEFOP": "ministère de l'Emploi et de la Formation professionnelle",
+    "MINFOF": "ministère des Forêts et de la Faune", "MINMIDT": "ministère des Mines, de l'Industrie et du Développement technologique",
+    "MINT": "ministère des Transports", "OHADA": "Organisation pour l'harmonisation en Afrique du droit des affaires", "OLB": "Origine et légalité des bois",
+    "PCB": "polychlorobiphényles", "PGES": "plan de gestion environnementale et sociale", "PME": "petite et moyenne entreprise",
+    "QR": "quick response (code-barres en deux dimensions)", "RCCM": "registre du commerce et du crédit mobilier", "SARL": "société à responsabilité limitée",
+    "TRI": "taux de rentabilité interne", "UTB": "unité de transformation du bois", "VAN": "valeur actuelle nette",
+}
+
+
+def _num_pages(section, fmt, debut=None):
+    sectPr = section._sectPr
+    pg = OxmlElement("w:pgNumType")
+    pg.set(qn("w:fmt"), fmt)
+    if debut is not None:
+        pg.set(qn("w:start"), str(debut))
+    sectPr.append(pg)
+
+
+def _pied(section, reference, total):
+    section.footer.is_linked_to_previous = False
+    f = section.footer.paragraphs[0]
+    f.text = ""
+    r = f.add_run(reference + "\t\tPage ")
+    _police(r, 8)
+    _champ(f, "PAGE")
+    if total:
+        r = f.add_run(" sur ")
+        _police(r, 8)
+        if str(total).isdigit():
+            r = f.add_run(str(total))
+            _police(r, 8)
+        else:
+            _champ(f, total)
+
+
+def _references(texte, sources_md):
+    ids = sorted(set(re.findall(r"\[(S-\d+)\]", texte)), key=lambda x: int(x[2:]))
+    table = {}
+    for l in Path(sources_md).read_text(encoding="utf-8").splitlines():
+        m = re.match(r"\| (S-\d+) \| ([^|]*) \| ([^|]*) \| ([^|]*) \| ([^|]*) \|", l)
+        if m:
+            table[m.group(1)] = [x.strip() for x in m.groups()[1:]]
+    return [f"[{i}] {table[i][0]}, {table[i][1]}, {table[i][2]}, {table[i][3]}." for i in ids if i in table]
+
+
+def _prelim(doc, off, titre, texte):
+    p = doc.add_paragraph()
+    p.paragraph_format.space_before = Pt(200)
+    _inline(p, titre, 24, True, ACCENT)
+    _filet(p)
+    for t, taille in ((off.get("sous_titre", ""), 14), (off.get("date", ""), 12)):
+        q = doc.add_paragraph()
+        _inline(q, t, taille)
+        _format_par(q, apres=6, justifie=False)
+    doc.add_paragraph().add_run().add_break(WD_BREAK.PAGE)
+
+    def titre_prelim(t):
+        q = doc.add_paragraph()
+        _inline(q, t.upper(), 14, True, ACCENT)
+        _format_par(q, apres=6, justifie=False)
+        _filet(q)
+
+    def tab(lignes):
+        t = doc.add_table(rows=len(lignes), cols=len(lignes[0]))
+        _bordures(t)
+        for ri, row in enumerate(lignes):
+            for ci, v in enumerate(row):
+                c = t.cell(ri, ci)
+                pp = c.paragraphs[0]
+                _format_par(pp, apres=0, justifie=False)
+                if ri == 0:
+                    _cellule_fond(c)
+                    _inline(pp, v, 9, True, RGBColor(0xFF, 0xFF, 0xFF))
+                else:
+                    _inline(pp, v, 9)
+        _repeter_entete(t.rows[0])
+        doc.add_paragraph()
+
+    titre_prelim("Fiche de contrôle")
+    tab([["", "Préparé", "Vérifié", "Approuvé"], ["Fonction", "chef de projet", "[contre-expert ou relecteur]", "[promoteur]"],
+         ["Nom", "[ ]", "[ ]", "[ ]"], ["Date", off.get("date", ""), "[ ]", "[ ]"], ["Visa", "", "", ""]])
+    titre_prelim("Sommaire")
+    n = 0
+    for l in texte.splitlines():
+        if l.startswith("## "):
+            h = l[3:].strip()
+            q = doc.add_paragraph()
+            if h in NON_NUMEROTES:
+                _inline(q, h)
+            else:
+                n += 1
+                _inline(q, f"{n}  {h}")
+            _format_par(q, apres=2, justifie=False)
+    q = doc.add_paragraph()
+    _inline(q, "Références")
+    titre_prelim("Liste des sigles")
+    presents = [k for k in sorted(SIGLES) if re.search(r"(?<![\w-])" + re.escape(k) + r"(?![\w-])", texte)]
+    tab([["Sigle", "Signification"]] + [[k, SIGLES[k]] for k in presents])
+
+
+NON_NUMEROTES = {"Résumé exécutif"}
+
+
+def convertir(md_path, docx_path, titre_court=None, reference=None, officiel=None):
     texte = Path(md_path).read_text(encoding="utf-8")
     doc = Document()
     s = doc.sections[0]
@@ -151,6 +260,18 @@ def convertir(md_path, docx_path, titre_court=None, reference=None):
     lignes = texte.splitlines()
     titre = next((l[2:].strip() for l in lignes if l.startswith("# ")), Path(md_path).stem)
     _entete_pied(doc, titre_court or titre[:60], reference or Path(md_path).stem)
+    num_chap = 0
+    if officiel:
+        s.different_first_page_header_footer = True
+        _num_pages(s, "lowerRoman", 1)
+        _pied(s, reference or Path(md_path).stem, None)
+        _prelim(doc, officiel, titre, texte)
+        corps = doc.add_section()
+        _num_pages(corps, "decimal", 1)
+        corps.different_first_page_header_footer = False
+        _pied(corps, reference or Path(md_path).stem, officiel.get("pages_corps") or "SECTIONPAGES")
+        refs = _references(texte, officiel["sources"])
+        lignes = [l for l in lignes if not l.startswith("# ")] + ["", "## Références", ""] + refs
     i = 0
     while i < len(lignes):
         l = lignes[i].rstrip()
@@ -198,8 +319,14 @@ def convertir(md_path, docx_path, titre_court=None, reference=None):
             _format_par(p, apres=12, justifie=False)
             _filet(p)
         elif l.startswith("## "):
+            h = l[3:].strip()
+            if officiel and h not in NON_NUMEROTES and h != "Références":
+                num_chap += 1
+                h = f"{num_chap}  {h}"
             p = doc.add_paragraph()
-            _inline(p, l[3:].strip().upper(), 14, True, ACCENT)
+            if officiel and (num_chap >= 1 or h == "Références"):
+                p.paragraph_format.page_break_before = True
+            _inline(p, h.upper(), 14, True, ACCENT)
             _format_par(p, apres=6, justifie=False)
             p.paragraph_format.space_before = Pt(12)
             p.paragraph_format.keep_with_next = True

@@ -22,6 +22,9 @@ from commun import docx_charte  # noqa: E402
 ICI = Path(__file__).resolve().parent
 DATE = "2026-11-18"
 DATE_TXT = "18 novembre 2026"
+# Nombre de pages du corps du business plan (hors couverture et pages preliminaires), mesure sur le PDF
+# par mesurer_pages_corps() ; LibreOffice ne calcule pas le champ SECTIONPAGES.
+PAGES_CORPS_BP = 13
 
 
 def _module(rel, nom):
@@ -60,7 +63,7 @@ def business_plan(c):
     L = [f"# Business plan : société de gestion des huiles usagées et de purification du gasoil", "",
          f"**Projet de création d'entreprise, Cameroun. Version de travail du {DATE_TXT}. Méthode de rédaction : pyramide de Minto. "
          "Chaque chiffre renvoie au livrable qui le calcule ; les hypothèses [H-xx] et sources [S-xx] sont dans `00_registres/`.**", "",
-         "## Synthèse", "",
+         "## Résumé exécutif", "",
          "**Recommandation : créer la société et lancer un pilote payant de trois mois, sans investissement lourd. "
          "Décision « Go conditionnel » : la trajectoire ne se poursuit qu'au franchissement de portes de décision chiffrées.**", "",
          "Trois raisons fondent cette recommandation :", "",
@@ -358,10 +361,14 @@ def construire(pdf=True):
     liv.mkdir(exist_ok=True)
     pref = f"{DATE} Huiles usagees"
     sorties = []
-    for md, nom in (("business_plan.md", "Business plan"), ("note_go_no_go.md", "Note Go No Go")):
-        d = liv / f"{pref} {nom}.docx"
-        docx_charte.convertir(ICI / md, d, titre_court=nom, reference=f"{pref} {nom}")
-        sorties.append(d)
+    d = liv / f"{pref} Business plan.docx"
+    off = dict(sous_titre="Société de gestion des huiles usagées et de purification du gasoil, Cameroun",
+               date=DATE_TXT, sources=RACINE / "00_registres" / "sources.md", pages_corps=PAGES_CORPS_BP)
+    docx_charte.convertir(ICI / "business_plan.md", d, titre_court="Business plan", reference=f"{pref} Business plan", officiel=off)
+    sorties.append(d)
+    d = liv / f"{pref} Note Go No Go.docx"
+    docx_charte.convertir(ICI / "note_go_no_go.md", d, titre_court="Note Go No Go", reference=f"{pref} Note Go No Go")
+    sorties.append(d)
     nb = deck_banque(c, liv / f"{pref} Presentation banque.pptx")
     nf = deck_forestiers(c, liv / f"{pref} Presentation forestiers.pptx")
     sorties += [liv / f"{pref} Presentation banque.pptx", liv / f"{pref} Presentation forestiers.pptx"]
@@ -372,6 +379,17 @@ def construire(pdf=True):
         for s in sorties:
             docx_charte.vers_pdf(s, liv)
     return nb, nf
+
+
+def mesurer_pages_corps(pdf):
+    """Pages du PDF a partir de celle qui porte le titre du resume executif."""
+    import subprocess
+    total = int(next(l.split()[-1] for l in subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout.splitlines() if l.startswith("Pages")))
+    for page in range(1, total + 1):
+        t = subprocess.run(["pdftotext", "-f", str(page), "-l", str(page), str(pdf), "-"], capture_output=True, text=True).stdout
+        if "RÉSUMÉ EXÉCUTIF" in t and "SOMMAIRE" not in t:
+            return total - page + 1
+    return None
 
 
 if __name__ == "__main__":

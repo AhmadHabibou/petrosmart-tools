@@ -2,7 +2,7 @@
 
 **Projet de création d'entreprise, Cameroun. Version de travail du 18 novembre 2026. Méthode de rédaction : pyramide de Minto. Chaque chiffre renvoie au livrable qui le calcule ; les hypothèses [H-xx] et sources [S-xx] sont dans `00_registres/`.**
 
-## Synthèse
+## Résumé exécutif
 
 **Recommandation : créer la société et lancer un pilote payant de trois mois, sans investissement lourd. Décision « Go conditionnel » : la trajectoire ne se poursuit qu'au franchissement de portes de décision chiffrées.**
 

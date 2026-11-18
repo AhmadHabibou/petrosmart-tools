@@ -186,3 +186,16 @@ def test_synthese_formats():
         assert "Pages:           2" in out
     for f in list(liv.iterdir()) + list((RACINE / "15_kit_operationnel" / "docx").iterdir()):
         assert "_" not in f.name, f.name
+
+
+def test_pagination_business_plan():
+    import shutil
+    if not shutil.which("pdftotext"):
+        import pytest
+        pytest.skip("poppler absent")
+    sys.path.insert(0, str(RACINE / "17_synthese"))
+    import construire_synthese as cs
+    pdf = next((RACINE / "17_synthese" / "livrables").glob("*Business plan.pdf"))
+    assert cs.mesurer_pages_corps(pdf) == cs.PAGES_CORPS_BP
+    t = subprocess.run(["pdftotext", "-f", "3", "-l", "3", str(pdf), "-"], capture_output=True, text=True).stdout
+    assert f"sur {cs.PAGES_CORPS_BP}" in t
