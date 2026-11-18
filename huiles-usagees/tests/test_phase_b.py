@@ -86,3 +86,43 @@ def test_chiffres_lot7_concordent():
     assert "avant mesures : 11 sur 12 ; après mesures : 1 sur 12" in r
     e = _lire("07_hse_eies/emissions.md")
     assert "| 100 | 90,0 | 9,00 |" in e
+
+
+def test_chiffres_lot9_concordent():
+    f = _lire("09_finance/resultats_finance.md")
+    for fragment in ("| VAN à 5 ans, sans valeur terminale | -190,3 | 9,0 | 321,8 |", "| 27,5 % |", "année 2 : -2,02 ; année 3 : 1,66",
+                     "| 29,5 % |", "| 2,3 % |", "| 45,6 |", "8,5 M FCFA, en plus", "| VAN à 5 ans | 9,0 | -23,6 |",
+                     "| VAN avec valeur terminale | 137,4 | 26,9 |", "| mois 20 |", "0,000000 FCFA"):
+        assert fragment in f, fragment
+
+
+def test_lot9_amorcage_coherent_avec_lot0():
+    sys.path.insert(0, str(RACINE))
+    from commun.hypotheses import HYPOTHESES
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("mat", RACINE / "00b_amorcage" / "matrice_amorcage.py")
+    mat = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mat)
+    top3 = mat.evaluer()[:3]
+    h = HYPOTHESES["H-161"]
+    assert abs(sum(d["rev_central"] for d in top3) / 12 - h.central) < 1
+    assert abs(sum(d["rev_bas"] for d in top3) / 12 - h.bas) < 1
+    assert abs(sum(d["rev_haut"] for d in top3) / 12 - h.haut) < 1
+
+
+def test_xlsx_formules_egales_python(tmp_path):
+    import shutil
+    from openpyxl import load_workbook
+    if shutil.which("soffice") is None:
+        import pytest
+        pytest.skip("LibreOffice absent")
+    src = RACINE / "09_finance" / "modele_financier.xlsx"
+    subprocess.run(["soffice", "--headless", "--calc", "--convert-to", "xlsx", "--outdir", str(tmp_path), str(src)],
+                   check=True, capture_output=True, timeout=180)
+    ws = load_workbook(tmp_path / "modele_financier.xlsx", data_only=True)["Mensuel"]
+    for r in range(1, ws.max_row + 1):
+        if str(ws.cell(r, 1).value).startswith("Contrôle"):
+            ecarts = [abs(ws.cell(r, c).value or 0) for c in range(2, 62)]
+            assert max(ecarts) < 1
+            return
+    raise AssertionError("ligne de controle absente")

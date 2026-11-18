@@ -86,6 +86,19 @@ Fichier généré par `commun/registres.py` depuis `commun/hypotheses.py`. Toute
 | H-135 | 06 | Litres collectes par arret urbain (garage, flotte) | 100 | 200 | 400 | L/arret | un a deux futs par garage | fort | enquete garages | supposé |
 | H-136 | 06 | Arrets urbains par jour de tournee | 8 | 12 | 18 | arrets/jour | embouteillages de Douala | fort | pilote urbain | supposé |
 | H-137 | 06 | Kilometres par jour de tournee urbaine | 60 | 90 | 130 | km/jour | approche, inter-arrets et retour | moyen | traces GPS | supposé |
+| H-150 | 09 | Remuneration chargee du gerant, a partir du mois 13 | 450 000 | 600 000 | 900 000 | FCFA/mois | le promoteur reste salarie de HIKMA la premiere annee ; a remplacer par les salaires sources du lot 10 | fort | lot 10 | supposé |
+| H-151 | 09 | Remuneration chargee du technicien, a partir du mois 4 | 250 000 | 350 000 | 450 000 | FCFA/mois | a remplacer par le lot 10 | moyen | lot 10 | supposé |
+| H-152 | 09 | Remuneration chargee d'un commercial a mi-temps, a partir du mois 13 | 200 000 | 250 000 | 350 000 | FCFA/mois | a remplacer par le lot 10 | moyen | lot 10 | supposé |
+| H-153 | 09 | Frais generaux (bureau, telephone, comptable externe, deplacements commerciaux), a partir du mois 4 | 600 000 | 900 000 | 1 300 000 | FCFA/mois | aucun devis | moyen | releve reel | supposé |
+| H-154 | 09 | Assurances (responsabilite civile environnementale, materiel), a partir du mois 4 | 2 000 000 | 3 000 000 | 5 000 000 | FCFA/an | a remplacer par le lot 13 (assureur) | moyen | devis assureur | supposé |
+| H-155 | 09 | Delai de paiement des clients | 30 | 60 | 90 | jours | grands comptes forestiers ; contrat facture trimestriellement | moyen | pilote | supposé |
+| H-156 | 09 | Delai de paiement des fournisseurs et sous-traitants | 0 | 30 | 45 | jours | le collecteur sous-traitant peut exiger le comptant | moyen | contrat de sous-traitance | supposé |
+| H-157 | 09 | Apport en capital du promoteur et des associes | 5 000 000 | 10 000 000 | 20 000 000 | FCFA | moyens propres limites [S-29] ; apport du mois 1 | fort | decision du promoteur (lot 11) | supposé |
+| H-158 | 09 | Emprunt bancaire a moyen terme debloque au passage en M1 | 15 000 000 | 20 000 000 | 30 000 000 | FCFA | finance l'achat des equipements (H-92) ; conditions a negocier | fort | offre bancaire | supposé |
+| H-159 | 09 | Taux d'interet de l'emprunt | 0,10 | 0,12 | 0,14 | fraction/an | cout moyen du credit aux PME : 11,85 % [S-78] | moyen | offre bancaire | probable |
+| H-160 | 09 | Duree de l'emprunt | 36 | 48 | 60 | mois | credit a moyen terme d'equipement | faible | offre bancaire | supposé |
+| H-161 | 09 | Marge nette mensuelle des activites d'amorcage (lot 0), sur les 24 premiers mois | 200 000 | 633 333 | 1 750 000 | FCFA/mois | revenu net des trois activites retenues : 2,40 a 21,00 M FCFA par an, 7,60 M en central (matrice du lot 0), divise par 12 | fort | releve reel | supposé |
+| H-162 | 09 | Baisse du prix du contrat en cas de guerre des prix (a partir du mois 25) | 0,20 | 0,30 | 0,40 | fraction | concurrent ou collecteur offrant l'enlevement gratuit ; scenario de stress | fort | veille concurrentielle | supposé |
 | H-30 | 00b | Lot 0 : frais de creation d'une structure juridique pour facturer | 50 000 | 100 000 | 200 000 | FCFA | montant a confirmer au CFCE (Q-08) | moyen | bareme du CFCE | supposé |
 | H-31 | 00b | Lot 0 : supports commerciaux (impression, cartes, plaquette) | 50 000 | 75 000 | 100 000 | FCFA | devis d'imprimerie a Yaounde a obtenir | faible | deux devis | supposé |
 | H-32 | 00b | Lot 0 : deplacements de prospection avant premier encaissement | 100 000 | 150 000 | 200 000 | FCFA | 4 a 8 deplacements Yaounde-Douala ou vers les UTB | moyen | releve des depenses | supposé |

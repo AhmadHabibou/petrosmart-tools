@@ -1,6 +1,6 @@
 # Projet de collecte et de valorisation des huiles usagées et du gasoil au Cameroun
 
-**État au 18/11/2026 : livraison intermédiaire (phases A, B et C).** Lots livrés : 0, 1, 2, 3, 4, 4 bis, 4 ter et 8, avec les registres et le socle de calcul. Décisions de viabilité (D-06) et de modèle (D-09) prises. Les lots 5, 6, 7 et 9 à 17 restent à produire. Ce fichier sera réécrit en version finale avec la synthèse du lot 17.
+**État au 18/11/2026 : livraison intermédiaire (phases A à D).** Lots livrés : 0 à 9 (dont 4 bis et 4 ter), avec les registres et le socle de calcul. Décisions de viabilité (D-06), de modèle (D-09) et de financement (D-11) prises. Les lots 10 à 17 restent à produire. Ce fichier sera réécrit en version finale avec la synthèse du lot 17.
 
 ## Conclusion provisoire en cinq lignes
 
@@ -17,6 +17,7 @@ Trajectoire par étapes (D-09) : démarrage en modèle à faible capital (purifi
 ## Budget de démarrage
 
 - Amorçage (lot 0) : au plus 500 000 FCFA avant le premier encaissement (`00b_amorcage/matrice_amorcage.md`).
+- Financement de la trajectoire retenue : environ 20 M FCFA de fonds propres et quasi-fonds propres, équipements en crédit-bail (`09_finance/lot9_finance.md`).
 - Preuves de terrain (lot 4 bis) : voir `04b_validation_terrain/budget_protocoles.md`, en partie refacturé aux clients pilotes.
 
 ## Cinq questions ouvertes à régler sur le terrain
@@ -39,7 +40,9 @@ La liste complète est dans `00_registres/questions_ouvertes.md`.
 6. `04_marche/lot4_marche.md`, `gisement.md`, `questionnaire_garages.md`
 7. `04c_extensions/lot4ter_extensions.md`, puis `matrice_extensions.md`
 8. `08_modele_entreprise/lot8_modele_entreprise.md`, puis `comparaison_modeles.md`
-9. `00_registres/` : décisions (D-06, D-09), questions ouvertes, hypothèses, sources
+9. `05_technique/lot5_technique.md`, `06_logistique/lot6_logistique.md`, `07_hse_eies/lot7_hse_eies.md`
+10. `09_finance/lot9_finance.md`, `resultats_finance.md`, `modele_financier.xlsx`
+11. `00_registres/` : décisions (D-06, D-09, D-11), questions ouvertes, hypothèses, sources
 
 ## Lundi prochain
 
