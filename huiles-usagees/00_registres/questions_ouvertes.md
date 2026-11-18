@@ -24,3 +24,13 @@ Chaque question porte le lot qui la pose, la personne ou l'institution qui peut 
 | Q-18 | 04b | Les collecteurs agréés acceptent-ils une sous-traitance d'enlèvement en forêt (pistes, distances) et à quel prix ? | Bocom International, SECA | H-48 ; faisabilité du pilote | M |
 | Q-19 | 02 | Montants actuels des amendes des articles 80 à 82 de la loi n°96/12 : la source secondaire [S-23] donne des bornes incohérentes pour l'article 82 | texte officiel [S-24] | argumentaire commercial, grille tarifaire | S |
 | Q-20 | 00b | Tractafric Equipment Cameroun propose-t-il le programme d'analyse d'huile de Caterpillar à ses clients forestiers, à quel prix et avec quel délai ? | Tractafric Equipment Cameroun | taille de la cible de A2 | S |
+| Q-21 | 02 | À partir de quand une huile usagée traitée cesse-t-elle d'être un déchet au Cameroun ? L'acheteur qui brûle le combustible doit-il détenir un titre ? | MINEPDED, par écrit | condition de vente du combustible ; modèle « unité de traitement » | M |
+| Q-22 | 02 | Nomenclature des établissements classés : quelle classe pour un centre de transit d'huiles usagées, et pour une unité de déshydratation et filtration ? | MINMIDT | enquête publique ou simple déclaration ; délai H-73 | M |
+| Q-23 | 02 | Catégorie d'évaluation environnementale (NIE, EIES sommaire, EIES détaillée) pour le centre de transit et pour l'unité de traitement, au regard de l'arrêté n°00001/MINEPDED du 8 février 2016 | MINEPDED | coût et délai H-71 | M |
+| Q-24 | 02 | La vente d'un combustible liquide issu d'huiles usagées relève-t-elle d'une autorisation du ministère chargé des produits pétroliers ? | ministère chargé de l'énergie et des hydrocarbures | titre supplémentaire éventuel | S |
+| Q-25 | 04 | Volumes annuels de lubrifiants importés ou vendus au Cameroun (position tarifaire des huiles lubrifiantes), sur 3 ans | INS (Commext), douanes, marketeurs | méthode 1 du gisement | M |
+| Q-26 | 02, 05 | Existe-t-il une norme camerounaise (ANOR) ou CEMAC pour les fiouls ou combustibles de substitution ? | ANOR | spécification du combustible | S |
+| Q-27 | 02 | Frais d'examen d'une NIE ou d'une EIES et honoraires de marché d'un bureau agréé | MINEPDED, bureaux agréés | budget pré-opérationnel | S |
+| Q-28 | 02, 05 | Droits et taxes à l'importation des équipements (positions tarifaires, TEC CEMAC, TVA) | douanes, transitaire | coût rendu Douala | S |
+| Q-29 | 04 | Quels industriels de Douala et Yaoundé utilisent des chaudières ou fours au fioul, avec quelle consommation ? | enquête directe, GICAM, MINMIDT | liste des acheteurs du combustible | M |
+| Q-30 | 04 | Prix et usages des huiles usagées dans le circuit informel de Douala et Yaoundé | enquête 30 garages | H-03, scénario de guerre des prix | M |

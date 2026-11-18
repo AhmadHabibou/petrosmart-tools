@@ -13,6 +13,8 @@ ETAPES = [
     "commun/registres.py",
     "00b_amorcage/matrice_amorcage.py",
     "04b_validation_terrain/budget_protocoles.py",
+    "02_reglementaire/calendrier.py",
+    "04_marche/gisement.py",
 ]
 
 
