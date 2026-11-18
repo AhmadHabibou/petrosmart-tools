@@ -230,7 +230,9 @@ PP = [
       "Quels délais et quels prix pour un lot de 12 échantillons ?"]),
     ("Riverains du futur site", "autre", "Autres", 4, 2,
      "Sensibles aux odeurs, au trafic et au risque de pollution ; consultés pendant l'enquête publique. Certitude : supposé.",
-     "acceptation du site et canal de dialogue", "Could", ["Quelles nuisances craindriez-vous le plus ?"]),
+     "acceptation du site et canal de dialogue", "Could",
+     ["Quelles nuisances craindriez-vous le plus ?", "Utilisez-vous des puits ou des sources à proximité du site envisagé ?",
+      "Qui, dans le quartier ou le village, devrait être associé au suivi du site ?"]),
     ("HIKMA Advisory and Coordination", "autre", "Autres", 4, 5,
      "Employeur du promoteur et conseiller des clients forestiers [S-29]. Position à obtenir par écrit (Q-10). Certitude : supposé.",
      "accord écrit sur la charte de prévention des conflits d'intérêts", "Must",
@@ -251,8 +253,10 @@ def quadrant(i, p):
 
 def guide(pp):
     q = COMMUNES[pp[1]] + pp[8]
+    reserve = COMMUNES["autre"] + ["Quels documents pourriez-vous nous communiquer pour approfondir ces points ?",
+                                   "Pouvons-nous vous recontacter après le pilote pour vous en présenter les résultats ?"]
     if len(q) < 10:
-        q = q + [x for x in COMMUNES["autre"] if x not in q][: 10 - len(q)]
+        q = q + [x for x in reserve if x not in q][: 10 - len(q)]
     return q[:15]
 
 

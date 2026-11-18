@@ -437,6 +437,8 @@ Fichier généré par `12_parties_prenantes/parties_prenantes.py`. Chaque guide 
 7. Quels engagements écrits attendez-vous de notre part ?
 8. Comment souhaitez-vous signaler un problème si vous en constatez un ?
 9. Quelles nuisances craindriez-vous le plus ?
+10. Utilisez-vous des puits ou des sources à proximité du site envisagé ?
+11. Qui, dans le quartier ou le village, devrait être associé au suivi du site ?
 
 ## HIKMA Advisory and Coordination
 
