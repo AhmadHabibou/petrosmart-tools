@@ -19,6 +19,7 @@ ETAPES = [
     "08_modele_entreprise/comparaison.py",
     "05_technique/procede.py",
     "06_logistique/tournees.py",
+    "07_hse_eies/risques_hse.py",
 ]
 
 

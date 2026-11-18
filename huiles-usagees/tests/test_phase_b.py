@@ -79,3 +79,10 @@ def test_chiffres_lot6_concordent():
     for fragment in ("| Sous-traitance à un collecteur agréé (H-48 par enlèvement) | 200 | 200 |", "coefficient de détour calé sur deux paires sourcées : 1,30".capitalize(),
                      "23 420 km", "40 FCFA/L pour 2 400 L"):
         assert fragment in t, fragment
+
+
+def test_chiffres_lot7_concordent():
+    r = _lire("07_hse_eies/matrice_risques_hse.md")
+    assert "avant mesures : 11 sur 12 ; après mesures : 1 sur 12" in r
+    e = _lire("07_hse_eies/emissions.md")
+    assert "| 100 | 90,0 | 9,00 |" in e
