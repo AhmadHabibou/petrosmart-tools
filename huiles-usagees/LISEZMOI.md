@@ -1,6 +1,6 @@
 # Projet de collecte et de valorisation des huiles usagées et du gasoil au Cameroun
 
-**État au 18/11/2026 : livraison intermédiaire (phases A à D).** Lots livrés : 0 à 9 (dont 4 bis et 4 ter), avec les registres et le socle de calcul. Décisions de viabilité (D-06), de modèle (D-09) et de financement (D-11) prises. Les lots 10 à 17 restent à produire. Ce fichier sera réécrit en version finale avec la synthèse du lot 17.
+**État au 18/11/2026 : livraison intermédiaire (phases A à E).** Lots livrés : 0 à 14 (dont 4 bis et 4 ter), avec les registres et le socle de calcul. Décisions de viabilité (D-06), de modèle (D-09), de financement (D-11), de forme sociale (D-12) et de plan (D-13) prises. Restent : kit opérationnel (15), application (16), synthèse (17). Ce fichier sera réécrit en version finale avec la synthèse du lot 17.
 
 ## Conclusion provisoire en cinq lignes
 
@@ -42,7 +42,9 @@ La liste complète est dans `00_registres/questions_ouvertes.md`.
 8. `08_modele_entreprise/lot8_modele_entreprise.md`, puis `comparaison_modeles.md`
 9. `05_technique/lot5_technique.md`, `06_logistique/lot6_logistique.md`, `07_hse_eies/lot7_hse_eies.md`
 10. `09_finance/lot9_finance.md`, `resultats_finance.md`, `modele_financier.xlsx`
-11. `00_registres/` : décisions (D-06, D-09, D-11), questions ouvertes, hypothèses, sources
+11. `10_organisation/`, `11_juridique/` (statuts, pacte, charte), `12_parties_prenantes/` (guides d'entretien), `13_risques/`
+12. `14_plan_action/lot14_plan_action.md` (portes de décision, 100 jours, check-list), `budget_preoperationnel.md`
+13. `00_registres/` : décisions, questions ouvertes, hypothèses, sources
 
 ## Lundi prochain
 

@@ -24,6 +24,7 @@ ETAPES = [
     "11_juridique/forme_sociale.py",
     "12_parties_prenantes/parties_prenantes.py",
     "13_risques/registre_risques.py",
+    "14_plan_action/budget_preoperationnel.py",
     "09_finance/rapport_finance.py",
 ]
 

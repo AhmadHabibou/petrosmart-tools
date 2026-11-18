@@ -152,3 +152,8 @@ def test_guides_entretien_10_a_15_questions():
 def test_chiffres_lot13_concordent():
     r = _lire("13_risques/registre_risques.md")
     assert "17 sur 20 avant mesures, 2 après mesures" in r and "P04, P11, P18" in r
+
+
+def test_chiffres_lot14_concordent():
+    b = _lire("14_plan_action/budget_preoperationnel.md")
+    assert "**16,64** |" in b and "9,84 M FCFA" in b and "marge de seulement 0,16 M FCFA" in b
