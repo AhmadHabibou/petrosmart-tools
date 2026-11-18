@@ -53,6 +53,38 @@ Fichier généré par `commun/registres.py` depuis `commun/hypotheses.py`. Toute
 | H-97 | 08 | Clients forestiers sous contrat en annee 5 | 8 | 15 | 25 | clients | progression lineaire depuis 2 clients en annee 1 ; 10 % des clients adressables H-64 en cas central | critique | pilote et prospection | supposé |
 | H-98 | 08 | Taux d'actualisation | 0,15 | 0,15 | 0,15 | fraction | taux du premier business plan [S-29] | moyen | cout du capital du lot 9 | supposé |
 | H-99 | 08 | Taux d'impot sur les societes applique au benefice (minimum de perception de 2,2 % du CA en sus) | 0,25 | 0,25 | 0,30 | fraction | 25 % pour les PME selon le cahier des charges [S-29], centimes additionnels non integres (Q-31) | moyen | DGI, lot 9 | supposé |
+| H-100 | 05 | Eau totale dans l'huile entrante (peu, moyennement, tres contaminee) | 0,02 | 0,08 | 0,20 | fraction massique | huiles de chantier exposees a la pluie plus chargees ; a mesurer (4 bis n°2, ASTM D6304 et D4007) | fort | campagne d'echantillonnage | supposé |
+| H-101 | 05 | Sediments et boues dans l'huile entrante | 0,01 | 0,02 | 0,05 | fraction massique | a mesurer (ASTM D4007) | moyen | campagne d'echantillonnage | supposé |
+| H-102 | 05 | Fractions legeres (dilution par le carburant) evaporees sous vide | 0,01 | 0,03 | 0,06 | fraction massique | dilution des huiles moteur par le gasoil, plus forte sur moteurs uses ; a mesurer (point eclair) | moyen | point eclair et distillation simulee | supposé |
+| H-103 | 05 | Part de l'eau eliminee par decantation (eau libre) | 0,60 | 0,75 | 0,85 | fraction | eau libre separable par gravite apres 24 a 72 h ; le reste est emulsionne ou dissous | moyen | essai de decantation en eprouvette | supposé |
+| H-104 | 05 | Part des sediments eliminee par decantation et filtration | 0,80 | 0,90 | 0,95 | fraction | decanteur plus filtre grossier | moyen | essai | supposé |
+| H-105 | 05 | Eau residuelle apres deshydratation sous vide | 0,00 | 0,00 | 0,01 | fraction massique | les fiches TYA annoncent au plus 50 ppm sur huiles propres [S-74] ; marge prise pour huiles usagees | moyen | essai fournisseur sur echantillon | supposé |
+| H-106 | 05 | Temperature de deshydratation sous vide | 60 | 70 | 80 | degC | plage usuelle des purificateurs sous vide ; a confirmer par le fournisseur | faible | fiche technique | supposé |
+| H-107 | 05 | Capacite thermique massique de l'huile | 1,90 | 2 | 2,10 | kJ/(kg.K) | ordre de grandeur des huiles minerales | faible | litterature | supposé |
+| H-108 | 05 | Rendement thermique du rechauffeur electrique et pertes du skid | 0,70 | 0,80 | 0,90 | fraction | pertes par les parois et la pompe a vide | faible | essai | supposé |
+| H-109 | 05 | Temperature ambiante de l'huile entrante | 25 | 27 | 30 | degC | climat equatorial | faible | mesure | supposé |
+| H-110 | 05 | Jours de fonctionnement du pretraitement par an | 200 | 230 | 250 | jours/an | un poste de 8 h | faible | planning | supposé |
+| H-111 | 05 | Huile entrainee dans les boues de decantation | 0,50 | 1 | 2 | kg huile/kg sediment | boues pateuses ; a mesurer | moyen | essai | supposé |
+| H-112 | 05 | Chaleur latente de vaporisation des fractions legeres (type gasoil) | 230 | 250 | 270 | kJ/kg | ordre de grandeur des distillats moyens | faible | litterature | supposé |
+| H-113 | 05 | Prix de l'electricite industrielle basse tension | 80 | 100 | 130 | FCFA/kWh | grille Eneo non consultee (Q-36) | moyen | facture ou grille tarifaire | supposé |
+| H-120 | 06 | Coefficient de detour route / vol d'oiseau, cale sur deux paires sourcees | 1,25 | 1,30 | 1,40 | facteur | Yaounde-Bertoua 333 km route pour 253 km a vol d'oiseau ; Douala-Bertoua 572 km pour 445 km [S-75][S-76] ; bornes elargies | moyen | matrice OSRM quand le reseau le permet | supposé |
+| H-121 | 06 | Distance de piste entre la ville de reference et le chantier ou l'UTB (aller simple) | 20 | 50 | 100 | km | UTB souvent en ville ou en bord de route, chantiers en profondeur ; aucune donnee par client | fort | relevé GPS pendant le pilote | supposé |
+| H-122 | 06 | Vitesse moyenne sur route revetue, camion charge | 40 | 50 | 60 | km/h | controles, traversees de villes, etat des routes | moyen | traces GPS | supposé |
+| H-123 | 06 | Vitesse moyenne sur piste forestiere, saison seche | 15 | 20 | 30 | km/h | pistes de debardage et routes forestieres | fort | traces GPS | supposé |
+| H-124 | 06 | Rapport de vitesse sur piste saison des pluies / saison seche | 0,40 | 0,60 | 0,80 | fraction | pistes detrempees, barrieres de pluie | fort | traces GPS et calendrier des barrieres de pluie | supposé |
+| H-125 | 06 | Temps de chargement par site (pompage, controle, bordereau) | 1,50 | 2 | 3 | h/site | pompage des futs et cuves, depistage Clor-D-Tect | moyen | pilote | supposé |
+| H-126 | 06 | Heures de conduite et de travail par jour d'equipage | 9 | 10 | 11 | h/jour | securite routiere ; pas de conduite de nuit sur piste | moyen | politique HSE | supposé |
+| H-127 | 06 | Consommation du camion-citerne | 28 | 32 | 38 | L/100 km | porteur de 19 t sur routes degradees ; aucune donnee constructeur consultee | moyen | releve reel | supposé |
+| H-128 | 06 | Entretien, pneus et reparations du camion | 150 | 250 | 400 | FCFA/km | routes et pistes degradees | fort | carnet d'entretien | supposé |
+| H-129 | 06 | Cout journalier de l'equipage (chauffeur et aide, frais de mission compris) | 35 000 | 50 000 | 70 000 | FCFA/jour | a remplacer par les salaires sources du lot 10 | moyen | lot 10 | supposé |
+| H-130 | 06 | Prix d'achat d'un camion-citerne de 13 000 L neuf, rendu Douala | 60 000 000 | 75 000 000 | 95 000 000 | FCFA | aucun devis consulte | fort | devis concessionnaires | supposé |
+| H-131 | 06 | Prix d'achat d'un camion-citerne d'occasion (type IVECO Eurocargo), rendu Douala | 20 000 000 | 30 000 000 | 45 000 000 | FCFA | modele cite par le cahier des charges [S-29], prix non consulte | fort | devis | supposé |
+| H-132 | 06 | Duree d'amortissement economique : neuf / occasion | 5 | 6 | 8 | ans (neuf) | occasion : moitie de cette duree dans le calcul | moyen | politique comptable | supposé |
+| H-133 | 06 | Assurance, visite technique, autorisations, GPS du camion | 2 500 000 | 3 500 000 | 5 000 000 | FCFA/an | a remplacer par le lot 13 (assureur) | moyen | devis assureur | supposé |
+| H-134 | 06 | Location d'un camion-citerne avec chauffeur | 250 000 | 350 000 | 500 000 | FCFA/jour | aucune offre consultee | fort | offres de loueurs | supposé |
+| H-135 | 06 | Litres collectes par arret urbain (garage, flotte) | 100 | 200 | 400 | L/arret | un a deux futs par garage | fort | enquete garages | supposé |
+| H-136 | 06 | Arrets urbains par jour de tournee | 8 | 12 | 18 | arrets/jour | embouteillages de Douala | fort | pilote urbain | supposé |
+| H-137 | 06 | Kilometres par jour de tournee urbaine | 60 | 90 | 130 | km/jour | approche, inter-arrets et retour | moyen | traces GPS | supposé |
 | H-30 | 00b | Lot 0 : frais de creation d'une structure juridique pour facturer | 50 000 | 100 000 | 200 000 | FCFA | montant a confirmer au CFCE (Q-08) | moyen | bareme du CFCE | supposé |
 | H-31 | 00b | Lot 0 : supports commerciaux (impression, cartes, plaquette) | 50 000 | 75 000 | 100 000 | FCFA | devis d'imprimerie a Yaounde a obtenir | faible | deux devis | supposé |
 | H-32 | 00b | Lot 0 : deplacements de prospection avant premier encaissement | 100 000 | 150 000 | 200 000 | FCFA | 4 a 8 deplacements Yaounde-Douala ou vers les UTB | moyen | releve des depenses | supposé |

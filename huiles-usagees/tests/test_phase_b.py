@@ -64,3 +64,11 @@ def test_chiffres_lot8_concordent():
 def test_chiffres_lot4ter_concordent():
     e = _lire("04c_extensions/matrice_extensions.md")
     assert "10 238 t/an en cas central" in e and "51 % du seuil bas" in e
+
+
+def test_chiffres_lot5_concordent():
+    b = _lire("05_technique/bilan_procede.md")
+    assert "| 96,3 % | 85,6 % | 65,1 % |" in b
+    assert "| 0,000 | 0,000 | 0,000 |" in b
+    m = _lire("05_technique/matrice_filieres.md")
+    assert "| 4,30 |" in m and "| 3,55 |" in m

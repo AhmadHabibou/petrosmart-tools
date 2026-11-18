@@ -39,3 +39,5 @@ Chaque question porte le lot qui la pose, la personne ou l'institution qui peut 
 | Q-33 | 04c | Les forestiers ont-ils des litiges sur la qualité ou la quantité du gasoil livré (eau, densité, volumes) ? | entretiens du lot 12, pilote | extension E3 | C |
 | Q-34 | 04c | Régime d'incitations applicable à une PME investissant moins d'un milliard de FCFA après l'ordonnance du 18 juillet 2025 | API, APME | extension E8 | C |
 | Q-35 | 08 | Conditions de crédit-bail ou de location d'un purificateur et d'un véhicule léger (loyer, durée, garanties) | sociétés de crédit-bail, loueurs | H-93, H-94 | S |
+| Q-36 | 05, 09 | Grille tarifaire Eneo applicable à un petit site industriel en basse tension | Eneo, facture d'un site voisin | H-113 | C |
+| Q-37 | 05 | Délais de livraison, service après-vente et pièces en Afrique centrale pour Parker (Racor), les purificateurs TYA et les appareils Pensky-Martens | distributeurs, demandes de prix du lot 15 | choix des fournisseurs | S |
