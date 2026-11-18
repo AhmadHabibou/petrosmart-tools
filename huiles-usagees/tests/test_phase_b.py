@@ -137,3 +137,13 @@ def test_chiffres_lot11_concordent():
     m = _lire("11_juridique/matrice_forme_sociale.md")
     assert "**2,60** | **4,05** | **4,10** | **3,40**" in m
     assert "SAS 4,10, SARL 4,05, SA 3,40, établissement individuel 2,60" in _lire("11_juridique/lot11_juridique.md")
+
+
+def test_guides_entretien_10_a_15_questions():
+    import re
+    texte = _lire("12_parties_prenantes/guides_entretien.md")
+    blocs = re.split(r"^## ", texte, flags=re.M)[1:]
+    assert len(blocs) == 34
+    for b in blocs:
+        n = len(re.findall(r"^\d+\. ", b, flags=re.M))
+        assert 10 <= n <= 15, b.splitlines()[0]

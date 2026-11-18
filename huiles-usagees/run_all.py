@@ -22,6 +22,7 @@ ETAPES = [
     "07_hse_eies/risques_hse.py",
     "10_organisation/masse_salariale.py",
     "11_juridique/forme_sociale.py",
+    "12_parties_prenantes/parties_prenantes.py",
     "09_finance/rapport_finance.py",
 ]
 
