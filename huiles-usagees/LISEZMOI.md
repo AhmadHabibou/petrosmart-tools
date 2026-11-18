@@ -1,6 +1,6 @@
 # Projet de collecte et de valorisation des huiles usagées et du gasoil au Cameroun
 
-**État au 18/11/2026 : livraison intermédiaire (phases A et B).** Lots livrés : 0, 1, 2, 3, 4 et 4 bis, avec les registres et le socle de calcul. Décision de viabilité D-06 prise. Les lots 4 ter et 5 à 17 restent à produire. Ce fichier sera réécrit en version finale avec la synthèse du lot 17.
+**État au 18/11/2026 : livraison intermédiaire (phases A, B et C).** Lots livrés : 0, 1, 2, 3, 4, 4 bis, 4 ter et 8, avec les registres et le socle de calcul. Décisions de viabilité (D-06) et de modèle (D-09) prises. Les lots 5, 6, 7 et 9 à 17 restent à produire. Ce fichier sera réécrit en version finale avec la synthèse du lot 17.
 
 ## Conclusion provisoire en cinq lignes
 
@@ -12,7 +12,7 @@
 
 ## Modèle recommandé
 
-Non tranché avant le lot 8. Orientation fixée par D-06 et D-07 : service de conformité, purification du gasoil, collecte sous-traitée puis en propre, remise des huiles à un valorisateur titulaire, sans unité de traitement propre.
+Trajectoire par étapes (D-09) : démarrage en modèle à faible capital (purificateur loué, enlèvements sous-traités, contrat de conformité), passage en prestataire équipé quand au moins 4 contrats annuels sont signés, permis propre en année 3, traitement seulement aux conditions de D-06. Point mort : environ 8 à 9 clients forestiers sous contrat (`08_modele_entreprise/comparaison_modeles.md`).
 
 ## Budget de démarrage
 
@@ -37,7 +37,9 @@ La liste complète est dans `00_registres/questions_ouvertes.md`.
 4. `02_reglementaire/lot2_reglementaire.md`, puis `calendrier.md`
 5. `03_benchmark/lot3_benchmark.md`
 6. `04_marche/lot4_marche.md`, `gisement.md`, `questionnaire_garages.md`
-7. `00_registres/` : décisions (D-06), questions ouvertes, hypothèses, sources
+7. `04c_extensions/lot4ter_extensions.md`, puis `matrice_extensions.md`
+8. `08_modele_entreprise/lot8_modele_entreprise.md`, puis `comparaison_modeles.md`
+9. `00_registres/` : décisions (D-06, D-09), questions ouvertes, hypothèses, sources
 
 ## Lundi prochain
 

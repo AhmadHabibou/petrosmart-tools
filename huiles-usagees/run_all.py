@@ -15,6 +15,8 @@ ETAPES = [
     "04b_validation_terrain/budget_protocoles.py",
     "02_reglementaire/calendrier.py",
     "04_marche/gisement.py",
+    "04c_extensions/extensions.py",
+    "08_modele_entreprise/comparaison.py",
 ]
 
 

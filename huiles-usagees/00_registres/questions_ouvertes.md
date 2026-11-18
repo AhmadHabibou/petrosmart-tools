@@ -34,3 +34,8 @@ Chaque question porte le lot qui la pose, la personne ou l'institution qui peut 
 | Q-28 | 02, 05 | Droits et taxes à l'importation des équipements (positions tarifaires, TEC CEMAC, TVA) | douanes, transitaire | coût rendu Douala | S |
 | Q-29 | 04 | Quels industriels de Douala et Yaoundé utilisent des chaudières ou fours au fioul, avec quelle consommation ? | enquête directe, GICAM, MINMIDT | liste des acheteurs du combustible | M |
 | Q-30 | 04 | Prix et usages des huiles usagées dans le circuit informel de Douala et Yaoundé | enquête 30 garages | H-03, scénario de guerre des prix | M |
+| Q-31 | 08, 09 | Taux effectif de l'impôt sur les sociétés d'une PME (centimes additionnels compris) et règles du minimum de perception en 2026 | DGI, loi de finances 2026 | H-99, modèle financier | S |
+| Q-32 | 04c | Indicateurs du référentiel FSC-STD-CMR-02.1-2026 et des exigences OLB sur les hydrocarbures, huiles et déchets dangereux | FSC, Bureau Veritas (OLB), auditeurs | contenu et prix de l'extension E2 | S |
+| Q-33 | 04c | Les forestiers ont-ils des litiges sur la qualité ou la quantité du gasoil livré (eau, densité, volumes) ? | entretiens du lot 12, pilote | extension E3 | C |
+| Q-34 | 04c | Régime d'incitations applicable à une PME investissant moins d'un milliard de FCFA après l'ordonnance du 18 juillet 2025 | API, APME | extension E8 | C |
+| Q-35 | 08 | Conditions de crédit-bail ou de location d'un purificateur et d'un véhicule léger (loyer, durée, garanties) | sociétés de crédit-bail, loueurs | H-93, H-94 | S |

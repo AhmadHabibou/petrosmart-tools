@@ -51,3 +51,16 @@ def test_hypotheses_citees_existent():
             continue
         for hid in re.findall(r"\bH-\d{2}\b", md.read_text(encoding="utf-8")):
             assert hid in HYPOTHESES, f"{md.name} cite {hid} absent du registre"
+
+
+def test_chiffres_lot8_concordent():
+    c = _lire("08_modele_entreprise/comparaison_modeles.md")
+    for fragment in ("**4,14** | **2,54** | **1,50** | **3,79** | **4,35**", "| M1 | 5,14 | 7,8 |", "| M5 | 5,14 | 8,9 |",
+                     "| 250 | -59,1 |", "| 400 | 241,4 |", "contribution 2,14 M FCFA, point mort 18,7", "point mort 21,5",
+                     "| Capital année 0 (M FCFA) | 15,0 | 15,0 | 87,0 | 4,0 | 4,0 |"):
+        assert fragment in c, fragment
+
+
+def test_chiffres_lot4ter_concordent():
+    e = _lire("04c_extensions/matrice_extensions.md")
+    assert "10 238 t/an en cas central" in e and "51 % du seuil bas" in e
