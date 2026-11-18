@@ -52,18 +52,18 @@ VAN de base : 137,4 M FCFA. Chaque hypothèse est placée à sa borne basse puis
 
 | Hypothèse | Libellé | VAN à la borne basse | VAN à la borne haute | Amplitude |
 |---|---|---:|---:|---:|
-| H-97 | Clients forestiers sous contrat en annee 5 | 31,4 | 293,3 | 261,9 |
-| H-80 | Prix annuel du contrat de conformite par client forestier (futs, kits, registre, formation, 4 enlevements, rapport PGES) | 45,2 | 286,8 | 241,7 |
-| H-48 | Pilote : cout d'une tournee d'enlevement sous-traitee a un collecteur agree | 178,4 | 66,8 | 111,7 |
-| H-88 | Enlevements d'huiles par client forestier et par an | 163,0 | 86,1 | 76,9 |
+| H-97 | Clients forestiers sous contrat en année 5 | 31,4 | 293,3 | 261,9 |
+| H-80 | Prix annuel du contrat de conformité par client forestier (fûts, kits, registre, formation, 4 enlèvements, rapport PGES) | 45,2 | 286,8 | 241,7 |
+| H-48 | Pilote : coût d'une tournée d'enlèvement sous-traitée à un collecteur agréé | 178,4 | 66,8 | 111,7 |
+| H-88 | Enlèvements d'huiles par client forestier et par an | 163,0 | 86,1 | 76,9 |
 | H-82 | Interventions de purification du gasoil par client forestier et par an | 118,7 | 194,0 | 75,3 |
 | H-81 | Prix d'une intervention de purification du gasoil et nettoyage de cuve | 107,7 | 182,6 | 74,8 |
-| H-83 | Valeur nette des huiles remises a un valorisateur titulaire (negatif : la societe paie) | 112,7 | 162,5 | 49,8 |
-| H-153 | Frais generaux (bureau, telephone, comptable externe, deplacements commerciaux), a partir du mois 4 | 156,6 | 112,2 | 44,4 |
-| H-161 | Marge nette mensuelle des activites d'amorcage (lot 0), sur les 24 premiers mois | 130,2 | 156,8 | 26,6 |
-| H-150 | Remuneration chargee du gerant, a partir du mois 13 | 145,7 | 120,9 | 24,8 |
-| H-87 | Cout des consommables par intervention de purification (cartouches, filtres, absorbants) | 146,5 | 125,3 | 21,2 |
-| H-155 | Delai de paiement des clients | 144,7 | 130,1 | 14,6 |
+| H-83 | Valeur nette des huiles remises à un valorisateur titulaire (négatif : la société paie) | 112,7 | 162,5 | 49,8 |
+| H-153 | Frais généraux (bureau, téléphone, comptable externe, déplacements commerciaux), à partir du mois 4 | 156,6 | 112,2 | 44,4 |
+| H-161 | Marge nette mensuelle des activités d'amorçage (lot 0), sur les 24 premiers mois | 130,2 | 156,8 | 26,6 |
+| H-150 | Rémunération chargée du gérant, à partir du mois 13 | 145,7 | 120,9 | 24,8 |
+| H-87 | Coût des consommables par intervention de purification (cartouches, filtres, absorbants) | 146,5 | 125,3 | 21,2 |
+| H-155 | Délai de paiement des clients | 144,7 | 130,1 | 14,6 |
 
 ## Simulation de Monte-Carlo (10 000 tirages)
 
