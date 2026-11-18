@@ -131,6 +131,8 @@ def construire(chemin=FICHIER):
         ind_ws.cell(row=1, column=c).fill = FOND
     ind_ws.column_dimensions["A"].width = 50
     wb.save(chemin)
+    from commun.deterministe import figer
+    figer(chemin)
     return chemin, lignes
 
 

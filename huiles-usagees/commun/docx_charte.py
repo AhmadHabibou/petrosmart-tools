@@ -239,6 +239,8 @@ def convertir(md_path, docx_path, titre_court=None, reference=None):
             _format_par(p)
         i += 1
     doc.save(docx_path)
+    from commun.deterministe import figer
+    figer(docx_path)
     return docx_path
 
 

@@ -12,7 +12,9 @@ def _lire(rel):
 
 
 def setup_module(_):
-    subprocess.run([sys.executable, str(RACINE / "run_all.py")], check=True, capture_output=True)
+    import os
+    subprocess.run([sys.executable, str(RACINE / "run_all.py")], check=True, capture_output=True,
+                   env={**os.environ, "HUILES_SANS_PDF": "1"})
 
 
 def test_chiffres_lot4_concordent():

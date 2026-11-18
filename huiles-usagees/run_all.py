@@ -3,6 +3,7 @@
 Usage : python run_all.py   (ou : make)
 """
 from pathlib import Path
+import os
 import runpy
 import sys
 
@@ -34,6 +35,7 @@ ETAPES = [
 def main() -> int:
     for e in ETAPES:
         print(f"> {e}")
+        sys.argv = [e] + (["--sans-pdf"] if os.environ.get("HUILES_SANS_PDF") else [])
         runpy.run_path(str(RACINE / e), run_name="__main__")
     from commun.controles import tirets_interdits
     fautes = tirets_interdits(RACINE)

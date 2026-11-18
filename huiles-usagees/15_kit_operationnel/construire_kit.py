@@ -199,6 +199,9 @@ def construire(pdf=True):
     pdfs.mkdir(exist_ok=True)
     grille_comparaison(sorties / f"{PREFIXE} B3 Grille de comparaison des offres.xlsx")
     tableau_de_bord(sorties / f"{PREFIXE} T1 Tableau de bord des indicateurs.xlsx")
+    from commun.deterministe import figer
+    for x in sorties.glob("*.xlsx"):
+        figer(x)
     sources = sorted(SRC.rglob("*.md")) + [RACINE / "11_juridique" / n for n in ("statuts_sarl.md", "pacte_associes.md", "charte_conflits_interets.md")] \
         + [RACINE / "04b_validation_terrain" / n for n in ("procedure_acceptation_lots.md", "lettre_acces_sanctions.md")]
     noms = {"statuts_sarl": "J1 Projet de statuts SARL", "pacte_associes": "J2 Projet de pacte d'associes",

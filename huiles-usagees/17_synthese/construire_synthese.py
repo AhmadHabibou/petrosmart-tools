@@ -365,6 +365,9 @@ def construire(pdf=True):
     nb = deck_banque(c, liv / f"{pref} Presentation banque.pptx")
     nf = deck_forestiers(c, liv / f"{pref} Presentation forestiers.pptx")
     sorties += [liv / f"{pref} Presentation banque.pptx", liv / f"{pref} Presentation forestiers.pptx"]
+    from commun.deterministe import figer
+    for x in sorties:
+        figer(x)
     if pdf:
         for s in sorties:
             docx_charte.vers_pdf(s, liv)
