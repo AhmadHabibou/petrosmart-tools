@@ -41,7 +41,7 @@ Les prix sont en dollars, tels que publiés ; leur conversion et les frais d'app
 
 | Équipement | Étape | Fournisseur ou modèle | Prix publié | Point d'attention | Sources |
 |---|---|---|---|---|---|
-| Purificateur de gasoil 60 L/min | 1 (location), 2 (achat) | Parker DFC14WS25VVX1 | 6 773,51 USD (prix spécial), hors stock | cartouches de rechange au Cameroun (Q-16) | [S-73] |
+| Purificateur de gasoil 60 L/min | 1 (location), 2 (achat) | Parker DFC14WS25VVX1 [S-73] ou DFCC14WS10VVX1 [S-92], version 50 Hz à exiger | 6 773,51 USD (prix spécial), hors stock | cartouches de rechange au Cameroun (Q-16) | [S-73] |
 | idem | | chariot Racor FBO-14 (même groupe Parker) | non lu | débit à vérifier | [S-84] |
 | idem | | FFC 3000, chariot de filtration en location (Royaume-Uni) | non lu | location hors CEMAC, modèle de référence pour un loueur local | [S-84] |
 | Purificateur sous vide | 4 | TYA, Tradeeasy | 2 500 USD FOB Chongqing, livraison 25 jours | modèle exact et débit à préciser | [S-74] |

@@ -12,7 +12,7 @@ Notre société, en création, propose aux exploitants forestiers et aux flottes
 
 | Code | Équipement | Quantité | Référence indicative |
 |---|---|---:|---|
-| E1 | Purificateur de gasoil portable | 1 | Parker DFC14WS25VVX1 ou équivalent |
+| E1 | Purificateur de gasoil portable | 1 | Parker DFC14WS25VVX1 ou DFCC14WS10VVX1 (filtration plus fine), en version 50 Hz, ou équivalent (Donaldson Clean Diesel Cart, HYDAC LVU-CD) |
 | E5 | Matériel de prélèvement | 1 lot | Koehler K27400 et échantillonneur COLIWASA ou équivalent |
 | E7 | Véhicule léger 4x4 pick-up | 1 | Toyota Hilux 2.4 GD-6 ou équivalent |
 

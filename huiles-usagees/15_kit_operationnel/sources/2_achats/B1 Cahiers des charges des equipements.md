@@ -4,7 +4,7 @@ Spécifications minimales. Les offres doivent indiquer : prix départ usine et p
 
 ## E1 Purificateur de gasoil portable
 
-Référence indicative : Parker DFC14WS25VVX1 ou équivalent. Quantité : 1. Mode d'acquisition : achat, location ou crédit-bail ; prix d'un jeu de 12 cartouches de rechange.
+Référence indicative : Parker DFC14WS25VVX1 ou DFCC14WS10VVX1 (filtration plus fine), en version 50 Hz, ou équivalent (Donaldson Clean Diesel Cart, HYDAC LVU-CD). Quantité : 1. Mode d'acquisition : achat, location ou crédit-bail ; prix d'un jeu de 12 cartouches de rechange ; offre séparée pour chacune des deux références Parker.
 
 - débit d'au moins 60 L/min ;
 - séparation de l'eau et filtration des particules (élément séparateur d'eau) ;
@@ -51,14 +51,16 @@ Référence indicative : Koehler K27400 et échantillonneur COLIWASA ou équival
 - étiquettes et scellés numérotés ;
 - glacière.
 
-## E6 Camion-citerne d'occasion pour huiles usagées
+## E6 Camion hydrocureur ADR d'occasion pour huiles usagées
 
-Référence indicative : porteur de type IVECO Eurocargo, citerne d'environ 13 000 L. Quantité : 1. Mode d'acquisition : achat à l'étape 3 seulement (D-10) ; location avec chauffeur en dépannage.
+Référence indicative : porteur de type IVECO Eurocargo, MAN ou DAF, citerne sous vide d'environ 13 000 L. Quantité : 1. Mode d'acquisition : achat à l'étape 3 seulement (D-10) ; location avec chauffeur en dépannage.
 
-- citerne compatible hydrocarbures, compartimentée ;
-- pompe d'aspiration et de refoulement ;
+- citerne sous vide conforme ADR, compatible hydrocarbures ;
+- pompe à vide (à palettes ou à anneau liquide) avec protection contre le débordement de la citerne ;
+- flexibles d'aspiration d'au moins 10 m et canne pour fûts de 200 L ;
+- vidange par gravité et par mise en pression ;
 - équipements de sécurité et signalisation ;
-- historique d'entretien ;
+- historique d'entretien de la pompe et du porteur ;
 - visite technique valide ;
 - garantie mécanique d'au moins 3 mois.
 

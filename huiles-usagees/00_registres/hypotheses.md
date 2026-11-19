@@ -78,7 +78,7 @@ Fichier généré par `commun/registres.py` depuis `commun/hypotheses.py`. Toute
 | H-128 | 06 | Entretien, pneus et réparations du camion | 150 | 250 | 400 | FCFA/km | routes et pistes dégradées | fort | carnet d'entretien | supposé |
 | H-129 | 06 | Coût journalier de l'équipage (chauffeur et aide, frais de mission compris) | 35 000 | 50 000 | 70 000 | FCFA/jour | a remplacer par les salaires sourcés du lot 10 | moyen | lot 10 | supposé |
 | H-130 | 06 | Prix d'achat d'un camion-citerne de 13 000 L neuf, rendu Douala | 60 000 000 | 75 000 000 | 95 000 000 | FCFA | aucun devis consulté | fort | devis concessionnaires | supposé |
-| H-131 | 06 | Prix d'achat d'un camion-citerne d'occasion (type IVECO Eurocargo), rendu Douala | 20 000 000 | 30 000 000 | 45 000 000 | FCFA | modèle cité par le cahier des charges [S-29], prix non consulté | fort | devis | supposé |
+| H-131 | 06 | Prix d'achat d'un camion hydrocureur ADR d'occasion (citerne sous vide, type IVECO Eurocargo), rendu Douala | 20 000 000 | 30 000 000 | 45 000 000 | FCFA | modèle cité par le cahier des charges [S-29] ; citerne sous vide retenue pour les fûts chargés en eau et en boues ; prix non consulté (Q-44) | fort | devis | supposé |
 | H-132 | 06 | Durée d'amortissement économique : neuf / occasion | 5 | 6 | 8 | ans (neuf) | occasion : moitié de cette durée dans le calcul | moyen | politique comptable | supposé |
 | H-133 | 06 | Assurance, visite technique, autorisations, GPS du camion | 2 500 000 | 3 500 000 | 5 000 000 | FCFA/an | a remplacer par le lot 13 (assureur) | moyen | devis assureur | supposé |
 | H-134 | 06 | Location d'un camion-citerne avec chauffeur | 250 000 | 350 000 | 500 000 | FCFA/jour | aucune offre consultée | fort | offres de loueurs | supposé |

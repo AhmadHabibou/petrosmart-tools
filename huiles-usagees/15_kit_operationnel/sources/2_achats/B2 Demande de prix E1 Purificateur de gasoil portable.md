@@ -6,7 +6,7 @@
 
 Objet : demande de prix n°2026-E1 pour : Purificateur de gasoil portable.
 
-Nous vous prions de nous adresser votre meilleure offre pour la fourniture de : Purificateur de gasoil portable (Parker DFC14WS25VVX1 ou équivalent), quantité : 1.
+Nous vous prions de nous adresser votre meilleure offre pour la fourniture de : Purificateur de gasoil portable (Parker DFC14WS25VVX1 ou DFCC14WS10VVX1 (filtration plus fine), en version 50 Hz, ou équivalent (Donaldson Clean Diesel Cart, HYDAC LVU-CD)), quantité : 1.
 
 Spécifications minimales :
 
@@ -27,7 +27,7 @@ Date limite de réponse : [date]. Contact : [nom, téléphone, courriel].
 
 Subject: request for quotation No. 2026-E1 for: Portable diesel fuel conditioning cart.
 
-Please send us your best offer for the supply of: Portable diesel fuel conditioning cart (Parker DFC14WS25VVX1 ou équivalent), quantity: 1.
+Please send us your best offer for the supply of: Portable diesel fuel conditioning cart (Parker DFC14WS25VVX1 ou DFCC14WS10VVX1 (filtration plus fine), en version 50 Hz, ou équivalent (Donaldson Clean Diesel Cart, HYDAC LVU-CD)), quantity: 1.
 
 Minimum specifications:
 
