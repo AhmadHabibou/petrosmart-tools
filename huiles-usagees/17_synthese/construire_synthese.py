@@ -211,7 +211,7 @@ def lisezmoi(c):
          "8. `00_registres/` : sources, hypothèses, questions ouvertes, décisions", "",
          "## Lundi", "",
          "1. Envoyer les quatre lettres du kit (A2) : HIKMA, MINEPDED, MINMIDT, MINEFOP.",
-         "2. Demander les devis : laboratoires (SGS Cameroun et deux autres), Bocom International et SECA, distributeur Parker ou loueur, deux assureurs.",
+         "2. Demander les devis : laboratoires (SGS Cameroun et deux autres), Bocom International et SECA, distributeur Parker ou loueur, deux assureurs, deux crédit-bailleurs (lettre B4 du kit).",
          "3. Déposer le dossier de la SARL au CFCE (statuts J1 relus par un avocat).",
          "4. Faire dix appels de prospection avec le script K4, en commençant par les flottes urbaines et les concessionnaires.",
          "5. Lancer l'enquête des 30 garages et ouvrir le tour de table des comptes courants.", "",
@@ -288,50 +288,6 @@ def _prs():
     return prs
 
 
-def deck_banque(c, chemin):
-    F = c["F"]
-    b, a, mc = F["scenarios"]["base"], F["annuel_base"], F["monte_carlo"]
-    prs = _prs()
-    _diapo(prs, "Gestion des huiles usagées et purification du gasoil", ["Projet de création de société, Cameroun", "Demande : crédit-bail d'équipements et garantie de crédit",
-                                                                         f"Dossier du {DATE_TXT}"])
-    _diapo(prs, "Synthèse", ["Un service de conformité payé par les producteurs forestiers, sans unité industrielle au démarrage",
-                             f"VAN à 5 ans {m_fcfa(b['van'], 1)} M FCFA, TRI {pct(b['tri'], 1)} (scénario de base)",
-                             f"Point mort : environ {nombre(c['pm'], 0)} clients sous contrat", "Trajectoire par étapes : chaque investissement suit une porte de décision chiffrée"],
-           note="Sources : 09_finance/resultats_finance.md ; 08_modele_entreprise/comparaison_modeles.md")
-    _diapo(prs, "Le besoin", ["Les huiles usagées sont des déchets dangereux soumis à permis [S-02]",
-                              "Les exploitants forestiers sont sanctionnés pour leur gestion des huiles [S-29]",
-                              f"Collecter en forêt coûte {nombre(c['cout_l_min'])} à {nombre(c['cout_l_max'])} FCFA par litre : le producteur doit payer le service"])
-    _diapo(prs, "L'offre", ["Contrat annuel par site : fûts, kits, registre, formation, enlèvements tracés, rapport",
-                            "Purification du gasoil et nettoyage de cuve sans entrée en cuve", "Dossier de preuves pour les audits FSC et OLB",
-                            f"Prix d'appel : {m_fcfa(val('H-80'), 1)} M FCFA HT par site et par an, testé au pilote"])
-    _diapo(prs, "Le marché", [f"Gisement par le parc : environ {m_fcfa(c['gis']['central']['parc_total'], 1)} M L/an (le chiffre de 70 000 t/an paraît surestimé)",
-                              f"Segment forestier : environ {m_fcfa(c['gis']['central']['foret'], 1)} M L/an, 70 titulaires de concessions et 251 UTB",
-                              "Aucun collecteur identifié en forêt ; collecteurs de déchets dangereux à Douala", "Aucun acheteur de combustible confirmé : la fabrication est gelée"])
-    _diapo(prs, "Modèle et trajectoire", tableau=[["Étape", "Contenu", "Porte"], ["0", "amorçage, pilote préparé", "2 clients pilotes"],
-                                                  ["1", "matériel loué, enlèvements sous-traités", "4 contrats, 3 mois d'EBITDA positif"],
-                                                  ["2", "équipements en crédit-bail", "9 clients, 100 000 L/an"], ["3", "permis propre", "320 000 L/an"]])
-    _diapo(prs, "Équipe et gouvernance", ["Gérant : ingénieur mines et pétrole, spécialiste HSE et EIES, certifié NEBOSH IGC",
-                                          "SARL, capital de 1 M FCFA et comptes courants bloqués", "HIKMA hors du capital ; charte de prévention des conflits d'intérêts",
-                                          "Deux personnes en année 1, quatre au passage à l'étape 2"])
-    _diapo(prs, "Plan financier (scénario de base, M FCFA)", tableau=[["", "A1", "A2", "A3", "A4", "A5"],
-                                                                       ["CA"] + [m_fcfa(x, 1) for x in a["ca"]], ["EBITDA"] + [m_fcfa(x, 1) for x in a["ebitda"]],
-                                                                       ["Résultat net"] + [m_fcfa(x, 1) for x in a["resultat_net"]],
-                                                                       ["Trésorerie"] + [m_fcfa(x, 1) for x in a["tresorerie_fin"]]],
-           note="Source : 09_finance/resultats_finance.md")
-    _diapo(prs, "Risques et sensibilité", [f"Monte-Carlo, 10 000 tirages : VAN à 5 ans négative dans {pct(mc['p_van5_negative'], 1)} des cas",
-                                           f"VAN avec valeur terminale négative dans {pct(mc['p_van_negative'], 1)} des cas",
-                                           "Variables dominantes : nombre de clients et prix du contrat", "Principaux risques : prix refusé, fonds propres, temps du gérant"])
-    _diapo(prs, "Financement demandé", ["Fonds propres et quasi-fonds propres : environ 20 M FCFA (promoteur et associés)",
-                                        f"Crédit-bail d'équipements : environ {m_fcfa(val('H-92'), 1)} M FCFA au passage à l'étape 2",
-                                        "Garantie : dispositif CDEC et African Guarantee Fund", f"Besoin au 90e centile : {m_fcfa(mc['besoin_p90'], 1)} M FCFA"])
-    _diapo(prs, "Plan d'action", ["Mois 1 à 3 : société, amorçage, échantillonnage, démarches écrites", "Mois 4 à 6 : pilote payant chez 2 clients forestiers",
-                                  "Mois 7 à 18 : portefeuille de clients, dossier FSC et OLB", "Mois 19 à 36 : équipements, préparation du permis"])
-    _diapo(prs, "Conditions et contact", ["Go conditionnel : franchissement de la porte 1 au plus tard au jour 75",
-                                          "Points faibles : prix du contrat non mesuré, textes lus par extraits, aucun devis", "[Nom], gérant ; [téléphone] ; [courriel]"])
-    prs.save(chemin)
-    return len(prs.slides)
-
-
 def deck_forestiers(c, chemin):
     prs = _prs()
     _diapo(prs, "Vos huiles usagées, gérées et tracées", ["Gestion des huiles usagées et purification du gasoil pour les exploitants forestiers et les UTB", "[Dénomination] ; [contact]"])
@@ -369,16 +325,15 @@ def construire(pdf=True):
     d = liv / f"{pref} Note Go No Go.docx"
     docx_charte.convertir(ICI / "note_go_no_go.md", d, titre_court="Note Go No Go", reference=f"{pref} Note Go No Go")
     sorties.append(d)
-    nb = deck_banque(c, liv / f"{pref} Presentation banque.pptx")
     nf = deck_forestiers(c, liv / f"{pref} Presentation forestiers.pptx")
-    sorties += [liv / f"{pref} Presentation banque.pptx", liv / f"{pref} Presentation forestiers.pptx"]
+    sorties.append(liv / f"{pref} Presentation forestiers.pptx")
     from commun.deterministe import figer
     for x in sorties:
         figer(x)
     if pdf:
         for s in sorties:
             docx_charte.vers_pdf(s, liv)
-    return nb, nf
+    return nf
 
 
 def mesurer_pages_corps(pdf):
@@ -393,5 +348,5 @@ def mesurer_pages_corps(pdf):
 
 
 if __name__ == "__main__":
-    nb, nf = construire(pdf="--sans-pdf" not in sys.argv)
-    print("Lot 17 : diapositives", nb, nf)
+    nf = construire(pdf="--sans-pdf" not in sys.argv)
+    print("Lot 17 : diapositives (forestiers)", nf)

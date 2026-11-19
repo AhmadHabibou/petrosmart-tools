@@ -15,6 +15,7 @@ Le kit est prêt à imprimer ou à compléter : 37 documents en `.docx` (dossier
 | B1 | Cahiers des charges des sept équipements | achats |
 | B2 | Demandes de prix en français et en anglais, une par équipement (E1 à E7) | achats |
 | B3 | Grille de comparaison des offres (Excel, score pondéré par formules) | achats |
+| B4 | Demande d'offre de crédit-bail pour le purificateur de gasoil, le matériel de prélèvement et le véhicule léger (décision D-11) | achats et financement |
 | P0 à P7 | Procédures : acceptation des lots, réception et échantillonnage, analyse, traitement, chargement et transport, déversement, nettoyage de cuve, purification du gasoil | exploitation |
 | F1 à F5 | Bordereau de suivi, registre des entrées et sorties, fiche d'analyse, fiche d'incident, étiquettes de fûts | exploitation |
 | C1 à C4 | Contrats : conformité forestier, achat d'huiles urbaines, vente de combustible, transport sous-traité | commercial et achats |

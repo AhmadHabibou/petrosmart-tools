@@ -199,4 +199,4 @@ Registre complet : `13_risques/registre_risques.md`.
 
 1. Le prix du contrat et le rythme de signature, qui expliquent l'essentiel de la valeur, ne sont pas encore mesurés.
 2. La seconde tranche de comptes courants (17,6 M FCFA) est prévue au pacte d'associés, mais aucun associé minoritaire n'est encore identifié : sa solvabilité reste à démontrer à la banque.
-3. Les loyers de crédit-bail (6,0 M FCFA par an) ne viennent d'aucune offre, et aucune administration n'a encore répondu par écrit sur le régime applicable.
+3. Les loyers de crédit-bail (6,0 M FCFA par an) ne viennent d'aucune offre (demande type B4 du kit opérationnel à envoyer), et aucune administration n'a encore répondu par écrit sur le régime applicable.

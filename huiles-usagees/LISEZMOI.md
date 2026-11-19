@@ -44,7 +44,7 @@ Liste complète : `00_registres/questions_ouvertes.md`.
 ## Lundi
 
 1. Envoyer les quatre lettres du kit (A2) : HIKMA, MINEPDED, MINMIDT, MINEFOP.
-2. Demander les devis : laboratoires (SGS Cameroun et deux autres), Bocom International et SECA, distributeur Parker ou loueur, deux assureurs.
+2. Demander les devis : laboratoires (SGS Cameroun et deux autres), Bocom International et SECA, distributeur Parker ou loueur, deux assureurs, deux crédit-bailleurs (lettre B4 du kit).
 3. Déposer le dossier de la SARL au CFCE (statuts J1 relus par un avocat).
 4. Faire dix appels de prospection avec le script K4, en commençant par les flottes urbaines et les concessionnaires.
 5. Lancer l'enquête des 30 garages et ouvrir le tour de table des comptes courants.

@@ -135,6 +135,37 @@ def rfq(e):
     return "\n".join(fr) + "\n"
 
 
+def demande_credit_bail():
+    """Demande d'offre de credit-bail adressee aux etablissements de credit-bail et aux banques (decision D-11)."""
+    eq = [e for e in EQUIPEMENTS if e["code"] in ("E1", "E5", "E7")]
+    L = ["# Demande d'offre de crédit-bail d'équipements", "",
+         "[Dénomination], société à responsabilité limitée en création, [adresse], [téléphone], [courriel]", "",
+         "À l'attention de : [établissement de crédit-bail ou banque], [service crédit-bail], [adresse]", "",
+         f"Objet : demande d'offre de crédit-bail n°{DATE[:4]}-CB pour l'équipement d'une société de gestion des huiles usagées et de purification du gasoil.", "",
+         "Madame, Monsieur,", "",
+         "Notre société, en création, propose aux exploitants forestiers et aux flottes un service annuel de gestion des huiles usagées et de purification du gasoil. "
+         f"Son plan de financement prévoit un crédit-bail d'équipements d'une valeur d'environ {fcfa(val('H-92'))} HT, mis en place au passage à la deuxième étape de son développement. "
+         "Nous vous prions de nous adresser une offre indicative pour les biens suivants :", "",
+         "| Code | Équipement | Quantité | Référence indicative |", "|---|---|---:|---|"]
+    L += [f"| {e['code']} | {e['fr']} | {e['qte']} | {e['ref']} |" for e in eq]
+    L += ["", "Les spécifications détaillées figurent dans les cahiers des charges joints (document B1).", "",
+          "Votre offre précisera :", "",
+          "- les durées proposées (36 et 48 mois) et le montant des loyers mensuels ou trimestriels hors taxes ;",
+          "- le premier loyer majoré ou l'apport initial demandé ;",
+          "- la valeur résiduelle et les conditions de levée d'option ;",
+          "- le taux de financement implicite et les frais de dossier ;",
+          "- l'assurance exigée sur les biens et son coût, ou la possibilité de l'assurer auprès de notre assureur ;",
+          "- les garanties demandées (caution des associés, dépôt de garantie, domiciliation des encaissements, garantie de portefeuille PME) ;",
+          "- l'éligibilité d'un véhicule d'occasion et l'âge maximal accepté ;",
+          "- les documents à fournir et le délai d'instruction ;",
+          "- la durée de validité de l'offre.", "",
+          "Nous joignons le business plan bancaire de la société. Nous restons à votre disposition pour une rencontre.", "",
+          "Date limite de réponse : [date]. Contact : [nom, téléphone, courriel].", "",
+          "Veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées.", "",
+          "[Nom du gérant], gérant", ""]
+    return "\n".join(L) + "\n"
+
+
 def _entete(ws, valeurs):
     ws.append(valeurs)
     for c in ws[1]:
@@ -193,6 +224,7 @@ def construire(pdf=True):
     (SRC / "2_achats" / "B1 Cahiers des charges des equipements.md").write_text(cahiers_des_charges(), encoding="utf-8")
     for e in EQUIPEMENTS:
         (SRC / "2_achats" / f"B2 Demande de prix {e['code']} {e['fr']}.md").write_text(rfq(e), encoding="utf-8")
+    (SRC / "2_achats" / "B4 Demande d'offre de credit-bail.md").write_text(demande_credit_bail(), encoding="utf-8")
     sorties = KIT / "docx"
     pdfs = KIT / "pdf"
     sorties.mkdir(exist_ok=True)

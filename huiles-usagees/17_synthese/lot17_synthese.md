@@ -6,11 +6,11 @@ Méthode : pyramide de Minto. Tous les chiffres de la synthèse sont lus dans le
 
 | Livrable | Fichier source | Versions |
 |---|---|---|
-| Business plan bancable | `business_plan.md` | `livrables/` en .docx et .pdf |
+| Business plan de synthèse (scénario de base avec emprunt ; pour la banque, le business plan bancaire le remplace) | `business_plan.md` | `livrables/` en .docx et .pdf |
 | Document de projet institutionnel (trame des documents de projet présentés aux administrations : fiche signalétique, contexte, marché, impacts, technique, finances, cadre réglementaire, appui attendu) | `bp_institutionnel.md`, généré par `construire_business_plans.py` | `livrables/` en .docx et .pdf |
 | Business plan bancaire (demande chiffrée, structure en crédit-bail et fonds propres, comptes, ratios de couverture, Monte-Carlo sur la structure demandée, garanties, conditions de décaissement) | `bp_banque.md`, généré par `construire_business_plans.py` | `livrables/` en .docx et .pdf |
 | Note Go/No Go (deux pages) | `note_go_no_go.md` | `livrables/` en .docx et .pdf |
-| Présentation pour une banque (12 diapositives) | généré par le script | `livrables/` en .pptx et .pdf |
+| Présentation pour une banque (12 diapositives, même structure de financement que le business plan bancaire) | généré par `construire_business_plans.py` | `livrables/` en .pptx et .pdf |
 | Présentation pour les clients forestiers (8 diapositives) | généré par le script | `livrables/` en .pptx et .pdf |
 | LISEZMOI du dépôt | généré par le script | `LISEZMOI.md` |
 

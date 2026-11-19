@@ -66,6 +66,8 @@ def donnees():
     c["base"] = dict(ind=ib, a=annuel(sb))
     c["tornado"] = mm.tornado(fabrique=structure_demandee)
     c["mc"] = mm.monte_carlo(fabrique=structure_demandee)
+    c["besoin_ct"] = max(0.0, -ind["tresorerie_min"])
+    c["tranche2"] = max(0.0, c["mc"]["besoin_p90"] - p["H-157"] - c["besoin_ct"])
     reg = _module("13_risques/registre_risques.py", "reg")
     c["risques"] = sorted(reg.RISQUES, key=lambda r: -r[4] * r[5])
     c["cal"] = c["fins"]
@@ -239,8 +241,7 @@ def bp_banque(c):
     g = c["F"]["guerre_prix"]
     base_tor, tor = c["tornado"]
     couv = [(a["ebitda"][i] + a["loyers"][i]) / a["loyers"][i] if a["loyers"][i] else None for i in range(5)]
-    besoin_ct = max(0.0, -ind["tresorerie_min"])
-    tranche2 = max(0.0, mc["besoin_p90"] - sd["p"]["H-157"] - besoin_ct)
+    besoin_ct, tranche2 = c["besoin_ct"], c["tranche2"]
     L = ["# Business plan : dossier de financement", "",
          "## Résumé exécutif", "",
          f"**Demande : un crédit-bail d'équipements d'une valeur d'environ {m_fcfa(val('H-92'), 1)} M FCFA, une facilité de trésorerie d'au moins {m_fcfa(besoin_ct, 1)} M FCFA "
@@ -361,8 +362,62 @@ def bp_banque(c):
           "## Points faibles du dossier", "",
           "1. Le prix du contrat et le rythme de signature, qui expliquent l'essentiel de la valeur, ne sont pas encore mesurés.",
           f"2. La seconde tranche de comptes courants ({m_fcfa(tranche2, 1)} M FCFA) est prévue au pacte d'associés, mais aucun associé minoritaire n'est encore identifié : sa solvabilité reste à démontrer à la banque.",
-          f"3. Les loyers de crédit-bail ({m_fcfa(val('H-94'), 1)} M FCFA par an) ne viennent d'aucune offre, et aucune administration n'a encore répondu par écrit sur le régime applicable."]
+          f"3. Les loyers de crédit-bail ({m_fcfa(val('H-94'), 1)} M FCFA par an) ne viennent d'aucune offre (demande type B4 du kit opérationnel à envoyer), et aucune administration n'a encore répondu par écrit sur le régime applicable."]
     return "\n".join(L) + "\n"
+
+
+def deck_banque(c, chemin):
+    """Presentation bancaire de 12 diapositives, sur la meme structure de financement que le business plan bancaire."""
+    sd, mc = c["sd"], c["mc"]
+    a, ind = sd["a"], sd["ind"]
+    _diapo, prs = cs._diapo, cs._prs()
+    _diapo(prs, "Gestion des huiles usagées et purification du gasoil", ["Projet de création de société, Cameroun",
+                                                                         "Demande : crédit-bail d'équipements, facilité de trésorerie, garantie de portefeuille",
+                                                                         f"Dossier du {DATE_TXT}"])
+    _diapo(prs, "Synthèse", ["Un service de conformité payé par les producteurs forestiers, sans unité industrielle au démarrage",
+                             f"VAN à 5 ans {m_fcfa(ind['van'], 1)} M FCFA, TRI {pct(ind['tri'], 1)}, sans emprunt bancaire",
+                             f"Point mort : environ {nombre(c['pm5'], 0)} clients sous contrat, atteint au mois {ind['point_mort_mois']}",
+                             "Trajectoire par étapes : chaque investissement suit une porte de décision chiffrée"],
+           note="Source : business plan bancaire du " + DATE_TXT)
+    _diapo(prs, "Le besoin", ["Les huiles usagées sont des déchets dangereux soumis à permis [S-02]",
+                              "Les exploitants forestiers sont sanctionnés pour leur gestion des huiles [S-29]",
+                              f"Collecter en forêt coûte {nombre(c['cout_l_min'])} à {nombre(c['cout_l_max'])} FCFA par litre : le producteur doit payer le service"])
+    _diapo(prs, "L'offre", ["Contrat annuel par site : fûts, kits, registre, formation, enlèvements tracés, rapport",
+                            "Purification du gasoil et nettoyage de cuve sans entrée en cuve", "Dossier de preuves pour les audits FSC et OLB",
+                            f"Prix d'appel : {m_fcfa(val('H-80'), 1)} M FCFA HT par site et par an, testé au pilote"])
+    _diapo(prs, "Le marché", [f"Gisement par le parc : environ {m_fcfa(c['gis']['central']['parc_total'], 1)} M L/an (le chiffre de 70 000 t/an paraît surestimé)",
+                              f"Segment forestier : environ {m_fcfa(c['gis']['central']['foret'], 1)} M L/an, 70 titulaires de concessions et 251 UTB",
+                              "Aucun collecteur identifié en forêt ; collecteurs de déchets dangereux à Douala", "Aucun acheteur de combustible confirmé : la fabrication est gelée"])
+    _diapo(prs, "Modèle et trajectoire", tableau=[["Étape", "Contenu", "Porte"], ["0", "amorçage, pilote préparé", "2 clients pilotes"],
+                                                  ["1", "matériel loué, enlèvements sous-traités", "4 contrats, 3 mois d'EBITDA positif"],
+                                                  ["2", "équipements en crédit-bail", "9 clients, 100 000 L/an"], ["3", "permis propre", "320 000 L/an"]])
+    _diapo(prs, "Équipe et gouvernance", ["Gérant : ingénieur mines et pétrole, spécialiste HSE et EIES, certifié NEBOSH IGC",
+                                          "SARL, capital de 1 M FCFA et comptes courants bloqués", "HIKMA hors du capital ; charte de prévention des conflits d'intérêts",
+                                          "Trois postes rémunérés dans le plan : gérant, technicien, commercial à mi-temps"])
+    _diapo(prs, "Plan financier (structure demandée, M FCFA)", tableau=[["", "A1", "A2", "A3", "A4", "A5"],
+                                                                         ["CA"] + [m_fcfa(x, 1) for x in a["ca"]], ["EBITDA"] + [m_fcfa(x, 1) for x in a["ebitda"]],
+                                                                         ["Résultat net"] + [m_fcfa(x, 1) for x in a["resultat_net"]],
+                                                                         ["Trésorerie"] + [m_fcfa(x, 1) for x in a["tresorerie_fin"]]],
+           note="Source : business plan bancaire, plan financier")
+    _diapo(prs, "Risques et sensibilité", [f"Monte-Carlo, 10 000 tirages : VAN à 5 ans négative dans {pct(mc['p_van5_negative'], 1)} des cas",
+                                           f"VAN avec valeur terminale négative dans {pct(mc['p_van_negative'], 1)} des cas",
+                                           "Variables dominantes : nombre de clients et prix du contrat",
+                                           "Couverture des loyers inférieure à 1 en années 1 et 2 : loyers payés par les fonds propres"])
+    _diapo(prs, "Financement demandé", tableau=[["Ressource", "M FCFA", "Porteur du risque"],
+                                                ["Fonds propres et comptes courants bloqués", m_fcfa(sd["p"]["H-157"], 1), "associés"],
+                                                ["Crédit-bail d'équipements", m_fcfa(val("H-92"), 1), "banque, bien en garantie"],
+                                                ["Facilité de trésorerie", m_fcfa(c["besoin_ct"], 1), "banque, garantie CDEC et AGF"],
+                                                ["Seconde tranche conditionnelle (90e centile)", m_fcfa(c["tranche2"], 1), "associés"]],
+           note="Besoin de financement maximal : " + m_fcfa(ind["besoin_financement"], 1) + " M FCFA ; au 90e centile : " + m_fcfa(mc["besoin_p90"], 1) + " M FCFA")
+    _diapo(prs, "Plan d'action", ["Mois 1 à 3 : société, amorçage, échantillonnage, démarches écrites", "Mois 4 à 6 : pilote payant chez 2 clients forestiers",
+                                  "Mois 7 à 18 : portefeuille de clients, dossier FSC et OLB", "Mois 19 à 36 : équipements, préparation du permis"])
+    _diapo(prs, "Conditions et contact", ["Décaissement après pilote : au moins un contrat annuel signé, fonds propres versés",
+                                          "Points faibles : prix du contrat non mesuré, associés minoritaires à identifier, aucune offre de crédit-bail",
+                                          "[Nom], gérant ; [téléphone] ; [courriel]"])
+    prs.save(chemin)
+    from commun.deterministe import figer
+    figer(chemin)
+    return len(prs.slides)
 
 
 # Pages du corps, mesurees sur le PDF (LibreOffice ne calcule pas SECTIONPAGES) ; controlees a chaque generation du PDF et par les tests.
@@ -400,4 +455,8 @@ if __name__ == "__main__":
     pdf = "--sans-pdf" not in sys.argv
     produire("bp_institutionnel.md", "Document de projet institutionnel", "Société de gestion des huiles usagées et de purification du gasoil", pdf)
     produire("bp_banque.md", "Business plan bancaire", "Dossier de financement : crédit-bail d'équipements et facilité de trésorerie", pdf)
-    print("Business plans : institutionnel et bancaire generes")
+    pptx = ICI / "livrables" / f"{PREF} Presentation banque.pptx"
+    nb = deck_banque(c, pptx)
+    if pdf:
+        docx_charte.vers_pdf(pptx, ICI / "livrables")
+    print("Business plans : institutionnel et bancaire generes ; presentation banque :", nb, "diapositives")
