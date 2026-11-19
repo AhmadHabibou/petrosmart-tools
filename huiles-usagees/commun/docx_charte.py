@@ -313,6 +313,29 @@ def convertir(md_path, docx_path, titre_court=None, reference=None, officiel=Non
                     trPr.append(OxmlElement("w:cantSplit"))
             doc.add_paragraph()
             continue
+        m_fig = re.fullmatch(r"!\[([^\]]+)\]\(([^)]+)\)", l.strip())
+        if m_fig:
+            p = doc.add_paragraph()
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p.paragraph_format.keep_with_next = True
+            p.add_run().add_picture(str(Path(md_path).parent / m_fig.group(2)), width=Cm(15))
+            p = doc.add_paragraph()
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            r = p.add_run(m_fig.group(1))
+            _police(r, 10, False)
+            r.italic = True
+            _format_par(p, apres=2, justifie=False)
+            p.paragraph_format.keep_with_next = True
+            i += 1
+            continue
+        if re.match(r"^Sources? :", l):
+            p = doc.add_paragraph()
+            _inline(p, l.strip(), 8)
+            for r in p.runs:
+                r.italic = True
+            _format_par(p, apres=8, justifie=False)
+            i += 1
+            continue
         if l.startswith("# "):
             p = doc.add_paragraph()
             _inline(p, l[2:].strip(), 16, True, ACCENT)

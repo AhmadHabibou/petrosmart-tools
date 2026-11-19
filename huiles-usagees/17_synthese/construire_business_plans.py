@@ -24,6 +24,21 @@ from commun import docx_charte  # noqa: E402
 import modele_mensuel as mm  # noqa: E402
 import construire_synthese as cs  # noqa: E402
 
+
+def _plan_acquisition():
+    spec = importlib.util.spec_from_file_location("dossier_eq", RACINE / "05_technique" / "construire_dossier_equipements.py")
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m.plan_acquisition()
+
+
+def _table_plan(etapes=None):
+    L = ["| Étape | Contenu | Mode | Montant prévu (M FCFA) | État du devis |", "|---|---|---|---:|---|"]
+    for et, contenu, mode, mt, hid, devis in _plan_acquisition():
+        if etapes is None or et in etapes:
+            L.append(f"| {et} | {contenu} | {mode} | {m_fcfa(mt, 1)} | {devis} |")
+    return L
+
 DATE, DATE_TXT = cs.DATE, cs.DATE_TXT
 PREF = f"{DATE} Huiles usagees"
 
@@ -189,9 +204,11 @@ def bp_institutionnel(c):
          f"Le solveur de tournées regroupe les sites forestiers en tournées d'environ une semaine ; collecter en forêt coûte de l'ordre de {nombre(c['cout_l_min'])} à {nombre(c['cout_l_max'])} FCFA par litre, "
          "selon l'option de flotte (`06_logistique/tournees.md`). La sous-traitance à un collecteur titulaire est retenue jusqu'à l'obtention du permis propre.", "",
          "### Équipements", "",
-         "- purificateur de gasoil de 60 L/min ; matériel de prélèvement ; kits de dépistage des halogènes ; véhicule léger 4x4 (en location puis en crédit-bail) ;",
-         "- à l'étape 3 : camion-citerne d'occasion et centre de transit ;",
-         "- à l'étape 4 seulement : décanteur et purificateur d'huile sous vide.", "",
+         "Les équipements sont acquis par étapes, au franchissement des portes de décision ; aucun n'est acheté avant le pilote.", "",
+         *_table_plan(),
+         "",
+         "Source : registre des hypothèses ; montants centraux, aucun devis reçu.", "",
+         "Le détail (principes de fonctionnement, fiches des équipements E1 à E7, références recommandées, exigences HSE) figure dans le dossier technique des équipements, joint en annexe.", "",
          "### Sécurité et environnement", "",
          "Huit procédures écrites encadrent la réception, l'analyse, le transport, l'intervention en cas de déversement, le nettoyage de cuve et la purification du gasoil. "
          "Une application de traçabilité, utilisable sans réseau, enregistre chaque fût, chaque enlèvement et chaque bordereau.", "",
@@ -290,6 +307,14 @@ def bp_banque(c):
          "- enlèvements sous-traités à un collecteur titulaire d'un permis jusqu'à l'étape 3, sous contrat avec exigences HSE, suivi GPS et clause de non-sollicitation ;",
          "- huit procédures écrites, dépistage des halogènes avant chaque pompage, application de traçabilité hors ligne ;",
          "- purificateur de gasoil de 60 L/min, véhicule léger 4x4, matériel de prélèvement : en crédit-bail.", "",
+         "## Plan d'investissement", "",
+         "Le financement demandé couvre les étapes 0 à 2. Les biens proposés en crédit-bail sont le purificateur de gasoil (Parker Racor ou équivalent), le matériel de prélèvement et le véhicule léger 4x4.", "",
+         *_table_plan(("0 et pilote", "1", "1 à 5", "2")),
+         "",
+         "Source : registre des hypothèses ; montants centraux, aucun devis reçu.", "",
+         f"Les investissements des étapes 3 et 4 (camion hydrocureur, environ {m_fcfa(val('H-131'), 1)} M FCFA ; centre de transit, environ {m_fcfa(val('H-95'), 1)} M FCFA) "
+         "ne font pas partie de cette demande : ils ne seront engagés qu'au franchissement des portes de décision et feront l'objet d'un dossier distinct. "
+         "Spécifications, références et fournisseurs : dossier technique des équipements, joint en annexe.", "",
          "## Cadre réglementaire, environnemental et social", "",
          f"Tant qu'elle ne détient ni ne transporte de déchets, la société n'a probablement pas besoin de permis ; une position écrite du MINEPDED est demandée. "
          f"Le permis propre (étape 3) suppose une évaluation environnementale par un bureau indépendant ; délai estimé de {nombre(c['cal']['bas'] / 30.4, 0)} à {nombre(c['cal']['haut'] / 30.4, 0)} mois. "
@@ -421,7 +446,7 @@ def deck_banque(c, chemin):
 
 
 # Pages du corps, mesurees sur le PDF (LibreOffice ne calcule pas SECTIONPAGES) ; controlees a chaque generation du PDF et par les tests.
-PAGES_CORPS = {"Document de projet institutionnel": 15, "Business plan bancaire": 17}
+PAGES_CORPS = {"Document de projet institutionnel": 16, "Business plan bancaire": 18}
 MARQUEURS = {"Document de projet institutionnel": "FICHE SIGNALÉTIQUE", "Business plan bancaire": "RÉSUMÉ EXÉCUTIF"}
 
 

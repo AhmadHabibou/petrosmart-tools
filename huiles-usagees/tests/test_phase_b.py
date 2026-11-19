@@ -237,3 +237,25 @@ def test_business_plan_bancaire_emplois_egal_ressources():
     t = _lire("17_synthese/bp_banque.md")
     m = re.search(r"\| \*\*Total\*\* \| \*\*([\d ,]+)\*\* \| \*\*Total\*\* \| \*\*([\d ,]+)\*\* \|", t)
     assert m and m.group(1) == m.group(2)
+
+
+def test_dossier_equipements():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("dossier_eq", RACINE / "05_technique" / "construire_dossier_equipements.py")
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    from commun.format import m_fcfa
+    t = _lire("05_technique/dossier_equipements.md")
+    for code in m._kit():
+        assert f"### {code} " in t and code in m.CHOIX
+    for _, _, _, mt, hid, _ in m.plan_acquisition():
+        assert f"| {m_fcfa(mt, 1).replace(NBSP, ' ')} | {hid} |" in t
+    for fig in ("purification_gasoil", "deshydratation_sous_vide", "hydrocureur"):
+        assert (RACINE / "05_technique" / "figures" / f"{fig}.png").exists()
+    assert "dossier technique des équipements" in _lire("17_synthese/bp_banque.md")
+    import shutil
+    if shutil.which("pdftotext"):
+        sys.path.insert(0, str(RACINE / "17_synthese"))
+        import construire_business_plans as cbp
+        pdf = RACINE / "17_synthese" / "livrables" / f"{m.PREF} {m.NOM}.pdf"
+        assert cbp.pages_corps_pdf(pdf, m.MARQUEUR) == m.PAGES_CORPS

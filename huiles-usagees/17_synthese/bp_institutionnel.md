@@ -135,9 +135,21 @@ Le solveur de tournées regroupe les sites forestiers en tournées d'environ une
 
 ### Équipements
 
-- purificateur de gasoil de 60 L/min ; matériel de prélèvement ; kits de dépistage des halogènes ; véhicule léger 4x4 (en location puis en crédit-bail) ;
-- à l'étape 3 : camion-citerne d'occasion et centre de transit ;
-- à l'étape 4 seulement : décanteur et purificateur d'huile sous vide.
+Les équipements sont acquis par étapes, au franchissement des portes de décision ; aucun n'est acheté avant le pilote.
+
+| Étape | Contenu | Mode | Montant prévu (M FCFA) | État du devis |
+|---|---|---|---:|---|
+| 0 et pilote | matériel de prélèvement (E5) ; les kits de dépistage (E4) sont comptés dans les consommables | achat | 0,2 | aucun devis |
+| 0 et pilote | purificateur de gasoil (E1), 3 mois | location | 1,2 | aucun devis |
+| 1 | dépôts de garantie, premiers loyers et petit matériel pour le purificateur (E1) et le véhicule (E7) | location ou crédit-bail | 4,0 | aucun devis |
+| 1 à 5 | loyers de crédit-bail et de location, par an | loyers | 6,0 | demande B4 à envoyer |
+| 2 | purificateur, matériel d'échantillonnage, véhicule, stock de fûts et kits | crédit-bail | 15,0 | demande B4 à envoyer |
+| 3 | camion hydrocureur ADR d'occasion (E6) | achat d'occasion | 30,0 | aucun devis (Q-44) |
+| 3 et 4 | centre de transit : cuves, décanteur, déshydrateur (E2), laboratoire de base (E3), permis | achat | 45,0 | aucun devis |
+
+Source : registre des hypothèses ; montants centraux, aucun devis reçu.
+
+Le détail (principes de fonctionnement, fiches des équipements E1 à E7, références recommandées, exigences HSE) figure dans le dossier technique des équipements, joint en annexe.
 
 ### Sécurité et environnement
 

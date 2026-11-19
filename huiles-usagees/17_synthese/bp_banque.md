@@ -59,6 +59,22 @@ Contribution annuelle d'un client forestier : environ 5,14 M FCFA, après enlèv
 - huit procédures écrites, dépistage des halogènes avant chaque pompage, application de traçabilité hors ligne ;
 - purificateur de gasoil de 60 L/min, véhicule léger 4x4, matériel de prélèvement : en crédit-bail.
 
+## Plan d'investissement
+
+Le financement demandé couvre les étapes 0 à 2. Les biens proposés en crédit-bail sont le purificateur de gasoil (Parker Racor ou équivalent), le matériel de prélèvement et le véhicule léger 4x4.
+
+| Étape | Contenu | Mode | Montant prévu (M FCFA) | État du devis |
+|---|---|---|---:|---|
+| 0 et pilote | matériel de prélèvement (E5) ; les kits de dépistage (E4) sont comptés dans les consommables | achat | 0,2 | aucun devis |
+| 0 et pilote | purificateur de gasoil (E1), 3 mois | location | 1,2 | aucun devis |
+| 1 | dépôts de garantie, premiers loyers et petit matériel pour le purificateur (E1) et le véhicule (E7) | location ou crédit-bail | 4,0 | aucun devis |
+| 1 à 5 | loyers de crédit-bail et de location, par an | loyers | 6,0 | demande B4 à envoyer |
+| 2 | purificateur, matériel d'échantillonnage, véhicule, stock de fûts et kits | crédit-bail | 15,0 | demande B4 à envoyer |
+
+Source : registre des hypothèses ; montants centraux, aucun devis reçu.
+
+Les investissements des étapes 3 et 4 (camion hydrocureur, environ 30,0 M FCFA ; centre de transit, environ 45,0 M FCFA) ne font pas partie de cette demande : ils ne seront engagés qu'au franchissement des portes de décision et feront l'objet d'un dossier distinct. Spécifications, références et fournisseurs : dossier technique des équipements, joint en annexe.
+
 ## Cadre réglementaire, environnemental et social
 
 Tant qu'elle ne détient ni ne transporte de déchets, la société n'a probablement pas besoin de permis ; une position écrite du MINEPDED est demandée. Le permis propre (étape 3) suppose une évaluation environnementale par un bureau indépendant ; délai estimé de 6 à 25 mois. Risques environnementaux et sociaux principaux : déversement en transport, accident lors du nettoyage de cuve ; mesures : sous-traitance encadrée, procédures, assurance de responsabilité civile.
