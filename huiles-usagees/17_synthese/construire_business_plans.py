@@ -240,6 +240,7 @@ def bp_banque(c):
     base_tor, tor = c["tornado"]
     couv = [(a["ebitda"][i] + a["loyers"][i]) / a["loyers"][i] if a["loyers"][i] else None for i in range(5)]
     besoin_ct = max(0.0, -ind["tresorerie_min"])
+    tranche2 = max(0.0, mc["besoin_p90"] - sd["p"]["H-157"] - besoin_ct)
     L = ["# Business plan : dossier de financement", "",
          "## Résumé exécutif", "",
          f"**Demande : un crédit-bail d'équipements d'une valeur d'environ {m_fcfa(val('H-92'), 1)} M FCFA, une facilité de trésorerie d'au moins {m_fcfa(besoin_ct, 1)} M FCFA "
@@ -330,9 +331,12 @@ def bp_banque(c):
           "## Financement demandé et garanties", "",
           "| Emplois | M FCFA | Ressources | M FCFA |", "|---|---:|---|---:|",
           f"| Besoin de financement maximal (pertes de démarrage, BFR, dépôts) | {m_fcfa(ind['besoin_financement'], 1)} | Fonds propres et comptes courants bloqués | {m_fcfa(sd['p']['H-157'], 1)} |",
+          f"| | | Facilité de trésorerie | {m_fcfa(besoin_ct, 1)} |",
           f"| Équipements (purificateur, véhicule, matériel) | {m_fcfa(val('H-92'), 1)} | Crédit-bail | {m_fcfa(val('H-92'), 1)} |",
-          f"| Marge de sécurité de trésorerie | {m_fcfa(besoin_ct, 1)} | Facilité de trésorerie | {m_fcfa(besoin_ct, 1)} |", "",
-          f"Au 90e centile des tirages, le besoin atteint {m_fcfa(mc['besoin_p90'], 1)} M FCFA (voir les points faibles).", "",
+          f"| Dérive du besoin jusqu'au 90e centile ({m_fcfa(mc['besoin_p90'], 1)} M FCFA) | {m_fcfa(tranche2, 1)} | Seconde tranche conditionnelle de comptes courants (article 2 du pacte d'associés) | {m_fcfa(tranche2, 1)} |",
+          f"| **Total** | **{m_fcfa(ind['besoin_financement'] + val('H-92') + tranche2, 1)}** | **Total** | **{m_fcfa(sd['p']['H-157'] + besoin_ct + val('H-92') + tranche2, 1)}** |", "",
+          "La facilité de trésorerie couvre l'écart entre le besoin maximal et les fonds propres, au creux de l'année 2. "
+          "La seconde tranche n'est appelée que si la trésorerie prévisionnelle à trois mois devient négative ; à défaut d'appel, les associés statuent sur l'arrêt du développement à la porte suivante. La banque ne porte pas ce risque de dérive.", "",
           "Garanties proposées : propriété du bailleur sur les équipements ; garantie de portefeuille PME (CDEC et African Guarantee Fund [S-79]) ; "
           "domiciliation des encaissements des contrats ; blocage des comptes courants d'associés pendant la durée du crédit-bail. Lignes de refinancement mobilisables par la banque : "
           "lignes PME vertes [S-80], lignes PME de bailleurs [S-81].", "",
@@ -356,8 +360,7 @@ def bp_banque(c):
           "- attestation d'assurance de responsabilité civile.", "",
           "## Points faibles du dossier", "",
           "1. Le prix du contrat et le rythme de signature, qui expliquent l'essentiel de la valeur, ne sont pas encore mesurés.",
-          f"2. Au 90e centile, le besoin de financement atteint {m_fcfa(mc['besoin_p90'], 1)} M FCFA, au-delà des {m_fcfa(sd['p']['H-157'] + besoin_ct, 1)} M FCFA demandés (fonds propres et facilité) : "
-          "une seconde tranche de comptes courants est à prévoir dans le pacte d'associés, faute de quoi la porte du mois 18 sert de point d'arrêt.",
+          f"2. La seconde tranche de comptes courants ({m_fcfa(tranche2, 1)} M FCFA) est prévue au pacte d'associés, mais aucun associé minoritaire n'est encore identifié : sa solvabilité reste à démontrer à la banque.",
           f"3. Les loyers de crédit-bail ({m_fcfa(val('H-94'), 1)} M FCFA par an) ne viennent d'aucune offre, et aucune administration n'a encore répondu par écrit sur le régime applicable."]
     return "\n".join(L) + "\n"
 

@@ -153,10 +153,12 @@ La couverture des loyers est inférieure à 1 les deux premières années : les 
 | Emplois | M FCFA | Ressources | M FCFA |
 |---|---:|---|---:|
 | Besoin de financement maximal (pertes de démarrage, BFR, dépôts) | 21,4 | Fonds propres et comptes courants bloqués | 20,0 |
+| | | Facilité de trésorerie | 1,4 |
 | Équipements (purificateur, véhicule, matériel) | 15,0 | Crédit-bail | 15,0 |
-| Marge de sécurité de trésorerie | 1,4 | Facilité de trésorerie | 1,4 |
+| Dérive du besoin jusqu'au 90e centile (39,0 M FCFA) | 17,6 | Seconde tranche conditionnelle de comptes courants (article 2 du pacte d'associés) | 17,6 |
+| **Total** | **54,0** | **Total** | **54,0** |
 
-Au 90e centile des tirages, le besoin atteint 39,0 M FCFA (voir les points faibles).
+La facilité de trésorerie couvre l'écart entre le besoin maximal et les fonds propres, au creux de l'année 2. La seconde tranche n'est appelée que si la trésorerie prévisionnelle à trois mois devient négative ; à défaut d'appel, les associés statuent sur l'arrêt du développement à la porte suivante. La banque ne porte pas ce risque de dérive.
 
 Garanties proposées : propriété du bailleur sur les équipements ; garantie de portefeuille PME (CDEC et African Guarantee Fund [S-79]) ; domiciliation des encaissements des contrats ; blocage des comptes courants d'associés pendant la durée du crédit-bail. Lignes de refinancement mobilisables par la banque : lignes PME vertes [S-80], lignes PME de bailleurs [S-81].
 
@@ -196,5 +198,5 @@ Registre complet : `13_risques/registre_risques.md`.
 ## Points faibles du dossier
 
 1. Le prix du contrat et le rythme de signature, qui expliquent l'essentiel de la valeur, ne sont pas encore mesurés.
-2. Au 90e centile, le besoin de financement atteint 39,0 M FCFA, au-delà des 21,4 M FCFA demandés (fonds propres et facilité) : une seconde tranche de comptes courants est à prévoir dans le pacte d'associés, faute de quoi la porte du mois 18 sert de point d'arrêt.
+2. La seconde tranche de comptes courants (17,6 M FCFA) est prévue au pacte d'associés, mais aucun associé minoritaire n'est encore identifié : sa solvabilité reste à démontrer à la banque.
 3. Les loyers de crédit-bail (6,0 M FCFA par an) ne viennent d'aucune offre, et aucune administration n'a encore répondu par écrit sur le régime applicable.

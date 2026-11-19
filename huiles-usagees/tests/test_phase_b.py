@@ -230,3 +230,10 @@ def test_pagination_business_plans():
     for nom, n in cbp.PAGES_CORPS.items():
         pdf = RACINE / "17_synthese" / "livrables" / f"{cbp.PREF} {nom}.pdf"
         assert cbp.pages_corps_pdf(pdf, cbp.MARQUEURS[nom]) == n, nom
+
+
+def test_business_plan_bancaire_emplois_egal_ressources():
+    import re
+    t = _lire("17_synthese/bp_banque.md")
+    m = re.search(r"\| \*\*Total\*\* \| \*\*([\d ,]+)\*\* \| \*\*Total\*\* \| \*\*([\d ,]+)\*\* \|", t)
+    assert m and m.group(1) == m.group(2)
