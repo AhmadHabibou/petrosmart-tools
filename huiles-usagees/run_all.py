@@ -29,6 +29,7 @@ ETAPES = [
     "09_finance/rapport_finance.py",
     "15_kit_operationnel/construire_kit.py",
     "17_synthese/construire_synthese.py",
+    "17_synthese/construire_business_plans.py",
 ]
 
 

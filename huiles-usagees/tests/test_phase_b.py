@@ -199,3 +199,34 @@ def test_pagination_business_plan():
     assert cs.mesurer_pages_corps(pdf) == cs.PAGES_CORPS_BP
     t = subprocess.run(["pdftotext", "-f", "3", "-l", "3", str(pdf), "-"], capture_output=True, text=True).stdout
     assert f"sur {cs.PAGES_CORPS_BP}" in t
+
+
+def test_business_plans_concordent():
+    sys.path.insert(0, str(RACINE / "17_synthese"))
+    sys.path.insert(0, str(RACINE / "09_finance"))
+    import modele_mensuel as mm
+    import construire_business_plans as cbp
+    from commun.format import m_fcfa, pct
+    s, ind = mm.simuler(cbp.structure_demandee())
+    n = lambda x: x.replace("\xa0", " ")
+    banque = _lire("17_synthese/bp_banque.md")
+    inst = _lire("17_synthese/bp_institutionnel.md")
+    assert n(f"VAN à 5 ans de {m_fcfa(ind['van'], 1)} M FCFA et TRI de {pct(ind['tri'], 1)}") in banque
+    assert n(f"| Besoin de financement maximal | {m_fcfa(ind['besoin_financement'], 1)} M FCFA |") in banque
+    assert n(f"VAN à 5 ans : {m_fcfa(ind['van'], 1)} M FCFA ; TRI : {pct(ind['tri'], 1)}") in inst
+    assert not ind["dscr"], "la structure demandee ne doit comporter aucun emprunt"
+    assert abs(mm.bilan_equilibre(s)).max() < 1e-3
+    for md in (banque, inst):
+        assert md.count("## Questions en suspens") + md.count("## Points faibles du dossier") == 1
+
+
+def test_pagination_business_plans():
+    import shutil
+    if not shutil.which("pdftotext"):
+        import pytest
+        pytest.skip("poppler absent")
+    sys.path.insert(0, str(RACINE / "17_synthese"))
+    import construire_business_plans as cbp
+    for nom, n in cbp.PAGES_CORPS.items():
+        pdf = RACINE / "17_synthese" / "livrables" / f"{cbp.PREF} {nom}.pdf"
+        assert cbp.pages_corps_pdf(pdf, cbp.MARQUEURS[nom]) == n, nom

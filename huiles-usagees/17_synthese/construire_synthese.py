@@ -201,7 +201,7 @@ def lisezmoi(c):
          "5. Q-11 : l'unité de Valtech Energy à Kribi fonctionne-t-elle, et achète-t-elle les huiles ?", "",
          "Liste complète : `00_registres/questions_ouvertes.md`.", "",
          "## Ordre de lecture", "",
-         "1. `17_synthese/livrables/` : note Go/No Go, business plan, présentations (banque, forestiers)",
+         "1. `17_synthese/livrables/` : note Go/No Go, business plan, document de projet institutionnel, business plan bancaire, présentations (banque, forestiers)",
          "2. `00b_amorcage/lot0_amorcage.md` et `14_plan_action/lot14_plan_action.md` : ce qu'il faut faire tout de suite",
          "3. `04b_validation_terrain/lot4bis_protocoles.md` : les preuves de terrain",
          "4. `02_reglementaire/`, `03_benchmark/`, `04_marche/`, `04c_extensions/` : le diagnostic",

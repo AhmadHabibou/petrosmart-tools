@@ -44,6 +44,7 @@ def parametres(scenario="base"):
             fav = scenario == "optimiste"
             p[k] = h.haut if (SENS[k] > 0) == fav else h.bas
     p["guerre_prix"] = False
+    p["credit_bail"] = False  # True : equipements en credit-bail sur toute la periode (decision D-11), ni achat ni emprunt
     return p
 
 
@@ -88,14 +89,14 @@ def simuler(p):
         s["salaires"][i] = (p["H-151"] if m >= 4 else 0) + (p["H-150"] + p["H-152"] if m >= 13 else 0)
         s["frais_generaux"][i] = p["H-153"] if m >= 4 else 0
         s["assurances"][i] = p["H-154"] / 12 if m >= 4 else 0
-        s["loyers"][i] = 0 if en_m1 else (p["H-94"] / 12 if m >= 4 else 0)
+        s["loyers"][i] = (p["H-94"] / 12 if m >= 4 else 0) if (p["credit_bail"] or not en_m1) else 0
         s["charges"][i] = sum(s[k][i] for k in ("enlevements", "consommables", "salaires", "frais_generaux", "assurances", "loyers"))
         s["ebitda"][i] = s["ca"][i] - s["charges"][i]
         # investissements et financement
         cap = 0.0
         if m == 3:
             cap += p["H-93"]
-        if bascule == m:
+        if bascule == m and not p["credit_bail"]:
             cap += p["H-92"]
             s["emprunt"][i] = p["H-158"]
             capital_restant = p["H-158"]
@@ -198,13 +199,14 @@ def bilan_equilibre(s):
     return actif - passif
 
 
-def tornado(cles=("H-80", "H-97", "H-48", "H-81", "H-82", "H-88", "H-150", "H-153", "H-83", "H-87", "H-161", "H-155")):
-    base = simuler(parametres())[1]["van_vt"]
+def tornado(cles=("H-80", "H-97", "H-48", "H-81", "H-82", "H-88", "H-150", "H-153", "H-83", "H-87", "H-161", "H-155"), fabrique=None):
+    fabrique = fabrique or parametres
+    base = simuler(fabrique())[1]["van_vt"]
     lignes = []
     for k in cles:
         vals = []
         for borne in ("bas", "haut"):
-            p = parametres()
+            p = fabrique()
             p[k] = getattr(HYPOTHESES[k], borne)
             vals.append(simuler(p)[1]["van_vt"])
         lignes.append((k, vals[0], vals[1], abs(vals[1] - vals[0])))
@@ -216,7 +218,8 @@ MC_CLES = ["H-01", "H-21", "H-48", "H-80", "H-81", "H-82", "H-83", "H-87", "H-88
            "H-152", "H-153", "H-154", "H-155", "H-161"]
 
 
-def monte_carlo(n=10_000, graine=20261118):
+def monte_carlo(n=10_000, graine=20261118, fabrique=None):
+    fabrique = fabrique or parametres
     rng = np.random.default_rng(graine)
     tirages = {k: rng.triangular(HYPOTHESES[k].bas, HYPOTHESES[k].central, HYPOTHESES[k].haut, n)
                if HYPOTHESES[k].bas < HYPOTHESES[k].haut else np.full(n, HYPOTHESES[k].central) for k in MC_CLES}
@@ -224,7 +227,7 @@ def monte_carlo(n=10_000, graine=20261118):
     van5 = np.zeros(n)
     besoin = np.zeros(n)
     for i in range(n):
-        p = parametres()
+        p = fabrique()
         for k in MC_CLES:
             p[k] = float(tirages[k][i])
         ind = simuler(p)[1]

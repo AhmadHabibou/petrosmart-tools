@@ -245,7 +245,7 @@ def _prelim(doc, off, titre, texte):
     tab([["Sigle", "Signification"]] + [[k, SIGLES[k]] for k in presents])
 
 
-NON_NUMEROTES = {"Résumé exécutif"}
+NON_NUMEROTES = {"Résumé exécutif", "Fiche signalétique du projet", "Résumé du projet"}
 
 
 def convertir(md_path, docx_path, titre_court=None, reference=None, officiel=None):
