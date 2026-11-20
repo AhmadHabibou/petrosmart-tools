@@ -32,6 +32,7 @@ ETAPES = [
     "05_technique/construire_dossier_equipements.py",
     "17_synthese/construire_business_plans.py",
     "05_technique/base_simulation.py",
+    "04b_validation_terrain/construire_formulaires_kobo.py",
     "18_optimisation/optimisation.py",
 ]
 

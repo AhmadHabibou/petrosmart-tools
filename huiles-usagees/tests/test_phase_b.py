@@ -299,3 +299,15 @@ def test_base_simulation(tmp_path):
     f.write_text("cas,courant,debit_kg_h\ncentral-320k,alimentation,1000\ncentral-320k,produit," + str(b["produit"]) + "\n", encoding="utf-8")
     (cas_id, r_sim, r_ref), = bs.comparer(f)
     assert cas_id == "central-320k" and abs(r_sim - r_ref) < 1e-9
+
+
+def test_formulaires_kobo():
+    sys.path.insert(0, str(RACINE / "04b_validation_terrain"))
+    import construire_formulaires_kobo as k
+    dossier = RACINE / "04b_validation_terrain" / "kobo"
+    classeurs = sorted(dossier.glob("*.xlsx"))
+    assert len(classeurs) == 1 + len(list((RACINE / "04b_validation_terrain" / "formulaires").glob("*.csv")))
+    for c in classeurs:
+        assert "<h:html" in k.valider(c)
+    assert k.type_colonne("type_contenant")[0] == "text" and k.type_colonne("volume_mL")[0] == "decimal"
+    assert k.type_colonne("type(deversement|non_conformite)")[2][1][1] == "Non conformité"

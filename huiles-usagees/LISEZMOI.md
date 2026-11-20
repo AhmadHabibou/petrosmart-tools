@@ -34,7 +34,7 @@ Liste complète : `00_registres/questions_ouvertes.md`.
 
 1. `17_synthese/livrables/` : note Go/No Go, business plan, document de projet institutionnel, business plan bancaire, dossier technique des équipements, présentations (banque, forestiers)
 2. `00b_amorcage/lot0_amorcage.md` et `14_plan_action/lot14_plan_action.md` : ce qu'il faut faire tout de suite
-3. `04b_validation_terrain/lot4bis_protocoles.md` : les preuves de terrain
+3. `04b_validation_terrain/lot4bis_protocoles.md` : les preuves de terrain ; formulaires KoboToolbox dans `04b_validation_terrain/kobo/`
 4. `02_reglementaire/`, `03_benchmark/`, `04_marche/`, `04c_extensions/` : le diagnostic
 5. `08_modele_entreprise/`, `05_technique/`, `06_logistique/`, `07_hse_eies/`, `09_finance/` : le modèle et ses chiffres
 6. `10_organisation/`, `11_juridique/`, `12_parties_prenantes/`, `13_risques/` : l'exécution
