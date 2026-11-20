@@ -48,6 +48,7 @@ def parametres(scenario="base"):
     # leviers de decision (optimisation, 18_optimisation) ; valeurs par defaut = trajectoire D-09
     p["mois_bascule_min"] = MOIS_BASCULE_MIN
     p["clients_bascule"] = CLIENTS_BASCULE
+    p["differe_mois"] = 0          # differe de remboursement du capital de l'emprunt (mois), interets payes ; duree totale H-160 inchangee
     p["camion_mois"] = None        # mois d'achat d'un camion d'occasion propre (None : enlevements sous-traites)
     p["cout_var_camion_l"] = 0.0   # cout variable par litre collecte avec le camion propre (lot 6), FCFA/L
     for k in ("H-01", "H-131", "H-132", "H-133"):
@@ -112,7 +113,8 @@ def simuler(p):
             s["emprunt"][i] = p["H-158"]
             capital_restant = p["H-158"]
             r = p["H-159"] / 12
-            mensualite = capital_restant * r / (1 - (1 + r) ** -p["H-160"])
+            n_amort = p["H-160"] - p.get("differe_mois", 0)
+            mensualite = capital_restant * r / (1 - (1 + r) ** -n_amort)
         duree = DUREE_AMORT_MOIS
         if p.get("camion_mois") == m:
             cap_camion = p["H-131"]
@@ -126,7 +128,8 @@ def simuler(p):
         s["amortissement"][i] = sum(c / d for j, (c, d) in enumerate(capex_hist) if j // 2 < i and i - j // 2 <= d)
         if capital_restant > 0:
             interet = capital_restant * p["H-159"] / 12
-            amort_dette = min(mensualite - interet, capital_restant) if bascule is not None and m > bascule else 0
+            amort_dette = (min(mensualite - interet, capital_restant)
+                           if bascule is not None and m > bascule + p.get("differe_mois", 0) else 0)
             if bascule == m:
                 interet = 0
             s["interets"][i] = interet

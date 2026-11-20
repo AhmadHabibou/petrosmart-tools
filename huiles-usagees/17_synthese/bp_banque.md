@@ -178,6 +178,8 @@ La facilité de trésorerie couvre l'écart entre le besoin maximal et les fonds
 
 Garanties proposées : propriété du bailleur sur les équipements ; garantie de portefeuille PME (CDEC et African Guarantee Fund [S-79]) ; domiciliation des encaissements des contrats ; blocage des comptes courants d'associés pendant la durée du crédit-bail. Lignes de refinancement mobilisables par la banque : lignes PME vertes [S-80], lignes PME de bailleurs [S-81].
 
+Alternative mise en concurrence : un prêt d'équipement d'environ 20,0 M FCFA sur 48 mois avec un différé de remboursement de 12 mois, adossé à une garantie de portefeuille [S-79][S-105]. Le choix se fera sur le coût total des deux offres ; un différé de 12 mois améliore la couverture de la dette en années 3 à 5, mais ne la rend pas positive en année 2.
+
 ## Risques et atténuation
 
 | ID | Risque | Criticité | Mesure | Déclencheur |

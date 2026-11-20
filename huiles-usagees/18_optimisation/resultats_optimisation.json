@@ -17,7 +17,8 @@
     "credit_bail": true,
     "mois_bascule_min": 13,
     "clients_bascule": 4,
-    "camion_mois": null
+    "camion_mois": null,
+    "differe_mois": 0
    },
    "van5_p10": -18826748.307728563,
    "van5_p50": 16818379.410355072,
@@ -35,7 +36,8 @@
     "credit_bail": true,
     "mois_bascule_min": 13,
     "clients_bascule": 4,
-    "camion_mois": 25
+    "camion_mois": 25,
+    "differe_mois": 0
    },
    "van5_p10": -29743362.07294574,
    "van5_p50": 6317507.069928111,
@@ -53,7 +55,8 @@
     "credit_bail": true,
     "mois_bascule_min": 13,
     "clients_bascule": 4,
-    "camion_mois": 37
+    "camion_mois": 37,
+    "differe_mois": 0
    },
    "van5_p10": -29327603.874026205,
    "van5_p50": 6269330.165410355,
@@ -71,7 +74,8 @@
     "credit_bail": false,
     "mois_bascule_min": 13,
     "clients_bascule": 4,
-    "camion_mois": null
+    "camion_mois": null,
+    "differe_mois": 0
    },
    "van5_p10": -18108825.67216727,
    "van5_p50": 17363661.16817244,
@@ -83,13 +87,52 @@
    "p_couv": 0.6585
   },
   {
+   "nom": "Achat et emprunt avec différé de 6 mois, porte au mois 13 et 4 contrats, enlèvements sous-traités",
+   "strat": {
+    "nom": "Achat et emprunt avec différé de 6 mois, porte au mois 13 et 4 contrats, enlèvements sous-traités",
+    "credit_bail": false,
+    "mois_bascule_min": 13,
+    "clients_bascule": 4,
+    "camion_mois": null,
+    "differe_mois": 6
+   },
+   "van5_p10": -18053167.803907506,
+   "van5_p50": 17415971.533607118,
+   "p_van5_neg": 0.2705,
+   "vanvt_p10": 49151525.13233788,
+   "vanvt_p50": 147754659.0074088,
+   "fp_p50": 15770532.824800506,
+   "fp_p90": 31274172.628163286,
+   "p_couv": 0.6675
+  },
+  {
+   "nom": "Achat et emprunt avec différé de 12 mois, porte au mois 13 et 4 contrats, enlèvements sous-traités",
+   "strat": {
+    "nom": "Achat et emprunt avec différé de 12 mois, porte au mois 13 et 4 contrats, enlèvements sous-traités",
+    "credit_bail": false,
+    "mois_bascule_min": 13,
+    "clients_bascule": 4,
+    "camion_mois": null,
+    "differe_mois": 12
+   },
+   "van5_p10": -18020070.046661533,
+   "van5_p50": 17461802.466981106,
+   "p_van5_neg": 0.2705,
+   "vanvt_p10": 49350985.057664454,
+   "vanvt_p50": 147912553.6919339,
+   "fp_p50": 15613334.689751783,
+   "fp_p90": 29560496.81734596,
+   "p_couv": 0.742
+  },
+  {
    "nom": "Achat et emprunt, porte au mois 13 et 4 contrats, enlèvements camion propre au mois 25",
    "strat": {
     "nom": "Achat et emprunt, porte au mois 13 et 4 contrats, enlèvements camion propre au mois 25",
     "credit_bail": false,
     "mois_bascule_min": 13,
     "clients_bascule": 4,
-    "camion_mois": 25
+    "camion_mois": 25,
+    "differe_mois": 0
    },
    "van5_p10": -29335605.35259693,
    "van5_p50": 6967058.818341674,
@@ -107,7 +150,8 @@
     "credit_bail": false,
     "mois_bascule_min": 13,
     "clients_bascule": 4,
-    "camion_mois": 37
+    "camion_mois": 37,
+    "differe_mois": 0
    },
    "van5_p10": -28747534.1257771,
    "van5_p50": 6867141.668881886,
@@ -125,7 +169,8 @@
     "credit_bail": false,
     "mois_bascule_min": 19,
     "clients_bascule": 4,
-    "camion_mois": null
+    "camion_mois": null,
+    "differe_mois": 0
    },
    "van5_p10": -18147491.8076451,
    "van5_p50": 17295593.85156545,
@@ -137,13 +182,52 @@
    "p_couv": 0.6585
   },
   {
+   "nom": "Achat et emprunt avec différé de 6 mois, porte au mois 19 et 4 contrats, enlèvements sous-traités",
+   "strat": {
+    "nom": "Achat et emprunt avec différé de 6 mois, porte au mois 19 et 4 contrats, enlèvements sous-traités",
+    "credit_bail": false,
+    "mois_bascule_min": 19,
+    "clients_bascule": 4,
+    "camion_mois": null,
+    "differe_mois": 6
+   },
+   "van5_p10": -18129555.056364704,
+   "van5_p50": 17339935.14159288,
+   "p_van5_neg": 0.2705,
+   "vanvt_p10": 49151525.13233788,
+   "vanvt_p50": 147707245.14651704,
+   "fp_p50": 16162236.855393078,
+   "fp_p90": 31274172.628163286,
+   "p_couv": 0.6715
+  },
+  {
+   "nom": "Achat et emprunt avec différé de 12 mois, porte au mois 19 et 4 contrats, enlèvements sous-traités",
+   "strat": {
+    "nom": "Achat et emprunt avec différé de 12 mois, porte au mois 19 et 4 contrats, enlèvements sous-traités",
+    "credit_bail": false,
+    "mois_bascule_min": 19,
+    "clients_bascule": 4,
+    "camion_mois": null,
+    "differe_mois": 12
+   },
+   "van5_p10": -18123546.685435772,
+   "van5_p50": 17389403.00829818,
+   "p_van5_neg": 0.2705,
+   "vanvt_p10": 49350985.057664454,
+   "vanvt_p50": 147876940.3452987,
+   "fp_p50": 15832379.275068117,
+   "fp_p90": 29560496.81734596,
+   "p_couv": 0.7455
+  },
+  {
    "nom": "Achat et emprunt, porte au mois 19 et 4 contrats, enlèvements camion propre au mois 25",
    "strat": {
     "nom": "Achat et emprunt, porte au mois 19 et 4 contrats, enlèvements camion propre au mois 25",
     "credit_bail": false,
     "mois_bascule_min": 19,
     "clients_bascule": 4,
-    "camion_mois": 25
+    "camion_mois": 25,
+    "differe_mois": 0
    },
    "van5_p10": -29335605.35259693,
    "van5_p50": 6809212.149407632,
@@ -161,7 +245,8 @@
     "credit_bail": false,
     "mois_bascule_min": 19,
     "clients_bascule": 4,
-    "camion_mois": 37
+    "camion_mois": 37,
+    "differe_mois": 0
    },
    "van5_p10": -28747534.1257771,
    "van5_p50": 6796763.544565063,
@@ -179,7 +264,8 @@
     "credit_bail": false,
     "mois_bascule_min": 13,
     "clients_bascule": 6,
-    "camion_mois": null
+    "camion_mois": null,
+    "differe_mois": 0
    },
    "van5_p10": -20052534.75450338,
    "van5_p50": 15806328.851016972,
@@ -191,13 +277,52 @@
    "p_couv": 0.6765
   },
   {
+   "nom": "Achat et emprunt avec différé de 6 mois, porte au mois 13 et 6 contrats, enlèvements sous-traités",
+   "strat": {
+    "nom": "Achat et emprunt avec différé de 6 mois, porte au mois 13 et 6 contrats, enlèvements sous-traités",
+    "credit_bail": false,
+    "mois_bascule_min": 13,
+    "clients_bascule": 6,
+    "camion_mois": null,
+    "differe_mois": 6
+   },
+   "van5_p10": -20047288.202719323,
+   "van5_p50": 15859133.445499707,
+   "p_van5_neg": 0.296,
+   "vanvt_p10": 48003040.076607995,
+   "vanvt_p50": 146489615.87431437,
+   "fp_p50": 17599404.46590043,
+   "fp_p90": 32912946.205293514,
+   "p_couv": 0.734
+  },
+  {
+   "nom": "Achat et emprunt avec différé de 12 mois, porte au mois 13 et 6 contrats, enlèvements sous-traités",
+   "strat": {
+    "nom": "Achat et emprunt avec différé de 12 mois, porte au mois 13 et 6 contrats, enlèvements sous-traités",
+    "credit_bail": false,
+    "mois_bascule_min": 13,
+    "clients_bascule": 6,
+    "camion_mois": null,
+    "differe_mois": 12
+   },
+   "van5_p10": -20017834.9515175,
+   "van5_p50": 15918399.592906836,
+   "p_van5_neg": 0.2945,
+   "vanvt_p10": 48092543.644627415,
+   "vanvt_p50": 146697525.87231836,
+   "fp_p50": 17548710.789380375,
+   "fp_p90": 32571652.59662106,
+   "p_couv": 0.7585
+  },
+  {
    "nom": "Achat et emprunt, porte au mois 13 et 6 contrats, enlèvements camion propre au mois 25",
    "strat": {
     "nom": "Achat et emprunt, porte au mois 13 et 6 contrats, enlèvements camion propre au mois 25",
     "credit_bail": false,
     "mois_bascule_min": 13,
     "clients_bascule": 6,
-    "camion_mois": 25
+    "camion_mois": 25,
+    "differe_mois": 0
    },
    "van5_p10": -31138043.29489402,
    "van5_p50": 5412029.248772353,
@@ -215,7 +340,8 @@
     "credit_bail": false,
     "mois_bascule_min": 13,
     "clients_bascule": 6,
-    "camion_mois": 37
+    "camion_mois": 37,
+    "differe_mois": 0
    },
    "van5_p10": -30962508.04036752,
    "van5_p50": 5257942.307008742,
@@ -233,7 +359,8 @@
     "credit_bail": false,
     "mois_bascule_min": 25,
     "clients_bascule": 6,
-    "camion_mois": null
+    "camion_mois": null,
+    "differe_mois": 0
    },
    "van5_p10": -20126461.708018016,
    "van5_p50": 15634107.172780737,
@@ -245,13 +372,52 @@
    "p_couv": 0.6785
   },
   {
+   "nom": "Achat et emprunt avec différé de 6 mois, porte au mois 25 et 6 contrats, enlèvements sous-traités",
+   "strat": {
+    "nom": "Achat et emprunt avec différé de 6 mois, porte au mois 25 et 6 contrats, enlèvements sous-traités",
+    "credit_bail": false,
+    "mois_bascule_min": 25,
+    "clients_bascule": 6,
+    "camion_mois": null,
+    "differe_mois": 6
+   },
+   "van5_p10": -20071461.12655064,
+   "van5_p50": 15677632.888073908,
+   "p_van5_neg": 0.2975,
+   "vanvt_p10": 48003040.076607995,
+   "vanvt_p50": 146407452.80827746,
+   "fp_p50": 17712210.597976163,
+   "fp_p90": 33066260.639196113,
+   "p_couv": 0.74
+  },
+  {
+   "nom": "Achat et emprunt avec différé de 12 mois, porte au mois 25 et 6 contrats, enlèvements sous-traités",
+   "strat": {
+    "nom": "Achat et emprunt avec différé de 12 mois, porte au mois 25 et 6 contrats, enlèvements sous-traités",
+    "credit_bail": false,
+    "mois_bascule_min": 25,
+    "clients_bascule": 6,
+    "camion_mois": null,
+    "differe_mois": 12
+   },
+   "van5_p10": -20046998.521079857,
+   "van5_p50": 15733638.511506543,
+   "p_van5_neg": 0.2965,
+   "vanvt_p10": 48092543.644627415,
+   "vanvt_p50": 146615635.62492147,
+   "fp_p50": 17696012.542472627,
+   "fp_p90": 32804601.453933965,
+   "p_couv": 0.763
+  },
+  {
    "nom": "Achat et emprunt, porte au mois 25 et 6 contrats, enlèvements camion propre au mois 25",
    "strat": {
     "nom": "Achat et emprunt, porte au mois 25 et 6 contrats, enlèvements camion propre au mois 25",
     "credit_bail": false,
     "mois_bascule_min": 25,
     "clients_bascule": 6,
-    "camion_mois": 25
+    "camion_mois": 25,
+    "differe_mois": 0
    },
    "van5_p10": -31138043.29489402,
    "van5_p50": 5219286.79575533,
@@ -269,7 +435,8 @@
     "credit_bail": false,
     "mois_bascule_min": 25,
     "clients_bascule": 6,
-    "camion_mois": 37
+    "camion_mois": 37,
+    "differe_mois": 0
    },
    "van5_p10": -30966280.843121544,
    "van5_p50": 5230022.821402617,
@@ -283,135 +450,138 @@
  ],
  "pareto": [
   {
-   "nom": "Achat et emprunt, porte au mois 13 et 4 contrats, enlèvements sous-traités",
+   "nom": "Achat et emprunt avec différé de 12 mois, porte au mois 13 et 4 contrats, enlèvements sous-traités",
    "strat": {
-    "nom": "Achat et emprunt, porte au mois 13 et 4 contrats, enlèvements sous-traités",
+    "nom": "Achat et emprunt avec différé de 12 mois, porte au mois 13 et 4 contrats, enlèvements sous-traités",
     "credit_bail": false,
     "mois_bascule_min": 13,
     "clients_bascule": 4,
-    "camion_mois": null
+    "camion_mois": null,
+    "differe_mois": 12
    },
-   "van5_p10": -18108825.67216727,
-   "van5_p50": 17363661.16817244,
-   "p_van5_neg": 0.271,
-   "vanvt_p10": 48967698.39572831,
-   "vanvt_p50": 147628181.53724405,
-   "fp_p50": 15985848.54640505,
-   "fp_p90": 32559948.51594287,
-   "p_couv": 0.6585
+   "van5_p10": -18020070.046661533,
+   "van5_p50": 17461802.466981106,
+   "p_van5_neg": 0.2705,
+   "vanvt_p10": 49350985.057664454,
+   "vanvt_p50": 147912553.6919339,
+   "fp_p50": 15613334.689751783,
+   "fp_p90": 29560496.81734596,
+   "p_couv": 0.742
   },
   {
-   "nom": "Achat et emprunt, porte au mois 19 et 4 contrats, enlèvements sous-traités",
+   "nom": "Achat et emprunt avec différé de 12 mois, porte au mois 19 et 4 contrats, enlèvements sous-traités",
    "strat": {
-    "nom": "Achat et emprunt, porte au mois 19 et 4 contrats, enlèvements sous-traités",
+    "nom": "Achat et emprunt avec différé de 12 mois, porte au mois 19 et 4 contrats, enlèvements sous-traités",
     "credit_bail": false,
     "mois_bascule_min": 19,
     "clients_bascule": 4,
-    "camion_mois": null
+    "camion_mois": null,
+    "differe_mois": 12
    },
-   "van5_p10": -18147491.8076451,
-   "van5_p50": 17295593.85156545,
-   "p_van5_neg": 0.271,
-   "vanvt_p10": 48967698.39572831,
-   "vanvt_p50": 147570465.38919625,
-   "fp_p50": 16377641.430393293,
-   "fp_p90": 32559948.51594287,
-   "p_couv": 0.6585
+   "van5_p10": -18123546.685435772,
+   "van5_p50": 17389403.00829818,
+   "p_van5_neg": 0.2705,
+   "vanvt_p10": 49350985.057664454,
+   "vanvt_p50": 147876940.3452987,
+   "fp_p50": 15832379.275068117,
+   "fp_p90": 29560496.81734596,
+   "p_couv": 0.7455
   }
  ],
- "retenue": "Achat et emprunt, porte au mois 13 et 4 contrats, enlèvements sous-traités",
- "meilleur_achat": "Achat et emprunt, porte au mois 13 et 4 contrats, enlèvements sous-traités",
- "seuil_loyer": 3884765.625,
+ "retenue": "Achat et emprunt avec différé de 12 mois, porte au mois 13 et 4 contrats, enlèvements sous-traités",
+ "meilleur_achat": "Achat et emprunt avec différé de 12 mois, porte au mois 13 et 4 contrats, enlèvements sous-traités",
+ "seuil_loyer": 3744140.625,
  "strategie_retenue": {
-  "nom": "Achat et emprunt, porte au mois 13 et 4 contrats, enlèvements sous-traités",
+  "nom": "Achat et emprunt avec différé de 12 mois, porte au mois 13 et 4 contrats, enlèvements sous-traités",
   "credit_bail": false,
   "mois_bascule_min": 13,
   "clients_bascule": 4,
-  "camion_mois": null
+  "camion_mois": null,
+  "differe_mois": 12
  },
  "confirmation": {
-  "van5_p10": -19942280.2480263,
-  "van5_p50": 14970904.02646877,
-  "p_van5_neg": 0.297,
-  "vanvt_p10": 45431186.09822386,
-  "vanvt_p50": 141334841.48778856,
-  "fp_p50": 16494192.993996419,
-  "fp_p90": 33882289.09011942,
-  "p_couv": 0.6325
+  "van5_p10": -19881305.549327806,
+  "van5_p50": 15068305.722272633,
+  "p_van5_neg": 0.2958,
+  "vanvt_p10": 45606448.31157668,
+  "vanvt_p50": 141609062.70574048,
+  "fp_p50": 16164937.591680985,
+  "fp_p90": 30855873.302864987,
+  "p_couv": 0.7218
  },
  "seuil_prix": 6625000.0,
  "valeur_information": [
   [
    "H-97",
-   0.5994736106587361
+   0.5994299815382998
   ],
   [
    "H-80",
-   0.5638045059220451
+   0.5638224265542242
   ],
   [
    "H-48",
-   -0.3073022525530225
+   -0.3073512235575122
   ],
   [
    "H-81",
-   0.21270415945504156
+   0.2127089506710895
   ],
   [
    "H-88",
-   -0.19355118126351184
+   -0.1935980882079809
   ],
   [
    "H-82",
-   0.17536242285762424
+   0.17533549536135495
   ],
   [
    "H-83",
-   0.1066423196744232
+   0.10666666838266668
   ],
   [
    "H-153",
-   -0.10098188467381884
+   -0.1008786491407865
   ],
   [
    "H-21",
-   0.08286432387664325
+   0.08287812404478123
   ],
   [
    "H-96",
-   0.07043880792838808
+   0.07044913926849139
   ],
   [
    "H-150",
-   -0.06913650731536508
+   -0.06911736391917365
   ],
   [
    "H-161",
-   0.06748968338689684
+   0.06731640928916409
   ],
   [
    "H-154",
-   -0.04622117146221171
+   -0.04622207447422074
   ],
   [
    "H-87",
-   -0.0359879098318791
+   -0.035994107423941074
   ],
   [
    "H-155",
-   -0.03222911375829114
+   -0.03223646313436463
   ],
   [
    "H-151",
-   -0.027297225044972246
+   -0.027284275412842757
   ],
   [
    "H-152",
-   -0.017815662634156626
+   -0.017777344413773447
   ],
   [
    "camion_l",
-   0.002392476671924767
+   0.0024160245481602456
   ]
  ]
 }

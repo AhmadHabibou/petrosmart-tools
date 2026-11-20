@@ -61,10 +61,14 @@ def strategies():
     out = [dict(nom=f"Crédit-bail, enlèvements {'sous-traités' if c is None else f'camion propre au mois {c}'}",
                 credit_bail=True, mois_bascule_min=mm.MOIS_BASCULE_MIN, clients_bascule=mm.CLIENTS_BASCULE, camion_mois=c)
            for c in (None, 25, 37)]
-    for (mmin, cmin), c in product(((13, 4), (19, 4), (13, 6), (25, 6)), (None, 25, 37)):
-        out.append(dict(nom=f"Achat et emprunt, porte au mois {mmin} et {cmin} contrats, enlèvements "
+    for (mmin, cmin), c, d in product(((13, 4), (19, 4), (13, 6), (25, 6)), (None, 25, 37), (0, 6, 12)):
+        if d and c is not None:
+            continue  # differe teste avec les enlevements sous-traites seulement
+        out.append(dict(nom=f"Achat et emprunt{f' avec différé de {d} mois' if d else ''}, porte au mois {mmin} et {cmin} contrats, enlèvements "
                             f"{'sous-traités' if c is None else f'camion propre au mois {c}'}",
-                        credit_bail=False, mois_bascule_min=mmin, clients_bascule=cmin, camion_mois=c))
+                        credit_bail=False, mois_bascule_min=mmin, clients_bascule=cmin, camion_mois=c, differe_mois=d))
+    for s in out:
+        s.setdefault("differe_mois", 0)
     return out
 
 
@@ -105,7 +109,8 @@ def evaluer(args):
     for i in range(n):
         p = mm.parametres()
         p.update(credit_bail=strat["credit_bail"], mois_bascule_min=strat["mois_bascule_min"],
-                 clients_bascule=strat["clients_bascule"], camion_mois=strat["camion_mois"], cout_var_camion_l=cout_l)
+                 clients_bascule=strat["clients_bascule"], camion_mois=strat["camion_mois"], cout_var_camion_l=cout_l,
+                 differe_mois=strat.get("differe_mois", 0))
         p["H-157"] = 0.0
         p.update(extra)
         for k, v in t.items():
@@ -188,6 +193,14 @@ def _ligne(res, pred):
     return max((l for l in res["lignes"] if pred(l["strat"])), key=lambda l: l["vanvt_p10"])
 
 
+def differe_conclusion(res):
+    sans = _ligne(res, lambda s: not s["credit_bail"] and s["camion_mois"] is None and s["differe_mois"] == 0)
+    avec = _ligne(res, lambda s: not s["credit_bail"] and s["camion_mois"] is None and s["differe_mois"] == 12)
+    return (f"5. **Négocier un différé de 12 mois sur un éventuel emprunt.** Il porte la probabilité de couverture d'au moins {nombre(COUVERTURE_MIN, 1)} en années 3 à 5 "
+            f"de {pct(sans['p_couv'])} à {pct(avec['p_couv'])} et les fonds propres requis au 90e centile de {m_fcfa(sans['fp_p90'], 1)} à {m_fcfa(avec['fp_p90'], 1)} M FCFA. "
+            "Il ne règle pas l'année 2, dont l'EBITDA est négatif dans le scénario de base : aucun remboursement n'y est possible sans les fonds propres.")
+
+
 def conclusions(res):
     """Synthese en tete du rapport (pyramide de Minto), entierement lue dans les resultats."""
     st = _ligne(res, lambda s: s["camion_mois"] is None)
@@ -206,12 +219,13 @@ def conclusions(res):
          f"3. **Le choix entre crédit-bail et emprunt dépend des offres.** Avec les hypothèses actuelles, l'achat financé par emprunt fait mieux "
          f"({m_fcfa(p4['vanvt_p10'], 1)} contre {m_fcfa(cb['vanvt_p10'], 1)} M FCFA au 10e centile) ; {loyer}. "
          "Mais l'emprunt suppose qu'une banque prête à une société dont la couverture de la dette est négative en année 2 (lot 9) : le crédit-bail (D-11) reste la voie réaliste "
-         "tant qu'aucune offre de prêt n'est obtenue, et la décision est à revoir à réception des offres B4.",
+         "tant qu'aucune offre de prêt n'est obtenue, et la décision est à revoir à réception des offres B4 (crédit-bail) et B5 (prêt garanti).",
          f"4. **La couverture du service financier est le point faible pour la banque.** Aucune stratégie n'atteint {nombre(COUVERTURE_MIN, 1)} en années 3 à 5 dans "
-         f"{pct(PROBA_COUVERTURE)} des tirages (au mieux {pct(couv_max)}) ; la stratégie retenue y parvient dans {pct(res['confirmation']['p_couv'])} des cas. "
+         f"{pct(PROBA_COUVERTURE)} des tirages (au mieux {pct(couv_max)}) ; la stratégie retenue y parvient dans {pct(next(l['p_couv'] for l in res['lignes'] if l['nom'] == res['retenue']))} des cas. "
          "La seconde tranche de comptes courants du pacte d'associés en est la réponse.",
-         f"5. **Prix plancher du contrat : {m_fcfa(res['seuil_prix'], 2)} M FCFA HT par site** pour une VAN à 5 ans positive dans {pct(PROBA_VAN5)} des tirages.",
-         "6. **Mesurer en premier** le nombre de contrats signés et le prix accepté (pilote), puis le prix des enlèvements sous-traités (devis des collecteurs).", ""]
+         differe_conclusion(res),
+         f"6. **Prix plancher du contrat : {m_fcfa(res['seuil_prix'], 2)} M FCFA HT par site** pour une VAN à 5 ans positive dans {pct(PROBA_VAN5)} des tirages.",
+         "7. **Mesurer en premier** le nombre de contrats signés et le prix accepté (pilote), puis le prix des enlèvements sous-traités (devis des collecteurs).", ""]
     return L
 
 

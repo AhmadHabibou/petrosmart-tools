@@ -4,12 +4,13 @@ Fichier généré par `18_optimisation/optimisation.py`. Méthode : évaluation 
 
 ## Conclusions
 
-1. **Sous-traiter les enlèvements jusqu'à l'étape 3** (confirme D-10). Le camion propre réduit la VAN avec valeur terminale au 10e centile de 15,1 M FCFA et augmente les fonds propres requis au 90e centile de 29,5 M FCFA.
-2. **Fixer la porte d'équipement à 4 contrats.** Elle fait mieux que 6 contrats (49,0 contre 47,6 M FCFA au 10e centile) ; le mois minimal de la porte n'a pas d'effet, car c'est le nombre de contrats qui la déclenche.
-3. **Le choix entre crédit-bail et emprunt dépend des offres.** Avec les hypothèses actuelles, l'achat financé par emprunt fait mieux (49,0 contre 40,7 M FCFA au 10e centile) ; le crédit-bail ne l'égale que si ses loyers restent sous 3,88 M FCFA par an (6,00 M FCFA supposés). Mais l'emprunt suppose qu'une banque prête à une société dont la couverture de la dette est négative en année 2 (lot 9) : le crédit-bail (D-11) reste la voie réaliste tant qu'aucune offre de prêt n'est obtenue, et la décision est à revoir à réception des offres B4.
-4. **La couverture du service financier est le point faible pour la banque.** Aucune stratégie n'atteint 1,2 en années 3 à 5 dans 80 % des tirages (au mieux 78 %) ; la stratégie retenue y parvient dans 63 % des cas. La seconde tranche de comptes courants du pacte d'associés en est la réponse.
-5. **Prix plancher du contrat : 6,62 M FCFA HT par site** pour une VAN à 5 ans positive dans 80 % des tirages.
-6. **Mesurer en premier** le nombre de contrats signés et le prix accepté (pilote), puis le prix des enlèvements sous-traités (devis des collecteurs).
+1. **Sous-traiter les enlèvements jusqu'à l'étape 3** (confirme D-10). Le camion propre réduit la VAN avec valeur terminale au 10e centile de 15,5 M FCFA et augmente les fonds propres requis au 90e centile de 32,5 M FCFA.
+2. **Fixer la porte d'équipement à 4 contrats.** Elle fait mieux que 6 contrats (49,4 contre 48,1 M FCFA au 10e centile) ; le mois minimal de la porte n'a pas d'effet, car c'est le nombre de contrats qui la déclenche.
+3. **Le choix entre crédit-bail et emprunt dépend des offres.** Avec les hypothèses actuelles, l'achat financé par emprunt fait mieux (49,4 contre 40,7 M FCFA au 10e centile) ; le crédit-bail ne l'égale que si ses loyers restent sous 3,74 M FCFA par an (6,00 M FCFA supposés). Mais l'emprunt suppose qu'une banque prête à une société dont la couverture de la dette est négative en année 2 (lot 9) : le crédit-bail (D-11) reste la voie réaliste tant qu'aucune offre de prêt n'est obtenue, et la décision est à revoir à réception des offres B4 (crédit-bail) et B5 (prêt garanti).
+4. **La couverture du service financier est le point faible pour la banque.** Aucune stratégie n'atteint 1,2 en années 3 à 5 dans 80 % des tirages (au mieux 78 %) ; la stratégie retenue y parvient dans 74 % des cas. La seconde tranche de comptes courants du pacte d'associés en est la réponse.
+5. **Négocier un différé de 12 mois sur un éventuel emprunt.** Il porte la probabilité de couverture d'au moins 1,2 en années 3 à 5 de 66 % à 74 % et les fonds propres requis au 90e centile de 32,6 à 29,6 M FCFA. Il ne règle pas l'année 2, dont l'EBITDA est négatif dans le scénario de base : aucun remboursement n'y est possible sans les fonds propres.
+6. **Prix plancher du contrat : 6,62 M FCFA HT par site** pour une VAN à 5 ans positive dans 80 % des tirages.
+7. **Mesurer en premier** le nombre de contrats signés et le prix accepté (pilote), puis le prix des enlèvements sous-traités (devis des collecteurs).
 
 Coût variable d'un camion propre : tiré entre 74 et 226 FCFA/L, valeur centrale 123 FCFA/L (carburant, entretien, équipage sur le réseau des 15 clients du lot 6, saisons sèche et des pluies), proportionnel à la fréquence des enlèvements (H-88) ; s'y ajoutent l'assurance et les autorisations (H-133) et l'achat d'occasion (H-131).
 
@@ -17,8 +18,16 @@ Coût variable d'un camion propre : tiré entre 74 et 226 FCFA/L, valeur central
 
 | Stratégie | VAN 5 ans P10 | VAN 5 ans P50 | VAN 5 ans < 0 | VAN avec VT P10 | Fonds propres requis P50 | Fonds propres requis P90 | Couverture ≥ 1,2 | Admissible |
 |---|---:|---:|---:|---:|---:|---:|---:|---|
+| Achat et emprunt avec différé de 12 mois, porte au mois 13 et 4 contrats, enlèvements sous-traités | -18,0 | 17,5 | 27 % | 49,4 | 15,6 | 29,6 | 74 % | non |
+| Achat et emprunt avec différé de 12 mois, porte au mois 19 et 4 contrats, enlèvements sous-traités | -18,1 | 17,4 | 27 % | 49,4 | 15,8 | 29,6 | 75 % | non |
+| Achat et emprunt avec différé de 6 mois, porte au mois 13 et 4 contrats, enlèvements sous-traités | -18,1 | 17,4 | 27 % | 49,2 | 15,8 | 31,3 | 67 % | non |
+| Achat et emprunt avec différé de 6 mois, porte au mois 19 et 4 contrats, enlèvements sous-traités | -18,1 | 17,3 | 27 % | 49,2 | 16,2 | 31,3 | 67 % | non |
 | Achat et emprunt, porte au mois 13 et 4 contrats, enlèvements sous-traités | -18,1 | 17,4 | 27 % | 49,0 | 16,0 | 32,6 | 66 % | non |
 | Achat et emprunt, porte au mois 19 et 4 contrats, enlèvements sous-traités | -18,1 | 17,3 | 27 % | 49,0 | 16,4 | 32,6 | 66 % | non |
+| Achat et emprunt avec différé de 12 mois, porte au mois 13 et 6 contrats, enlèvements sous-traités | -20,0 | 15,9 | 29 % | 48,1 | 17,5 | 32,6 | 76 % | non |
+| Achat et emprunt avec différé de 12 mois, porte au mois 25 et 6 contrats, enlèvements sous-traités | -20,0 | 15,7 | 30 % | 48,1 | 17,7 | 32,8 | 76 % | non |
+| Achat et emprunt avec différé de 6 mois, porte au mois 13 et 6 contrats, enlèvements sous-traités | -20,0 | 15,9 | 30 % | 48,0 | 17,6 | 32,9 | 73 % | non |
+| Achat et emprunt avec différé de 6 mois, porte au mois 25 et 6 contrats, enlèvements sous-traités | -20,1 | 15,7 | 30 % | 48,0 | 17,7 | 33,1 | 74 % | non |
 | Achat et emprunt, porte au mois 13 et 6 contrats, enlèvements sous-traités | -20,1 | 15,8 | 30 % | 47,6 | 17,6 | 33,6 | 68 % | non |
 | Achat et emprunt, porte au mois 25 et 6 contrats, enlèvements sous-traités | -20,1 | 15,6 | 30 % | 47,6 | 17,8 | 33,8 | 68 % | non |
 | Crédit-bail, enlèvements sous-traités | -18,8 | 16,8 | 27 % | 40,7 | 18,5 | 37,7 | 67 % | non |
@@ -41,12 +50,12 @@ Montants en M FCFA. P10, P50, P90 : 10e, 50e et 90e centiles des tirages. La VAN
 
 | Stratégie | VAN avec VT P10 | Fonds propres requis P90 |
 |---|---:|---:|
-| Achat et emprunt, porte au mois 13 et 4 contrats, enlèvements sous-traités | 49,0 | 32,6 |
-| Achat et emprunt, porte au mois 19 et 4 contrats, enlèvements sous-traités | 49,0 | 32,6 |
+| Achat et emprunt avec différé de 12 mois, porte au mois 13 et 4 contrats, enlèvements sous-traités | 49,4 | 29,6 |
+| Achat et emprunt avec différé de 12 mois, porte au mois 19 et 4 contrats, enlèvements sous-traités | 49,4 | 29,6 |
 
 ## Stratégie retenue et confirmation
 
-**Achat et emprunt, porte au mois 13 et 4 contrats, enlèvements sous-traités**, confirmée sur 10 000 tirages : VAN à 5 ans au 10e centile -19,9 M FCFA, médiane 15,0 M FCFA, négative dans 29,7 % des tirages ; VAN avec valeur terminale au 10e centile 45,4 M FCFA ; fonds propres requis 16,5 M FCFA en médiane et 33,9 M FCFA au 90e centile ; couverture d'au moins 1,2 dans 63,2 % des tirages.
+**Achat et emprunt avec différé de 12 mois, porte au mois 13 et 4 contrats, enlèvements sous-traités**, confirmée sur 10 000 tirages : VAN à 5 ans au 10e centile -19,9 M FCFA, médiane 15,1 M FCFA, négative dans 29,6 % des tirages ; VAN avec valeur terminale au 10e centile 45,6 M FCFA ; fonds propres requis 16,2 M FCFA en médiane et 30,9 M FCFA au 90e centile ; couverture d'au moins 1,2 dans 72,2 % des tirages.
 
 Règle de choix : sur la frontière de Pareto (stratégies admissibles, ou toutes si aucune ne l'est), la plus forte VAN avec valeur terminale au 10e centile.
 
@@ -56,7 +65,7 @@ La valeur terminale du modèle mensuel ne déduit pas le renouvellement des équ
 
 ## Crédit-bail ou emprunt
 
-Le crédit-bail (enlèvements sous-traités) égale la meilleure stratégie d'achat (achat et emprunt, porte au mois 13 et 4 contrats, enlèvements sous-traités) sur la VAN avec valeur terminale au 10e centile si ses loyers ne dépassent pas **3,88 M FCFA par an**, contre 6,00 M FCFA supposés (H-94). Le choix entre crédit-bail (D-11) et emprunt se fera donc sur les offres reçues avec la lettre B4, en tenant compte de l'option d'achat en fin de contrat, que le modèle ignore, et des garanties exigées pour un emprunt.
+Le crédit-bail (enlèvements sous-traités) égale la meilleure stratégie d'achat (achat et emprunt avec différé de 12 mois, porte au mois 13 et 4 contrats, enlèvements sous-traités) sur la VAN avec valeur terminale au 10e centile si ses loyers ne dépassent pas **3,74 M FCFA par an**, contre 6,00 M FCFA supposés (H-94). Le choix entre crédit-bail (D-11) et emprunt se fera donc sur les offres reçues avec la lettre B4, en tenant compte de l'option d'achat en fin de contrat, que le modèle ignore, et des garanties exigées pour un emprunt.
 
 ## Seuil de prix du contrat
 
