@@ -1,0 +1,7 @@
+cas,courant,debit_kg_h,temperature_c,pression_mbar_abs,fraction_eau,fraction_legers,fraction_huile,fraction_solides,puissance_kw
+bas-320k,alimentation,,,,,,,,
+bas-320k,eau_decantee,,,,,,,,
+bas-320k,boues,,,,,,,,
+bas-320k,vapeur_condensee_eau,,,,,,,,
+bas-320k,vapeur_condensee_legers,,,,,,,,
+bas-320k,produit,,,,,,,,

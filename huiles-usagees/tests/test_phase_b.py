@@ -259,3 +259,43 @@ def test_dossier_equipements():
         import construire_business_plans as cbp
         pdf = RACINE / "17_synthese" / "livrables" / f"{m.PREF} {m.NOM}.pdf"
         assert cbp.pages_corps_pdf(pdf, m.MARQUEUR) == m.PAGES_CORPS
+
+
+def test_optimisation():
+    import json
+    sys.path.insert(0, str(RACINE / "18_optimisation"))
+    sys.path.insert(0, str(RACINE / "09_finance"))
+    import optimisation as o
+    import modele_mensuel as mm
+    res = json.loads((RACINE / "18_optimisation" / "resultats_optimisation.json").read_text(encoding="utf-8"))
+    rapport = _lire("18_optimisation/resultats_optimisation.md")
+    assert f"**{res['retenue']}**" in rapport and res["n_confirmation"] == 10_000
+    # les leviers par defaut reproduisent le modele du lot 9
+    s, ind = mm.simuler(mm.parametres())
+    assert abs(ind["van"] - 9.0e6) < 0.05e6 and abs(mm.bilan_equilibre(s)).max() < 1e-3
+    # coherence du seuil de loyer avec le classement credit-bail / achat
+    cb = max((l for l in res["lignes"] if l["strat"]["credit_bail"] and l["strat"]["camion_mois"] is None), key=lambda l: l["vanvt_p10"])
+    ach = max((l for l in res["lignes"] if not l["strat"]["credit_bail"]), key=lambda l: l["vanvt_p10"])
+    if res["seuil_loyer"] is not None:
+        assert (res["seuil_loyer"] < o.val("H-94")) == (ach["vanvt_p10"] > cb["vanvt_p10"])
+    # une strategie evaluee seule donne la meme VAN que le modele (apport sans effet sur la VAN)
+    t = o.tirages(3, camion=res["cout_l"])
+    r = o.evaluer((o.strategies()[3], t, 0, 3, res["cout_l"][1], {}))
+    p = mm.parametres()
+    for k, v in t.items():
+        if k != o.CAMION:
+            p[k] = float(v[0])
+    assert abs(r["van"][0] - mm.simuler(p)[1]["van"]) < 1
+
+
+def test_base_simulation(tmp_path):
+    sys.path.insert(0, str(RACINE / "05_technique"))
+    import base_simulation as bs
+    import procede
+    cas = bs.cas_de_calcul()
+    assert len(cas) == 9 and (RACINE / "05_technique" / "simulation" / "cas_de_calcul.csv").exists()
+    b = procede.bilan("central")
+    f = tmp_path / "retour.csv"
+    f.write_text("cas,courant,debit_kg_h\ncentral-320k,alimentation,1000\ncentral-320k,produit," + str(b["produit"]) + "\n", encoding="utf-8")
+    (cas_id, r_sim, r_ref), = bs.comparer(f)
+    assert cas_id == "central-320k" and abs(r_sim - r_ref) < 1e-9

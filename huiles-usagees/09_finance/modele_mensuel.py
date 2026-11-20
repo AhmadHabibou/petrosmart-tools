@@ -45,6 +45,13 @@ def parametres(scenario="base"):
             p[k] = h.haut if (SENS[k] > 0) == fav else h.bas
     p["guerre_prix"] = False
     p["credit_bail"] = False  # True : equipements en credit-bail sur toute la periode (decision D-11), ni achat ni emprunt
+    # leviers de decision (optimisation, 18_optimisation) ; valeurs par defaut = trajectoire D-09
+    p["mois_bascule_min"] = MOIS_BASCULE_MIN
+    p["clients_bascule"] = CLIENTS_BASCULE
+    p["camion_mois"] = None        # mois d'achat d'un camion d'occasion propre (None : enlevements sous-traites)
+    p["cout_var_camion_l"] = 0.0   # cout variable par litre collecte avec le camion propre (lot 6), FCFA/L
+    for k in ("H-01", "H-131", "H-132", "H-133"):
+        p.setdefault(k, HYPOTHESES[k].central)
     return p
 
 
@@ -71,7 +78,7 @@ def simuler(p):
     for i in range(MOIS):
         m = i + 1
         n = clients(m, p)
-        if bascule is None and m >= MOIS_BASCULE_MIN and n >= CLIENTS_BASCULE:
+        if bascule is None and m >= p.get("mois_bascule_min", MOIS_BASCULE_MIN) and n >= p.get("clients_bascule", CLIENTS_BASCULE):
             bascule = m
         en_m1 = bascule is not None and m >= bascule
         prix = p["H-80"] * ((1 - p["H-162"]) if (p["guerre_prix"] and m >= 25) else 1)
@@ -84,7 +91,11 @@ def simuler(p):
         s["ca_commission_urbaine"][i] = 0 if p["guerre_prix"] and m >= 25 else vol_urb * p["H-21"]
         s["ca_amorcage"][i] = p["H-161"] if m <= 24 else 0
         s["ca"][i] = s["ca_contrat"][i] + s["ca_gasoil"][i] + s["ca_huiles"][i] + s["ca_commission_urbaine"][i] + s["ca_amorcage"][i]
-        s["enlevements"][i] = n * p["H-88"] / 12 * p["H-48"]
+        camion = p.get("camion_mois") is not None and m >= p["camion_mois"]
+        if camion:
+            s["enlevements"][i] = n * p["H-01"] / 12 * p["cout_var_camion_l"] + p["H-133"] / 12
+        else:
+            s["enlevements"][i] = n * p["H-88"] / 12 * p["H-48"]
         s["consommables"][i] = nb_int * p["H-87"]
         s["salaires"][i] = (p["H-151"] if m >= 4 else 0) + (p["H-150"] + p["H-152"] if m >= 13 else 0)
         s["frais_generaux"][i] = p["H-153"] if m >= 4 else 0
@@ -102,10 +113,17 @@ def simuler(p):
             capital_restant = p["H-158"]
             r = p["H-159"] / 12
             mensualite = capital_restant * r / (1 - (1 + r) ** -p["H-160"])
-        s["capex"][i] = cap
-        capex_hist.append(cap)
+        duree = DUREE_AMORT_MOIS
+        if p.get("camion_mois") == m:
+            cap_camion = p["H-131"]
+            duree_camion = int(round(p["H-132"] / 2 * 12))  # occasion : moitie de la duree (H-132)
+        else:
+            cap_camion, duree_camion = 0.0, 1
+        s["capex"][i] = cap + cap_camion
+        capex_hist.append((cap, duree))
+        capex_hist.append((cap_camion, duree_camion))
         # amortissement lineaire a partir du mois suivant l'investissement
-        s["amortissement"][i] = sum(c / DUREE_AMORT_MOIS for j, c in enumerate(capex_hist) if j < i and i - j <= DUREE_AMORT_MOIS)
+        s["amortissement"][i] = sum(c / d for j, (c, d) in enumerate(capex_hist) if j // 2 < i and i - j // 2 <= d)
         if capital_restant > 0:
             interet = capital_restant * p["H-159"] / 12
             amort_dette = min(mensualite - interet, capital_restant) if bascule is not None and m > bascule else 0

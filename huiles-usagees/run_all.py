@@ -31,6 +31,8 @@ ETAPES = [
     "17_synthese/construire_synthese.py",
     "05_technique/construire_dossier_equipements.py",
     "17_synthese/construire_business_plans.py",
+    "05_technique/base_simulation.py",
+    "18_optimisation/optimisation.py",
 ]
 
 

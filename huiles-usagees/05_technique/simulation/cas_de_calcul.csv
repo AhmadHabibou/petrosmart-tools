@@ -1,0 +1,10 @@
+cas,qualite,eau,sediments,legers,volume_l_an,debit_l_h,temperature_c
+bas-320k,peu contaminée,0.02,0.005,0.01,320000,173.9,70
+bas-1050k,peu contaminée,0.02,0.005,0.01,1050000,570.7,70
+bas-1200k,peu contaminée,0.02,0.005,0.01,1200000,652.2,70
+central-320k,moyennement contaminée,0.08,0.02,0.03,320000,173.9,70
+central-1050k,moyennement contaminée,0.08,0.02,0.03,1050000,570.7,70
+central-1200k,moyennement contaminée,0.08,0.02,0.03,1200000,652.2,70
+haut-320k,très contaminée,0.2,0.05,0.06,320000,173.9,70
+haut-1050k,très contaminée,0.2,0.05,0.06,1050000,570.7,70
+haut-1200k,très contaminée,0.2,0.05,0.06,1200000,652.2,70
