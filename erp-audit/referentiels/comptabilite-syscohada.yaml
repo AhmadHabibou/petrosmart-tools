@@ -1,0 +1,9 @@
+# Regles comptables attendues. Source : Acte uniforme OHADA relatif au droit comptable et a l'information financiere (AUDCIF), adopte le 26/01/2017.
+invariants:
+  - {id: C01, regle: "total debit = total credit par piece", statut: verifie}
+  - {id: C02, regle: "total debit = total credit de la balance generale", statut: verifie}
+  - {id: C03, regle: "actif = passif au bilan", statut: verifie}
+  - {id: C04, regle: "numerotation des pieces continue, sans doublon ni trou, par journal et par exercice", statut: a_valider}
+  - {id: C05, regle: "aucune ecriture validee modifiable ou supprimable, correction par contrepassation", statut: a_valider}
+  - {id: C06, regle: "aucune saisie dans une periode cloturee", statut: verifie}
+classes_comptes: {1: "ressources durables", 2: "actif immobilise", 3: "stocks", 4: "tiers", 5: "tresorerie", 6: "charges des activites ordinaires", 7: "produits des activites ordinaires", 8: "autres charges et autres produits", 9: "comptabilite analytique"}

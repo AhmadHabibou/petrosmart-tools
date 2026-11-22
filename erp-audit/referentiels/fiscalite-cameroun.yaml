@@ -1,0 +1,9 @@
+# Parametres fiscaux de reference. Statut a_valider tant qu'un expert ONECCA n'a pas confirme sur les textes en vigueur.
+tva:
+  taux_principal: {valeur: 17.5, unite: "%", source: "Code general des impots, Cameroun", statut: a_valider}
+  centimes_additionnels_communaux: {valeur: 10, unite: "% du principal", source: "Code general des impots, Cameroun", statut: a_valider}
+  taux_global_applique: {valeur: 19.25, unite: "%", calcul: "17,5 x 1,10", statut: a_valider}
+devise:
+  code: XAF
+  decimales: 0
+  regle_arrondi: {valeur: "a confirmer", statut: a_valider}

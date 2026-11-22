@@ -1,0 +1,5 @@
+config.yaml
+.auth/
+resultats/
+node_modules/
+__pycache__/

@@ -1,0 +1,12 @@
+erp:
+  base_url: "https://recette.exemple-erp.com"   # instance de recette uniquement
+  production: false                              # le banc refuse de tourner si true
+profils:            # comptes de test crees pendant le module 1
+  - {role: administrateur, login: audit.hikma}
+  - {role: chef_comptable, login: audit.chefcompta}
+  - {role: comptable, login: audit.compta1}
+  - {role: comptable, login: audit.compta2}
+  - {role: vendeur, login: audit.vente1}
+  - {role: vendeur, login: audit.vente2}
+  - {role: magasinier, login: audit.stock}
+  - {role: gestionnaire_paie, login: audit.paie}

@@ -1,0 +1,3 @@
+# A completer au module 8 depuis la loi de finances et les textes CNPS en vigueur. Aucun taux n'est saisi tant qu'il n'est pas source.
+rubriques_attendues: [salaire_brut, irpp, cac_sur_irpp, cnps_salarie, cnps_employeur, cfc_salarie, cfc_employeur, rav, tdl]
+statut: a_completer
